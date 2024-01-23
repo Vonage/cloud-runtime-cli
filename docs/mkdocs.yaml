@@ -1,0 +1,17 @@
+site_name: Vonage cloud runtime - CLI
+site_description: Vonage cloud runtime - CLI
+site_author: vonage
+repo_url: https://github.com/vonage/vonage-cloud-runtime-cli
+edit_uri: 'edit/main/docs/documentation'
+copyright: "© Vonage"
+docs_dir: "documentation"
+
+nav:
+  - Introduction: index.md
+
+markdown_extensions:
+  - pymdownx.snippets:
+      base_path: [".", ".."]
+      
+plugins:
+  - techdocs-core
