@@ -1,0 +1,62 @@
+name: CI-Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build-and-test:
+    runs-on: macos-latest
+    env:
+      API_VERSION: ${{ vars.API_VERSION }}
+    strategy:
+      matrix:
+        go-version: [1.21.1]
+        os: [macos-latest]
+    environment: vcr-cli
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Set up Docker
+        run: |
+          brew install docker docker-machine docker-compose
+          colima start
+          
+          sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
+
+      - name: Cache Go modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/Library/Caches/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Run unit tests
+        run: go test ./...
+
+      - name: Run integration tests
+        run: |
+          cd tests/integration
+          docker-compose up --exit-code-from cli-tool
+
+      - name: Cross compile binaries
+        env:
+          GO_LDFLAGS: "-s -w -X 'main.apiVersion=${{env.API_VERSION}}' -X 'main.version=${{github.ref_name}}' -X 'main.buildDate=${{github.event.repository.updated_at}}' -X 'main.commit=${{github.sha}}' -X 'main.releaseURL=https://api.github.com/repos/${{github.repository}}'"
+        run: |
+          GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_darwin_amd64 .
+          GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_darwin_arm64 .
+          GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_linux_arm64 .
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_linux_amd64 .
+          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_windows_amd64.exe .
