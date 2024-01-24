@@ -8,10 +8,10 @@ import (
 
 	"github.com/cli/cli/v2/pkg/iostreams"
 	"github.com/spf13/cobra"
-	"vcr-cli/pkg/api"
-	"vcr-cli/pkg/cmdutil"
-	"vcr-cli/pkg/format"
-	"vcr-cli/vcr/root"
+	"vonage-cloud-runtime-cli/pkg/api"
+	"vonage-cloud-runtime-cli/pkg/cmdutil"
+	"vonage-cloud-runtime-cli/pkg/format"
+	"vonage-cloud-runtime-cli/vcr/root"
 )
 
 var (

@@ -2,8 +2,8 @@ package instance
 
 import (
 	"github.com/spf13/cobra"
-	"vcr-cli/pkg/cmdutil"
-	"vcr-cli/vcr/instance/remove"
+	"vonage-cloud-runtime-cli/pkg/cmdutil"
+	"vonage-cloud-runtime-cli/vcr/instance/remove"
 )
 
 func NewCmdInstance(f cmdutil.Factory) *cobra.Command {

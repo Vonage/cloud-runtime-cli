@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/spf13/cobra/doc"
-	"vcr-cli/pkg/cmdutil"
-	"vcr-cli/vcr/root"
+	"vonage-cloud-runtime-cli/pkg/cmdutil"
+	"vonage-cloud-runtime-cli/vcr/root"
 )
 
 func main() {

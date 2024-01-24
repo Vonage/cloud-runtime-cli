@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
-	"vcr-cli/pkg/config"
+	"vonage-cloud-runtime-cli/pkg/config"
 )
 
 func TestCreateVonageApplication(t *testing.T) {

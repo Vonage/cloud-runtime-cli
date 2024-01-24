@@ -8,7 +8,7 @@ import (
 
 	"github.com/cli/cli/v2/pkg/iostreams"
 	"github.com/stretchr/testify/require"
-	"vcr-cli/pkg/api"
+	"vonage-cloud-runtime-cli/pkg/api"
 )
 
 func Test_parseCapVersion(t *testing.T) {
@@ -136,7 +136,7 @@ func TestPrintUpdateMessage(t *testing.T) {
 		"A new release of vcr is available:",
 		"1.0.0",
 		"2.0.0",
-		"vcr update")
+		"vcr upgrade")
 
 	go func() {
 		updateMessageChan <- "2.0.0"

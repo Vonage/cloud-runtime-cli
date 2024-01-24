@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
-	"vcr-cli/pkg/api"
+	"vonage-cloud-runtime-cli/pkg/api"
 )
 
 type TemplateOptions struct {
@@ -174,7 +174,7 @@ func PrintUpdateMessage(out *iostreams.IOStreams, version string, updateMessageC
 					c.Cyan(strings.TrimPrefix(version, "v")),
 					c.Cyan(strings.TrimPrefix(rel, "v")))
 
-				fmt.Fprintf(out.Out, "To upgrade, run: %s\n", "vcr update")
+				fmt.Fprintf(out.Out, "To upgrade, run: %s\n", "vcr upgrade")
 				return
 			}
 			return

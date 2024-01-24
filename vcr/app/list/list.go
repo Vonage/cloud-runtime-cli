@@ -8,7 +8,7 @@ import (
 	"github.com/cli/cli/v2/utils"
 	"github.com/spf13/cobra"
 
-	"vcr-cli/pkg/cmdutil"
+	"vonage-cloud-runtime-cli/pkg/cmdutil"
 )
 
 type Options struct {

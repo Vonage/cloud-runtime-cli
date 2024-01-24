@@ -4,13 +4,13 @@ import (
 	"testing"
 	"time"
 
-	"vcr-cli/pkg/config"
+	"vonage-cloud-runtime-cli/pkg/config"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
 	"github.com/golang/mock/gomock"
 
-	"vcr-cli/pkg/cmdutil"
-	"vcr-cli/testutil/mocks"
+	"vonage-cloud-runtime-cli/pkg/cmdutil"
+	"vonage-cloud-runtime-cli/testutil/mocks"
 )
 
 const (

@@ -10,7 +10,7 @@ import (
 
 	"github.com/cli/cli/v2/pkg/iostreams"
 	"github.com/gorilla/websocket"
-	"vcr-cli/pkg/config"
+	"vonage-cloud-runtime-cli/pkg/config"
 
 	"github.com/go-resty/resty/v2"
 )

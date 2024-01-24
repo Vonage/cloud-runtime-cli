@@ -4,10 +4,10 @@ import (
 	"github.com/MakeNowJust/heredoc"
 	"github.com/spf13/cobra"
 
-	"vcr-cli/pkg/cmdutil"
-	createCmd "vcr-cli/vcr/app/create"
-	generatekeysCmd "vcr-cli/vcr/app/generatekeys"
-	listCmd "vcr-cli/vcr/app/list"
+	"vonage-cloud-runtime-cli/pkg/cmdutil"
+	createCmd "vonage-cloud-runtime-cli/vcr/app/create"
+	generatekeysCmd "vonage-cloud-runtime-cli/vcr/app/generatekeys"
+	listCmd "vonage-cloud-runtime-cli/vcr/app/list"
 )
 
 func NewCmdApp(f cmdutil.Factory) *cobra.Command {

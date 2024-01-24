@@ -6,10 +6,10 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/spf13/cobra"
-	"vcr-cli/pkg/config"
-	"vcr-cli/pkg/format"
+	"vonage-cloud-runtime-cli/pkg/config"
+	"vonage-cloud-runtime-cli/pkg/format"
 
-	"vcr-cli/pkg/cmdutil"
+	"vonage-cloud-runtime-cli/pkg/cmdutil"
 )
 
 type Options struct {

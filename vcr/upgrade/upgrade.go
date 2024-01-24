@@ -1,4 +1,4 @@
-package update
+package upgrade
 
 import (
 	"bytes"
@@ -14,8 +14,8 @@ import (
 	"github.com/inconshreveable/go-update"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 	"github.com/spf13/cobra"
-	"vcr-cli/pkg/api"
-	"vcr-cli/pkg/cmdutil"
+	"vonage-cloud-runtime-cli/pkg/api"
+	"vonage-cloud-runtime-cli/pkg/cmdutil"
 )
 
 type Options struct {
@@ -24,13 +24,13 @@ type Options struct {
 	forceUpdate bool
 }
 
-func NewCmdUpdate(f cmdutil.Factory, version, buildDate, commit string) *cobra.Command {
+func NewCmdUpgrade(f cmdutil.Factory, version, buildDate, commit string) *cobra.Command {
 	opts := Options{
 		Factory: f,
 	}
 
 	cmd := &cobra.Command{
-		Use:   "update",
+		Use:   "upgrade",
 		Short: `Show and update VCR CLI version`,
 		Long: heredoc.Doc(`Show VCR CLI version. 
 
@@ -102,7 +102,7 @@ func runUpdate(ctx context.Context, opts *Options, version, buildDate, commit st
 		return err
 	}
 
-	fmt.Fprintf(io.Out, "%s Successfully updated to update %s\n", c.SuccessIcon(), latestVersion)
+	fmt.Fprintf(io.Out, "%s Successfully updated to version %s\n", c.SuccessIcon(), latestVersion)
 
 	return nil
 }

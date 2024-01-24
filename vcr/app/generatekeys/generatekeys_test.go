@@ -11,8 +11,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/google/shlex"
 	"github.com/stretchr/testify/require"
-	"vcr-cli/testutil"
-	"vcr-cli/testutil/mocks"
+	"vonage-cloud-runtime-cli/testutil"
+	"vonage-cloud-runtime-cli/testutil/mocks"
 )
 
 func TestAppGenerateKeys(t *testing.T) {

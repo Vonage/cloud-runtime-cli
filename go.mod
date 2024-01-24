@@ -1,4 +1,4 @@
-module vcr-cli
+module vonage-cloud-runtime-cli
 
 go 1.21.1
 
