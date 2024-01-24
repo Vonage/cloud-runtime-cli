@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:latest
+    restart: on-failure:3
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  graphql-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile-graphql
+    restart: on-failure:3
+    ports:
+      - "8080:8080"
+    depends_on:
+      - "postgres"
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:password@postgres:5432/postgres
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      HASURA_GRAPHQL_DEV_MODE: "true"
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, query-log, http-log, websocket-log, webhook-log
+
+  mockserver:
+    build:
+      context: ../..
+      dockerfile: tests/integration/Dockerfile-mockserver
+    ports:
+      - "9001:80"
+
+  cli-tool:
+    build:
+      context: ../..
+      dockerfile: tests/integration/Dockerfile-clitool
+    depends_on:
+      - "mockserver"
+      - "graphql-engine"

@@ -1,0 +1,9 @@
+project:
+    name: test
+instance:
+    name: test
+    runtime: test
+    region: id
+    application-id: id
+debug:
+    application-id: id

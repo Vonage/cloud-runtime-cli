@@ -1,0 +1,6 @@
+graphql_endpoint = http://graphql-engine:8080/v1/graphql
+default_region   = aws.euw1
+
+[credentials]
+api_key    = test_key
+api_secret = test_secret

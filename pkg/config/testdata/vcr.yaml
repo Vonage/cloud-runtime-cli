@@ -1,0 +1,6 @@
+project:
+  name: test
+instance:
+  name: dev
+debug:
+  application-id: id
