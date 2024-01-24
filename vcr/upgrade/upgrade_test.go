@@ -1,4 +1,4 @@
-package update
+package upgrade
 
 import (
 	"bytes"
@@ -19,19 +19,19 @@ import (
 	"vcr-cli/testutil/mocks"
 )
 
-func TestUpdate(t *testing.T) {
+func TestUpgrade(t *testing.T) {
 	type mock struct {
-		UpdateGetLatestReleaseTimes     int
-		UpdateReturnRelease             api.Release
-		UpdateGetLatestReleaseReturnErr error
+		UpgradeGetLatestReleaseTimes     int
+		UpgradeReturnRelease             api.Release
+		UpgradeGetLatestReleaseReturnErr error
 
-		UpdateGetAssetTimes     int
-		UpdateURL               string
-		UpdateReturnBytes       []byte
-		UpdateGetAssetReturnErr error
-		UpdateVersion           string
-		UpdateBuildDate         string
-		UpdateCommit            string
+		UpgradeGetAssetTimes     int
+		UpgradeURL               string
+		UpgradeReturnBytes       []byte
+		UpgradeGetAssetReturnErr error
+		UpgradeVersion           string
+		UpgradeBuildDate         string
+		UpgradeCommit            string
 	}
 	type want struct {
 		errMsg string
@@ -50,17 +50,17 @@ func TestUpdate(t *testing.T) {
 			cli:  "",
 			mock: mock{
 
-				UpdateGetLatestReleaseTimes:     1,
-				UpdateReturnRelease:             api.Release{TagName: "v0.0.1"},
-				UpdateGetLatestReleaseReturnErr: nil,
+				UpgradeGetLatestReleaseTimes:     1,
+				UpgradeReturnRelease:             api.Release{TagName: "v0.0.1"},
+				UpgradeGetLatestReleaseReturnErr: nil,
 
-				UpdateGetAssetTimes:     0,
-				UpdateURL:               "",
-				UpdateReturnBytes:       nil,
-				UpdateGetAssetReturnErr: nil,
-				UpdateVersion:           "0.0.1",
-				UpdateBuildDate:         "",
-				UpdateCommit:            "",
+				UpgradeGetAssetTimes:     0,
+				UpgradeURL:               "",
+				UpgradeReturnBytes:       nil,
+				UpgradeGetAssetReturnErr: nil,
+				UpgradeVersion:           "0.0.1",
+				UpgradeBuildDate:         "",
+				UpgradeCommit:            "",
 			},
 			want: want{
 				stdout: "✓ You are using the latest version of vcr-cli (0.0.1)\n",
@@ -71,17 +71,17 @@ func TestUpdate(t *testing.T) {
 			cli:  "",
 			mock: mock{
 
-				UpdateGetLatestReleaseTimes:     1,
-				UpdateReturnRelease:             api.Release{TagName: "v0.0.1"},
-				UpdateGetLatestReleaseReturnErr: nil,
+				UpgradeGetLatestReleaseTimes:     1,
+				UpgradeReturnRelease:             api.Release{TagName: "v0.0.1"},
+				UpgradeGetLatestReleaseReturnErr: nil,
 
-				UpdateGetAssetTimes:     0,
-				UpdateURL:               "",
-				UpdateReturnBytes:       nil,
-				UpdateGetAssetReturnErr: nil,
-				UpdateVersion:           "0.0.5",
-				UpdateBuildDate:         "",
-				UpdateCommit:            "",
+				UpgradeGetAssetTimes:     0,
+				UpgradeURL:               "",
+				UpgradeReturnBytes:       nil,
+				UpgradeGetAssetReturnErr: nil,
+				UpgradeVersion:           "0.0.5",
+				UpgradeBuildDate:         "",
+				UpgradeCommit:            "",
 			},
 			want: want{
 				stdout: "✓ Current version (0.0.5) is newer than the latest version (0.0.1) !\n",
@@ -93,17 +93,17 @@ func TestUpdate(t *testing.T) {
 			cli:  "",
 			mock: mock{
 
-				UpdateGetLatestReleaseTimes:     1,
-				UpdateReturnRelease:             api.Release{TagName: "test"},
-				UpdateGetLatestReleaseReturnErr: nil,
+				UpgradeGetLatestReleaseTimes:     1,
+				UpgradeReturnRelease:             api.Release{TagName: "test"},
+				UpgradeGetLatestReleaseReturnErr: nil,
 
-				UpdateGetAssetTimes:     0,
-				UpdateURL:               "",
-				UpdateReturnBytes:       nil,
-				UpdateGetAssetReturnErr: nil,
-				UpdateVersion:           "0.0.1",
-				UpdateBuildDate:         "",
-				UpdateCommit:            "",
+				UpgradeGetAssetTimes:     0,
+				UpgradeURL:               "",
+				UpgradeReturnBytes:       nil,
+				UpgradeGetAssetReturnErr: nil,
+				UpgradeVersion:           "0.0.1",
+				UpgradeBuildDate:         "",
+				UpgradeCommit:            "",
 			},
 			want: want{
 				errMsg: "failed to get latest version: invalid update found: No Major.Minor.Patch elements found",
@@ -111,21 +111,21 @@ func TestUpdate(t *testing.T) {
 		},
 
 		{
-			name: "update-api-error",
+			name: "upgrade-api-error",
 			cli:  "",
 			mock: mock{
 
-				UpdateGetLatestReleaseTimes:     1,
-				UpdateReturnRelease:             api.Release{},
-				UpdateGetLatestReleaseReturnErr: errors.New("api error"),
+				UpgradeGetLatestReleaseTimes:     1,
+				UpgradeReturnRelease:             api.Release{},
+				UpgradeGetLatestReleaseReturnErr: errors.New("api error"),
 
-				UpdateGetAssetTimes:     0,
-				UpdateURL:               "",
-				UpdateReturnBytes:       nil,
-				UpdateGetAssetReturnErr: nil,
-				UpdateVersion:           "0.0.1",
-				UpdateBuildDate:         "",
-				UpdateCommit:            "",
+				UpgradeGetAssetTimes:     0,
+				UpgradeURL:               "",
+				UpgradeReturnBytes:       nil,
+				UpgradeGetAssetReturnErr: nil,
+				UpgradeVersion:           "0.0.1",
+				UpgradeBuildDate:         "",
+				UpgradeCommit:            "",
 			},
 			want: want{
 				errMsg: "failed to get assets: api error",
@@ -140,13 +140,13 @@ func TestUpdate(t *testing.T) {
 			releaseMock := mocks.NewMockReleaseInterface(ctrl)
 			releaseMock.EXPECT().
 				GetLatestRelease(gomock.Any()).
-				Times(tt.mock.UpdateGetLatestReleaseTimes).
-				Return(tt.mock.UpdateReturnRelease, tt.mock.UpdateGetLatestReleaseReturnErr)
+				Times(tt.mock.UpgradeGetLatestReleaseTimes).
+				Return(tt.mock.UpgradeReturnRelease, tt.mock.UpgradeGetLatestReleaseReturnErr)
 
 			releaseMock.EXPECT().
-				GetAsset(gomock.Any(), tt.mock.UpdateURL).
-				Times(tt.mock.UpdateGetAssetTimes).
-				Return(tt.mock.UpdateReturnBytes, tt.mock.UpdateGetAssetReturnErr)
+				GetAsset(gomock.Any(), tt.mock.UpgradeURL).
+				Times(tt.mock.UpgradeGetAssetTimes).
+				Return(tt.mock.UpgradeReturnBytes, tt.mock.UpgradeGetAssetReturnErr)
 
 			ios, _, stdout, stderr := iostreams.Test()
 
@@ -157,7 +157,7 @@ func TestUpdate(t *testing.T) {
 
 			f := testutil.DefaultFactoryMock(t, ios, nil, releaseMock, nil, nil, nil)
 
-			cmd := NewCmdUpdate(f, tt.mock.UpdateVersion, tt.mock.UpdateBuildDate, tt.mock.UpdateCommit)
+			cmd := NewCmdUpgrade(f, tt.mock.UpgradeVersion, tt.mock.UpgradeBuildDate, tt.mock.UpgradeCommit)
 			cmd.SetArgs(argv)
 			cmd.SetIn(&bytes.Buffer{})
 			cmd.SetOut(io.Discard)
@@ -182,7 +182,7 @@ func TestUpdate(t *testing.T) {
 	}
 }
 
-func TestUpdateByAsset(t *testing.T) {
+func TestUpgradeByAsset(t *testing.T) {
 	filePath := "testdata/vcr"
 
 	file, err := os.Open(filePath)
@@ -197,11 +197,11 @@ func TestUpdateByAsset(t *testing.T) {
 	}
 
 	type mock struct {
-		UpdateExePath           string
-		UpdateRelease           api.Release
-		UpdateGetAssetTimes     int
-		UpdateReturnAsset       []byte
-		UpdateGetAssetReturnErr error
+		UpgradeExePath           string
+		UpgradeRelease           api.Release
+		UpgradeGetAssetTimes     int
+		UpgradeReturnAsset       []byte
+		UpgradeGetAssetReturnErr error
 	}
 	type want struct {
 		errMsg string
@@ -215,13 +215,13 @@ func TestUpdateByAsset(t *testing.T) {
 		{
 			name: "happy-path",
 			mock: mock{
-				UpdateExePath: "testdata/vcr",
-				UpdateRelease: api.Release{
+				UpgradeExePath: "testdata/vcr",
+				UpgradeRelease: api.Release{
 					TagName: "v0.0.1",
 					Assets:  []api.Asset{{Name: fmt.Sprintf("vcr_%s_%s.tar.gz", runtime.GOOS, runtime.GOARCH), BrowserDownloadURL: "test-DownloadURL"}}},
-				UpdateGetAssetTimes:     1,
-				UpdateReturnAsset:       byteSlice,
-				UpdateGetAssetReturnErr: nil,
+				UpgradeGetAssetTimes:     1,
+				UpgradeReturnAsset:       byteSlice,
+				UpgradeGetAssetReturnErr: nil,
 			},
 
 			want: want{
@@ -232,13 +232,13 @@ func TestUpdateByAsset(t *testing.T) {
 		{
 			name: "api-error",
 			mock: mock{
-				UpdateExePath: "testdata/vcr",
-				UpdateRelease: api.Release{
+				UpgradeExePath: "testdata/vcr",
+				UpgradeRelease: api.Release{
 					TagName: "v0.0.1",
 					Assets:  []api.Asset{{Name: fmt.Sprintf("vcr_%s_%s.tar.gz", runtime.GOOS, runtime.GOARCH), BrowserDownloadURL: "test-DownloadURL"}}},
-				UpdateGetAssetTimes:     1,
-				UpdateReturnAsset:       nil,
-				UpdateGetAssetReturnErr: errors.New("api error"),
+				UpgradeGetAssetTimes:     1,
+				UpgradeReturnAsset:       nil,
+				UpgradeGetAssetReturnErr: errors.New("api error"),
 			},
 
 			want: want{
@@ -254,14 +254,14 @@ func TestUpdateByAsset(t *testing.T) {
 			releaseMock := mocks.NewMockReleaseInterface(ctrl)
 			releaseMock.EXPECT().
 				GetAsset(gomock.Any(), gomock.Any()).
-				Times(tt.mock.UpdateGetAssetTimes).
-				Return(tt.mock.UpdateReturnAsset, tt.mock.UpdateGetAssetReturnErr)
+				Times(tt.mock.UpgradeGetAssetTimes).
+				Return(tt.mock.UpgradeReturnAsset, tt.mock.UpgradeGetAssetReturnErr)
 
 			f := testutil.DefaultFactoryMock(t, nil, nil, releaseMock, nil, nil, nil)
 			opts := &Options{
 				Factory: f,
 			}
-			err := updateByAsset(context.Background(), opts, tt.mock.UpdateRelease, tt.mock.UpdateExePath)
+			err := updateByAsset(context.Background(), opts, tt.mock.UpgradeRelease, tt.mock.UpgradeExePath)
 			if err != nil && tt.want.errMsg != "" {
 				require.Error(t, err, "should throw error")
 				require.Equal(t, tt.want.errMsg, err.Error())

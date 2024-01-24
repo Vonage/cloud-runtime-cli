@@ -1,4 +1,4 @@
-## vcr update
+## vcr upgrade
 
 Show and update VCR CLI version
 
@@ -10,7 +10,7 @@ If current version is not the latest, the option to update will be provided.
 
 
 ```
-vcr update [flags]
+vcr upgrade [flags]
 ```
 
 ### Options

@@ -19,7 +19,7 @@ import (
 	initCmd "vcr-cli/vcr/init"
 	instanceCmd "vcr-cli/vcr/instance"
 	secretCmd "vcr-cli/vcr/secret"
-	updateCmd "vcr-cli/vcr/update"
+	upgradeCmd "vcr-cli/vcr/upgrade"
 )
 
 func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, UpdateStream chan string) *cobra.Command {
@@ -41,7 +41,7 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, UpdateStre
 			$ vcr init
 		`),
 		Annotations: map[string]string{
-			"versionInfo": updateCmd.Format(version, buildDate, commit),
+			"versionInfo": upgradeCmd.Format(version, buildDate, commit),
 		},
 		SilenceErrors: true,
 		SilenceUsage:  true,
@@ -67,6 +67,11 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, UpdateStre
 			if err != nil {
 				close(UpdateStream)
 				return fmt.Errorf("failed to initialize cli: %w", err)
+			}
+
+			if cmd.Name() == "upgrade" {
+				close(UpdateStream)
+				return nil
 			}
 
 			go func() {
@@ -111,12 +116,12 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, UpdateStre
 	cmd.AddCommand(deployCmd.NewCmdDeploy(f))
 	cmd.AddCommand(instanceCmd.NewCmdInstance(f))
 	cmd.AddCommand(secretCmd.NewCmdSecret(f))
-	cmd.AddCommand(updateCmd.NewCmdUpdate(f, version, buildDate, commit))
+	cmd.AddCommand(upgradeCmd.NewCmdUpgrade(f, version, buildDate, commit))
 	return cmd
 }
 
 func checkForUpdate(ctx context.Context, f cmdutil.Factory, version string) (string, error) {
-	current, err := updateCmd.GetCurrentVersion(version)
+	current, err := upgradeCmd.GetCurrentVersion(version)
 	if err != nil {
 		return "", fmt.Errorf("current update is invalid: %w", err)
 	}
@@ -124,7 +129,7 @@ func checkForUpdate(ctx context.Context, f cmdutil.Factory, version string) (str
 	if err != nil {
 		return "", err
 	}
-	latest, err := updateCmd.GetLatestVersion(release)
+	latest, err := upgradeCmd.GetLatestVersion(release)
 	if err != nil {
 		return "", fmt.Errorf("failed to get latest update: %w", err)
 	}

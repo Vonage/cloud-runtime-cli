@@ -136,7 +136,7 @@ func TestPrintUpdateMessage(t *testing.T) {
 		"A new release of vcr is available:",
 		"1.0.0",
 		"2.0.0",
-		"vcr update")
+		"vcr upgrade")
 
 	go func() {
 		updateMessageChan <- "2.0.0"

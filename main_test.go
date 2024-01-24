@@ -3,10 +3,11 @@ package main
 import (
 	"errors"
 	"fmt"
+	"testing"
+
 	"github.com/cli/cli/v2/pkg/iostreams"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
-	"testing"
 	"vcr-cli/pkg/api"
 	"vcr-cli/pkg/cmdutil"
 )
@@ -36,7 +37,7 @@ func Test_printError(t *testing.T) {
 				latestVersion: "1.0.1",
 			},
 			want: want{
-				stdout: "\n\nA new release of vcr is available: 0.0.1 → 1.0.1\nTo upgrade, run: vcr update\n",
+				stdout: "\n\nA new release of vcr is available: 0.0.1 → 1.0.1\nTo upgrade, run: vcr upgrade\n",
 				stderr: "X the app crashed\n",
 			},
 		},
@@ -54,7 +55,7 @@ func Test_printError(t *testing.T) {
 				latestVersion: "1.0.1",
 			},
 			want: want{
-				stdout: "\n\nA new release of vcr is available: 0.0.1 → 1.0.1\nTo upgrade, run: vcr update\n",
+				stdout: "\n\nA new release of vcr is available: 0.0.1 → 1.0.1\nTo upgrade, run: vcr upgrade\n",
 				stderr: "X API Error Encountered:\n \tMain issue : http error\n \tHTTP status : 404\n \tError code : 3001\n \tDetailed message : Not Found\n \tTrace ID : 1234\n \tContainer logs : container logs\n\n",
 			},
 		},
