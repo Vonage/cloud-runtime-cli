@@ -8,7 +8,7 @@ import (
 
 	"github.com/cli/cli/v2/pkg/iostreams"
 	"github.com/stretchr/testify/require"
-	"vcr-cli/pkg/api"
+	"vonage-cloud-runtime-cli/pkg/api"
 )
 
 func Test_parseCapVersion(t *testing.T) {

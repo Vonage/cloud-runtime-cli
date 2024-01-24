@@ -8,9 +8,9 @@ import (
 	context "context"
 	reflect "reflect"
 	time "time"
-	api "vcr-cli/pkg/api"
-	cmdutil "vcr-cli/pkg/cmdutil"
-	config "vcr-cli/pkg/config"
+	api "vonage-cloud-runtime-cli/pkg/api"
+	cmdutil "vonage-cloud-runtime-cli/pkg/cmdutil"
+	config "vonage-cloud-runtime-cli/pkg/config"
 
 	iostreams "github.com/cli/cli/v2/pkg/iostreams"
 	resty "github.com/go-resty/resty/v2"

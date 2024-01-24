@@ -3,10 +3,10 @@ package secret
 import (
 	"github.com/MakeNowJust/heredoc"
 	"github.com/spf13/cobra"
-	"vcr-cli/pkg/cmdutil"
-	"vcr-cli/vcr/secret/create"
-	"vcr-cli/vcr/secret/remove"
-	"vcr-cli/vcr/secret/update"
+	"vonage-cloud-runtime-cli/pkg/cmdutil"
+	"vonage-cloud-runtime-cli/vcr/secret/create"
+	"vonage-cloud-runtime-cli/vcr/secret/remove"
+	"vonage-cloud-runtime-cli/vcr/secret/update"
 )
 
 func NewCmdSecret(f cmdutil.Factory) *cobra.Command {

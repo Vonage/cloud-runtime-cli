@@ -9,10 +9,10 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/google/shlex"
 	"github.com/stretchr/testify/require"
-	"vcr-cli/pkg/api"
-	"vcr-cli/pkg/config"
-	"vcr-cli/testutil"
-	"vcr-cli/testutil/mocks"
+	"vonage-cloud-runtime-cli/pkg/api"
+	"vonage-cloud-runtime-cli/pkg/config"
+	"vonage-cloud-runtime-cli/testutil"
+	"vonage-cloud-runtime-cli/testutil/mocks"
 )
 
 func TestDeploy(t *testing.T) {

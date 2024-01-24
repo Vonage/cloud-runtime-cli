@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
-	"vcr-cli/pkg/api"
+	"vonage-cloud-runtime-cli/pkg/api"
 )
 
 type TemplateOptions struct {

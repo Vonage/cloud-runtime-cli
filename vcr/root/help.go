@@ -9,7 +9,7 @@ import (
 	"github.com/cli/go-gh/v2/pkg/text"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"vcr-cli/pkg/cmdutil"
+	"vonage-cloud-runtime-cli/pkg/cmdutil"
 )
 
 func rootUsageFunc(w io.Writer, command *cobra.Command) error {

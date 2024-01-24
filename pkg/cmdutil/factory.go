@@ -10,8 +10,8 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/google/uuid"
 
-	"vcr-cli/pkg/api"
-	"vcr-cli/pkg/config"
+	"vonage-cloud-runtime-cli/pkg/api"
+	"vonage-cloud-runtime-cli/pkg/config"
 )
 
 //go:generate mockgen -source=factory.go -package mocks -destination ../../testutil/mocks/factory.go

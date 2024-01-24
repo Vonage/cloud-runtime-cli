@@ -5,21 +5,21 @@ import (
 	"fmt"
 	"time"
 
-	"vcr-cli/pkg/cmdutil"
-	"vcr-cli/pkg/config"
-	"vcr-cli/pkg/format"
+	"vonage-cloud-runtime-cli/pkg/cmdutil"
+	"vonage-cloud-runtime-cli/pkg/config"
+	"vonage-cloud-runtime-cli/pkg/format"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/spf13/cobra"
 
-	appCmd "vcr-cli/vcr/app"
-	configureCmd "vcr-cli/vcr/configure"
-	debugCmd "vcr-cli/vcr/debug"
-	deployCmd "vcr-cli/vcr/deploy"
-	initCmd "vcr-cli/vcr/init"
-	instanceCmd "vcr-cli/vcr/instance"
-	secretCmd "vcr-cli/vcr/secret"
-	upgradeCmd "vcr-cli/vcr/upgrade"
+	appCmd "vonage-cloud-runtime-cli/vcr/app"
+	configureCmd "vonage-cloud-runtime-cli/vcr/configure"
+	debugCmd "vonage-cloud-runtime-cli/vcr/debug"
+	deployCmd "vonage-cloud-runtime-cli/vcr/deploy"
+	initCmd "vonage-cloud-runtime-cli/vcr/init"
+	instanceCmd "vonage-cloud-runtime-cli/vcr/instance"
+	secretCmd "vonage-cloud-runtime-cli/vcr/secret"
+	upgradeCmd "vonage-cloud-runtime-cli/vcr/upgrade"
 )
 
 func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, UpdateStream chan string) *cobra.Command {

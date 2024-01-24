@@ -12,10 +12,10 @@ import (
 	"github.com/google/shlex"
 	"github.com/stretchr/testify/require"
 
-	"vcr-cli/pkg/api"
-	"vcr-cli/pkg/cmdutil"
-	"vcr-cli/testutil"
-	"vcr-cli/testutil/mocks"
+	"vonage-cloud-runtime-cli/pkg/api"
+	"vonage-cloud-runtime-cli/pkg/cmdutil"
+	"vonage-cloud-runtime-cli/testutil"
+	"vonage-cloud-runtime-cli/testutil/mocks"
 )
 
 func runCommand(t *testing.T, deploymentMock cmdutil.DeploymentInterface, cli string) (*testutil.CmdOut, error) {

@@ -8,8 +8,8 @@ import (
 	"github.com/cli/cli/v2/pkg/iostreams"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
-	"vcr-cli/pkg/api"
-	"vcr-cli/pkg/cmdutil"
+	"vonage-cloud-runtime-cli/pkg/api"
+	"vonage-cloud-runtime-cli/pkg/cmdutil"
 )
 
 func Test_printError(t *testing.T) {
