@@ -14,6 +14,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/google/shlex"
 	"github.com/stretchr/testify/require"
+
 	"vonage-cloud-runtime-cli/pkg/api"
 	"vonage-cloud-runtime-cli/testutil"
 	"vonage-cloud-runtime-cli/testutil/mocks"
@@ -157,7 +158,7 @@ func TestUpgrade(t *testing.T) {
 
 			f := testutil.DefaultFactoryMock(t, ios, nil, releaseMock, nil, nil, nil)
 
-			cmd := NewCmdUpgrade(f, tt.mock.UpgradeVersion, tt.mock.UpgradeBuildDate, tt.mock.UpgradeCommit)
+			cmd := NewCmdUpgrade(f, tt.mock.UpgradeVersion)
 			cmd.SetArgs(argv)
 			cmd.SetIn(&bytes.Buffer{})
 			cmd.SetOut(io.Discard)

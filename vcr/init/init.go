@@ -21,6 +21,8 @@ import (
 	"vonage-cloud-runtime-cli/pkg/format"
 )
 
+const SkipValue = "SKIP"
+
 type Options struct {
 	cmdutil.Factory
 
@@ -155,7 +157,7 @@ func askInstanceAppID(ctx context.Context, opts *Options) error {
 	if err != nil {
 		return err
 	}
-	if appLabel == "SKIP" {
+	if appLabel == SkipValue {
 		return nil
 	}
 	opts.manifest.Instance.ApplicationID = appOptions.IDLookup[appLabel]
@@ -177,7 +179,7 @@ func askDebugAppID(ctx context.Context, opts *Options) error {
 	if err != nil {
 		return err
 	}
-	if appLabel == "SKIP" {
+	if appLabel == SkipValue {
 		return nil
 	}
 	opts.manifest.Debug.ApplicationID = appOptions.IDLookup[appLabel]
@@ -266,7 +268,7 @@ func askTemplate(ctx context.Context, opts *Options) error {
 	if err != nil {
 		return err
 	}
-	if templateLabel == "SKIP" {
+	if templateLabel == SkipValue {
 		return nil
 	}
 

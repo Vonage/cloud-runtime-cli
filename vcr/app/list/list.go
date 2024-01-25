@@ -57,7 +57,7 @@ func runList(ctx context.Context, opts *Options) error {
 	if err != nil {
 		return fmt.Errorf("failed to list Vonage applications: %w", err)
 	}
-
+	//nolint
 	tp := utils.NewTablePrinter(io)
 	tp.AddField(c.Bold("ID"), nil, nil)
 	tp.AddField(c.Bold("Name"), nil, nil)

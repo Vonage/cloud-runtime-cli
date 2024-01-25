@@ -9,10 +9,10 @@ import (
 	"strings"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
-	"github.com/gorilla/websocket"
-	"vonage-cloud-runtime-cli/pkg/config"
-
 	"github.com/go-resty/resty/v2"
+	"github.com/gorilla/websocket"
+
+	"vonage-cloud-runtime-cli/pkg/config"
 )
 
 // DeploymentClient is a client for the deployment API.

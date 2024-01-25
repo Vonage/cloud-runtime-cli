@@ -3,6 +3,7 @@ package secret
 import (
 	"github.com/MakeNowJust/heredoc"
 	"github.com/spf13/cobra"
+
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
 	"vonage-cloud-runtime-cli/vcr/secret/create"
 	"vonage-cloud-runtime-cli/vcr/secret/remove"

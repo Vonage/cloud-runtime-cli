@@ -72,7 +72,10 @@ func Test_run(t *testing.T) {
 		}
 		require.Equal(t, mockMessage.Payload, body)
 		w.WriteHeader(http.StatusOK)
-		w.Write(body)
+
+		if _, err := w.Write(body); err != nil {
+			t.Fatalf("Failed to write message: %v", err)
+		}
 	}))
 
 	defer hs.Close()

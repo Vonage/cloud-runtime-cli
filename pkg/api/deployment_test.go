@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
+
 	"vonage-cloud-runtime-cli/pkg/config"
 )
 
@@ -1228,7 +1229,9 @@ func TestDeploymentClient_WatchDeployment(t *testing.T) {
 				}
 				defer conn.Close()
 
-				conn.WriteMessage(tt.mock.messageType, tt.mock.message)
+				if err := conn.WriteMessage(tt.mock.messageType, tt.mock.message); err != nil {
+					t.Fatalf("Failed to write message: %v", err)
+				}
 			})
 			ts := httptest.NewServer(handler)
 			defer ts.Close()

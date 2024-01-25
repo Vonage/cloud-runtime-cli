@@ -8,6 +8,7 @@ import (
 
 	"github.com/cli/cli/v2/pkg/iostreams"
 	"github.com/stretchr/testify/require"
+
 	"vonage-cloud-runtime-cli/pkg/api"
 )
 

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -60,13 +61,13 @@ func TestGetAbsDir(t *testing.T) {
 
 	nonExistingDir := "nonexisting"
 	_, err = GetAbsDir(nonExistingDir)
-	if err != ErrNotExistedPath {
+	if !errors.Is(err, ErrNotExistedPath) {
 		t.Errorf("Expected ErrNotExistedPath, but got: %v", err)
 	}
 
 	filePath := "manifest.go"
 	_, err = GetAbsDir(filePath)
-	if err != ErrNotDirectory {
+	if !errors.Is(err, ErrNotDirectory) {
 		t.Errorf("Expected ErrNotDirectory, but got: %v", err)
 	}
 }

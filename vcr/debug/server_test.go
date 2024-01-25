@@ -68,7 +68,10 @@ func Test_startDebugProxyServer(t *testing.T) {
 			t.Fatalf("Failed to read body: %v", err)
 		}
 		w.WriteHeader(http.StatusOK)
-		w.Write(body)
+
+		if _, err := w.Write(body); err != nil {
+			t.Fatalf("Failed to write message: %v", err)
+		}
 	}))
 
 	defer hs.Close()
@@ -81,7 +84,9 @@ func Test_startDebugProxyServer(t *testing.T) {
 	defer close(done)
 
 	go func() {
-		startDebugProxyServer("app-name", mockLocalAppHost, "host-address", mockWebsocketURL, "", 9027, done)
+		if err := startDebugProxyServer("app-name", mockLocalAppHost, "host-address", mockWebsocketURL, "", 9027, done); err != nil {
+			fmt.Println("Error starting debug proxy server")
+		}
 	}()
 
 	resp, err := http.Get(hs.URL)

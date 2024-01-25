@@ -24,7 +24,7 @@ type UploadResponse struct {
 	SourceCodeKey string `json:"sourceCodeKey"`
 }
 
-func uploadTgzHandler(w http.ResponseWriter, r *http.Request) {
+func uploadTgzHandler(w http.ResponseWriter, _ *http.Request) {
 	mockResponse := UploadResponse{SourceCodeKey: "test-key"}
 	w.Header().Set("Content-Type", "application/json")
 	jsonResponse, err := json.Marshal(mockResponse)
@@ -33,14 +33,17 @@ func uploadTgzHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(jsonResponse)
+	if _, err := w.Write(jsonResponse); err != nil {
+		fmt.Println("Error writing response")
+		return
+	}
 }
 
 type CreatePackageResponse struct {
 	PackageID string `json:"packageId"`
 }
 
-func createPackageHandler(w http.ResponseWriter, r *http.Request) {
+func createPackageHandler(w http.ResponseWriter, _ *http.Request) {
 	mockResponse := CreatePackageResponse{PackageID: "test-package-id"}
 	w.Header().Set("Content-Type", "application/json")
 	jsonResponse, err := json.Marshal(mockResponse)
@@ -49,7 +52,10 @@ func createPackageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(jsonResponse)
+	if _, err := w.Write(jsonResponse); err != nil {
+		fmt.Println("Error writing response")
+		return
+	}
 }
 
 type DeployInstanceResponse struct {
@@ -59,7 +65,7 @@ type DeployInstanceResponse struct {
 	HostURLs     []string `json:"hostUrls"`
 }
 
-func deployInstanceHandler(w http.ResponseWriter, r *http.Request) {
+func deployInstanceHandler(w http.ResponseWriter, _ *http.Request) {
 	mockResponse := DeployInstanceResponse{InstanceID: "test-instance-id", ServiceName: "test-service-name", DeploymentID: "test-deployment-id", HostURLs: []string{"test-host-url"}}
 	w.Header().Set("Content-Type", "application/json")
 	jsonResponse, err := json.Marshal(mockResponse)
@@ -68,7 +74,10 @@ func deployInstanceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(jsonResponse)
+	if _, err := w.Write(jsonResponse); err != nil {
+		fmt.Println("Error writing response")
+		return
+	}
 }
 
 func watchDeploymentHandler(w http.ResponseWriter, r *http.Request) {
@@ -80,7 +89,10 @@ func watchDeploymentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close()
 
-	conn.WriteMessage(websocket.TextMessage, []byte(`{"status": "completed"}`))
+	if err := conn.WriteMessage(websocket.TextMessage, []byte(`{"status": "completed"}`)); err != nil {
+		fmt.Println("Error writing message")
+		return
+	}
 }
 
 type Release struct {
@@ -92,7 +104,7 @@ type Asset struct {
 	BrowserDownloadURL string `json:"browser_download_url"`
 }
 
-func getLatestReleaseHandler(w http.ResponseWriter, r *http.Request) {
+func getLatestReleaseHandler(w http.ResponseWriter, _ *http.Request) {
 	mockResponse := Release{TagName: "v0.0.1"}
 	w.Header().Set("Content-Type", "application/json")
 	jsonResponse, err := json.Marshal(mockResponse)
@@ -101,5 +113,8 @@ func getLatestReleaseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(jsonResponse)
+	if _, err := w.Write(jsonResponse); err != nil {
+		fmt.Println("Error writing response")
+		return
+	}
 }

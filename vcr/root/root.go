@@ -116,7 +116,7 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 	cmd.AddCommand(deployCmd.NewCmdDeploy(f))
 	cmd.AddCommand(instanceCmd.NewCmdInstance(f))
 	cmd.AddCommand(secretCmd.NewCmdSecret(f))
-	cmd.AddCommand(upgradeCmd.NewCmdUpgrade(f, version, buildDate, commit))
+	cmd.AddCommand(upgradeCmd.NewCmdUpgrade(f, version))
 	return cmd
 }
 

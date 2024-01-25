@@ -10,12 +10,14 @@ import (
 	"github.com/cli/go-gh/v2/pkg/text"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
 )
 
 func rootUsageFunc(w io.Writer, command *cobra.Command) error {
 	fmt.Fprintf(w, "Usage:  %s", command.UseLine())
 
+	//nolint
 	var subcommands []*cobra.Command
 	for _, c := range command.Commands() {
 		if !c.IsAvailableCommand() {
@@ -40,7 +42,7 @@ func rootUsageFunc(w io.Writer, command *cobra.Command) error {
 	return nil
 }
 
-func rootFlagErrorFunc(cmd *cobra.Command, err error) error {
+func rootFlagErrorFunc(_ *cobra.Command, err error) error {
 	if errors.Is(err, pflag.ErrHelp) {
 		return err
 	}

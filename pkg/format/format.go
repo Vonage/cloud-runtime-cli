@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
+
 	"vonage-cloud-runtime-cli/pkg/api"
 )
 

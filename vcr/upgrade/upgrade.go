@@ -14,6 +14,7 @@ import (
 	"github.com/inconshreveable/go-update"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 	"github.com/spf13/cobra"
+
 	"vonage-cloud-runtime-cli/pkg/api"
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
 )
@@ -24,7 +25,7 @@ type Options struct {
 	forceUpdate bool
 }
 
-func NewCmdUpgrade(f cmdutil.Factory, version, buildDate, commit string) *cobra.Command {
+func NewCmdUpgrade(f cmdutil.Factory, version string) *cobra.Command {
 	opts := Options{
 		Factory: f,
 	}

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -20,7 +21,7 @@ func TestValidateSecretName(t *testing.T) {
 		t.Errorf("Expected result: %v, but got: %v", expectedResult, result)
 	}
 
-	if err != expectedError {
+	if !errors.Is(err, expectedError) {
 		t.Errorf("Expected error: %v, but got: %v", expectedError, err)
 	}
 
@@ -93,7 +94,11 @@ func TestGetSecretFromInputs(t *testing.T) {
 	defer func() { os.Stdin = oldStdin }()
 	r, w, _ := os.Pipe()
 	os.Stdin = r
-	w.Write([]byte(stdinData))
+
+	if _, err := w.Write([]byte(stdinData)); err != nil {
+		t.Errorf("Expected no error, but got: %v", err)
+	}
+
 	w.Close()
 
 	secret, err = GetSecretFromInputs(nil, name, value, secretFile)
