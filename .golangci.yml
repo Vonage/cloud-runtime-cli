@@ -36,7 +36,6 @@ linters:
     - interfacebloat
     - ireturn
     - paralleltest
-    - testifylint
     - testpackage
     - varnamelen
     - tagliatelle
@@ -69,7 +68,6 @@ linters:
     - thelper
     - predeclared
     - staticcheck
-    - perfsprint
     - maintidx
     - prealloc
     - unparam
@@ -92,6 +90,7 @@ issues:
         - errorlint
         - gocognit
         - structcheck
+        - testifylint
     - path: tests/integration
       linters:
         - funlen
