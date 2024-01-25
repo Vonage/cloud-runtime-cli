@@ -151,5 +151,5 @@ vonage-cloud-runtime-cli/
         ├── upgrade.go
         └── upgrade_test.go
 ```
-* The `vcr` folder will contain all commands and sub commands of the CLI where the folder hierarchy will be the same as the command hierarchy. For example, `vcr app list` will be in `vcr/app/list/list.go`
+* The `vonage-cloud-runtime-cli` folder will contain all commands and sub commands of the CLI where the folder hierarchy will be the same as the command hierarchy. For example, `vcr app list` will be in `vcr/app/list/list.go`
 * Each command should add the sub commands to its own command.
