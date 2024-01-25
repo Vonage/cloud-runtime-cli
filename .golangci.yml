@@ -1,0 +1,91 @@
+linters-settings:
+  gofmt:
+    simplify: true
+  goimports:
+    local-prefixes: github.com/Vonage/vonage-cloud-runtime-cli
+  gocyclo:
+    min-complexity: 20
+  cyclop:
+    max-complexity: 20
+
+run:
+  timeout: 10m
+  issues-exit-code: 1
+  tests: true
+  skip-dirs:
+    - vendor
+    - .git
+    - node_modules
+
+linters:
+  enable-all: true
+  disable:
+    - gochecknoglobals
+    - gochecknoinits
+    - funlen
+    - wsl
+    - lll
+    - exhaustivestruct
+    - wrapcheck
+    - exhaustruct
+    - forbidigo
+    - godot
+    - gofumpt
+    - depguard
+    - goerr113
+    - ifshort
+    - interfacebloat
+    - ireturn
+    - paralleltest
+    - testpackage
+    - varnamelen
+    - tagliatelle
+    - nlreturn
+    - noctx
+    - gomnd
+    - forcetypeassert
+    - whitespace
+    - gci
+    - scopelint
+    - godox
+    - gosec
+    - nestif
+    - mirror
+    - thelper
+    - usestdlibvars
+    - nosnakecase
+    - contextcheck
+    - maligned
+    - unconvert
+    - durationcheck
+    - usestdlibvars
+    - thelper
+    - predeclared
+    - maintidx
+    - unparam
+    - perfsprint
+
+issues:
+  exclude-rules:
+    - text: "don't use an underscore in package name"
+      linters:
+        - golint
+    - text: "package comment should be of the form"
+      linters:
+        - golint
+    - path: (.+)_test.go
+      linters:
+        - funlen
+        - goconst
+        - dupl
+        - exhaustivestruct
+        - gocognit
+        - structcheck
+        - testifylint
+    - path: tests/integration
+      linters:
+        - funlen
+        - goconst
+        - dupl
+        - exhaustivestruct
+        - structcheck

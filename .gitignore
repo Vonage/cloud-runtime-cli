@@ -1,2 +1,3 @@
-# ignore techdocs output folder
-generated-docs/
+.idea
+bin
+.DS_Store

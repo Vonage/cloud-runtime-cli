@@ -1,0 +1,6 @@
+graphql_endpoint = https://api.vonage.com/graphql
+default_region   = testAlias
+
+[credentials]
+api_key    = test
+api_secret = test

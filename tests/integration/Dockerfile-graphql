@@ -1,0 +1,10 @@
+FROM hasura/graphql-engine:v2.8.4
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y curl
+
+COPY scripts/run_hasura.sh .
+RUN chmod +x /app/run_hasura.sh
+
+CMD ["/app/run_hasura.sh"]
