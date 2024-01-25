@@ -1,7 +1,7 @@
 ## Project Structure
 
 ```
-vcr-cli/
+vonage-cloud-runtime-cli/
 ├── LICENSE
 ├── Makefile
 ├── PLAN.md
@@ -61,7 +61,23 @@ vcr-cli/
 │     └── format
 │         ├── format.go
 │         └── format_test.go
-├
+├── tests
+│     └── integration
+│         ├── Dockerfile
+│         ├── Dockerfile-clitool
+│         ├── Dockerfile-graphql
+│         ├── Dockerfile-mockserver
+│         ├── docker-compose.yml
+│         ├── init.sql
+│         ├── mocks
+│         │   └── main.go
+│         ├── scripts
+│         │   ├── run_clitool.sh
+│         │   ├── run_hasura.sh
+│         │   └── run_mockserver.sh
+│         └── testdata
+│           ├── config.yaml
+│           └── vcr.yaml
 ├── testutil
 │     ├── factory.go
 │     ├── mocks
@@ -129,11 +145,11 @@ vcr-cli/
     │     └── update
     │         ├── update.go
     │         └── update_test.go
-    └── update
+    └── upgrade
         ├── testdata
         │     └── vcr
-        ├── update.go
-        └── update_test.go
+        ├── upgrade.go
+        └── upgrade_test.go
 ```
-* The `vcr` folder will contain all commands and sub commands of the CLI where the folder hierarchy will be the same as the command hierarchy. For example, `vcr app list` will be in `vcr/app/list/list.go`
+* The `vonage-cloud-runtime-cli` folder will contain all commands and sub commands of the CLI where the folder hierarchy will be the same as the command hierarchy. For example, `vcr app list` will be in `vcr/app/list/list.go`
 * Each command should add the sub commands to its own command.
