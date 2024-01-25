@@ -34,7 +34,7 @@ type Error struct {
 	HTTPStatusCode int
 	ServerCode     int
 	Message        string
-	TraceId        string
+	TraceID        string
 	ContainerLogs  string
 }
 
@@ -45,14 +45,14 @@ func NewErrorFromHTTPResponse(resp *resty.Response) Error {
 		return Error{
 			HTTPStatusCode: resp.StatusCode(),
 			Message:        resp.String(),
-			TraceId:        traceIDFromHTTPResponse(resp),
+			TraceID:        traceIDFromHTTPResponse(resp),
 		}
 	}
 	return Error{
 		HTTPStatusCode: resp.StatusCode(),
 		ServerCode:     result.Error.Code,
 		Message:        result.Error.Message,
-		TraceId:        traceIDFromHTTPResponse(resp),
+		TraceID:        traceIDFromHTTPResponse(resp),
 		ContainerLogs:  result.Error.ContainerLogs,
 	}
 }
@@ -61,7 +61,7 @@ func NewErrorFromGraphqlResponse(resp *resty.Response, message string) Error {
 	return Error{
 		HTTPStatusCode: resp.StatusCode(),
 		Message:        message,
-		TraceId:        traceIDFromHTTPResponse(resp),
+		TraceID:        traceIDFromHTTPResponse(resp),
 	}
 }
 
@@ -76,14 +76,14 @@ func NewErrorFromWebsocketResponse(resp *http.Response) error {
 		return Error{
 			HTTPStatusCode: resp.StatusCode,
 			Message:        string(bodyBytes),
-			TraceId:        traceIDFromWebsocketResponse(resp),
+			TraceID:        traceIDFromWebsocketResponse(resp),
 		}
 	}
 	return Error{
 		HTTPStatusCode: resp.StatusCode,
 		ServerCode:     result.Error.Code,
 		Message:        result.Error.Message,
-		TraceId:        traceIDFromWebsocketResponse(resp),
+		TraceID:        traceIDFromWebsocketResponse(resp),
 		ContainerLogs:  result.Error.ContainerLogs,
 	}
 }
@@ -93,7 +93,7 @@ func (e Error) Error() string {
 	httpStatus := fmt.Sprintf("HTTP status: %s", strconv.Itoa(e.HTTPStatusCode))
 	errorCode := fmt.Sprintf("Error code: %s", strconv.Itoa(e.ServerCode))
 	detailedMessage := fmt.Sprintf("Detailed message: %s", e.Message)
-	traceID := fmt.Sprintf("Trace ID: %s", e.TraceId)
+	traceID := fmt.Sprintf("Trace ID: %s", e.TraceID)
 	containerLogs := fmt.Sprintf("Container logs: %s", e.ContainerLogs)
 	sb.WriteString("API Error Encountered: ( ")
 	if e.HTTPStatusCode != 0 {
@@ -105,7 +105,7 @@ func (e Error) Error() string {
 	if e.Message != "" {
 		sb.WriteString(fmt.Sprintf("%s ", detailedMessage))
 	}
-	if e.TraceId != "" {
+	if e.TraceID != "" {
 		sb.WriteString(fmt.Sprintf("%s ", traceID))
 	}
 	if e.ContainerLogs != "" {

@@ -186,7 +186,7 @@ type listRuntimeResponseData struct {
 	Runtimes []Runtime `json:"Runtimes"`
 }
 type listRuntimeResponse struct {
-	Data listRuntimeResponseData
+	Data listRuntimeResponseData `json:"data"`
 }
 
 // List lists all the available runtimes.

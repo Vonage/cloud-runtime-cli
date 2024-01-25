@@ -22,7 +22,7 @@ import (
 	upgradeCmd "vonage-cloud-runtime-cli/vcr/upgrade"
 )
 
-func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, UpdateStream chan string) *cobra.Command {
+func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStream chan string) *cobra.Command {
 	var opts config.GlobalOptions
 	io := f.IOStreams()
 	c := io.ColorScheme()
@@ -51,13 +51,13 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, UpdateStre
 			defer cancel()
 			if cmd.Name() == "configure" {
 				f.SetGlobalOptions(&opts)
-				close(UpdateStream)
+				close(updateStream)
 				return nil
 			}
 
 			cliConfig, err := config.ReadCLIConfig(opts.ConfigFilePath)
 			if err != nil {
-				close(UpdateStream)
+				close(updateStream)
 				return fmt.Errorf("failed to read cli config: %w", err)
 			}
 
@@ -65,35 +65,35 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, UpdateStre
 			err = f.Init(ctx, cliConfig, &opts)
 			spinner.Stop()
 			if err != nil {
-				close(UpdateStream)
+				close(updateStream)
 				return fmt.Errorf("failed to initialize cli: %w", err)
 			}
 
 			if cmd.Name() == "upgrade" {
-				close(UpdateStream)
+				close(updateStream)
 				return nil
 			}
 
 			go func() {
 				ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(opts.Timeout))
 				defer cancel()
-				defer close(UpdateStream)
+				defer close(updateStream)
 				rel, err := checkForUpdate(ctx, f, version)
 				if err != nil {
-					UpdateStream <- fmt.Sprintf("%s Checking for update failed: %s", c.WarningIcon(), err)
+					updateStream <- fmt.Sprintf("%s Checking for update failed: %s", c.WarningIcon(), err)
 					return
 				}
-				UpdateStream <- rel
+				updateStream <- rel
 			}()
 			return nil
 		},
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {
-			format.PrintUpdateMessage(io, version, UpdateStream)
+			format.PrintUpdateMessage(io, version, updateStream)
 		},
 	}
 
 	cmd.SetHelpFunc(func(c *cobra.Command, args []string) {
-		rootHelpFunc(f, c, args)
+		rootHelpFunc(f, c)
 	})
 	cmd.SetUsageFunc(func(c *cobra.Command) error {
 		return rootUsageFunc(f.IOStreams().ErrOut, c)

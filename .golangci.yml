@@ -23,6 +23,56 @@ linters:
     - funlen
     - wsl
     - lll
+    - exhaustivestruct
+    - wrapcheck
+    - exhaustruct
+    - forbidigo
+    - gocyclo
+    - godot
+    - gofumpt
+    - depguard
+    - goerr113
+    - ifshort
+    - interfacebloat
+    - ireturn
+    - paralleltest
+    - testifylint
+    - testpackage
+    - varnamelen
+    - tagliatelle
+    - nlreturn
+    - noctx
+    - gomnd
+    - forcetypeassert
+    - cyclop
+    - whitespace
+    - revive
+    - goimports
+    - gci
+    - scopelint
+    - godox
+    - gosec
+    - nestif
+    - tagalign
+    - mirror
+    - ineffassign
+    - thelper
+    - usestdlibvars
+    - perfsprint
+    - nosnakecase
+    - contextcheck
+    - maligned
+    - goconst
+    - unconvert
+    - durationcheck
+    - usestdlibvars
+    - thelper
+    - predeclared
+    - staticcheck
+    - perfsprint
+    - maintidx
+    - prealloc
+    - unparam
 
 issues:
   exclude-rules:
@@ -32,3 +82,22 @@ issues:
     - text: "package comment should be of the form"
       linters:
         - golint
+    - path: (.+)_test.go
+      linters:
+        - funlen
+        - goconst
+        - dupl
+        - errcheck
+        - exhaustivestruct
+        - errorlint
+        - gocognit
+        - structcheck
+    - path: tests/integration
+      linters:
+        - funlen
+        - goconst
+        - dupl
+        - errcheck
+        - exhaustivestruct
+        - errorlint
+        - structcheck

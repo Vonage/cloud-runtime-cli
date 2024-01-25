@@ -27,7 +27,7 @@ var ErrTimeout = errors.New("timed out waiting for debug server to deploy")
 type Options struct {
 	cmdutil.Factory
 
-	AppId        string
+	AppID        string
 	Name         string
 	Runtime      string
 	Verbose      bool
@@ -98,7 +98,7 @@ func NewCmdDebug(f cmdutil.Factory) *cobra.Command {
 	}
 
 	// flags
-	cmd.Flags().StringVarP(&opts.AppId, "app-id", "i", "", "Application ID")
+	cmd.Flags().StringVarP(&opts.AppID, "app-id", "i", "", "Application ID")
 	cmd.Flags().StringVarP(&opts.Name, "name", "n", "", "Set the name of the debugger proxy")
 	cmd.Flags().StringVarP(&opts.Runtime, "runtime", "r", "", "Select runtime for debugger")
 	cmd.Flags().BoolVarP(&opts.Verbose, "verbose", "v", false, "Enable verbose logging")
@@ -231,7 +231,7 @@ func deployDebugServer(ctx context.Context, opts *Options) (api.DeployResponse, 
 	io := opts.IOStreams()
 	c := io.ColorScheme()
 	var err error
-	opts.AppId, err = cmdutil.StringVar("app-id", opts.AppId, opts.manifest.Debug.ApplicationID, "", true)
+	opts.AppID, err = cmdutil.StringVar("app-id", opts.AppID, opts.manifest.Debug.ApplicationID, "", true)
 	if err != nil {
 		return api.DeployResponse{}, fmt.Errorf("failed to get debug app id: %w", err)
 	}
@@ -246,7 +246,7 @@ func deployDebugServer(ctx context.Context, opts *Options) (api.DeployResponse, 
 		return api.DeployResponse{}, fmt.Errorf("failed to get name: %w", err)
 	}
 
-	if io.CanPrompt() && opts.manifest.Instance.ApplicationID == opts.AppId {
+	if io.CanPrompt() && opts.manifest.Instance.ApplicationID == opts.AppID {
 		if !opts.Survey().AskYesNo("Are you sure you want to debug with instance app id ?") {
 			spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Fetching applications list...")
 			apps, err := opts.DeploymentClient().ListVonageApplications(ctx, "")
@@ -255,12 +255,12 @@ func deployDebugServer(ctx context.Context, opts *Options) (api.DeployResponse, 
 				return api.DeployResponse{}, fmt.Errorf("failed to list Vonage applications: %w", err)
 			}
 			appOptions := format.GetAppOptions(apps.Applications)
-			appLabel, err := opts.Survey().AskForUserChoice("Select your Vonage application ID for debug session:", appOptions.Labels, appOptions.IdLookup, "")
+			appLabel, err := opts.Survey().AskForUserChoice("Select your Vonage application ID for debug session:", appOptions.Labels, appOptions.IDLookup, "")
 			if err != nil {
 				return api.DeployResponse{}, fmt.Errorf("failed to select Vonage application: %w", err)
 			}
 			if appLabel != "SKIP" {
-				opts.AppId = appOptions.IdLookup[appLabel]
+				opts.AppID = appOptions.IDLookup[appLabel]
 			}
 		}
 	}
@@ -281,7 +281,7 @@ func deployDebugServer(ctx context.Context, opts *Options) (api.DeployResponse, 
 	}
 
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Deploying debug server...")
-	resp, err := opts.DeploymentClient().DeployDebugService(ctx, opts.region, opts.AppId, opts.Name, caps)
+	resp, err := opts.DeploymentClient().DeployDebugService(ctx, opts.region, opts.AppID, opts.Name, caps)
 	spinner.Stop()
 	if err != nil {
 		return api.DeployResponse{}, fmt.Errorf("failed to deploy debug server: %w", err)
@@ -348,7 +348,7 @@ func startApp(ctx context.Context, opts *Options, resp api.DeployResponse, regio
 		resp.ServiceName,
 		opts.APIKey(),
 		opts.APISecret(),
-		opts.AppId,
+		opts.AppID,
 		opts.AppPort,
 		opts.DebuggerPort,
 		resp.PrivateKey,

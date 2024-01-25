@@ -21,7 +21,7 @@ import (
 type Options struct {
 	cmdutil.Factory
 	ProjectName, InstanceName string
-	AppId                     string
+	AppID                     string
 	Runtime                   string
 	Capabilities              string
 	CapabilitiesParsed        api.Capabilities
@@ -30,7 +30,7 @@ type Options struct {
 	cwd          string
 	ManifestFile string
 	manifest     *config.Manifest
-	projectId    string
+	projectID    string
 	region       string
 }
 
@@ -105,7 +105,7 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 
 	cmd.Flags().StringVarP(&opts.ProjectName, "project-name", "p", "", "Project name")
 	cmd.Flags().StringVarP(&opts.Runtime, "runtime", "r", "", "Set the runtime of the application")
-	cmd.Flags().StringVarP(&opts.AppId, "app-id", "i", "", "Set the ID of the Vonage application you wish to link the VCR application to")
+	cmd.Flags().StringVarP(&opts.AppID, "app-id", "i", "", "Set the ID of the Vonage application you wish to link the VCR application to")
 	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "Instance name")
 	cmd.Flags().StringVarP(&opts.Capabilities, "capabilities", "c", "", "Provide the comma separated capabilities required for your application. eg: \"messaging,voice\"")
 	cmd.Flags().StringVarP(&opts.TgzFile, "tgz", "z", "", "Provide the path to the tar.gz code you wish to deploy. Code need to be compressed from root directory and include library")
@@ -130,14 +130,14 @@ func runDeploy(ctx context.Context, opts *Options) error {
 
 	opts.region, err = cmdutil.StringVar("region", opts.GlobalOptions().Region, opts.manifest.Instance.Region, opts.Region(), true)
 	if err != nil {
-		fmt.Errorf("failed to get region: %w", err)
+		return fmt.Errorf("failed to get region: %w", err)
 	}
 
 	if err := opts.InitDeploymentClient(ctx, opts.region); err != nil {
 		return fmt.Errorf("failed to initialize deployment client: %w", err)
 	}
 
-	opts.projectId, err = createProject(ctx, opts)
+	opts.projectID, err = createProject(ctx, opts)
 	if err != nil {
 		return err
 	}
@@ -296,7 +296,7 @@ func createProject(ctx context.Context, opts *Options) (string, error) {
 		return "", fmt.Errorf("failed to get project name: %w", err)
 	}
 
-	var projectId string
+	var projectID string
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Getting project details...")
 	proj, err := opts.Datastore().GetProject(ctx, opts.APIKey(), opts.ProjectName)
 	spinner.Stop()
@@ -310,15 +310,15 @@ func createProject(ctx context.Context, opts *Options) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("failed to create project %q: %w", opts.ProjectName, err)
 		}
-		projectId = result.ProjectID
-		fmt.Fprintf(io.Out, "%s Project %q created: project_id=%q\n", c.SuccessIcon(), opts.ProjectName, projectId)
-		return projectId, nil
+		projectID = result.ProjectID
+		fmt.Fprintf(io.Out, "%s Project %q created: project_id=%q\n", c.SuccessIcon(), opts.ProjectName, projectID)
+		return projectID, nil
 	}
 
-	projectId = proj.ID
-	fmt.Fprintf(io.Out, "%s Project %q retrieved: project_id=%q\n", c.SuccessIcon(), opts.ProjectName, projectId)
+	projectID = proj.ID
+	fmt.Fprintf(io.Out, "%s Project %q retrieved: project_id=%q\n", c.SuccessIcon(), opts.ProjectName, projectID)
 
-	return projectId, nil
+	return projectID, nil
 }
 
 func uploadSourceCode(ctx context.Context, opts *Options) (api.UploadResponse, error) {
@@ -393,7 +393,7 @@ func createPackage(ctx context.Context, opts *Options, uploadResp api.UploadResp
 func Deploy(ctx context.Context, opts *Options, createPkgResp api.CreatePackageResponse) (api.DeployInstanceResponse, error) {
 
 	var err error
-	opts.AppId, err = cmdutil.StringVar("app-id", opts.AppId, opts.manifest.Instance.ApplicationID, "", true)
+	opts.AppID, err = cmdutil.StringVar("app-id", opts.AppID, opts.manifest.Instance.ApplicationID, "", true)
 	if err != nil {
 		return api.DeployInstanceResponse{}, fmt.Errorf("failed to get instance app id: %w", err)
 	}
@@ -405,8 +405,8 @@ func Deploy(ctx context.Context, opts *Options, createPkgResp api.CreatePackageR
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Deploying instance...")
 	deployInstanceArgs := api.DeployInstanceArgs{
 		PackageID:        createPkgResp.PackageID,
-		ProjectID:        opts.projectId,
-		APIApplicationID: opts.AppId,
+		ProjectID:        opts.projectID,
+		APIApplicationID: opts.AppID,
 		InstanceName:     opts.InstanceName,
 		Region:           opts.region,
 		Environment:      opts.manifest.Instance.Environment,

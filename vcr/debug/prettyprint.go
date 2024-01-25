@@ -132,6 +132,7 @@ func flattenMapForPrinting(m map[string][]string) string {
 }
 
 func marshalIndent(v interface{}) string {
+	//nolint
 	buf, _ := json.MarshalIndent(v, "      ", "  ")
 	return string(buf)
 }

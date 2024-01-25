@@ -36,6 +36,7 @@ func startDebugProxyServer(appName, localAppHost, hostAddress, websocketServerUR
 			}
 		}
 		w.WriteHeader(resp.Status)
+		//nolint
 		w.Write(resp.Payload)
 	})
 
@@ -47,7 +48,7 @@ func startDebugProxyServer(appName, localAppHost, hostAddress, websocketServerUR
 	errStream := make(chan error, 2)
 	go func() {
 		if err := connClient.run(); err != nil {
-			errStream <- fmt.Errorf("failed to run websocket connection: %s", err)
+			errStream <- fmt.Errorf("failed to run websocket connection: %w", err)
 		}
 	}()
 	go func() {

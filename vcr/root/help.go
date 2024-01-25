@@ -2,6 +2,7 @@ package root
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -40,7 +41,7 @@ func rootUsageFunc(w io.Writer, command *cobra.Command) error {
 }
 
 func rootFlagErrorFunc(cmd *cobra.Command, err error) error {
-	if err == pflag.ErrHelp {
+	if errors.Is(err, pflag.ErrHelp) {
 		return err
 	}
 	return cmdutil.FlagErrorWrap(err)
@@ -84,7 +85,7 @@ func isRootCmd(command *cobra.Command) bool {
 	return command != nil && !command.HasParent()
 }
 
-func rootHelpFunc(f cmdutil.Factory, command *cobra.Command, args []string) {
+func rootHelpFunc(f cmdutil.Factory, command *cobra.Command) {
 	flags := command.Flags()
 
 	if isRootCmd(command) {

@@ -5,8 +5,8 @@ import "time"
 type Region struct {
 	Name              string `json:"name"`
 	Alias             string `json:"alias"`
-	DeploymentApiURL  string `json:"deployment_api_url"`
-	AssetsApiURL      string `json:"assets_api_url"`
+	DeploymentAPIURL  string `json:"deployment_api_url"`
+	AssetsAPIURL      string `json:"assets_api_url"`
 	EndpointURLScheme string `json:"endpoint_url_scheme"`
 	DebuggerURLScheme string `json:"debugger_url_scheme"`
 	HostTemplate      string `json:"host_template"`

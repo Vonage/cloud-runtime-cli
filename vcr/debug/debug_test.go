@@ -18,7 +18,7 @@ import (
 
 func Test_deployDebugServer(t *testing.T) {
 	type mock struct {
-		DebugAppId    string
+		DebugAppID    string
 		DebugRuntime  string
 		DebugRegion   string
 		DebugName     string
@@ -34,7 +34,7 @@ func Test_deployDebugServer(t *testing.T) {
 		DebugAskForUserChoiceErr     error
 
 		DebugDeployDebugServiceRegion    string
-		DebugDeployDebugServiceAppId     string
+		DebugDeployDebugServiceAppID     string
 		DebugDeployDebugServiceName      string
 		DebugDeployDebugServiceCaps      api.Capabilities
 		DebugDeployDebugServiceTimes     int
@@ -65,7 +65,7 @@ func Test_deployDebugServer(t *testing.T) {
 			name: "happy-path",
 			mock: mock{
 
-				DebugAppId:   "id-1",
+				DebugAppID:   "id-1",
 				DebugRuntime: "nodejs",
 				DebugName:    "name-1",
 				DebugRegion:  "eu-west-1",
@@ -98,7 +98,7 @@ func Test_deployDebugServer(t *testing.T) {
 				DebugAskForUserChoiceErr:     nil,
 
 				DebugDeployDebugServiceRegion:    "eu-west-1",
-				DebugDeployDebugServiceAppId:     "id-1",
+				DebugDeployDebugServiceAppID:     "id-1",
 				DebugDeployDebugServiceName:      "name-1",
 				DebugDeployDebugServiceCaps:      api.Capabilities{Messages: "v1.0"},
 				DebugDeployDebugServiceTimes:     1,
@@ -137,7 +137,7 @@ func Test_deployDebugServer(t *testing.T) {
 				Times(tt.mock.DebugAskForUserChoiceTimes).
 				Return(tt.mock.DebugReturnAppLabel, tt.mock.DebugAskForUserChoiceErr)
 
-			deploymentMock.EXPECT().DeployDebugService(gomock.Any(), tt.mock.DebugDeployDebugServiceRegion, tt.mock.DebugDeployDebugServiceAppId, tt.mock.DebugDeployDebugServiceName, tt.mock.DebugDeployDebugServiceCaps).
+			deploymentMock.EXPECT().DeployDebugService(gomock.Any(), tt.mock.DebugDeployDebugServiceRegion, tt.mock.DebugDeployDebugServiceAppID, tt.mock.DebugDeployDebugServiceName, tt.mock.DebugDeployDebugServiceCaps).
 				Times(tt.mock.DebugDeployDebugServiceTimes).
 				Return(tt.mock.DebugReturnDeployResponse, tt.mock.DebugDeployDebugServiceReturnErr)
 
@@ -155,7 +155,7 @@ func Test_deployDebugServer(t *testing.T) {
 
 			opts := &Options{
 				Factory:  f,
-				AppId:    tt.mock.DebugAppId,
+				AppID:    tt.mock.DebugAppID,
 				Runtime:  tt.mock.DebugRuntime,
 				region:   tt.mock.DebugRegion,
 				Name:     tt.mock.DebugName,
@@ -204,7 +204,6 @@ func Test_startDebugProxy(t *testing.T) {
 	}
 	type want struct {
 		errMsg  string
-		stdout  string
 		stderr  string
 		region  api.Region
 		httpURL string
@@ -241,7 +240,7 @@ func Test_startDebugProxy(t *testing.T) {
 				Times(tt.mock.DebugGetRegionTimes).
 				Return(tt.mock.DebugReturnRegion, tt.mock.DebugGetRegionReturnError)
 
-			ios, _, stdout, stderr := iostreams.Test()
+			ios, _, _, stderr := iostreams.Test()
 
 			f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, deploymentMock, nil)
 
@@ -264,7 +263,6 @@ func Test_startDebugProxy(t *testing.T) {
 				return
 			}
 			cmdOut := &testutil.CmdOut{
-				OutBuf: stdout,
 				ErrBuf: stderr,
 			}
 

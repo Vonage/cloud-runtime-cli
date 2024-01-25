@@ -44,7 +44,7 @@ type DeploymentInterface interface {
 	DeployInstance(ctx context.Context, deployInstanceArgs api.DeployInstanceArgs) (api.DeployInstanceResponse, error)
 	DeleteInstance(ctx context.Context, instanceID string) error
 	UploadTgz(ctx context.Context, fileBytes []byte) (api.UploadResponse, error)
-	WatchDeployment(ctx context.Context, out *iostreams.IOStreams, packageId string) error
+	WatchDeployment(ctx context.Context, out *iostreams.IOStreams, packageID string) error
 	CreateSecret(ctx context.Context, s config.Secret) error
 	UpdateSecret(ctx context.Context, s config.Secret) error
 	RemoveSecret(ctx context.Context, name string) error
@@ -125,8 +125,8 @@ func (f *DefaultFactory) Init(ctx context.Context, cfg config.CLIConfig, opts *c
 		}
 		return err
 	}
-	f.assetClient = api.NewAssetClient(region.AssetsApiURL, f.httpClient)
-	f.deploymentClient = api.NewDeploymentClient(region.DeploymentApiURL, f.apiVersion, f.httpClient, f.websocketConnectionClient)
+	f.assetClient = api.NewAssetClient(region.AssetsAPIURL, f.httpClient)
+	f.deploymentClient = api.NewDeploymentClient(region.DeploymentAPIURL, f.apiVersion, f.httpClient, f.websocketConnectionClient)
 	f.releaseClient = api.NewReleaseClient(f.releaseURL, f.httpClient)
 	return nil
 }
@@ -146,7 +146,7 @@ func (f *DefaultFactory) InitDeploymentClient(ctx context.Context, regionAlias s
 		}
 		return err
 	}
-	f.deploymentClient = api.NewDeploymentClient(region.DeploymentApiURL, f.apiVersion, f.httpClient, f.websocketConnectionClient)
+	f.deploymentClient = api.NewDeploymentClient(region.DeploymentAPIURL, f.apiVersion, f.httpClient, f.websocketConnectionClient)
 	return nil
 }
 

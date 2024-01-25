@@ -17,7 +17,7 @@ import (
 
 func TestAppGenerateKeys(t *testing.T) {
 	type mock struct {
-		GenerateAppId         string
+		GenerateAppID         string
 		GenerateKeysTimes     int
 		GenerateKeysReturnErr error
 	}
@@ -36,7 +36,7 @@ func TestAppGenerateKeys(t *testing.T) {
 			name: "happy-path",
 			cli:  "--app-id=42066b10-c4ae-48a0-addd-feb2bd615a67",
 			mock: mock{
-				GenerateAppId:         "42066b10-c4ae-48a0-addd-feb2bd615a67",
+				GenerateAppID:         "42066b10-c4ae-48a0-addd-feb2bd615a67",
 				GenerateKeysTimes:     1,
 				GenerateKeysReturnErr: nil,
 			},
@@ -61,7 +61,7 @@ func TestAppGenerateKeys(t *testing.T) {
 			name: "generate-keys-api-error",
 			cli:  "--app-id=42066b10-c4ae-48a0-addd-feb2bd615a67",
 			mock: mock{
-				GenerateAppId:         "42066b10-c4ae-48a0-addd-feb2bd615a67",
+				GenerateAppID:         "42066b10-c4ae-48a0-addd-feb2bd615a67",
 				GenerateKeysTimes:     1,
 				GenerateKeysReturnErr: errors.New("api error"),
 			},
@@ -77,7 +77,7 @@ func TestAppGenerateKeys(t *testing.T) {
 			ctrl := gomock.NewController(t)
 
 			deploymentMock := mocks.NewMockDeploymentInterface(ctrl)
-			deploymentMock.EXPECT().GenerateVonageApplicationKeys(gomock.Any(), tt.mock.GenerateAppId).
+			deploymentMock.EXPECT().GenerateVonageApplicationKeys(gomock.Any(), tt.mock.GenerateAppID).
 				Times(tt.mock.GenerateKeysTimes).
 				Return(tt.mock.GenerateKeysReturnErr)
 

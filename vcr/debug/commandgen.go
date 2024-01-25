@@ -130,5 +130,6 @@ func killProcessRecursive(p *process.Process) {
 			killProcessRecursive(c)
 		}
 	}
+	//nolint
 	p.Kill()
 }

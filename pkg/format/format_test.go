@@ -129,7 +129,7 @@ func TestParseCapabilities(t *testing.T) {
 }
 
 func TestPrintUpdateMessage(t *testing.T) {
-	ios, _, stdout, stderr := iostreams.Test()
+	ios, _, stdout, _ := iostreams.Test()
 	version := "1.0.0"
 	updateMessageChan := make(chan string)
 	expectedOutput := fmt.Sprintf("\n\n%s %s → %s\nTo upgrade, run: %s\n",
@@ -146,7 +146,7 @@ func TestPrintUpdateMessage(t *testing.T) {
 
 	require.Equal(t, expectedOutput, stdout.String())
 
-	ios, _, _, stderr = iostreams.Test()
+	ios, _, _, stderr := iostreams.Test()
 	updateMessageChan = make(chan string)
 	errMessage := "Invalid release message"
 	go func() {
@@ -183,7 +183,7 @@ func TestGetAppOptions(t *testing.T) {
 			"2": "App 2 - (2)",
 			"3": "App 3 - (3)",
 		},
-		IdLookup: map[string]string{
+		IDLookup: map[string]string{
 			"App 1 - (1)": "1",
 			"App 2 - (2)": "2",
 			"App 3 - (3)": "3",
@@ -194,7 +194,7 @@ func TestGetAppOptions(t *testing.T) {
 
 	require.Equal(t, expectedOptions.Labels, options.Labels)
 	require.Equal(t, expectedOptions.Lookup, options.Lookup)
-	require.Equal(t, expectedOptions.IdLookup, options.IdLookup)
+	require.Equal(t, expectedOptions.IDLookup, options.IDLookup)
 }
 
 func TestGetRuntimeOptions(t *testing.T) {

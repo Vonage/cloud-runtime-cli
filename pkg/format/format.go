@@ -87,21 +87,21 @@ func GetRuntimeOptions(runtimes []api.Runtime) RuntimeOptions {
 type AppOptions struct {
 	Labels   []string
 	Lookup   map[string]string
-	IdLookup map[string]string
+	IDLookup map[string]string
 }
 
 func GetAppOptions(apps []api.ApplicationListItem) AppOptions {
 	options := AppOptions{
 		Labels:   make([]string, 0),
 		Lookup:   map[string]string{},
-		IdLookup: make(map[string]string),
+		IDLookup: make(map[string]string),
 	}
 	options.Labels = append(options.Labels, "SKIP")
 	for _, r := range apps {
 		label := fmt.Sprintf("%s - (%s)", r.Name, r.ID)
 		options.Labels = append(options.Labels, label)
 		options.Lookup[r.ID] = label
-		options.IdLookup[label] = r.ID
+		options.IDLookup[label] = r.ID
 	}
 	return options
 }
@@ -196,7 +196,7 @@ func PrintAPIError(err error, httpErr *api.Error) string {
 	httpStatus = fmt.Sprintf("HTTP status : %s", strconv.Itoa(httpErr.HTTPStatusCode))
 	errorCode = fmt.Sprintf("Error code : %s", strconv.Itoa(httpErr.ServerCode))
 	detailedMessage = fmt.Sprintf("Detailed message : %s", httpErr.Message)
-	traceID = fmt.Sprintf("Trace ID : %s", httpErr.TraceId)
+	traceID = fmt.Sprintf("Trace ID : %s", httpErr.TraceID)
 	containerLogs = fmt.Sprintf("Container logs : %s", httpErr.ContainerLogs)
 
 	var sb strings.Builder
@@ -207,7 +207,7 @@ func PrintAPIError(err error, httpErr *api.Error) string {
 	if httpErr.Message != "" {
 		sb.WriteString(fmt.Sprintf(" 	%s\n", detailedMessage))
 	}
-	if httpErr.TraceId != "" {
+	if httpErr.TraceID != "" {
 		sb.WriteString(fmt.Sprintf(" 	%s\n", traceID))
 	}
 	if httpErr.ContainerLogs != "" {

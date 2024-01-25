@@ -40,6 +40,7 @@ func printError(out *iostreams.IOStreams, err error, cmd *cobra.Command, updateM
 	c := out.ColorScheme()
 	var flagError *cmdutil.FlagError
 	var httpErr api.Error
+	//nolint
 	if errors.As(err, &flagError) || strings.HasPrefix(err.Error(), "unknown command ") {
 		fmt.Fprintf(out.ErrOut, "%s\n", err)
 		fmt.Fprintln(out.ErrOut, cmd.UsageString())

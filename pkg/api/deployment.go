@@ -309,8 +309,8 @@ func (c *DeploymentClient) UploadTgz(ctx context.Context, fileBytes []byte) (Upl
 var completedRegex = regexp.MustCompile(`(?i)(status.*completed|completed.*status)`)
 var failedRegex = regexp.MustCompile(`(?i)(status.*failed|failed.*status|failed to watch build logs)`)
 
-func (c *DeploymentClient) WatchDeployment(ctx context.Context, out *iostreams.IOStreams, packageId string) error {
-	url := fmt.Sprintf("%s/packages/%s/build/watch", strings.Replace(c.baseURL, "http", "ws", 1), packageId)
+func (c *DeploymentClient) WatchDeployment(ctx context.Context, out *iostreams.IOStreams, packageID string) error {
+	url := fmt.Sprintf("%s/packages/%s/build/watch", strings.Replace(c.baseURL, "http", "ws", 1), packageID)
 	err := c.websocketConnectionClient.ConnectWithRetry(url)
 	if err != nil {
 		return err
@@ -328,12 +328,12 @@ func (c *DeploymentClient) WatchDeployment(ctx context.Context, out *iostreams.I
 					return nil
 				}
 				if failedRegex.MatchString(string(message)) {
-					return fmt.Errorf("error while building package %s", packageId)
+					return fmt.Errorf("error while building package %s", packageID)
 				}
 				continue
 			}
 			if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
-				return fmt.Errorf("error while building package %s, normal closure from server", packageId)
+				return fmt.Errorf("error while building package %s, normal closure from server", packageID)
 			}
 			c.websocketConnectionClient.conn.Close()
 			if err := c.websocketConnectionClient.ConnectWithRetry(url); err != nil {

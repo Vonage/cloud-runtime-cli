@@ -41,7 +41,7 @@ func NewCmdUpgrade(f cmdutil.Factory, version, buildDate, commit string) *cobra.
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
 			defer cancel()
 			fmt.Fprint(f.IOStreams().Out, cmd.Root().Annotations["versionInfo"])
-			return runUpdate(ctx, &opts, version, buildDate, commit)
+			return runUpgrade(ctx, &opts, version)
 		},
 	}
 
@@ -50,13 +50,13 @@ func NewCmdUpgrade(f cmdutil.Factory, version, buildDate, commit string) *cobra.
 	return cmd
 }
 
-func runUpdate(ctx context.Context, opts *Options, version, buildDate, commit string) error {
+func runUpgrade(ctx context.Context, opts *Options, version string) error {
 	io := opts.IOStreams()
 	c := opts.IOStreams().ColorScheme()
 
 	current, err := GetCurrentVersion(version)
 	if err != nil {
-		return fmt.Errorf("current update is invalid: %s", err)
+		return fmt.Errorf("current update is invalid: %w", err)
 	}
 
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Checking for update...")
@@ -133,7 +133,7 @@ func GetLatestVersion(release api.Release) (semver.Version, error) {
 	releaseVersion := strings.TrimPrefix(release.TagName, "v")
 	parsedVersion, err := semver.Parse(releaseVersion)
 	if err != nil {
-		return semver.Version{}, fmt.Errorf("invalid update found: %s", err)
+		return semver.Version{}, fmt.Errorf("invalid update found: %w", err)
 	}
 
 	return parsedVersion, nil

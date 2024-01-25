@@ -48,7 +48,7 @@ func Test_printError(t *testing.T) {
 					HTTPStatusCode: 404,
 					ServerCode:     3001,
 					Message:        "Not Found",
-					TraceId:        "1234",
+					TraceID:        "1234",
 					ContainerLogs:  "container logs",
 				}),
 				cmd:           cmd,

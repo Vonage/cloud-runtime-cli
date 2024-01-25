@@ -96,10 +96,10 @@ func runInit(ctx context.Context, opts *Options) error {
 	if err := askRegion(ctx, opts); err != nil {
 		return fmt.Errorf("failed to ask region: %w", err)
 	}
-	if err := askInstanceAppId(ctx, opts); err != nil {
+	if err := askInstanceAppID(ctx, opts); err != nil {
 		return fmt.Errorf("failed to ask instance app id: %w", err)
 	}
-	if err := askDebugAppId(ctx, opts); err != nil {
+	if err := askDebugAppID(ctx, opts); err != nil {
 		return fmt.Errorf("failed to ask debug app id: %w", err)
 	}
 	if err := askTemplate(ctx, opts); err != nil {
@@ -140,8 +140,8 @@ promptProjectName:
 	return nil
 }
 
-func askInstanceAppId(ctx context.Context, opts *Options) error {
-	appId := opts.manifest.Instance.ApplicationID
+func askInstanceAppID(ctx context.Context, opts *Options) error {
+	appID := opts.manifest.Instance.ApplicationID
 
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Retrieving app list... ")
 	apps, err := opts.DeploymentClient().ListVonageApplications(ctx, "")
@@ -151,19 +151,19 @@ func askInstanceAppId(ctx context.Context, opts *Options) error {
 	}
 	appOptions := format.GetAppOptions(apps.Applications)
 
-	appLabel, err := opts.Survey().AskForUserChoice("Select your Vonage application ID for deployment:", appOptions.Labels, appOptions.IdLookup, appOptions.Lookup[appId])
+	appLabel, err := opts.Survey().AskForUserChoice("Select your Vonage application ID for deployment:", appOptions.Labels, appOptions.IDLookup, appOptions.Lookup[appID])
 	if err != nil {
 		return err
 	}
 	if appLabel == "SKIP" {
 		return nil
 	}
-	opts.manifest.Instance.ApplicationID = appOptions.IdLookup[appLabel]
+	opts.manifest.Instance.ApplicationID = appOptions.IDLookup[appLabel]
 	return nil
 }
 
-func askDebugAppId(ctx context.Context, opts *Options) error {
-	appId := opts.manifest.Debug.ApplicationID
+func askDebugAppID(ctx context.Context, opts *Options) error {
+	appID := opts.manifest.Debug.ApplicationID
 
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Retrieving app list... ")
 	apps, err := opts.DeploymentClient().ListVonageApplications(ctx, "")
@@ -173,14 +173,14 @@ func askDebugAppId(ctx context.Context, opts *Options) error {
 	}
 	appOptions := format.GetAppOptions(apps.Applications)
 
-	appLabel, err := opts.Survey().AskForUserChoice("Select your Vonage application ID for debug:", appOptions.Labels, appOptions.IdLookup, appOptions.Lookup[appId])
+	appLabel, err := opts.Survey().AskForUserChoice("Select your Vonage application ID for debug:", appOptions.Labels, appOptions.IDLookup, appOptions.Lookup[appID])
 	if err != nil {
 		return err
 	}
 	if appLabel == "SKIP" {
 		return nil
 	}
-	opts.manifest.Debug.ApplicationID = appOptions.IdLookup[appLabel]
+	opts.manifest.Debug.ApplicationID = appOptions.IDLookup[appLabel]
 	return nil
 }
 

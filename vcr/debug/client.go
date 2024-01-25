@@ -160,6 +160,7 @@ func (c *DebuggerConnectionClient) ReadMessage() (int, []byte, error) {
 	for {
 		messageType, message, err := c.conn.ReadMessage()
 		if err == nil {
+			//nolint
 			return messageType, message, err
 		}
 		if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
@@ -187,10 +188,6 @@ func (c *DebuggerConnectionClient) WriteJSON(v interface{}) error {
 		}
 		continue
 	}
-}
-
-func (c *DebuggerConnectionClient) close() {
-	close(c.done)
 }
 
 func (c *DebuggerConnectionClient) sendRemoteRequest(cmd remoteCommand, headers http.Header, query url.Values) <-chan websocketResponseMessage {
