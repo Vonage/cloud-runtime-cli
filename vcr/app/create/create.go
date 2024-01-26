@@ -32,11 +32,8 @@ func NewCmdAppCreate(f cmdutil.Factory) *cobra.Command {
 		Example: heredoc.Doc(`
 				$ vcr app create --name App
 				✓ Application created
-					id: 1
-					name: App
-					enableRTC: true
-					enableVoice: false
-					enableMessages: true
+				ℹ id: 1
+				ℹ name: App
 				`),
 		Args: cobra.MaximumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -80,17 +77,13 @@ func runCreate(ctx context.Context, opts *Options) error {
 	}
 	fmt.Fprintf(io.Out, heredoc.Doc(`
 						%s Application created
-							id: %s
-							name: %s
-							enableRTC: %t
-							enableVoice: %t
-							enableMessages: %t
+						%s id: %s
+						%s name: %s
 						`),
 		c.SuccessIcon(),
+		c.Green(cmdutil.InfoIcon),
 		result.ApplicationID,
-		result.ApplicationName,
-		opts.EnableRTC,
-		opts.EnableVoice,
-		opts.EnableMessages)
+		c.Green(cmdutil.InfoIcon),
+		result.ApplicationName)
 	return nil
 }

@@ -118,10 +118,9 @@ func TestDeploy(t *testing.T) {
 				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n" +
 					"✓ Source code uploaded.\n" +
 					"✓ Package created: package_id=\"test-package-id\"\n" +
-					"Start Watching build logs for package \"test-package-id\" ...\n" +
-					"Build logs ends\n" +
+					"Waiting for build to start...\n" +
 					"✓ Package \"test-package-id\" built successfully\n" +
-					"✓ Instance has been deployed!\n\tinstance id: test-instance-id\n\tinstance service name: test-service-name\n\tinstance host address: test-host-url\n",
+					"✓ Instance has been deployed!\nℹ instance id: test-instance-id\nℹ instance service name: test-service-name\n➜ instance host address: test-host-url\n",
 			},
 		},
 
@@ -178,10 +177,9 @@ func TestDeploy(t *testing.T) {
 				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n" +
 					"✓ Source code uploaded.\n" +
 					"✓ Package created: package_id=\"test-package-id\"\n" +
-					"Start Watching build logs for package \"test-package-id\" ...\n" +
-					"Build logs ends\n" +
+					"Waiting for build to start...\n" +
 					"✓ Package \"test-package-id\" built successfully\n" +
-					"✓ Instance has been deployed!\n\tinstance id: test-instance-id\n\tinstance service name: test-service-name\n\tinstance host address: test-host-url\n",
+					"✓ Instance has been deployed!\nℹ instance id: test-instance-id\nℹ instance service name: test-service-name\n➜ instance host address: test-host-url\n",
 			},
 		},
 	}
