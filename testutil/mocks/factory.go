@@ -251,6 +251,21 @@ func (m *MockDeploymentInterface) EXPECT() *MockDeploymentInterfaceMockRecorder 
 	return m.recorder
 }
 
+// CreateMongoDatabase mocks base method.
+func (m *MockDeploymentInterface) CreateMongoDatabase(ctx context.Context, version string) (api.MongoInfoResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateMongoDatabase", ctx, version)
+	ret0, _ := ret[0].(api.MongoInfoResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateMongoDatabase indicates an expected call of CreateMongoDatabase.
+func (mr *MockDeploymentInterfaceMockRecorder) CreateMongoDatabase(ctx, version interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMongoDatabase", reflect.TypeOf((*MockDeploymentInterface)(nil).CreateMongoDatabase), ctx, version)
+}
+
 // CreatePackage mocks base method.
 func (m *MockDeploymentInterface) CreatePackage(ctx context.Context, createPackageArgs api.CreatePackageArgs) (api.CreatePackageResponse, error) {
 	m.ctrl.T.Helper()
@@ -338,6 +353,20 @@ func (mr *MockDeploymentInterfaceMockRecorder) DeleteInstance(ctx, instanceID in
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteInstance", reflect.TypeOf((*MockDeploymentInterface)(nil).DeleteInstance), ctx, instanceID)
 }
 
+// DeleteMongoDatabase mocks base method.
+func (m *MockDeploymentInterface) DeleteMongoDatabase(ctx context.Context, version, database string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteMongoDatabase", ctx, version, database)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteMongoDatabase indicates an expected call of DeleteMongoDatabase.
+func (mr *MockDeploymentInterfaceMockRecorder) DeleteMongoDatabase(ctx, version, database interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMongoDatabase", reflect.TypeOf((*MockDeploymentInterface)(nil).DeleteMongoDatabase), ctx, version, database)
+}
+
 // DeployDebugService mocks base method.
 func (m *MockDeploymentInterface) DeployDebugService(ctx context.Context, region, applicationID, name string, caps api.Capabilities) (api.DeployResponse, error) {
 	m.ctrl.T.Helper()
@@ -382,6 +411,21 @@ func (mr *MockDeploymentInterfaceMockRecorder) GenerateVonageApplicationKeys(ctx
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateVonageApplicationKeys", reflect.TypeOf((*MockDeploymentInterface)(nil).GenerateVonageApplicationKeys), ctx, appID)
 }
 
+// GetMongoDatabase mocks base method.
+func (m *MockDeploymentInterface) GetMongoDatabase(ctx context.Context, version, database string) (api.MongoInfoResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMongoDatabase", ctx, version, database)
+	ret0, _ := ret[0].(api.MongoInfoResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetMongoDatabase indicates an expected call of GetMongoDatabase.
+func (mr *MockDeploymentInterfaceMockRecorder) GetMongoDatabase(ctx, version, database interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMongoDatabase", reflect.TypeOf((*MockDeploymentInterface)(nil).GetMongoDatabase), ctx, version, database)
+}
+
 // GetServiceReadyStatus mocks base method.
 func (m *MockDeploymentInterface) GetServiceReadyStatus(ctx context.Context, serviceName string) (bool, error) {
 	m.ctrl.T.Helper()
@@ -395,6 +439,21 @@ func (m *MockDeploymentInterface) GetServiceReadyStatus(ctx context.Context, ser
 func (mr *MockDeploymentInterfaceMockRecorder) GetServiceReadyStatus(ctx, serviceName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServiceReadyStatus", reflect.TypeOf((*MockDeploymentInterface)(nil).GetServiceReadyStatus), ctx, serviceName)
+}
+
+// ListMongoDatabases mocks base method.
+func (m *MockDeploymentInterface) ListMongoDatabases(ctx context.Context, version string) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListMongoDatabases", ctx, version)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListMongoDatabases indicates an expected call of ListMongoDatabases.
+func (mr *MockDeploymentInterfaceMockRecorder) ListMongoDatabases(ctx, version interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMongoDatabases", reflect.TypeOf((*MockDeploymentInterface)(nil).ListMongoDatabases), ctx, version)
 }
 
 // ListVonageApplications mocks base method.

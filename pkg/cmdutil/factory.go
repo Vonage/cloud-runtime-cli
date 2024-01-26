@@ -52,6 +52,10 @@ type DeploymentInterface interface {
 	CreateSecret(ctx context.Context, s config.Secret) error
 	UpdateSecret(ctx context.Context, s config.Secret) error
 	RemoveSecret(ctx context.Context, name string) error
+	CreateMongoDatabase(ctx context.Context, version string) (api.MongoInfoResponse, error)
+	DeleteMongoDatabase(ctx context.Context, version, database string) error
+	GetMongoDatabase(ctx context.Context, version, database string) (api.MongoInfoResponse, error)
+	ListMongoDatabases(ctx context.Context, version string) ([]string, error)
 }
 
 type DatastoreInterface interface {
