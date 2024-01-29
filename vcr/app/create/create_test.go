@@ -53,11 +53,8 @@ func TestAppCreate(t *testing.T) {
 			want: want{
 				stdout: heredoc.Doc(`
 				✓ Application created
-					id: 1
-					name: App
-					enableRTC: false
-					enableVoice: false
-					enableMessages: false
+				ℹ id: 1
+				ℹ name: App
 				`),
 			},
 		},

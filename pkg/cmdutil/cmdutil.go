@@ -8,6 +8,9 @@ import (
 	"github.com/briandowns/spinner"
 )
 
+const RightArrowIcon = "➜"
+const InfoIcon = "ℹ"
+
 type Survey struct{}
 
 // AskYesNo prompts the user with a yes/no question and returns true for "yes" and false for "no"

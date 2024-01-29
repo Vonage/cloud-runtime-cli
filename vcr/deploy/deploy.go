@@ -160,15 +160,17 @@ func runDeploy(ctx context.Context, opts *Options) error {
 
 	hostsString := ""
 	for _, url := range deploymentResponse.HostURLs {
-		hostsString += fmt.Sprintf("\n	instance host address: %s", url)
+		hostsString += fmt.Sprintf("\n%s instance host address: %s", c.Magenta(cmdutil.RightArrowIcon), url)
 	}
 	fmt.Fprintf(io.Out, heredoc.Doc(`
 						%s Instance has been deployed!
-							instance id: %s
-							instance service name: %s%s
+						%s instance id: %s
+						%s instance service name: %s%s
 						`),
 		c.SuccessIcon(),
+		c.Blue(cmdutil.InfoIcon),
 		deploymentResponse.InstanceID,
+		c.Blue(cmdutil.InfoIcon),
 		deploymentResponse.ServiceName,
 		hostsString)
 	return nil
@@ -379,12 +381,11 @@ func createPackage(ctx context.Context, opts *Options, uploadResp api.UploadResp
 
 	fmt.Fprintf(io.Out, "%s Package created: package_id=%q\n", c.SuccessIcon(), createPkgResp.PackageID)
 
-	fmt.Fprintf(io.Out, "Start Watching build logs for package %q ...\n", createPkgResp.PackageID)
+	fmt.Fprintf(io.Out, "  Waiting for build to start...\n")
 	err = opts.DeploymentClient().WatchDeployment(ctx, opts.IOStreams(), createPkgResp.PackageID)
 	if err != nil {
 		return api.CreatePackageResponse{}, fmt.Errorf("failed to watch deployment for package_id=%q: %w", createPkgResp.PackageID, err)
 	}
-	fmt.Fprintf(io.Out, "Build logs ends\n")
 
 	fmt.Fprintf(io.Out, "%s Package %q built successfully\n", c.SuccessIcon(), createPkgResp.PackageID)
 
