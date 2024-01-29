@@ -81,9 +81,9 @@ func runCreate(ctx context.Context, opts *Options) error {
 						%s name: %s
 						`),
 		c.SuccessIcon(),
-		c.Green(cmdutil.InfoIcon),
+		c.Blue(cmdutil.InfoIcon),
 		result.ApplicationID,
-		c.Green(cmdutil.InfoIcon),
+		c.Blue(cmdutil.InfoIcon),
 		result.ApplicationName)
 	return nil
 }
