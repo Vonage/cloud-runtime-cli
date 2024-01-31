@@ -197,26 +197,26 @@ func PrintAPIError(out *iostreams.IOStreams, err error, httpErr *api.Error) stri
 	}
 	var mainIssue, httpStatus, errorCode, detailedMessage, traceID, containerLogs string
 	mainIssue = fmt.Sprintf("%s Details:", c.Red(cmdutil.InfoIcon))
-	httpStatus = fmt.Sprintf("HTTP Status : %s", strconv.Itoa(httpErr.HTTPStatusCode))
-	errorCode = fmt.Sprintf("Error Code  : %s", strconv.Itoa(httpErr.ServerCode))
-	detailedMessage = fmt.Sprintf("Message     : %s", httpErr.Message)
-	traceID = fmt.Sprintf("Trace ID    : %s", httpErr.TraceID)
+	httpStatus = fmt.Sprintf("- HTTP Status : %s", strconv.Itoa(httpErr.HTTPStatusCode))
+	errorCode = fmt.Sprintf("- Error Code  : %s", strconv.Itoa(httpErr.ServerCode))
+	detailedMessage = fmt.Sprintf("- Message     : %s", httpErr.Message)
+	traceID = fmt.Sprintf("- Trace ID    : %s", httpErr.TraceID)
 	containerLogs = fmt.Sprintf("%s App logs captured before failure:\n%s", c.Red(cmdutil.InfoIcon), httpErr.ContainerLogs)
 
 	var sb strings.Builder
 	sb.WriteString(fmt.Sprintf("Error Encountered: %s\n\n", mainErrMsg))
 	sb.WriteString(fmt.Sprintf("%s\n", mainIssue))
 	if httpErr.HTTPStatusCode != 0 {
-		sb.WriteString(fmt.Sprintf("  - %s\n", httpStatus))
+		sb.WriteString(fmt.Sprintf("  %s\n", httpStatus))
 	}
 	if httpErr.ServerCode != 0 {
-		sb.WriteString(fmt.Sprintf("  - %s\n", errorCode))
+		sb.WriteString(fmt.Sprintf("  %s\n", errorCode))
 	}
 	if httpErr.Message != "" {
-		sb.WriteString(fmt.Sprintf("  - %s\n", detailedMessage))
+		sb.WriteString(fmt.Sprintf("  %s\n", detailedMessage))
 	}
 	if httpErr.TraceID != "" {
-		sb.WriteString(fmt.Sprintf("  - %s\n", traceID))
+		sb.WriteString(fmt.Sprintf("  %s\n", traceID))
 	}
 	if httpErr.ContainerLogs != "" {
 		sb.WriteString(fmt.Sprintf("\n%s\n", containerLogs))
