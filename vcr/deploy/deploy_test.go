@@ -118,7 +118,7 @@ func TestDeploy(t *testing.T) {
 				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n" +
 					"✓ Source code uploaded.\n" +
 					"✓ Package created: package_id=\"test-package-id\"\n" +
-					"  Waiting for build to start...\n" +
+					"ℹ Waiting for build to start...\n" +
 					"✓ Package \"test-package-id\" built successfully\n" +
 					"✓ Instance has been deployed!\nℹ instance id: test-instance-id\nℹ instance service name: test-service-name\n➜ instance host address: test-host-url\n",
 			},
@@ -177,7 +177,7 @@ func TestDeploy(t *testing.T) {
 				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n" +
 					"✓ Source code uploaded.\n" +
 					"✓ Package created: package_id=\"test-package-id\"\n" +
-					"  Waiting for build to start...\n" +
+					"ℹ Waiting for build to start...\n" +
 					"✓ Package \"test-package-id\" built successfully\n" +
 					"✓ Instance has been deployed!\nℹ instance id: test-instance-id\nℹ instance service name: test-service-name\n➜ instance host address: test-host-url\n",
 			},
