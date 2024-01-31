@@ -381,7 +381,7 @@ func createPackage(ctx context.Context, opts *Options, uploadResp api.UploadResp
 
 	fmt.Fprintf(io.Out, "%s Package created: package_id=%q\n", c.SuccessIcon(), createPkgResp.PackageID)
 
-	fmt.Fprintf(io.Out, "  Waiting for build to start...\n")
+	fmt.Fprintf(io.Out, "%s Waiting for build to start...\n", c.Blue(cmdutil.InfoIcon))
 	err = opts.DeploymentClient().WatchDeployment(ctx, opts.IOStreams(), createPkgResp.PackageID)
 	if err != nil {
 		return api.CreatePackageResponse{}, fmt.Errorf("failed to watch deployment for package_id=%q: %w", createPkgResp.PackageID, err)

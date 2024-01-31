@@ -46,7 +46,9 @@ func printError(out *iostreams.IOStreams, err error, cmd *cobra.Command, updateM
 		fmt.Fprintf(out.ErrOut, "%s\n", err)
 		fmt.Fprintln(out.ErrOut, cmd.UsageString())
 	} else if errors.As(err, &httpErr) {
-		fmt.Fprintf(out.ErrOut, "%s %s\n", c.FailureIcon(), format.PrintAPIError(err, &httpErr))
+		fmt.Println(c.Red(`────────────────────────────────────────────────────────`))
+		fmt.Fprintf(out.ErrOut, "%s %s\n", c.FailureIcon(), format.PrintAPIError(out, err, &httpErr))
+		fmt.Println(c.Red(`────────────────────────────────────────────────────────`))
 		format.PrintUpdateMessage(out, version, updateMessageChan)
 	} else {
 		fmt.Fprintf(out.ErrOut, "%s %s\n", c.FailureIcon(), err)
