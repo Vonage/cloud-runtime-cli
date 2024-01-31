@@ -10,6 +10,8 @@ import (
 
 	"github.com/cli/cli/v2/pkg/iostreams"
 
+	"vonage-cloud-runtime-cli/pkg/cmdutil"
+
 	"vonage-cloud-runtime-cli/pkg/api"
 )
 
@@ -187,33 +189,39 @@ func PrintUpdateMessage(out *iostreams.IOStreams, version string, updateMessageC
 	}
 }
 
-func PrintAPIError(err error, httpErr *api.Error) string {
+func PrintAPIError(out *iostreams.IOStreams, err error, httpErr *api.Error) string {
+	c := out.ColorScheme()
 	mainErrMsg, err := extractFinalErrorMessage(err)
 	if err != nil {
 		mainErrMsg = err.Error()
 	}
 	var mainIssue, httpStatus, errorCode, detailedMessage, traceID, containerLogs string
-	mainIssue = fmt.Sprintf("Main issue : %s", mainErrMsg)
-	httpStatus = fmt.Sprintf("HTTP status : %s", strconv.Itoa(httpErr.HTTPStatusCode))
-	errorCode = fmt.Sprintf("Error code : %s", strconv.Itoa(httpErr.ServerCode))
-	detailedMessage = fmt.Sprintf("Detailed message : %s", httpErr.Message)
-	traceID = fmt.Sprintf("Trace ID : %s", httpErr.TraceID)
-	containerLogs = fmt.Sprintf("Container logs : %s", httpErr.ContainerLogs)
+	mainIssue = fmt.Sprintf("%s Details:", c.Red(cmdutil.InfoIcon))
+	httpStatus = fmt.Sprintf("- HTTP Status : %s", strconv.Itoa(httpErr.HTTPStatusCode))
+	errorCode = fmt.Sprintf("- Error Code  : %s", strconv.Itoa(httpErr.ServerCode))
+	detailedMessage = fmt.Sprintf("- Message     : %s", httpErr.Message)
+	traceID = fmt.Sprintf("- Trace ID    : %s", httpErr.TraceID)
+	containerLogs = fmt.Sprintf("%s App logs captured before failure:\n%s", c.Red(cmdutil.InfoIcon), httpErr.ContainerLogs)
 
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("API Error Encountered:\n 	%s\n 	%s\n", mainIssue, httpStatus))
+	sb.WriteString(fmt.Sprintf("Error Encountered: %s\n\n", mainErrMsg))
+	sb.WriteString(fmt.Sprintf("%s\n", mainIssue))
+	if httpErr.HTTPStatusCode != 0 {
+		sb.WriteString(fmt.Sprintf("  %s\n", httpStatus))
+	}
 	if httpErr.ServerCode != 0 {
-		sb.WriteString(fmt.Sprintf(" 	%s\n", errorCode))
+		sb.WriteString(fmt.Sprintf("  %s\n", errorCode))
 	}
 	if httpErr.Message != "" {
-		sb.WriteString(fmt.Sprintf(" 	%s\n", detailedMessage))
+		sb.WriteString(fmt.Sprintf("  %s\n", detailedMessage))
 	}
 	if httpErr.TraceID != "" {
-		sb.WriteString(fmt.Sprintf(" 	%s\n", traceID))
+		sb.WriteString(fmt.Sprintf("  %s\n", traceID))
 	}
 	if httpErr.ContainerLogs != "" {
-		sb.WriteString(fmt.Sprintf(" 	%s\n", containerLogs))
+		sb.WriteString(fmt.Sprintf("\n%s\n", containerLogs))
 	}
+	sb.WriteString("\nPlease refer to the documentation or contact support for further assistance.")
 	return sb.String()
 }
 
