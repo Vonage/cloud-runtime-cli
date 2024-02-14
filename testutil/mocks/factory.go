@@ -273,17 +273,17 @@ func (mr *MockDeploymentInterfaceMockRecorder) CreateVonageApplication(ctx, name
 }
 
 // DeleteDebugService mocks base method.
-func (m *MockDeploymentInterface) DeleteDebugService(ctx context.Context, serviceName string) error {
+func (m *MockDeploymentInterface) DeleteDebugService(ctx context.Context, serviceName string, preserveData bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteDebugService", ctx, serviceName)
+	ret := m.ctrl.Call(m, "DeleteDebugService", ctx, serviceName, preserveData)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteDebugService indicates an expected call of DeleteDebugService.
-func (mr *MockDeploymentInterfaceMockRecorder) DeleteDebugService(ctx, serviceName interface{}) *gomock.Call {
+func (mr *MockDeploymentInterfaceMockRecorder) DeleteDebugService(ctx, serviceName, preserveData interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDebugService", reflect.TypeOf((*MockDeploymentInterface)(nil).DeleteDebugService), ctx, serviceName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDebugService", reflect.TypeOf((*MockDeploymentInterface)(nil).DeleteDebugService), ctx, serviceName, preserveData)
 }
 
 // DeleteInstance mocks base method.
@@ -418,17 +418,17 @@ func (mr *MockDeploymentInterfaceMockRecorder) UploadTgz(ctx, fileBytes interfac
 }
 
 // WatchDeployment mocks base method.
-func (m *MockDeploymentInterface) WatchDeployment(ctx context.Context, out *iostreams.IOStreams, packageId string) error {
+func (m *MockDeploymentInterface) WatchDeployment(ctx context.Context, out *iostreams.IOStreams, packageID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WatchDeployment", ctx, out, packageId)
+	ret := m.ctrl.Call(m, "WatchDeployment", ctx, out, packageID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // WatchDeployment indicates an expected call of WatchDeployment.
-func (mr *MockDeploymentInterfaceMockRecorder) WatchDeployment(ctx, out, packageId interface{}) *gomock.Call {
+func (mr *MockDeploymentInterfaceMockRecorder) WatchDeployment(ctx, out, packageID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WatchDeployment", reflect.TypeOf((*MockDeploymentInterface)(nil).WatchDeployment), ctx, out, packageId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WatchDeployment", reflect.TypeOf((*MockDeploymentInterface)(nil).WatchDeployment), ctx, out, packageID)
 }
 
 // MockDatastoreInterface is a mock of DatastoreInterface interface.
