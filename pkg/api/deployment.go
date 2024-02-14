@@ -147,9 +147,10 @@ func (c *DeploymentClient) DeployDebugService(ctx context.Context, region, appli
 	return result, nil
 }
 
-func (c *DeploymentClient) DeleteDebugService(ctx context.Context, serviceName string) error {
+func (c *DeploymentClient) DeleteDebugService(ctx context.Context, serviceName string, preserveData bool) error {
 	resp, err := c.httpClient.R().
 		SetContext(ctx).
+		SetQueryParam("preserveData", fmt.Sprintf("%t", preserveData)).
 		Delete(c.baseURL + "/debug/services/" + serviceName)
 	if err != nil {
 		return fmt.Errorf("%w: trace_id = %s", err, traceIDFromHTTPResponse(resp))

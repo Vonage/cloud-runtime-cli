@@ -146,7 +146,7 @@ func Test_deployDebugServer(t *testing.T) {
 				Times(tt.mock.DebugGetServiceReadyStatusTimes).
 				Return(tt.mock.DebugReturnStatus, tt.mock.DebugGetServiceReadyStatusReturnErr)
 
-			deploymentMock.EXPECT().DeleteDebugService(gomock.Any(), tt.mock.DebugDeleteDebugServiceServiceName).
+			deploymentMock.EXPECT().DeleteDebugService(gomock.Any(), tt.mock.DebugDeleteDebugServiceServiceName, false).
 				Times(tt.mock.DebugDeleteDebugServiceTimes).
 				Return(tt.mock.DebugDeleteDebugServiceReturnErr)
 
