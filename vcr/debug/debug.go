@@ -232,7 +232,7 @@ func deployDebugServer(ctx context.Context, opts *Options) (api.DeployResponse, 
 	io := opts.IOStreams()
 	c := io.ColorScheme()
 	var err error
-	opts.AppID, err = cmdutil.StringVar("app-id", opts.AppID, opts.manifest.Debug.ApplicationID, "", true)
+	opts.AppID, err = cmdutil.StringVar("app-id", opts.AppID, opts.manifest.Debug.ApplicationID, opts.manifest.Instance.ApplicationID, true)
 	if err != nil {
 		return api.DeployResponse{}, fmt.Errorf("failed to get debug app id: %w", err)
 	}
@@ -272,8 +272,15 @@ func deployDebugServer(ctx context.Context, opts *Options) (api.DeployResponse, 
 		return api.DeployResponse{}, fmt.Errorf("no debug entrypoint found in manifest")
 	}
 
-	if err := injectEnvars(opts.manifest.Instance.Environment); err != nil {
-		return api.DeployResponse{}, fmt.Errorf("failed to inject environment variables: %w", err)
+	switch {
+	case len(opts.manifest.Debug.Environment) != 0:
+		if err := injectEnvars(opts.manifest.Debug.Environment); err != nil {
+			return api.DeployResponse{}, fmt.Errorf("failed to inject debug environment variables: %w", err)
+		}
+	case len(opts.manifest.Instance.Environment) != 0:
+		if err := injectEnvars(opts.manifest.Instance.Environment); err != nil {
+			return api.DeployResponse{}, fmt.Errorf("failed to inject instance environment variables: %w", err)
+		}
 	}
 
 	caps, err := format.ParseCapabilities(opts.manifest.Instance.Capabilities)
