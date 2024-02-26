@@ -16,21 +16,19 @@ import (
 )
 
 type TemplateOptions struct {
-	Labels     []string
-	NameLookup map[string]string
+	Labels   []string
+	IDLookup map[string]string
 }
 
-func GetTemplateOptions(templateNames []string, prefix string) TemplateOptions {
+func GetTemplateOptions(templateNames []api.Product) TemplateOptions {
 	options := TemplateOptions{
-		Labels:     make([]string, 0),
-		NameLookup: make(map[string]string),
+		Labels:   make([]string, 0),
+		IDLookup: make(map[string]string),
 	}
 	options.Labels = append(options.Labels, "SKIP")
 	for _, r := range templateNames {
-		label := strings.TrimPrefix(r, prefix)
-		label = strings.TrimSuffix(label, ".zip")
-		options.Labels = append(options.Labels, label)
-		options.NameLookup[label] = r
+		options.Labels = append(options.Labels, r.Name)
+		options.IDLookup[r.Name] = r.ID
 	}
 	return options
 }
@@ -58,30 +56,34 @@ func GetRegionOptions(regions []api.Region) RegionOptions {
 }
 
 type RuntimeOptions struct {
-	Labels        []string
-	Lookup        map[string]string
-	RuntimeLookup map[string]string
+	Labels                []string
+	Lookup                map[string]string
+	RuntimeLookup         map[string]string
+	ProgrammingLangLookup map[string]string
 }
 
 func GetRuntimeOptions(runtimes []api.Runtime) RuntimeOptions {
 	options := RuntimeOptions{
-		Labels:        make([]string, 0),
-		Lookup:        make(map[string]string),
-		RuntimeLookup: make(map[string]string),
+		Labels:                make([]string, 0),
+		Lookup:                make(map[string]string),
+		RuntimeLookup:         make(map[string]string),
+		ProgrammingLangLookup: make(map[string]string),
 	}
 
 	for _, r := range runtimes {
-		if r.Language != "debug" {
+		if r.Language != "debug" && r.Language != "" {
 			if r.Comments != "" {
 				label := fmt.Sprintf("%s - (%s)", r.Name, r.Comments)
 				options.Labels = append(options.Labels, label)
 				options.Lookup[r.Name] = label
 				options.RuntimeLookup[label] = r.Name
+				options.ProgrammingLangLookup[label] = r.Language
 				continue
 			}
 			options.Labels = append(options.Labels, r.Name)
 			options.Lookup[r.Name] = r.Name
 			options.RuntimeLookup[r.Name] = r.Name
+			options.ProgrammingLangLookup[r.Name] = r.Language
 		}
 	}
 	return options

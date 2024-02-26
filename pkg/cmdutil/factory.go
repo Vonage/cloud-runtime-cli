@@ -32,6 +32,10 @@ type ReleaseInterface interface {
 	GetAsset(ctx context.Context, url string) ([]byte, error)
 }
 
+type MarketplaceInterface interface {
+	GetTemplate(ctx context.Context, productID, versionID string) ([]byte, error)
+}
+
 type DeploymentInterface interface {
 	CreateVonageApplication(ctx context.Context, name string, enableRTC, enableVoice, enableMessages bool) (api.CreateVonageApplicationOutput, error)
 	ListVonageApplications(ctx context.Context, filter string) (api.ListVonageApplicationsOutput, error)
@@ -58,6 +62,8 @@ type DatastoreInterface interface {
 	ListRuntimes(ctx context.Context) ([]api.Runtime, error)
 	GetRuntimeByName(ctx context.Context, name string) (api.Runtime, error)
 	GetProject(ctx context.Context, accountID, name string) (api.Project, error)
+	ListProducts(ctx context.Context) ([]api.Product, error)
+	GetLatestProductVersionByID(ctx context.Context, id string) (api.ProductVersion, error)
 }
 
 // Factory provides clients and parameters for all subcommands.
@@ -71,6 +77,7 @@ type Factory interface {
 	HTTPClient() *resty.Client
 	AssetClient() AssetInterface
 	ReleaseClient() ReleaseInterface
+	MarketplaceClient() MarketplaceInterface
 	Datastore() DatastoreInterface
 	DeploymentClient() DeploymentInterface
 	Survey() SurveyInterface
@@ -100,6 +107,7 @@ type DefaultFactory struct {
 	deploymentClient          *api.DeploymentClient
 	datastore                 *api.Datastore
 	releaseClient             *api.ReleaseClient
+	marketplaceClient         *api.MarketplaceClient
 }
 
 func NewDefaultFactory(apiVersion string, releaseURL string) *DefaultFactory {
@@ -128,6 +136,7 @@ func (f *DefaultFactory) Init(ctx context.Context, cfg config.CLIConfig, opts *c
 	f.assetClient = api.NewAssetClient(region.AssetsAPIURL, f.httpClient)
 	f.deploymentClient = api.NewDeploymentClient(region.DeploymentAPIURL, f.apiVersion, f.httpClient, f.websocketConnectionClient)
 	f.releaseClient = api.NewReleaseClient(f.releaseURL, f.httpClient)
+	f.marketplaceClient = api.NewMarketplaceClient(region.MarketplaceAPIURL, f.httpClient)
 	return nil
 }
 
@@ -176,6 +185,10 @@ func (f *DefaultFactory) AssetClient() AssetInterface {
 
 func (f *DefaultFactory) ReleaseClient() ReleaseInterface {
 	return f.releaseClient
+}
+
+func (f *DefaultFactory) MarketplaceClient() MarketplaceInterface {
+	return f.marketplaceClient
 }
 
 func (f *DefaultFactory) Datastore() DatastoreInterface {
