@@ -16,9 +16,10 @@ CREATE TABLE IF NOT EXISTS "Regions" (
     enabled BOOLEAN,
     deployment_api_url VARCHAR(255),
     assets_api_url VARCHAR(255),
+    marketplace_api_url VARCHAR(255),
     endpoint_url_scheme VARCHAR(255),
     debugger_url_scheme VARCHAR(255),
     host_template VARCHAR(255)
     );
 
-INSERT INTO "Regions" (name, alias, enabled, deployment_api_url, assets_api_url, endpoint_url_scheme, debugger_url_scheme, host_template) VALUES ('Region One', 'aws.euw1', true, 'http://mockserver:80', 'https://assets.region1.example.com', 'https', 'https', 'region1.example.com');
+INSERT INTO "Regions" (name, alias, enabled, deployment_api_url, assets_api_url, marketplace_api_url, endpoint_url_scheme, debugger_url_scheme, host_template) VALUES ('Region One', 'aws.euw1', true, 'http://mockserver:80', 'https://assets.region1.example.com', 'https://marketplace-api.region1.example.com', 'https', 'https', 'region1.example.com');
