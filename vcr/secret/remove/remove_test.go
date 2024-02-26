@@ -88,7 +88,7 @@ func TestSecretRemove(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, deploymentMock, nil)
+			f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, deploymentMock, nil, nil)
 
 			cmd := NewCmdSecretRemove(f)
 			cmd.SetArgs(argv)

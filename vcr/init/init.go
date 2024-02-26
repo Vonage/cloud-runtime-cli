@@ -329,8 +329,8 @@ func getProductTemplatesByLang(productList []api.Product, programmingLang string
 }
 
 // uncompressToDir uncompresses the given tar.gz file bytes to the given directory.
-func uncompressToDir(FileBytes []byte, dest string) error {
-	gzr, err := gzip.NewReader(bytes.NewReader(FileBytes))
+func uncompressToDir(fileBytes []byte, dest string) error {
+	gzr, err := gzip.NewReader(bytes.NewReader(fileBytes))
 	if err != nil {
 		return fmt.Errorf("failed to create a new gzip reader: %w", err)
 	}

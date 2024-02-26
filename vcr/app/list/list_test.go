@@ -26,7 +26,7 @@ func runCommand(t *testing.T, deploymentMock cmdutil.DeploymentInterface, cli st
 		t.Fatal(err)
 	}
 
-	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, deploymentMock, nil)
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, deploymentMock, nil, nil)
 
 	cmd := NewCmdAppList(f)
 	cmd.SetArgs(argv)

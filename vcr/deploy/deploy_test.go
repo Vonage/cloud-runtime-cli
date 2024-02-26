@@ -226,7 +226,7 @@ func TestDeploy(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			f := testutil.DefaultFactoryMock(t, ios, assetMock, nil, datastoreMock, deploymentMock, surveyMock)
+			f := testutil.DefaultFactoryMock(t, ios, assetMock, nil, datastoreMock, deploymentMock, surveyMock, nil)
 
 			cmd := NewCmdDeploy(f)
 			cmd.SetArgs(argv)

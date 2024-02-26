@@ -72,7 +72,7 @@ func TestCheckForUpdate(t *testing.T) {
 
 			ios, _, _, _ := iostreams.Test()
 
-			f := testutil.DefaultFactoryMock(t, ios, nil, releaseMock, nil, nil, nil)
+			f := testutil.DefaultFactoryMock(t, ios, nil, releaseMock, nil, nil, nil, nil)
 
 			output, err := checkForUpdate(context.Background(), f, tt.mock.RootCurrentVersion)
 			if err != nil && tt.want.errMsg != "" {
