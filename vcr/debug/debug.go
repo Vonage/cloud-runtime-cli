@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/MakeNowJust/heredoc"
+	"github.com/cli/cli/v2/pkg/iostreams"
 	"github.com/spf13/cobra"
 
 	"vonage-cloud-runtime-cli/pkg/api"
@@ -233,17 +234,17 @@ func deployDebugServer(ctx context.Context, opts *Options) (api.DeployResponse, 
 	io := opts.IOStreams()
 	c := io.ColorScheme()
 	var err error
-	opts.AppID, err = cmdutil.StringVar("app-id", opts.AppID, opts.manifest.Debug.ApplicationID, "", true)
+	opts.AppID, err = stringVarFromManifest(opts.IOStreams(), "app-id", opts.AppID, opts.manifest.Debug.ApplicationID, opts.manifest.Instance.ApplicationID, true)
 	if err != nil {
 		return api.DeployResponse{}, fmt.Errorf("failed to get debug app id: %w", err)
 	}
 
-	opts.Runtime, err = cmdutil.StringVar("runtime", opts.Runtime, opts.manifest.Instance.Runtime, "", true)
+	opts.Runtime, err = stringVarFromManifest(opts.IOStreams(), "runtime", opts.Runtime, opts.manifest.Instance.Runtime, "", true)
 	if err != nil {
 		return api.DeployResponse{}, fmt.Errorf("failed to get runtime: %w", err)
 	}
 
-	opts.Name, err = cmdutil.StringVar("name", opts.Name, opts.manifest.Debug.Name, "", false)
+	opts.Name, err = stringVarFromManifest(opts.IOStreams(), "name", opts.Name, opts.manifest.Debug.Name, "", false)
 	if err != nil {
 		return api.DeployResponse{}, fmt.Errorf("failed to get name: %w", err)
 	}
@@ -273,8 +274,16 @@ func deployDebugServer(ctx context.Context, opts *Options) (api.DeployResponse, 
 		return api.DeployResponse{}, fmt.Errorf("no debug entrypoint found in manifest")
 	}
 
-	if err := injectEnvars(opts.manifest.Instance.Environment); err != nil {
-		return api.DeployResponse{}, fmt.Errorf("failed to inject environment variables: %w", err)
+	switch {
+	case len(opts.manifest.Debug.Environment) != 0:
+		if err := injectEnvars(opts.manifest.Debug.Environment); err != nil {
+			return api.DeployResponse{}, fmt.Errorf("failed to inject debug environment variables: %w", err)
+		}
+	case len(opts.manifest.Instance.Environment) != 0:
+		if err := injectEnvars(opts.manifest.Instance.Environment); err != nil {
+			return api.DeployResponse{}, fmt.Errorf("failed to inject instance environment variables: %w", err)
+		}
+		fmt.Fprintf(io.Out, "%s Debug environment values were not detected in the manifest, while instance environment values were loaded as an alternative. Please consider adding debug environment values\n", c.WarningIcon())
 	}
 
 	caps, err := format.ParseCapabilities(opts.manifest.Instance.Capabilities)
@@ -382,4 +391,21 @@ func getPreserveDataArg(manifestValue, flagValue bool) bool {
 		return true
 	}
 	return manifestValue
+}
+
+func stringVarFromManifest(out *iostreams.IOStreams, name string, str string, debugValue string, instanceValue string, required bool) (string, error) {
+	c = out.ColorScheme()
+	if str == "" {
+		str = debugValue
+	}
+	if str == "" {
+		str = instanceValue
+		if str != "" {
+			fmt.Fprintf(out.Out, "%s Debug %[2]s was not detected in the manifest, while instance %[2]s was loaded as an alternative. Please consider adding debug %[2]s\n", c.WarningIcon(), name)
+		}
+	}
+	if str == "" && required {
+		return "", fmt.Errorf("%s is required", name)
+	}
+	return str, nil
 }
