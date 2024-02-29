@@ -146,7 +146,7 @@ func Test_deployDebugServer(t *testing.T) {
 				Times(tt.mock.DebugGetServiceReadyStatusTimes).
 				Return(tt.mock.DebugReturnStatus, tt.mock.DebugGetServiceReadyStatusReturnErr)
 
-			deploymentMock.EXPECT().DeleteDebugService(gomock.Any(), tt.mock.DebugDeleteDebugServiceServiceName).
+			deploymentMock.EXPECT().DeleteDebugService(gomock.Any(), tt.mock.DebugDeleteDebugServiceServiceName, false).
 				Times(tt.mock.DebugDeleteDebugServiceTimes).
 				Return(tt.mock.DebugDeleteDebugServiceReturnErr)
 
@@ -276,4 +276,31 @@ func Test_startDebugProxy(t *testing.T) {
 			require.Equal(t, tt.want.httpURL, httpURL)
 		})
 	}
+}
+
+func Test_stringVarFromManifest(t *testing.T) {
+	ios, _, stdout, _ := iostreams.Test()
+	str, err := stringVarFromManifest(ios, "name", "value", "debugValue", "instanceValue", false)
+	require.NoError(t, err)
+	require.Equal(t, "value", str)
+	require.Equal(t, "", stdout.String())
+
+	ios, _, stdout, _ = iostreams.Test()
+	str, err = stringVarFromManifest(ios, "name", "", "debugValue", "instanceValue", false)
+	require.NoError(t, err)
+	require.Equal(t, "debugValue", str)
+	require.Equal(t, "", stdout.String())
+
+	ios, _, stdout, _ = iostreams.Test()
+	str, err = stringVarFromManifest(ios, "name", "", "", "instanceValue", false)
+	require.NoError(t, err)
+	require.Equal(t, "instanceValue", str)
+	require.Equal(t, "! Debug name was not detected in the manifest, while instance name was loaded as an alternative. Please consider adding debug name\n", stdout.String())
+
+	ios, _, stdout, _ = iostreams.Test()
+	str, err = stringVarFromManifest(ios, "name", "", "", "", true)
+	require.Error(t, err)
+	require.Equal(t, "", str)
+	require.EqualError(t, err, "name is required")
+	require.Equal(t, "", stdout.String())
 }

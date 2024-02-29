@@ -61,6 +61,7 @@ type Debug struct {
 	ApplicationID string   `yaml:"application-id,omitempty"`
 	Environment   []Env    `yaml:"environment,omitempty"`
 	Entrypoint    []string `yaml:"entrypoint,omitempty"`
+	PreserveData  bool     `yaml:"preserve-data,omitempty"`
 }
 
 func NewManifestWithDefaults() *Manifest {

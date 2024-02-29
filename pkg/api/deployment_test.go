@@ -390,7 +390,7 @@ func TestDeleteDebugService(t *testing.T) {
 
 			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
 
-			err := deploymentClient.DeleteDebugService(context.Background(), "service-name")
+			err := deploymentClient.DeleteDebugService(context.Background(), "service-name", false)
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
