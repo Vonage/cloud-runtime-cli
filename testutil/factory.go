@@ -47,13 +47,14 @@ var (
 )
 
 // DefaultFactoryMock returns a mock of the Factory interface with default values.
-func DefaultFactoryMock(t *testing.T, io *iostreams.IOStreams, da cmdutil.AssetInterface, dr cmdutil.ReleaseInterface, ds cmdutil.DatastoreInterface, dc cmdutil.DeploymentInterface, su cmdutil.SurveyInterface) cmdutil.Factory {
+func DefaultFactoryMock(t *testing.T, io *iostreams.IOStreams, da cmdutil.AssetInterface, dr cmdutil.ReleaseInterface, ds cmdutil.DatastoreInterface, dc cmdutil.DeploymentInterface, su cmdutil.SurveyInterface, ma cmdutil.MarketplaceInterface) cmdutil.Factory {
 	f := mocks.NewMockFactory(gomock.NewController(t))
 	f.EXPECT().Survey().Return(su).AnyTimes()
 	f.EXPECT().IOStreams().Return(io).AnyTimes()
 	f.EXPECT().HTTPClient().Return(DefaultHTTPClient).AnyTimes()
 	f.EXPECT().AssetClient().Return(da).AnyTimes()
 	f.EXPECT().ReleaseClient().Return(dr).AnyTimes()
+	f.EXPECT().MarketplaceClient().Return(ma).AnyTimes()
 	f.EXPECT().Datastore().Return(ds).AnyTimes()
 	f.EXPECT().DeploymentClient().Return(dc).AnyTimes()
 	f.EXPECT().Region().Return(DefaultRegion).AnyTimes()

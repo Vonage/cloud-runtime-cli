@@ -190,6 +190,44 @@ func (mr *MockReleaseInterfaceMockRecorder) GetLatestRelease(ctx interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLatestRelease", reflect.TypeOf((*MockReleaseInterface)(nil).GetLatestRelease), ctx)
 }
 
+// MockMarketplaceInterface is a mock of MarketplaceInterface interface.
+type MockMarketplaceInterface struct {
+	ctrl     *gomock.Controller
+	recorder *MockMarketplaceInterfaceMockRecorder
+}
+
+// MockMarketplaceInterfaceMockRecorder is the mock recorder for MockMarketplaceInterface.
+type MockMarketplaceInterfaceMockRecorder struct {
+	mock *MockMarketplaceInterface
+}
+
+// NewMockMarketplaceInterface creates a new mock instance.
+func NewMockMarketplaceInterface(ctrl *gomock.Controller) *MockMarketplaceInterface {
+	mock := &MockMarketplaceInterface{ctrl: ctrl}
+	mock.recorder = &MockMarketplaceInterfaceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockMarketplaceInterface) EXPECT() *MockMarketplaceInterfaceMockRecorder {
+	return m.recorder
+}
+
+// GetTemplate mocks base method.
+func (m *MockMarketplaceInterface) GetTemplate(ctx context.Context, productID, versionID string) ([]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTemplate", ctx, productID, versionID)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTemplate indicates an expected call of GetTemplate.
+func (mr *MockMarketplaceInterfaceMockRecorder) GetTemplate(ctx, productID, versionID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTemplate", reflect.TypeOf((*MockMarketplaceInterface)(nil).GetTemplate), ctx, productID, versionID)
+}
+
 // MockDeploymentInterface is a mock of DeploymentInterface interface.
 type MockDeploymentInterface struct {
 	ctrl     *gomock.Controller
@@ -484,6 +522,21 @@ func (mr *MockDatastoreInterfaceMockRecorder) GetInstanceByProjectAndInstanceNam
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInstanceByProjectAndInstanceName", reflect.TypeOf((*MockDatastoreInterface)(nil).GetInstanceByProjectAndInstanceName), ctx, projectName, instanceName)
 }
 
+// GetLatestProductVersionByID mocks base method.
+func (m *MockDatastoreInterface) GetLatestProductVersionByID(ctx context.Context, id string) (api.ProductVersion, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLatestProductVersionByID", ctx, id)
+	ret0, _ := ret[0].(api.ProductVersion)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLatestProductVersionByID indicates an expected call of GetLatestProductVersionByID.
+func (mr *MockDatastoreInterfaceMockRecorder) GetLatestProductVersionByID(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLatestProductVersionByID", reflect.TypeOf((*MockDatastoreInterface)(nil).GetLatestProductVersionByID), ctx, id)
+}
+
 // GetProject mocks base method.
 func (m *MockDatastoreInterface) GetProject(ctx context.Context, accountID, name string) (api.Project, error) {
 	m.ctrl.T.Helper()
@@ -527,6 +580,21 @@ func (m *MockDatastoreInterface) GetRuntimeByName(ctx context.Context, name stri
 func (mr *MockDatastoreInterfaceMockRecorder) GetRuntimeByName(ctx, name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRuntimeByName", reflect.TypeOf((*MockDatastoreInterface)(nil).GetRuntimeByName), ctx, name)
+}
+
+// ListProducts mocks base method.
+func (m *MockDatastoreInterface) ListProducts(ctx context.Context) ([]api.Product, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListProducts", ctx)
+	ret0, _ := ret[0].([]api.Product)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListProducts indicates an expected call of ListProducts.
+func (mr *MockDatastoreInterfaceMockRecorder) ListProducts(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProducts", reflect.TypeOf((*MockDatastoreInterface)(nil).ListProducts), ctx)
 }
 
 // ListRegions mocks base method.
@@ -788,6 +856,20 @@ func (m *MockFactory) InitDeploymentClient(ctx context.Context, regionAlias stri
 func (mr *MockFactoryMockRecorder) InitDeploymentClient(ctx, regionAlias interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InitDeploymentClient", reflect.TypeOf((*MockFactory)(nil).InitDeploymentClient), ctx, regionAlias)
+}
+
+// MarketplaceClient mocks base method.
+func (m *MockFactory) MarketplaceClient() cmdutil.MarketplaceInterface {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MarketplaceClient")
+	ret0, _ := ret[0].(cmdutil.MarketplaceInterface)
+	return ret0
+}
+
+// MarketplaceClient indicates an expected call of MarketplaceClient.
+func (mr *MockFactoryMockRecorder) MarketplaceClient() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MarketplaceClient", reflect.TypeOf((*MockFactory)(nil).MarketplaceClient))
 }
 
 // Region mocks base method.

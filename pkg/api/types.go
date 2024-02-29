@@ -7,6 +7,7 @@ type Region struct {
 	Alias             string `json:"alias"`
 	DeploymentAPIURL  string `json:"deployment_api_url"`
 	AssetsAPIURL      string `json:"assets_api_url"`
+	MarketplaceAPIURL string `json:"marketplace_api_url"`
 	EndpointURLScheme string `json:"endpoint_url_scheme"`
 	DebuggerURLScheme string `json:"debugger_url_scheme"`
 	HostTemplate      string `json:"host_template"`
@@ -53,4 +54,14 @@ type Release struct {
 type Asset struct {
 	Name               string `json:"name"`
 	BrowserDownloadURL string `json:"browser_download_url"`
+}
+
+type Product struct {
+	ID                  string `json:"id,omitempty"`
+	Name                string `json:"name,omitempty"`
+	ProgrammingLanguage string `json:"programming_language,omitempty"`
+}
+
+type ProductVersion struct {
+	ID string `json:"id,omitempty"`
 }

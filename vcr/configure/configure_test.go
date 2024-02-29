@@ -106,7 +106,7 @@ func TestConfigure(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			f := testutil.DefaultFactoryMock(t, ios, assetMock, nil, datastoreMock, deploymentMock, surveyMock)
+			f := testutil.DefaultFactoryMock(t, ios, assetMock, nil, datastoreMock, deploymentMock, surveyMock, nil)
 
 			cmd := NewCmdConfigure(f)
 			cmd.SetArgs(argv)

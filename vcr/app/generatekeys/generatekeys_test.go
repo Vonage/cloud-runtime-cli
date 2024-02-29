@@ -89,7 +89,7 @@ func TestAppGenerateKeys(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, deploymentMock, nil)
+			f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, deploymentMock, nil, nil)
 
 			cmd := NewCmdAppGenerateKeys(f)
 			cmd.SetArgs(argv)
