@@ -134,7 +134,7 @@ promptProjectName:
 	}
 	matched := projNameRe.MatchString(projName)
 	if !matched {
-		fmt.Fprintf(io.ErrOut, "%s project name %s is not correct,  project name should be lower case alphanumeric or - characters", c.FailureIcon(), projName)
+		fmt.Fprintf(io.ErrOut, "%s project name %s is not correct,  project name should be lower case alphanumeric or - characters\n", c.FailureIcon(), projName)
 		goto promptProjectName
 	}
 
