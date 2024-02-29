@@ -255,25 +255,23 @@ func TestGetRegionOptions(t *testing.T) {
 }
 
 func TestGetTemplateOptions(t *testing.T) {
-	templateNames := []string{
-		"prefix/template1.zip",
-		"prefix/template2.zip",
-		"prefix/template3.zip",
+	templateNames := []api.Product{
+		{Name: "template1", ID: "1"},
+		{Name: "template2", ID: "2"},
+		{Name: "template3", ID: "3"},
 	}
-
-	prefix := "prefix/"
 
 	expectedOptions := TemplateOptions{
 		Labels: []string{"SKIP", "template1", "template2", "template3"},
-		NameLookup: map[string]string{
-			"template1": "prefix/template1.zip",
-			"template2": "prefix/template2.zip",
-			"template3": "prefix/template3.zip",
+		IDLookup: map[string]string{
+			"template1": "1",
+			"template2": "2",
+			"template3": "3",
 		},
 	}
 
-	options := GetTemplateOptions(templateNames, prefix)
+	options := GetTemplateOptions(templateNames)
 
 	require.Equal(t, expectedOptions.Labels, options.Labels)
-	require.Equal(t, expectedOptions.NameLookup, options.NameLookup)
+	require.Equal(t, expectedOptions.IDLookup, options.IDLookup)
 }

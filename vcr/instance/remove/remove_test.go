@@ -153,7 +153,7 @@ func TestInstanceRemove(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, deploymentMock, nil)
+			f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, deploymentMock, nil, nil)
 
 			cmd := NewCmdInstanceRemove(f)
 			cmd.SetArgs(argv)

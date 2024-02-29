@@ -1,8 +1,9 @@
 package init
 
 import (
-	"archive/zip"
+	"archive/tar"
 	"bytes"
+	"compress/gzip"
 	"context"
 	"errors"
 	"fmt"
@@ -29,6 +30,7 @@ type Options struct {
 	cwd              string
 	manifest         *config.Manifest
 	manifestFileName string
+	programmingLang  string
 }
 
 func NewCmdInit(f cmdutil.Factory) *cobra.Command {
@@ -64,12 +66,12 @@ func NewCmdInit(f cmdutil.Factory) *cobra.Command {
 			}
 			absPath, err := config.GetAbsDir(opts.cwd)
 			if err != nil {
-				if errors.Is(err, config.ErrNotExistedPath) {
-					if err := os.Mkdir(absPath, 0744); err != nil {
-						return fmt.Errorf("failed to create directory %s: %w", absPath, err)
-					}
+				if !errors.Is(err, config.ErrNotExistedPath) {
+					return fmt.Errorf("failed to get absolute path of %q: %w", opts.cwd, err)
 				}
-				return fmt.Errorf("failed to get absolute path of %q: %w", opts.cwd, err)
+				if err := os.Mkdir(absPath, 0744); err != nil {
+					return fmt.Errorf("failed to create directory %s: %w", absPath, err)
+				}
 			}
 			opts.cwd = absPath
 			return runInit(ctx, opts)
@@ -105,7 +107,7 @@ func runInit(ctx context.Context, opts *Options) error {
 		return fmt.Errorf("failed to ask debug app id: %w", err)
 	}
 	if err := askTemplate(ctx, opts); err != nil {
-		return fmt.Errorf("failed to ask template: %w", err)
+		return err
 	}
 
 	if err := config.WriteManifest(config.GetAbsFilename(opts.cwd, opts.manifestFileName), opts.manifest); err != nil {
@@ -134,7 +136,7 @@ promptProjectName:
 	}
 	matched := projNameRe.MatchString(projName)
 	if !matched {
-		fmt.Fprintf(io.ErrOut, "%s project name %s is not correct,  project name should be lower case alphanumeric or - characters", c.FailureIcon(), projName)
+		fmt.Fprintf(io.ErrOut, "%s project name %s is not correct,  project name should be lower case alphanumeric or - characters\n", c.FailureIcon(), projName)
 		goto promptProjectName
 	}
 
@@ -201,6 +203,7 @@ func askRuntime(ctx context.Context, opts *Options) error {
 		return err
 	}
 	opts.manifest.Instance.Runtime = runtimeOptions.RuntimeLookup[runtimeLabel]
+	opts.programmingLang = runtimeOptions.ProgrammingLangLookup[runtimeLabel]
 	return nil
 }
 
@@ -246,43 +249,53 @@ func askTemplate(ctx context.Context, opts *Options) error {
 	io := opts.IOStreams()
 	c := io.ColorScheme()
 
-	runtime := opts.manifest.Instance.Runtime
-	prefix := fmt.Sprintf(".neru/templates/%s/", runtime)
+	programingLang := opts.programmingLang
 
-	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Retrieving template name list... ")
-	templates, err := opts.AssetClient().GetTemplateNameList(ctx, prefix, false, 0)
+	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Retrieving product templates... ")
+	products, err := opts.Datastore().ListProducts(ctx)
 	spinner.Stop()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to list product templates: %w", err)
 	}
 
-	templateNames := getTemplateNames(templates)
-	if len(templateNames) == 0 {
-		fmt.Fprintf(io.ErrOut, "%s No templates available for the selected runtime %q\n", c.WarningIcon(), runtime)
+	productTemplates := getProductTemplatesByLang(products, programingLang)
+	if len(productTemplates) == 0 {
+		fmt.Fprintf(io.ErrOut, "%s No product templates available for the selected runtime %q\n", c.WarningIcon(), opts.manifest.Instance.Runtime)
 		return nil
 	}
 
-	templateOptions := format.GetTemplateOptions(templateNames, prefix)
+	templateOptions := format.GetTemplateOptions(productTemplates)
 
-	templateLabel, err := opts.Survey().AskForUserChoice(fmt.Sprintf("Select a template for runtime %s: ", runtime), templateOptions.Labels, templateOptions.NameLookup, "")
+	templateLabel, err := opts.Survey().AskForUserChoice(fmt.Sprintf("Select a product template for runtime %s: ", opts.manifest.Instance.Runtime), templateOptions.Labels, templateOptions.IDLookup, "")
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to ask user to select a product template for runtime %s: %w", opts.manifest.Instance.Runtime, err)
 	}
 	if templateLabel == SkipValue {
 		return nil
 	}
 
-	selectedTemplateName := templateOptions.NameLookup[templateLabel]
+	selectedProductID := templateOptions.IDLookup[templateLabel]
 
-	spinner = cmdutil.DisplaySpinnerMessageWithHandle(" Downloading template files... ")
-	template, err := opts.AssetClient().GetTemplate(ctx, selectedTemplateName)
+	spinner = cmdutil.DisplaySpinnerMessageWithHandle(" Retrieve the latest product template version... ")
+	selectedProductVersion, err := opts.Datastore().GetLatestProductVersionByID(ctx, selectedProductID)
 	spinner.Stop()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get the latest product template version: %w", err)
+	}
+	selectedProductVersionID := selectedProductVersion.ID
+
+	spinner = cmdutil.DisplaySpinnerMessageWithHandle(" Downloading template files... ")
+	template, err := opts.MarketplaceClient().GetTemplate(ctx, selectedProductID, selectedProductVersionID)
+	spinner.Stop()
+	if err != nil {
+		return fmt.Errorf("failed to download template files: %w", err)
 	}
 
-	if err := uncompressToDir(template.Content, opts.cwd); err != nil {
-		return err
+	spinner = cmdutil.DisplaySpinnerMessageWithHandle(" Uncompressing template files... ")
+	err = uncompressToDir(template, opts.cwd)
+	spinner.Stop()
+	if err != nil {
+		return fmt.Errorf("failed to uncompress template files: %w", err)
 	}
 
 	templateManifestFilePath, err := config.FindTemplateManifestFile(opts.cwd)
@@ -291,7 +304,7 @@ func askTemplate(ctx context.Context, opts *Options) error {
 			fmt.Fprintf(io.ErrOut, "%s No manifest file found in the template files.\n", c.WarningIcon())
 			return nil
 		}
-		return err
+		return fmt.Errorf("failed to find template manifest file: %w", err)
 	}
 
 	templateManifest, err := config.ReadManifest(templateManifestFilePath)
@@ -305,73 +318,55 @@ func askTemplate(ctx context.Context, opts *Options) error {
 	return nil
 }
 
-func getTemplateNames(templateList []api.Metadata) []string {
-	list := make([]string, 0)
-	for _, l := range templateList {
-		if strings.HasSuffix(l.Name, "/") {
-			continue
+func getProductTemplatesByLang(productList []api.Product, programmingLang string) []api.Product {
+	list := make([]api.Product, 0)
+	for _, l := range productList {
+		if programmingLang == strings.ToLower(l.ProgrammingLanguage) {
+			list = append(list, l)
 		}
-		list = append(list, l.Name)
 	}
 	return list
 }
 
-func uncompressToDir(zipFileBytes []byte, dest string) error {
-	r, err := zip.NewReader(bytes.NewReader(zipFileBytes), int64(len(zipFileBytes)))
+// uncompressToDir uncompresses the given tar.gz file bytes to the given directory.
+func uncompressToDir(fileBytes []byte, dest string) error {
+	gzr, err := gzip.NewReader(bytes.NewReader(fileBytes))
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create a new gzip reader: %w", err)
 	}
+	defer gzr.Close()
 
-	if err := os.MkdirAll(dest, os.ModePerm); err != nil {
-		return err
-	}
+	tr := tar.NewReader(gzr)
 
-	// Closure to address file descriptors issue with all the deferred .Close() methods
-	extractAndWriteFile := func(f *zip.File) error {
-		rc, err := f.Open()
+	for {
+		header, err := tr.Next()
+		if err == io.EOF {
+			break
+		}
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to read tar file: %w", err)
 		}
-		defer func() {
-			if err := rc.Close(); err != nil {
-				panic(err)
+		target := filepath.Join(dest, header.Name)
+		switch header.Typeflag {
+		case tar.TypeDir:
+			if err := os.MkdirAll(target, os.ModePerm); err != nil {
+				return fmt.Errorf("failed to create directory %s: %w", target, err)
 			}
-		}()
-
-		path := filepath.Join(dest, f.Name)
-
-		if f.FileInfo().IsDir() {
-			if err := os.MkdirAll(path, f.Mode()); err != nil {
+		case tar.TypeReg:
+			if err := os.MkdirAll(filepath.Dir(target), os.ModePerm); err != nil {
 				return err
 			}
-		} else {
-			if err := os.MkdirAll(filepath.Dir(path), f.Mode()); err != nil {
-				return err
-			}
-			f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+			file, err := os.OpenFile(target, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(header.Mode))
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to open file %s: %w", target, err)
 			}
-			defer func() {
-				if err := f.Close(); err != nil {
-					panic(err)
-				}
-			}()
-
-			_, err = io.Copy(f, rc)
-			if err != nil {
-				return err
+			if _, err := io.Copy(file, tr); err != nil {
+				return fmt.Errorf("failed to copy file %s: %w", target, err)
 			}
-		}
-		return nil
-	}
-
-	for _, f := range r.File {
-		err := extractAndWriteFile(f)
-		if err != nil {
-			return err
+			if err := file.Close(); err != nil {
+				return fmt.Errorf("failed to close file %s: %w", target, err)
+			}
 		}
 	}
-
 	return nil
 }

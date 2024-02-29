@@ -156,7 +156,7 @@ func TestUpgrade(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			f := testutil.DefaultFactoryMock(t, ios, nil, releaseMock, nil, nil, nil)
+			f := testutil.DefaultFactoryMock(t, ios, nil, releaseMock, nil, nil, nil, nil)
 
 			cmd := NewCmdUpgrade(f, tt.mock.UpgradeVersion)
 			cmd.SetArgs(argv)
@@ -258,7 +258,7 @@ func TestUpgradeByAsset(t *testing.T) {
 				Times(tt.mock.UpgradeGetAssetTimes).
 				Return(tt.mock.UpgradeReturnAsset, tt.mock.UpgradeGetAssetReturnErr)
 
-			f := testutil.DefaultFactoryMock(t, nil, nil, releaseMock, nil, nil, nil)
+			f := testutil.DefaultFactoryMock(t, nil, nil, releaseMock, nil, nil, nil, nil)
 			opts := &Options{
 				Factory: f,
 			}

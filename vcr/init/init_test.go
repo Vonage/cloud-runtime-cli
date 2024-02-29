@@ -19,7 +19,7 @@ import (
 )
 
 func TestInit(t *testing.T) {
-	filePath := "testdata/test.zip"
+	filePath := "testdata/test.tar.gz"
 
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -82,16 +82,19 @@ func TestInit(t *testing.T) {
 		InitReturnInstName                  string
 		InitInstNameAskForUserInputErr      error
 
-		InitGetTemplateNameListTimes         int
-		InitReturnTemplates                  []api.Metadata
-		InitGetTemplateNameListReturnErr     error
-		InitTemplateAskForUserChoiceQuestion string
-		InitTemplateAskForUserChoiceTimes    int
-		InitReturnTemplateLabel              string
-		InitTemplateAskForUserChoiceErr      error
-		InitGetTemplateTimes                 int
-		InitGetReturnTemplate                api.Template
-		InitGetTemplateReturnErr             error
+		InitListProductsTimes                         int
+		InitReturnProducts                            []api.Product
+		InitListProductsReturnErr                     error
+		InitTemplateAskForUserChoiceQuestion          string
+		InitTemplateAskForUserChoiceTimes             int
+		InitReturnTemplateLabel                       string
+		InitTemplateAskForUserChoiceErr               error
+		InitGetLatestProductVersionByIDTimes          int
+		InitGetLatestProductVersionByIDReturnTemplate api.ProductVersion
+		InitGetLatestProductVersionByIDReturnErr      error
+		InitGetTemplateTimes                          int
+		InitGetTemplateReturnTemplate                 []byte
+		InitGetTemplateReturnErr                      error
 	}
 	type want struct {
 		errMsg string
@@ -111,62 +114,65 @@ func TestInit(t *testing.T) {
 			mock: mock{
 				InitProjNameAskForUserInputQuestion: "Enter your project name:",
 				InitProjNameAskForUserInputTimes:    1,
-				InitReturnProjName:                  "test",
+				InitReturnProjName:                  "project-name",
 				InitProjNameAskForUserInputErr:      nil,
 
 				InitInstListVonageAppsFilter:     "",
 				InitInstListVonageAppsTimes:      1,
-				InitReturnInstApps:               api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "test", ID: "id"}}},
+				InitReturnInstApps:               api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "app-name", ID: "app-id"}}},
 				InitInstListVonageAppsReturnErr:  nil,
 				InitInstAskForUserChoiceQuestion: "Select your Vonage application ID for deployment:",
 				InitInstAskForUserChoiceTimes:    1,
-				InitReturnInstAppLabel:           "test - (id)",
+				InitReturnInstAppLabel:           "app-name - (app-id)",
 				InitInstAskForUserChoiceErr:      nil,
 
 				InitDebugListVonageAppsFilter:     "",
 				InitDebugListVonageAppsTimes:      1,
-				InitReturnDebugApps:               api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "test", ID: "id"}}},
+				InitReturnDebugApps:               api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "app-name", ID: "app-id"}}},
 				InitDebugListVonageAppsReturnErr:  nil,
 				InitDebugAskForUserChoiceQuestion: "Select your Vonage application ID for debug:",
 				InitDebugAskForUserChoiceTimes:    1,
-				InitReturnDebugAppLabel:           "test - (id)",
+				InitReturnDebugAppLabel:           "app-name - (app-id)",
 				InitDebugAskForUserChoiceErr:      nil,
 
 				InitListRuntimesTimes:               1,
-				InitReturnRuntimes:                  []api.Runtime{{Name: "test", Comments: "nodejs"}},
+				InitReturnRuntimes:                  []api.Runtime{{Name: "nodejs16", Comments: "deprecated", Language: "nodejs"}},
 				InitListRuntimesReturnErr:           nil,
 				InitRuntimeAskForUserChoiceQuestion: "Select a runtime:",
 				InitRuntimeAskForUserChoiceTimes:    1,
-				InitReturnRuntimeLabel:              "test - (nodejs)",
+				InitReturnRuntimeLabel:              "nodejs16 - (deprecated)",
 				InitRuntimeAskForUserChoiceErr:      nil,
 
 				InitListRegionsTimes:               1,
-				InitReturnRegions:                  []api.Region{{Name: "test", Alias: "id"}},
+				InitReturnRegions:                  []api.Region{{Name: "AWS - Europe Ireland", Alias: "aws.euw1"}},
 				InitListRegionsReturnErr:           nil,
 				InitRegionAskForUserChoiceQuestion: "Select a region:",
 				InitRegionAskForUserChoiceTimes:    1,
-				InitReturnRegionLabel:              "test - (id)",
+				InitReturnRegionLabel:              "AWS - Europe Ireland - (aws.euw1)",
 				InitRegionAskForUserChoiceErr:      nil,
 
 				InitInstNameAskForUserInputQuestion: "Enter your Instance name:",
 				InitInstNameAskForUserInputTimes:    1,
-				InitReturnInstName:                  "test",
+				InitReturnInstName:                  "instance-name",
 				InitInstNameAskForUserInputErr:      nil,
 
-				InitGetTemplateNameListTimes:         1,
-				InitReturnTemplates:                  []api.Metadata{},
-				InitGetTemplateNameListReturnErr:     nil,
+				InitListProductsTimes:                1,
+				InitReturnProducts:                   []api.Product{},
+				InitListProductsReturnErr:            nil,
 				InitTemplateAskForUserChoiceQuestion: "Select a template:",
 				InitTemplateAskForUserChoiceTimes:    0,
-				InitReturnTemplateLabel:              "test",
+				InitReturnTemplateLabel:              "template-label",
 				InitTemplateAskForUserChoiceErr:      nil,
 
-				InitGetTemplateTimes:     0,
-				InitGetReturnTemplate:    api.Template{},
-				InitGetTemplateReturnErr: nil,
+				InitGetLatestProductVersionByIDTimes:          0,
+				InitGetLatestProductVersionByIDReturnTemplate: api.ProductVersion{},
+				InitGetLatestProductVersionByIDReturnErr:      nil,
+				InitGetTemplateTimes:                          0,
+				InitGetTemplateReturnTemplate:                 []byte{},
+				InitGetTemplateReturnErr:                      nil,
 			},
 			want: want{
-				stderr: "! No templates available for the selected runtime \"test\"\n",
+				stderr: "! No product templates available for the selected runtime \"nodejs16\"\n",
 			},
 		},
 		{
@@ -175,59 +181,62 @@ func TestInit(t *testing.T) {
 			mock: mock{
 				InitProjNameAskForUserInputQuestion: "Enter your project name:",
 				InitProjNameAskForUserInputTimes:    1,
-				InitReturnProjName:                  "test",
+				InitReturnProjName:                  "project-name",
 				InitProjNameAskForUserInputErr:      nil,
 
 				InitInstListVonageAppsFilter:     "",
 				InitInstListVonageAppsTimes:      1,
-				InitReturnInstApps:               api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "test", ID: "id"}}},
+				InitReturnInstApps:               api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "app-name", ID: "app-id"}}},
 				InitInstListVonageAppsReturnErr:  nil,
 				InitInstAskForUserChoiceQuestion: "Select your Vonage application ID for deployment:",
 				InitInstAskForUserChoiceTimes:    1,
-				InitReturnInstAppLabel:           "test - (id)",
+				InitReturnInstAppLabel:           "app-name - (app-id)",
 				InitInstAskForUserChoiceErr:      nil,
 
 				InitDebugListVonageAppsFilter:     "",
 				InitDebugListVonageAppsTimes:      1,
-				InitReturnDebugApps:               api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "test", ID: "id"}}},
+				InitReturnDebugApps:               api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "app-name", ID: "app-id"}}},
 				InitDebugListVonageAppsReturnErr:  nil,
 				InitDebugAskForUserChoiceQuestion: "Select your Vonage application ID for debug:",
 				InitDebugAskForUserChoiceTimes:    1,
-				InitReturnDebugAppLabel:           "test - (id)",
+				InitReturnDebugAppLabel:           "app-name - (app-id)",
 				InitDebugAskForUserChoiceErr:      nil,
 
 				InitListRuntimesTimes:               1,
-				InitReturnRuntimes:                  []api.Runtime{{Name: "test", Comments: "nodejs"}},
+				InitReturnRuntimes:                  []api.Runtime{{Name: "nodejs16", Comments: "deprecated", Language: "nodejs"}},
 				InitListRuntimesReturnErr:           nil,
 				InitRuntimeAskForUserChoiceQuestion: "Select a runtime:",
 				InitRuntimeAskForUserChoiceTimes:    1,
-				InitReturnRuntimeLabel:              "test - (nodejs)",
+				InitReturnRuntimeLabel:              "nodejs16 - (deprecated)",
 				InitRuntimeAskForUserChoiceErr:      nil,
 
 				InitListRegionsTimes:               1,
-				InitReturnRegions:                  []api.Region{{Name: "test", Alias: "id"}},
+				InitReturnRegions:                  []api.Region{{Name: "AWS - Europe Ireland", Alias: "aws.euw1"}},
 				InitListRegionsReturnErr:           nil,
 				InitRegionAskForUserChoiceQuestion: "Select a region:",
 				InitRegionAskForUserChoiceTimes:    1,
-				InitReturnRegionLabel:              "test - (id)",
+				InitReturnRegionLabel:              "AWS - Europe Ireland - (aws.euw1)",
 				InitRegionAskForUserChoiceErr:      nil,
 
 				InitInstNameAskForUserInputQuestion: "Enter your Instance name:",
 				InitInstNameAskForUserInputTimes:    1,
-				InitReturnInstName:                  "test",
+				InitReturnInstName:                  "instance-name",
 				InitInstNameAskForUserInputErr:      nil,
 
-				InitGetTemplateNameListTimes:         1,
-				InitReturnTemplates:                  []api.Metadata{{Name: "test.zip"}},
-				InitGetTemplateNameListReturnErr:     nil,
-				InitTemplateAskForUserChoiceQuestion: "Select a template for runtime test: ",
+				InitListProductsTimes:                1,
+				InitReturnProducts:                   []api.Product{{ID: "product-id", Name: "product-name", ProgrammingLanguage: "NodeJS"}},
+				InitListProductsReturnErr:            nil,
+				InitTemplateAskForUserChoiceQuestion: "Select a product template for runtime nodejs16: ",
 				InitTemplateAskForUserChoiceTimes:    1,
-				InitReturnTemplateLabel:              "test",
+				InitReturnTemplateLabel:              "product-name",
 				InitTemplateAskForUserChoiceErr:      nil,
 
-				InitGetTemplateTimes:     1,
-				InitGetReturnTemplate:    api.Template{Content: byteSlice},
-				InitGetTemplateReturnErr: nil,
+				InitGetLatestProductVersionByIDTimes:          1,
+				InitGetLatestProductVersionByIDReturnTemplate: api.ProductVersion{ID: "product-version-id"},
+				InitGetLatestProductVersionByIDReturnErr:      nil,
+				InitGetTemplateTimes:                          1,
+				InitGetTemplateReturnTemplate:                 byteSlice,
+				InitGetTemplateReturnErr:                      nil,
 			},
 			want: want{
 				stdout: fmt.Sprintf("✓ %s/vcr.yaml created\n", absPath),
@@ -241,6 +250,7 @@ func TestInit(t *testing.T) {
 			deploymentMock := mocks.NewMockDeploymentInterface(ctrl)
 			datastoreMock := mocks.NewMockDatastoreInterface(ctrl)
 			assetMock := mocks.NewMockAssetInterface(ctrl)
+			marketplaceMock := mocks.NewMockMarketplaceInterface(ctrl)
 
 			surveyMock.EXPECT().AskForUserInput(tt.mock.InitProjNameAskForUserInputQuestion, gomock.Any()).
 				Times(tt.mock.InitProjNameAskForUserInputTimes).
@@ -282,17 +292,21 @@ func TestInit(t *testing.T) {
 				Times(tt.mock.InitInstNameAskForUserInputTimes).
 				Return(tt.mock.InitReturnInstName, tt.mock.InitInstNameAskForUserInputErr)
 
-			assetMock.EXPECT().GetTemplateNameList(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-				Times(tt.mock.InitGetTemplateNameListTimes).
-				Return(tt.mock.InitReturnTemplates, tt.mock.InitGetTemplateNameListReturnErr)
+			datastoreMock.EXPECT().ListProducts(gomock.Any()).
+				Times(tt.mock.InitListProductsTimes).
+				Return(tt.mock.InitReturnProducts, tt.mock.InitListProductsReturnErr)
 
 			surveyMock.EXPECT().AskForUserChoice(tt.mock.InitTemplateAskForUserChoiceQuestion, gomock.Any(), gomock.Any(), gomock.Any()).
 				Times(tt.mock.InitTemplateAskForUserChoiceTimes).
 				Return(tt.mock.InitReturnTemplateLabel, tt.mock.InitTemplateAskForUserChoiceErr)
 
-			assetMock.EXPECT().GetTemplate(gomock.Any(), gomock.Any()).
+			datastoreMock.EXPECT().GetLatestProductVersionByID(gomock.Any(), gomock.Any()).
+				Times(tt.mock.InitGetLatestProductVersionByIDTimes).
+				Return(tt.mock.InitGetLatestProductVersionByIDReturnTemplate, tt.mock.InitGetLatestProductVersionByIDReturnErr)
+
+			marketplaceMock.EXPECT().GetTemplate(gomock.Any(), gomock.Any(), gomock.Any()).
 				Times(tt.mock.InitGetTemplateTimes).
-				Return(tt.mock.InitGetReturnTemplate, tt.mock.InitGetTemplateReturnErr)
+				Return(tt.mock.InitGetTemplateReturnTemplate, tt.mock.InitGetTemplateReturnErr)
 
 			ios, _, stdout, stderr := iostreams.Test()
 
@@ -301,7 +315,7 @@ func TestInit(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			f := testutil.DefaultFactoryMock(t, ios, assetMock, nil, datastoreMock, deploymentMock, surveyMock)
+			f := testutil.DefaultFactoryMock(t, ios, assetMock, nil, datastoreMock, deploymentMock, surveyMock, marketplaceMock)
 
 			cmd := NewCmdInit(f)
 			cmd.SetArgs(argv)

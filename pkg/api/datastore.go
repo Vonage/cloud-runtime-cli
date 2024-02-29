@@ -56,6 +56,7 @@ query MyQuery ($alias: String!) {
     name
     alias
 	deployment_api_url
+	marketplace_api_url
 	assets_api_url
 	endpoint_url_scheme
 	debugger_url_scheme
@@ -87,7 +88,7 @@ type getByProjAndInstNameResponse struct {
 
 // GetByProjectAndInstanceName gets the instance by project and instance name.
 func (ds *Datastore) GetInstanceByProjectAndInstanceName(ctx context.Context, projectName, instanceName string) (Instance, error) {
-	const selectQuery = `
+	const query = `
 query MyQuery ($project_name: String!, $instance_name: String!) {
   Instances(where: {Project: {name: {_eq: $project_name}}, _and: {name: {_eq: $instance_name}}}) {
     id
@@ -95,7 +96,7 @@ query MyQuery ($project_name: String!, $instance_name: String!) {
   }
 }`
 	req := GQLRequest{
-		Query: selectQuery,
+		Query: query,
 		Variables: map[string]string{
 			"project_name":  projectName,
 			"instance_name": instanceName,
@@ -121,7 +122,7 @@ type getInstanceByIDResponse struct {
 
 // GetInstanceByID gets the instance by ID.
 func (ds *Datastore) GetInstanceByID(ctx context.Context, id string) (Instance, error) {
-	const selectQuery = `
+	const query = `
 query myQuery ($id: uuid!) {
   Instances_by_pk(id: $id) {
     id
@@ -129,7 +130,7 @@ query myQuery ($id: uuid!) {
   }
 }`
 	req := GQLRequest{
-		Query: selectQuery,
+		Query: query,
 		Variables: map[string]string{
 			"id": id,
 		},
@@ -247,4 +248,66 @@ query MyQuery ($api_account_id: String!, $name: String!) {
 		return Project{}, ErrNotFound
 	}
 	return resp.Data.Projects[0], nil
+}
+
+type listProductResponseData struct {
+	Products []Product `json:"Products"`
+}
+type listProductResponse struct {
+	Data listProductResponseData `json:"data"`
+}
+
+func (ds *Datastore) ListProducts(ctx context.Context) ([]Product, error) {
+	const query = `
+query MyQuery {
+  Products(where: {ProductVersions: {code_template_enabled: {_eq: true}}, type: {_eq: public}}, order_by: {name: asc}) {
+    id
+    name
+    programming_language
+  }
+}`
+
+	req := GQLRequest{
+		Query: query,
+	}
+	var resp listProductResponse
+
+	if err := ds.gqlClient.Do(ctx, req, &resp); err != nil {
+		return nil, err
+	}
+	return resp.Data.Products, nil
+}
+
+type getLatestProductVersionByIDParams struct {
+	ID string `json:"id"`
+}
+
+type getLatestProductVersionByIDResponseData struct {
+	ProductVersions []ProductVersion `json:"ProductVersions"`
+}
+
+type getLatestProductVersionByIDResponse struct {
+	Data getLatestProductVersionByIDResponseData `json:"data"`
+}
+
+func (ds *Datastore) GetLatestProductVersionByID(ctx context.Context, id string) (ProductVersion, error) {
+	const query = `
+query MyQuery ($id: uuid!) {
+  ProductVersions(where: {Product: {id: {_eq: $id}}}, order_by: {created_at: desc}) {
+    id
+  }
+}
+`
+	req := GQLRequest{
+		Query:     query,
+		Variables: getLatestProductVersionByIDParams{ID: id},
+	}
+	var resp getLatestProductVersionByIDResponse
+	if err := ds.gqlClient.Do(ctx, req, &resp); err != nil {
+		return ProductVersion{}, err
+	}
+	if len(resp.Data.ProductVersions) == 0 {
+		return ProductVersion{}, ErrNotFound
+	}
+	return resp.Data.ProductVersions[0], nil
 }

@@ -657,3 +657,187 @@ func TestGetProject(t *testing.T) {
 		})
 	}
 }
+
+func TestListProducts(t *testing.T) {
+
+	httpClient := resty.New()
+	httpmock.ActivateNonDefault(httpClient.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	type mock struct {
+		mockResponse listProductResponse
+		status       int
+	}
+
+	type want struct {
+		output []Product
+		err    error
+	}
+
+	tests := []struct {
+		name string
+		mock mock
+		want want
+	}{
+		{
+			name: "200-happy-path",
+			mock: mock{
+				mockResponse: listProductResponse{
+					Data: listProductResponseData{
+						Products: []Product{
+							{
+								ID:                  "Product1-id",
+								Name:                "Product1",
+								ProgrammingLanguage: "Python",
+							},
+							{
+								ID:                  "Product2-id",
+								Name:                "Product2",
+								ProgrammingLanguage: "NodeJS",
+							},
+						},
+					},
+				},
+				status: http.StatusOK,
+			},
+			want: want{
+				output: []Product{
+					{
+						ID:                  "Product1-id",
+						Name:                "Product1",
+						ProgrammingLanguage: "Python",
+					},
+					{
+						ID:                  "Product2-id",
+						Name:                "Product2",
+						ProgrammingLanguage: "NodeJS",
+					},
+				},
+				err: nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			jsonData, err := json.Marshal(tt.mock.mockResponse)
+			if err != nil {
+				t.Fatalf("Error occurred during marshaling. Error: %s", err.Error())
+			}
+
+			mockResponse := string(jsonData)
+
+			httpmock.RegisterResponder("POST", "https://example.com",
+				func(req *http.Request) (*http.Response, error) {
+					resp := httpmock.NewStringResponse(tt.mock.status, mockResponse)
+					resp.Header.Set("Content-Type", "application/json")
+					return resp, nil
+				})
+
+			gqlClient := NewGraphQLClient("https://example.com", httpClient)
+			datastoreClient := NewDatastore(gqlClient)
+
+			regions, err := datastoreClient.ListProducts(context.Background())
+			if tt.want.err != nil {
+				require.EqualError(t, err, tt.want.err.Error())
+				httpmock.Reset()
+				return
+			}
+
+			require.Equal(t, tt.want.output, regions)
+			httpmock.Reset()
+		})
+	}
+}
+
+func TestGetLatestProductVersionByID(t *testing.T) {
+	httpClient := resty.New()
+	httpmock.ActivateNonDefault(httpClient.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	type mock struct {
+		mockResponse getLatestProductVersionByIDResponse
+		status       int
+	}
+
+	type want struct {
+		output ProductVersion
+		err    error
+	}
+
+	tests := []struct {
+		name string
+		mock mock
+		want want
+	}{
+		{
+			name: "200-happy-path",
+			mock: mock{
+				mockResponse: getLatestProductVersionByIDResponse{
+					Data: getLatestProductVersionByIDResponseData{
+						ProductVersions: []ProductVersion{
+							{
+								ID: "ProductVersion1-id",
+							},
+						},
+					},
+				},
+				status: http.StatusOK,
+			},
+			want: want{
+				output: ProductVersion{
+					ID: "ProductVersion1-id",
+				},
+				err: nil,
+			},
+		},
+
+		{
+			name: "404-error",
+			mock: mock{
+				mockResponse: getLatestProductVersionByIDResponse{
+					Data: getLatestProductVersionByIDResponseData{
+						ProductVersions: []ProductVersion{},
+					},
+				},
+				status: http.StatusOK,
+			},
+			want: want{
+				output: ProductVersion{},
+				err:    ErrNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			jsonData, err := json.Marshal(tt.mock.mockResponse)
+			if err != nil {
+				t.Fatalf("Error occurred during marshaling. Error: %s", err.Error())
+			}
+
+			mockResponse := string(jsonData)
+
+			httpmock.RegisterResponder("POST", "https://example.com",
+				func(req *http.Request) (*http.Response, error) {
+					resp := httpmock.NewStringResponse(tt.mock.status, mockResponse)
+					resp.Header.Set("Content-Type", "application/json")
+					return resp, nil
+				})
+
+			gqlClient := NewGraphQLClient("https://example.com", httpClient)
+			datastoreClient := NewDatastore(gqlClient)
+
+			output, err := datastoreClient.GetLatestProductVersionByID(context.Background(), "Product1-id")
+			if tt.want.err != nil {
+				require.EqualError(t, err, tt.want.err.Error())
+				httpmock.Reset()
+				return
+			}
+
+			require.Equal(t, tt.want.output, output)
+			httpmock.Reset()
+		})
+
+	}
+}

@@ -152,7 +152,7 @@ func Test_deployDebugServer(t *testing.T) {
 
 			ios, _, stdout, stderr := iostreams.Test()
 
-			f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, deploymentMock, surveyMock)
+			f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, deploymentMock, surveyMock, nil)
 
 			opts := &Options{
 				Factory:  f,
@@ -243,7 +243,7 @@ func Test_startDebugProxy(t *testing.T) {
 
 			ios, _, _, stderr := iostreams.Test()
 
-			f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, deploymentMock, nil)
+			f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, deploymentMock, nil, nil)
 
 			opts := &Options{
 				Factory:      f,
