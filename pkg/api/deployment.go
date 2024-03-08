@@ -401,3 +401,100 @@ func (c *DeploymentClient) RemoveSecret(ctx context.Context, name string) error 
 	}
 	return nil
 }
+
+type pluginsRequest struct {
+	Plugin  string                 `json:"plugin"`
+	Version string                 `json:"version"`
+	Action  string                 `json:"action"`
+	Options map[string]interface{} `json:"options"`
+}
+
+type MongoInfoResponse struct {
+	Username         string `json:"username"`
+	Password         string `json:"password"`
+	Database         string `json:"database"`
+	ConnectionString string `json:"connectionString"`
+}
+
+const pluginsPath = "/plugins"
+
+func (c *DeploymentClient) CreateMongoDatabase(ctx context.Context, version string) (MongoInfoResponse, error) {
+	var result MongoInfoResponse
+
+	resp, err := c.httpClient.R().
+		SetContext(ctx).
+		SetResult(&result).
+		SetBody(pluginsRequest{Plugin: "mongo", Version: version, Action: "createDB"}).
+		Post(c.baseURL + pluginsPath)
+	if err != nil {
+		return MongoInfoResponse{}, fmt.Errorf("%w: trace_id = %s", err, traceIDFromHTTPResponse(resp))
+	}
+	if resp.StatusCode() == http.StatusNotFound {
+		return MongoInfoResponse{}, ErrNotFound
+	}
+	if resp.IsError() {
+		return MongoInfoResponse{}, NewErrorFromHTTPResponse(resp)
+	}
+
+	return result, nil
+}
+
+func (c *DeploymentClient) DeleteMongoDatabase(ctx context.Context, version, database string) error {
+	resp, err := c.httpClient.R().
+		SetContext(ctx).
+		SetBody(pluginsRequest{Plugin: "mongo", Version: version, Action: "deleteDB", Options: map[string]interface{}{"database": database}}).
+		Post(c.baseURL + pluginsPath)
+	if err != nil {
+		return fmt.Errorf("%w: trace_id = %s", err, traceIDFromHTTPResponse(resp))
+	}
+	if resp.StatusCode() == http.StatusNotFound {
+		return ErrNotFound
+	}
+	if resp.IsError() {
+		return NewErrorFromHTTPResponse(resp)
+	}
+
+	return nil
+}
+
+func (c *DeploymentClient) GetMongoDatabase(ctx context.Context, version string, database string) (MongoInfoResponse, error) {
+	var result MongoInfoResponse
+
+	resp, err := c.httpClient.R().
+		SetContext(ctx).
+		SetResult(&result).
+		SetBody(pluginsRequest{Plugin: "mongo", Version: version, Action: "getDB", Options: map[string]interface{}{"database": database}}).
+		Post(c.baseURL + pluginsPath)
+	if err != nil {
+		return MongoInfoResponse{}, fmt.Errorf("%w: trace_id = %s", err, traceIDFromHTTPResponse(resp))
+	}
+	if resp.StatusCode() == http.StatusNotFound {
+		return MongoInfoResponse{}, ErrNotFound
+	}
+	if resp.IsError() {
+		return MongoInfoResponse{}, NewErrorFromHTTPResponse(resp)
+	}
+
+	return result, nil
+}
+
+func (c *DeploymentClient) ListMongoDatabases(ctx context.Context, version string) ([]string, error) {
+	var result []string
+
+	resp, err := c.httpClient.R().
+		SetContext(ctx).
+		SetResult(&result).
+		SetBody(pluginsRequest{Plugin: "mongo", Version: version, Action: "listDBs"}).
+		Post(c.baseURL + pluginsPath)
+	if err != nil {
+		return nil, fmt.Errorf("%w: trace_id = %s", err, traceIDFromHTTPResponse(resp))
+	}
+	if resp.StatusCode() == http.StatusNotFound {
+		return nil, ErrNotFound
+	}
+	if resp.IsError() {
+		return nil, NewErrorFromHTTPResponse(resp)
+	}
+
+	return result, nil
+}
