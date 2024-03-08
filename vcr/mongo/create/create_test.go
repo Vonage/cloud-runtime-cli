@@ -50,11 +50,11 @@ func TestMongoCreate(t *testing.T) {
 			},
 			want: want{
 				stdout: heredoc.Doc(`
-				✓ Database created:
-					username: test
-					password: test
-					database: TestDB
-					connectionString: mongodb://test:test@localhost:27017/TestDB
+				✓ Database created
+				ℹ username: test
+				ℹ password: test
+				ℹ database: TestDB
+				ℹ connectionString: mongodb://test:test@localhost:27017/TestDB
 				`),
 			},
 		},

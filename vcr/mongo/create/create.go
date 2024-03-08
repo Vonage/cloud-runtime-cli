@@ -50,16 +50,20 @@ func runCreate(ctx context.Context, opts *Options) error {
 		return fmt.Errorf("failed to create database: %w", err)
 	}
 	fmt.Fprintf(io.Out, heredoc.Doc(`
-						%s Database created:
-							username: %s
-							password: %s
-							database: %s
-							connectionString: %s
+						%s Database created
+						%s username: %s
+						%s password: %s
+						%s database: %s
+						%s connectionString: %s
 						`),
 		c.SuccessIcon(),
+		c.Blue(cmdutil.InfoIcon),
 		result.Username,
+		c.Blue(cmdutil.InfoIcon),
 		result.Password,
+		c.Blue(cmdutil.InfoIcon),
 		result.Database,
+		c.Blue(cmdutil.InfoIcon),
 		result.ConnectionString)
 	return nil
 }
