@@ -52,11 +52,11 @@ func TestMongoInfo(t *testing.T) {
 			},
 			want: want{
 				stdout: heredoc.Doc(`
-				✓ Database info:
-					username: test
-					password: test
-					database: TestDB
-					connectionString: mongodb://test:test@localhost:27017/TestDB
+				✓ Database info
+				ℹ username: test
+				ℹ password: test
+				ℹ database: TestDB
+				ℹ connectionString: mongodb://test:test@localhost:27017/TestDB
 				`),
 			},
 		},

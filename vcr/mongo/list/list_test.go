@@ -47,9 +47,9 @@ func TestMongoList(t *testing.T) {
 			},
 			want: want{
 				stdout: heredoc.Doc(`
-				✓ Databases:
-				  - TestDB1
-				  - TestDB2
+				Database
+				TestDB1
+				TestDB2
 				`),
 			},
 		},
