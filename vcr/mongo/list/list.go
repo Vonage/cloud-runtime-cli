@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
 
+	"github.com/cli/cli/v2/utils"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/spf13/cobra"
 )
@@ -43,7 +45,7 @@ func runList(ctx context.Context, opts *Options) error {
 	io := opts.IOStreams()
 	c := opts.IOStreams().ColorScheme()
 
-	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Creating Database")
+	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Listing Databases")
 	result, err := opts.DeploymentClient().ListMongoDatabases(ctx, opts.Version)
 	spinner.Stop()
 	if err != nil {
@@ -55,9 +57,16 @@ func runList(ctx context.Context, opts *Options) error {
 		return nil
 	}
 
-	fmt.Fprintf(io.Out, "%s Databases:\n", c.SuccessIcon())
+	tp := utils.NewTablePrinter(io)
+	tp.AddField(c.Bold("Database"), nil, nil)
+	tp.EndRow()
 	for _, db := range result {
-		fmt.Fprintf(io.Out, "  - %s\n", db)
+		tp.AddField(db, nil, nil)
+		tp.EndRow()
+	}
+
+	if err := tp.Render(); err != nil {
+		return fmt.Errorf("error rending databases: %w", err)
 	}
 
 	return nil
