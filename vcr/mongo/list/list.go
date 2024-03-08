@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
 
-	"github.com/cli/cli/v2/utils"
-
 	"github.com/MakeNowJust/heredoc"
+	"github.com/cli/cli/v2/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -57,6 +56,7 @@ func runList(ctx context.Context, opts *Options) error {
 		return nil
 	}
 
+	//nolint
 	tp := utils.NewTablePrinter(io)
 	tp.AddField(c.Bold("Database"), nil, nil)
 	tp.EndRow()
