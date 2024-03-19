@@ -32,8 +32,6 @@ func NewCmdSecretCreate(f cmdutil.Factory) *cobra.Command {
 		Long: heredoc.Doc(`Create a new secret.
 
 			The secrets can be loaded into your deployed applications as environment variables.
-			
-			Each secret will be capitalised and prefixed with NERU_SECRET_ when being injected in as an environment variable.
 		`),
 		Example: heredoc.Doc(`
 			$  vcr secret create --name <name> --value <value>
