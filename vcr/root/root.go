@@ -2,6 +2,7 @@ package root
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -58,8 +59,13 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 
 			cliConfig, err := config.ReadCLIConfig(opts.ConfigFilePath)
 			if err != nil {
-				close(updateStream)
-				return fmt.Errorf("failed to read cli config: %w", err)
+				var path string
+				cliConfig, path, err = config.ReadDefaultCLIConfig()
+				if errors.Is(err, config.ErrNoConfig) {
+					close(updateStream)
+					return fmt.Errorf("failed to read cli config: %w", config.ErrNoConfig)
+				}
+				fmt.Fprintf(io.ErrOut, "%s Config file not found at %q, using %q\n", c.WarningIcon(), opts.ConfigFilePath, path)
 			}
 
 			spinner := cmdutil.DisplaySpinnerMessageWithHandle(fmt.Sprintf(" Executing cmd %q...", cmd.Name()))
@@ -103,7 +109,7 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 
 	cmd.Flags().BoolP("version", "v", false, "Show vcr version")
 	cmd.PersistentFlags().Bool("help", false, "Show help for command")
-	cmd.PersistentFlags().StringVarP(&opts.ConfigFilePath, "config-file", "", config.DefaultCLIConfigPath, "path to config file (default is $HOME/.vcr-cli)")
+	cmd.PersistentFlags().StringVarP(&opts.ConfigFilePath, "config-file", "", config.DefaultCLIConfigPath[0], "path to config file (default is $HOME/.vcr-cli)")
 	cmd.PersistentFlags().StringVarP(&opts.GraphqlEndpoint, "graphql-endpoint", "", "", "graphql endpoint used to fetch metadata")
 	cmd.PersistentFlags().StringVarP(&opts.Region, "region", "", "", "vonage platform region")
 	cmd.PersistentFlags().StringVarP(&opts.APIKey, "api-key", "", "", "vonage API key")
