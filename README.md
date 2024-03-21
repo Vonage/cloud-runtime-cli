@@ -20,35 +20,18 @@ Find current and past releases on the [releases page](https://github.com/Vonage/
 
 ### macOS
 
-#### M1 (ARM)
 ```
-curl -L -O https://github.com/Vonage/vonage-cloud-runtime-cli/releases/latest/download/vcr_darwin_arm64.tar.gz
-tar -xvf vcr_darwin_arm64.tar.gz
-sudo mv vcr_darwin_arm64 /usr/local/bin/vcr
-```
-#### Intel
-```
-curl -L -O https://github.com/Vonage/vonage-cloud-runtime-cli/releases/latest/download/vcr_darwin_amd64.tar.gz
-tar -xvf vcr_darwin_amd64.tar.gz
-sudo mv vcr_darwin_amd64 /usr/local/bin/vcr
+curl -L https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/script/install.sh | sh
 ```
 
 ### Linux
 ```
-curl -L -O https://github.com/Vonage/vonage-cloud-runtime-cli/releases/latest/download/vcr_linux_amd64.tar.gz
-tar -xvf vcr_linux_amd64.tar.gz
-sudo mv vcr_linux_amd64 /usr/local/bin/vcr
+curl -L https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/script/install.sh | sh
 ```
 
 ### Windows
 ```
-mkdir .vcr
-cd .vcr
-curl -L -O https://github.com/Vonage/vonage-cloud-runtime-cli/releases/latest/download/vcr_windows_amd64.tar.gz
-tar -xzf vcr_windows_amd64.tar.gz
-ren vcr_windows_amd64.exe vcr.exe
-setx PATH "%PATH%;%cd%"
-Close and reopen command prompt to reload your PATH.
+pwsh -Command "iwr https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/script/install.ps1 -useb | iex"
 ```
 
 

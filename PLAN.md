@@ -61,6 +61,9 @@ vonage-cloud-runtime-cli/
 │     └── format
 │         ├── format.go
 │         └── format_test.go
+├── script
+│     ├── install.ps1
+│     ├── install.sh
 ├── tests
 │     └── integration
 │         ├── Dockerfile
