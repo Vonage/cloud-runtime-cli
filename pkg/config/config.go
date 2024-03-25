@@ -1,14 +1,24 @@
 package config
 
 import (
+	"errors"
+
 	"github.com/mitchellh/go-homedir"
 	"gopkg.in/ini.v1"
 )
 
+var ErrNoConfig = errors.New("config file not found, please use 'vcr configure' to create one")
+
 const (
-	DefaultGraphqlURL    = "https://graphql.euw1.runtime.vonage.cloud/v1/graphql"
-	DefaultRegion        = "aws.euw1"
-	DefaultCLIConfigPath = "~/.vcr-cli"
+	DefaultGraphqlURL = "https://graphql.euw1.runtime.vonage.cloud/v1/graphql"
+	DefaultRegion     = "aws.euw1"
+)
+
+var (
+	DefaultCLIConfigPath = []string{
+		"~/.vcr-cli",
+		"~/.neru-cli",
+	}
 )
 
 type Credentials struct {
@@ -21,6 +31,18 @@ type CLIConfig struct {
 	DefaultRegion   string `ini:"default_region"`
 
 	Credentials `ini:"credentials"`
+}
+
+func ReadDefaultCLIConfig() (CLIConfig, string, error) {
+	var cliConfig CLIConfig
+	var err error
+	for _, path := range DefaultCLIConfigPath {
+		cliConfig, err = ReadCLIConfig(path)
+		if err == nil {
+			return cliConfig, path, nil
+		}
+	}
+	return CLIConfig{}, "", ErrNoConfig
 }
 
 func ReadCLIConfig(path string) (CLIConfig, error) {
