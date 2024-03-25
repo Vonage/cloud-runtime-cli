@@ -65,3 +65,8 @@ type Product struct {
 type ProductVersion struct {
 	ID string `json:"id,omitempty"`
 }
+
+type Log struct {
+	Message   string    `json:"message"`
+	Timestamp time.Time `json:"timestamp"`
+}

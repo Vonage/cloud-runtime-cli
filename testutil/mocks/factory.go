@@ -641,6 +641,21 @@ func (mr *MockDatastoreInterfaceMockRecorder) GetRuntimeByName(ctx, name interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRuntimeByName", reflect.TypeOf((*MockDatastoreInterface)(nil).GetRuntimeByName), ctx, name)
 }
 
+// ListLogsByInstanceId mocks base method.
+func (m *MockDatastoreInterface) ListLogsByInstanceId(ctx context.Context, instanceID string, limit int, timestamp time.Time) ([]api.Log, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListLogsByInstanceId", ctx, instanceID, limit, timestamp)
+	ret0, _ := ret[0].([]api.Log)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListLogsByInstanceId indicates an expected call of ListLogsByInstanceId.
+func (mr *MockDatastoreInterfaceMockRecorder) ListLogsByInstanceId(ctx, instanceID, limit, timestamp interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListLogsByInstanceId", reflect.TypeOf((*MockDatastoreInterface)(nil).ListLogsByInstanceId), ctx, instanceID, limit, timestamp)
+}
+
 // ListProducts mocks base method.
 func (m *MockDatastoreInterface) ListProducts(ctx context.Context) ([]api.Product, error) {
 	m.ctrl.T.Helper()

@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"time"
 )
 
 type Datastore struct {
@@ -310,4 +311,37 @@ query MyQuery ($id: uuid!) {
 		return ProductVersion{}, ErrNotFound
 	}
 	return resp.Data.ProductVersions[0], nil
+}
+
+type getLogByIDParams struct {
+	ID        string    `json:"instance_id"`
+	Limit     int       `json:"limit"`
+	Timestamp time.Time `json:"timestamp"`
+}
+
+type listLogResponseData struct {
+	Logs []Log `json:"Logs"`
+}
+type listLogResponse struct {
+	Data listLogResponseData `json:"data"`
+}
+
+// ListLogs lists all the available logs.
+func (ds *Datastore) ListLogsByInstanceId(ctx context.Context, id string, limit int, timestamp time.Time) ([]Log, error) {
+	const query = `
+query MyQuery ($instance_id: String!, $limit: Int!, $timestamp: Time!) {
+  Logs(where: {instance_id: {_eq: $instance_id}, timestamp: {_gt: $timestamp}}, order_by: {timestamp: asc}, limit: $limit) {
+    message
+    timestamp
+  }
+}`
+	req := GQLRequest{
+		Query:     query,
+		Variables: getLogByIDParams{ID: id, Limit: limit, Timestamp: timestamp},
+	}
+	var resp listLogResponse
+	if err := ds.gqlClient.Do(ctx, req, &resp); err != nil {
+		return nil, err
+	}
+	return resp.Data.Logs, nil
 }
