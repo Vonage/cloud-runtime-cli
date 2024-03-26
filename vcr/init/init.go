@@ -23,14 +23,16 @@ import (
 )
 
 const SkipValue = "SKIP"
+const DefaultRuntime = "nodejs18"
 
 type Options struct {
 	cmdutil.Factory
 
-	cwd              string
-	manifest         *config.Manifest
-	manifestFileName string
-	programmingLang  string
+	cwd                      string
+	manifest                 *config.Manifest
+	manifestFilePath         string
+	templateManifestFilePath string
+	programmingLang          string
 }
 
 func NewCmdInit(f cmdutil.Factory) *cobra.Command {
@@ -86,7 +88,8 @@ func runInit(ctx context.Context, opts *Options) error {
 	c := io.ColorScheme()
 
 	opts.manifest = config.NewManifestWithDefaults()
-	opts.manifestFileName = config.DefaultManifestFileNames[len(config.DefaultManifestFileNames)-1]
+	opts.manifestFilePath = config.GetAbsFilename(opts.cwd, config.DefaultManifestFileNames[len(config.DefaultManifestFileNames)-1])
+	opts.templateManifestFilePath = opts.manifestFilePath
 
 	if err := askProjectName(opts); err != nil {
 		return fmt.Errorf("failed to ask project name: %w", err)
@@ -110,11 +113,16 @@ func runInit(ctx context.Context, opts *Options) error {
 		return err
 	}
 
-	if err := config.WriteManifest(config.GetAbsFilename(opts.cwd, opts.manifestFileName), opts.manifest); err != nil {
-		return fmt.Errorf("failed to write manifest: %w", err)
+	if err := config.WriteManifest(opts.templateManifestFilePath, opts.manifest); err != nil {
+		return fmt.Errorf("failed to write manifest to %q: %w", opts.templateManifestFilePath, err)
 	}
 
-	fmt.Fprintf(io.Out, "%s %s created\n", c.SuccessIcon(), config.GetAbsFilename(opts.cwd, opts.manifestFileName))
+	if err := os.Rename(opts.templateManifestFilePath, opts.manifestFilePath); err != nil {
+		fmt.Fprintf(io.Out, "%s %s created\n", c.SuccessIcon(), opts.templateManifestFilePath)
+		return fmt.Errorf("failed to rename manifest file to %q : %w", opts.manifestFilePath, err)
+	}
+
+	fmt.Fprintf(io.Out, "%s %s created\n", c.SuccessIcon(), opts.manifestFilePath)
 	return nil
 }
 
@@ -189,8 +197,6 @@ func askDebugAppID(ctx context.Context, opts *Options) error {
 }
 
 func askRuntime(ctx context.Context, opts *Options) error {
-	runtime := opts.manifest.Instance.Runtime
-
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Retrieving runtime list... ")
 	runtimes, err := opts.Datastore().ListRuntimes(ctx)
 	spinner.Stop()
@@ -198,7 +204,7 @@ func askRuntime(ctx context.Context, opts *Options) error {
 		return err
 	}
 	runtimeOptions := format.GetRuntimeOptions(runtimes)
-	runtimeLabel, err := opts.Survey().AskForUserChoice("Select a runtime:", runtimeOptions.Labels, runtimeOptions.RuntimeLookup, runtimeOptions.Lookup[runtime])
+	runtimeLabel, err := opts.Survey().AskForUserChoice("Select a runtime:", runtimeOptions.Labels, runtimeOptions.RuntimeLookup, DefaultRuntime)
 	if err != nil {
 		return err
 	}
@@ -298,7 +304,7 @@ func askTemplate(ctx context.Context, opts *Options) error {
 		return fmt.Errorf("failed to uncompress template files: %w", err)
 	}
 
-	templateManifestFilePath, err := config.FindTemplateManifestFile(opts.cwd)
+	opts.templateManifestFilePath, err = config.FindTemplateManifestFile(opts.cwd)
 	if err != nil {
 		if errors.Is(err, config.ErrNoManifest) {
 			fmt.Fprintf(io.ErrOut, "%s No manifest file found in the template files.\n", c.WarningIcon())
@@ -307,7 +313,7 @@ func askTemplate(ctx context.Context, opts *Options) error {
 		return fmt.Errorf("failed to find template manifest file: %w", err)
 	}
 
-	templateManifest, err := config.ReadManifest(templateManifestFilePath)
+	templateManifest, err := config.ReadManifest(opts.templateManifestFilePath)
 	if err != nil {
 		fmt.Fprintf(io.ErrOut, "%s Failed to parse template manifest file due to %s.\n", c.WarningIcon(), err.Error())
 		return nil
