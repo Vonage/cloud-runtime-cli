@@ -16,10 +16,10 @@ var ErrNotDirectory = errors.New("path is not a directory")
 
 var (
 	DefaultManifestFileNames = []string{
-		"neru.yml",
 		"neru.yaml",
-		"vcr.yml",
+		"neru.yml",
 		"vcr.yaml",
+		"vcr.yml",
 	}
 )
 

@@ -71,7 +71,7 @@ func GetRuntimeOptions(runtimes []api.Runtime) RuntimeOptions {
 	}
 
 	for _, r := range runtimes {
-		if r.Language != "debug" && r.Language != "" {
+		if r.Language != "debug" && r.Language != "" && r.Comments != "deprecated" {
 			if r.Comments != "" {
 				label := fmt.Sprintf("%s - (%s)", r.Name, r.Comments)
 				options.Labels = append(options.Labels, label)
