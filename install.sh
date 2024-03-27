@@ -10,11 +10,9 @@ main() {
       arch="amd64"
   fi
 	vcr_binary="vcr_${os}_${arch}"
-	if [ -n $1 ]; then
-      version="download/$1"
-  else
-      version="latest/download"
-  fi
+version="${1:+download/$1}"
+version="${version:-latest/download}"
+
   vcr_uri="https://github.com/Vonage/cloud-runtime-cli/releases/$version/$vcr_binary.tar.gz"
 	vcr_resp=$(curl -L -s -o /dev/null -w "%{http_code}" $vcr_uri)
 	if [ "$vcr_resp" -ne 200 ]; then
