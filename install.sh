@@ -25,6 +25,7 @@ main() {
 	bin_dir="$vcr_install/bin"
 	tmp_dir="$vcr_install/tmp"
 	exe="$bin_dir/vcr"
+	sys_exe="/usr/local/bin/vcr"
 
 	mkdir -p "$bin_dir"
 	mkdir -p "$tmp_dir"
@@ -34,22 +35,22 @@ main() {
 	tar -C "$tmp_dir" -xzf "$tmp_dir/${vcr_binary}.tar.gz"
 	chmod +x "$tmp_dir/${vcr_binary}"
 
-	mv "$tmp_dir/${vcr_binary}" "$exe"
+	mv "$tmp_dir/${vcr_binary}" "$sys_exe"
 	rm "$tmp_dir/${vcr_binary}.tar.gz"
 
-	echo "vcr was installed successfully to $exe"
-	if command -v vcr >/dev/null; then
-		echo "Run 'vcr --help' to get started"
-	else
-		case $SHELL in
-		/bin/zsh) shell_profile=".zshrc" ;;
-		*) shell_profile=".bash_profile" ;;
-		esac
-		echo "Manually add the directory to your \$HOME/$shell_profile (or similar)"
-		echo "  export VCR_INSTALL=\"$vcr_install\""
-		echo "  export PATH=\"\$VCR_INSTALL/bin:\$PATH\""
-		echo "Run '$exe --help' to get started"
-	fi
+	echo "vcr was installed successfully to $sys_exe"
+#	if command -v vcr >/dev/null; then
+#		echo "Run 'vcr --help' to get started"
+#	else
+#		case $SHELL in
+#		/bin/zsh) shell_profile=".zshrc" ;;
+#		*) shell_profile=".bash_profile" ;;
+#		esac
+#		echo "Manually add the directory to your \$HOME/$shell_profile (or similar)"
+#		echo "  export VCR_INSTALL=\"$vcr_install\""
+#		echo "  export PATH=\"\$VCR_INSTALL/bin:\$PATH\""
+#		echo "Run '$exe --help' to get started"
+#	fi
 }
 
 main "$1"
