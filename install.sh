@@ -30,7 +30,7 @@ version="${version:-latest/download}"
 	mkdir -p "$bin_dir"
 	mkdir -p "$tmp_dir"
 
-	curl -s -q --fail --location --progress-bar --output "$tmp_dir/${vcr_binary}.tar.gz" "$vcr_uri"
+	curl -q --fail --location --progress-bar --output "$tmp_dir/${vcr_binary}.tar.gz" "$vcr_uri"
 
 	tar -C "$tmp_dir" -xzf "$tmp_dir/${vcr_binary}.tar.gz"
 	chmod +x "$tmp_dir/${vcr_binary}"
