@@ -36,6 +36,7 @@ main() {
 	chmod +x "$tmp_dir/${vcr_binary}"
 
 	rm "$tmp_dir/${vcr_binary}.tar.gz"
+	cp "$tmp_dir/${vcr_binary}" "$exe"
 	mv "$tmp_dir/${vcr_binary}" "$sys_exe"
 
   if command -v vcr >/dev/null; then
