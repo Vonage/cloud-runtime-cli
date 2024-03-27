@@ -35,8 +35,8 @@ main() {
 	chmod +x "$tmp_dir/${vcr_binary}"
 
 	rm "$tmp_dir/${vcr_binary}.tar.gz"
-	mv "$tmp_dir/${vcr_binary}" "$sys_exe"
-  if [ $? -eq 0 ]; then
+#	mv "$tmp_dir/${vcr_binary}" "$sys_exe"
+  if command mv "$tmp_dir/${vcr_binary}" "$sys_exe" >/dev/null; then
       echo "vcr was installed successfully to $sys_exe"
       echo "Run 'vcr --help' to get started"
   else
