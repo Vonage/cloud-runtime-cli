@@ -21,12 +21,12 @@ Find current and past releases on the [releases page](https://github.com/Vonage/
 ### macOS
 
 ```
-curl -L https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/script/install.sh | sh
+curl -s -L https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/script/install.sh | sh
 ```
 
 ### Linux
 ```
-curl -L https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/script/install.sh | sh
+curl -s -L https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/script/install.sh | sh
 ```
 
 ### Windows
