@@ -10,8 +10,8 @@ main() {
       arch="amd64"
   fi
 	vcr_binary="vcr_${os}_${arch}"
-version="${1:+download/$1}"
-version="${version:-latest/download}"
+  version="${1:+download/$1}"
+  version="${version:-latest/download}"
 
   vcr_uri="https://github.com/Vonage/cloud-runtime-cli/releases/$version/$vcr_binary.tar.gz"
 	vcr_resp=$(curl -L -s -o /dev/null -w "%{http_code}" $vcr_uri)
@@ -39,12 +39,14 @@ version="${version:-latest/download}"
 	mv "$tmp_dir/${vcr_binary}" "$sys_exe"
 
   if command -v vcr >/dev/null; then
+    echo "vcr was installed successfully to $sys_exe"
     echo "Run 'vcr --help' to get started"
   else
     case $SHELL in
     /bin/zsh) shell_profile=".zshrc" ;;
     *) shell_profile=".bash_profile" ;;
     esac
+    echo "vcr was installed successfully to $exe"
     echo "Manually add the directory to your \$HOME/$shell_profile (or similar)"
     echo "  export VCR_INSTALL=\"$vcr_install\""
     echo "  export PATH=\"\$VCR_INSTALL/bin:\$PATH\""
