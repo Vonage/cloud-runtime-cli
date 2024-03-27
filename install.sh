@@ -10,7 +10,7 @@ main() {
       arch="amd64"
   fi
 	vcr_binary="vcr_${os}_${arch}"
-	if [[ -n $1 ]]; then
+	if [ -n $1 ]; then
       version="download/$1"
   else
       version="latest/download"
@@ -32,36 +32,26 @@ main() {
 	mkdir -p "$bin_dir"
 	mkdir -p "$tmp_dir"
 
-	curl -q --fail --location --progress-bar --output "$tmp_dir/${vcr_binary}.tar.gz" "$vcr_uri"
+	curl -s -q --fail --location --progress-bar --output "$tmp_dir/${vcr_binary}.tar.gz" "$vcr_uri"
 
 	tar -C "$tmp_dir" -xzf "$tmp_dir/${vcr_binary}.tar.gz"
 	chmod +x "$tmp_dir/${vcr_binary}"
 
 	rm "$tmp_dir/${vcr_binary}.tar.gz"
-#	mv "$tmp_dir/${vcr_binary}" "$sys_exe"
-  if command mv "$tmp_dir/${vcr_binary}" "$sys_exe" >/dev/null; then
-      echo "vcr was installed successfully to $sys_exe"
-      echo "Run 'vcr --help' to get started"
-  else
-      mv "$tmp_dir/${vcr_binary}" "$exe"
-      echo "vcr was installed successfully to $exe"
-      check_installation_status
-  fi
-}
+	mv "$tmp_dir/${vcr_binary}" "$sys_exe"
 
-check_installation_status() {
- 	if command -v vcr >/dev/null; then
- 		echo "Run 'vcr --help' to get started"
- 	else
- 		case $SHELL in
- 		/bin/zsh) shell_profile=".zshrc" ;;
- 		*) shell_profile=".bash_profile" ;;
- 		esac
- 		echo "Manually add the directory to your \$HOME/$shell_profile (or similar)"
- 		echo "  export VCR_INSTALL=\"$vcr_install\""
- 		echo "  export PATH=\"\$VCR_INSTALL/bin:\$PATH\""
- 		echo "Run '$exe --help' to get started"
- 	fi
+  if command -v vcr >/dev/null; then
+    echo "Run 'vcr --help' to get started"
+  else
+    case $SHELL in
+    /bin/zsh) shell_profile=".zshrc" ;;
+    *) shell_profile=".bash_profile" ;;
+    esac
+    echo "Manually add the directory to your \$HOME/$shell_profile (or similar)"
+    echo "  export VCR_INSTALL=\"$vcr_install\""
+    echo "  export PATH=\"\$VCR_INSTALL/bin:\$PATH\""
+    echo "Run '$exe --help' to get started"
+  fi
 }
 
 main "$1"
