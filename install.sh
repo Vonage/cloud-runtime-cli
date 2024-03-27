@@ -6,6 +6,9 @@ set -e
 main() {
 	os=$(uname -s | tr '[:upper:]' '[:lower:]')
 	arch=$(uname -m)
+	if [ "$arch" = "x86_64" ]; then
+      arch="amd64"
+  fi
 	vcr_binary="vcr_${os}_${arch}"
 	if [[ -n $1 ]]; then
       version="download/$1"
