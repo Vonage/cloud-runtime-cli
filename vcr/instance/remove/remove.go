@@ -58,7 +58,7 @@ func runRemove(ctx context.Context, opts *Options) error {
 	io := opts.IOStreams()
 	c := io.ColorScheme()
 
-	if err := validateFlags(opts); err != nil {
+	if err := cmdutil.ValidateFlags(opts.InstanceID, opts.InstanceName, opts.ProjectName); err != nil {
 		return fmt.Errorf("failed to validate flags: %w", err)
 	}
 
@@ -85,13 +85,6 @@ func runRemove(ctx context.Context, opts *Options) error {
 
 	fmt.Fprintf(io.Out, "%s Instance %q successfully removed\n", c.SuccessIcon(), inst.ID)
 
-	return nil
-}
-
-func validateFlags(opts *Options) error {
-	if opts.InstanceID == "" && (opts.InstanceName == "" || opts.ProjectName == "") {
-		return fmt.Errorf("must provide either 'id' flag or 'project-name' and 'instance-name' flags")
-	}
 	return nil
 }
 

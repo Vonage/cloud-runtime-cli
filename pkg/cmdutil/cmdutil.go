@@ -96,3 +96,10 @@ func StringVar(name string, str string, manifestValue string, configValue string
 	}
 	return str, nil
 }
+
+func ValidateFlags(InstanceID, InstanceName, ProjectName string) error {
+	if InstanceID == "" && (InstanceName == "" || ProjectName == "") {
+		return fmt.Errorf("must provide either 'id' flag or 'project-name' and 'instance-name' flags")
+	}
+	return nil
+}

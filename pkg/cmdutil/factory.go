@@ -68,7 +68,7 @@ type DatastoreInterface interface {
 	GetProject(ctx context.Context, accountID, name string) (api.Project, error)
 	ListProducts(ctx context.Context) ([]api.Product, error)
 	GetLatestProductVersionByID(ctx context.Context, id string) (api.ProductVersion, error)
-	ListLogsByInstanceId(ctx context.Context, instanceID string, limit int, timestamp time.Time) ([]api.Log, error)
+	ListLogsByInstanceID(ctx context.Context, instanceID string, limit int, timestamp time.Time) ([]api.Log, error)
 }
 
 // Factory provides clients and parameters for all subcommands.

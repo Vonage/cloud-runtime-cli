@@ -327,10 +327,10 @@ type listLogResponse struct {
 }
 
 // ListLogs lists all the available logs.
-func (ds *Datastore) ListLogsByInstanceId(ctx context.Context, id string, limit int, timestamp time.Time) ([]Log, error) {
+func (ds *Datastore) ListLogsByInstanceID(ctx context.Context, id string, limit int, timestamp time.Time) ([]Log, error) {
 	const query = `
 query MyQuery ($instance_id: String!, $limit: Int!, $timestamp: Time!) {
-  Logs(where: {instance_id: {_eq: $instance_id}, timestamp: {_gt: $timestamp}}, order_by: {timestamp: asc}, limit: $limit) {
+  Logs(where: {instance_id: {_eq: $instance_id}, timestamp: {_gt: $timestamp}}, order_by: {timestamp: desc}, limit: $limit) {
     message
     timestamp
   }
