@@ -80,7 +80,7 @@ Loop:
 	for {
 		select {
 		case <-ticker.C:
-			fetchLogs(ctx, io, opts, &lastTimestamp)
+			fetchLogs(io, opts, &lastTimestamp)
 		case <-interrupt:
 			fmt.Println("Interrupt received, stopping...")
 			break Loop
@@ -90,7 +90,7 @@ Loop:
 	return nil
 }
 
-func fetchLogs(ctx context.Context, out *iostreams.IOStreams, opts *Options, lastTimestamp *time.Time) {
+func fetchLogs(out *iostreams.IOStreams, opts *Options, lastTimestamp *time.Time) {
 	c := out.ColorScheme()
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(opts.Timeout()))
 	defer cancel()

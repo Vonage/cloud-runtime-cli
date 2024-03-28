@@ -2,7 +2,6 @@ package log
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"io"
 	"testing"
@@ -12,6 +11,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/google/shlex"
 	"github.com/stretchr/testify/require"
+
 	"vonage-cloud-runtime-cli/pkg/api"
 	"vonage-cloud-runtime-cli/testutil"
 	"vonage-cloud-runtime-cli/testutil/mocks"
@@ -128,7 +128,6 @@ func Test_fetchLogs(t *testing.T) {
 		LogReturnLogs                    []api.Log
 	}
 	type want struct {
-		errMsg string
 		stdout string
 		stderr string
 	}
@@ -168,7 +167,7 @@ func Test_fetchLogs(t *testing.T) {
 				Factory: f,
 			}
 
-			fetchLogs(context.Background(), ios, opts, &lastTimestamp)
+			fetchLogs(ios, opts, &lastTimestamp)
 
 			cmdOut := &testutil.CmdOut{
 				OutBuf: stdout,
