@@ -9,7 +9,11 @@ vcr log [flags]
 ### Examples
 
 ```
+# Output instance log by instance id:
 $ vcr log --id <instance-id>
+
+# Output instance log by project and instance name:
+$ vcr log --project-name <project-name> --instance-name <instance-name>
 
 ```
 
@@ -19,7 +23,7 @@ $ vcr log --id <instance-id>
   -i, --id string              instance ID
   -n, --instance-name string   instance name (must be used with project-name flag)
   -p, --project-name string    project name (must be used with instance-name flag)
-  -l, --tail int               prints the last N number of logs (default 100)
+  -l, --tail int               prints the last N number of logs (default 300)
 ```
 
 ### Options inherited from parent commands

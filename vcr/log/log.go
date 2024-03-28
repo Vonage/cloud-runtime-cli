@@ -39,7 +39,11 @@ func NewCmdLog(f cmdutil.Factory) *cobra.Command {
 		Short:   `This command will output the log of an instance.`,
 		Args:    cobra.MaximumNArgs(0),
 		Example: heredoc.Doc(`
+			# Output instance log by instance id:
 			$ vcr log --id <instance-id>
+
+			# Output instance log by project and instance name:
+			$ vcr log --project-name <project-name> --instance-name <instance-name>
 			`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
