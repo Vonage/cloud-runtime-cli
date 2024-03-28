@@ -92,3 +92,50 @@ func TestDisplaySpinnerMessageWithHandle(t *testing.T) {
 
 	require.False(t, s.Active())
 }
+
+func TestValidateFlags(t *testing.T) {
+	tests := []struct {
+		name         string
+		instanceID   string
+		instanceName string
+		projectName  string
+		wantErr      bool
+	}{
+		{
+			name:         "Test with empty parameters",
+			instanceID:   "",
+			instanceName: "",
+			projectName:  "",
+			wantErr:      true,
+		},
+		{
+			name:         "Test with only instanceID",
+			instanceID:   "123",
+			instanceName: "",
+			projectName:  "",
+			wantErr:      false,
+		},
+		{
+			name:         "Test with instanceName and projectName",
+			instanceID:   "",
+			instanceName: "testInstance",
+			projectName:  "testProject",
+			wantErr:      false,
+		},
+		{
+			name:         "Test with only instanceName",
+			instanceID:   "",
+			instanceName: "testInstance",
+			projectName:  "",
+			wantErr:      true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := ValidateFlags(tt.instanceID, tt.instanceName, tt.projectName); (err != nil) != tt.wantErr {
+				t.Errorf("ValidateFlags() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
