@@ -120,7 +120,7 @@ func TestInstanceRemove(t *testing.T) {
 				RemoveDeleteInstReturnErr:               nil,
 			},
 			want: want{
-				errMsg: "failed to get instance: instance does not exist",
+				stdout: "✓ Instance \"id\" successfully removed\n",
 			},
 		},
 	}

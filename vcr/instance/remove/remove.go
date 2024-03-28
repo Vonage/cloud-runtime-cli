@@ -66,6 +66,10 @@ func runRemove(ctx context.Context, opts *Options) error {
 	inst, err := getInstance(ctx, opts)
 	spinner.Stop()
 	if err != nil {
+		if errors.Is(err, api.ErrNotFound) {
+			fmt.Fprintf(io.Out, "%s Instance %q successfully removed\n", c.SuccessIcon(), opts.InstanceID)
+			return nil
+		}
 		return fmt.Errorf("failed to get instance: %w", err)
 	}
 
@@ -92,18 +96,12 @@ func getInstance(ctx context.Context, opts *Options) (api.Instance, error) {
 	if opts.InstanceID != "" {
 		inst, err := opts.Datastore().GetInstanceByID(ctx, opts.InstanceID)
 		if err != nil {
-			if errors.Is(err, api.ErrNotFound) {
-				return api.Instance{}, fmt.Errorf("instance does not exist")
-			}
 			return api.Instance{}, err
 		}
 		return inst, nil
 	}
 	inst, err := opts.Datastore().GetInstanceByProjectAndInstanceName(ctx, opts.ProjectName, opts.InstanceName)
 	if err != nil {
-		if errors.Is(err, api.ErrNotFound) {
-			return api.Instance{}, fmt.Errorf("instance does not exist")
-		}
 		return api.Instance{}, err
 	}
 	return inst, nil

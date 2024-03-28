@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -12,6 +13,7 @@ import (
 	"github.com/cli/cli/v2/pkg/iostreams"
 	"github.com/spf13/cobra"
 
+	"vonage-cloud-runtime-cli/pkg/api"
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
 )
 
@@ -48,7 +50,7 @@ func NewCmdLog(f cmdutil.Factory) *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&opts.InstanceID, "id", "i", "", "instance ID")
-	cmd.Flags().IntVarP(&opts.Limit, "tail", "l", 100, "prints the last N number of logs")
+	cmd.Flags().IntVarP(&opts.Limit, "tail", "l", 300, "prints the last N number of logs")
 	cmd.Flags().StringVarP(&opts.ProjectName, "project-name", "p", "", "project name (must be used with instance-name flag)")
 	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "instance name (must be used with project-name flag)")
 
@@ -61,13 +63,12 @@ func runLog(ctx context.Context, opts *Options) error {
 		return fmt.Errorf("failed to validate flags: %w", err)
 	}
 
-	if opts.InstanceID == "" {
-		instance, err := opts.Datastore().GetInstanceByProjectAndInstanceName(ctx, opts.ProjectName, opts.InstanceName)
-		if err != nil {
-			return fmt.Errorf("failed to get instance ID: %w", err)
-		}
-		opts.InstanceID = instance.ID
+	inst, err := getInstance(ctx, opts)
+	if err != nil {
+		return fmt.Errorf("failed to get instance: %w", err)
 	}
+
+	opts.InstanceID = inst.ID
 
 	ticker := time.NewTicker(TickerInterval)
 	defer ticker.Stop()
@@ -105,4 +106,25 @@ func fetchLogs(out *iostreams.IOStreams, opts *Options, lastTimestamp *time.Time
 		fmt.Fprintf(out.Out, "%s %s\n", log.Timestamp.Format(time.RFC3339), log.Message)
 		*lastTimestamp = log.Timestamp
 	}
+}
+
+func getInstance(ctx context.Context, opts *Options) (api.Instance, error) {
+	if opts.InstanceID != "" {
+		inst, err := opts.Datastore().GetInstanceByID(ctx, opts.InstanceID)
+		if err != nil {
+			if errors.Is(err, api.ErrNotFound) {
+				return api.Instance{}, fmt.Errorf("instance %q not found", opts.InstanceID)
+			}
+			return api.Instance{}, err
+		}
+		return inst, nil
+	}
+	inst, err := opts.Datastore().GetInstanceByProjectAndInstanceName(ctx, opts.ProjectName, opts.InstanceName)
+	if err != nil {
+		if errors.Is(err, api.ErrNotFound) {
+			return api.Instance{}, fmt.Errorf("instance with project name %q and instance name %q not found", opts.ProjectName, opts.InstanceName)
+		}
+		return api.Instance{}, err
+	}
+	return inst, nil
 }
