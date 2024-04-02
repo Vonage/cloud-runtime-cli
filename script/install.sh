@@ -1,6 +1,5 @@
 #!/bin/sh
 # Based on Deno installer: Copyright 2019 the Deno authors. All rights reserved. MIT license.
-
 set -e
 
 main() {
@@ -30,25 +29,26 @@ main() {
 	mkdir -p "$bin_dir"
 	mkdir -p "$tmp_dir"
 
-	curl -q --fail --location --progress-bar --output "$tmp_dir/${vcr_binary}.tar.gz" "$vcr_uri"
+	if ! curl -q --fail --location --progress-bar --output "$tmp_dir/${vcr_binary}.tar.gz" "$vcr_uri"; then
+	  echo "Error encountered when downloading ${vcr_binary} to ${tmp_dir} , please try to run with sudo"
+	  exit 1
+  fi
 
 	tar -C "$tmp_dir" -xzf "$tmp_dir/${vcr_binary}.tar.gz"
 	chmod +x "$tmp_dir/${vcr_binary}"
 
 	rm "$tmp_dir/${vcr_binary}.tar.gz"
 	cp "$tmp_dir/${vcr_binary}" "$exe"
-	mv "$tmp_dir/${vcr_binary}" "$sys_exe"
-
-  if command -v vcr >/dev/null; then
-    echo "vcr was installed successfully to $sys_exe"
-    echo "Run 'vcr --help' to get started"
+	if mv "$tmp_dir/${vcr_binary}" "$sys_exe"; then
+     echo "vcr was installed successfully to $sys_exe"
+     echo "Run 'vcr --help' to get started"
   else
     case $SHELL in
     /bin/zsh) shell_profile=".zshrc" ;;
     *) shell_profile=".bash_profile" ;;
     esac
-    echo "vcr was installed successfully to $exe"
-    echo "Manually add the directory to your \$HOME/$shell_profile (or similar)"
+    echo "Error encountered when moving ${vcr_binary} to $sys_exe , please try to run with sudo"
+    echo "Or manually add the directory to your \$HOME/$shell_profile (or similar)"
     echo "  export VCR_INSTALL=\"$vcr_install\""
     echo "  export PATH=\"\$VCR_INSTALL/bin:\$PATH\""
     echo "Run '$exe --help' to get started"
