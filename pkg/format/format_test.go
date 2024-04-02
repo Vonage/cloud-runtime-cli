@@ -231,6 +231,10 @@ func TestGetRegionOptions(t *testing.T) {
 		{Name: "US East", Alias: "us-east"},
 		{Name: "Europe", Alias: "europe"},
 		{Name: "Asia Pacific", Alias: "apac"},
+		{Name: "TEST - Europe Central", Alias: "test.euc1"},
+		{Name: "AWS - Europe Central Test", Alias: "test.euc1"},
+		{Name: "AWS - Europe Central", Alias: "test.euc1"},
+		{Name: "AWS - Europe Central Test", Alias: "euc1"},
 	}
 
 	expectedOptions := RegionOptions{

@@ -30,7 +30,7 @@ type listRegionResponse struct {
 func (ds *Datastore) ListRegions(ctx context.Context) ([]Region, error) {
 	const query = `
 query MyQuery {
-  Regions(where: {name: {_nregex: "TEST"}, enabled: {_eq: true}}) {
+  Regions(where: {enabled: {_eq: true}}) {
  	name    
 	alias
 	deployment_api_url
