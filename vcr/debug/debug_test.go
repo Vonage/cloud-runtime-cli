@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
@@ -303,4 +304,61 @@ func Test_stringVarFromManifest(t *testing.T) {
 	require.Equal(t, "", str)
 	require.EqualError(t, err, "name is required")
 	require.Equal(t, "", stdout.String())
+}
+
+func Test_injectEnvars(t *testing.T) {
+	tests := []struct {
+		name    string
+		envs    []config.Env
+		wantErr bool
+	}{
+		{
+			name: "Test with secret environment variable not set",
+			envs: []config.Env{
+				{
+					Name:   "TEST_ENV",
+					Secret: "SECRET_ENV",
+					Value:  "",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "Test with secret environment variable set",
+			envs: []config.Env{
+				{
+					Name:   "TEST_ENV",
+					Secret: "SECRET_ENV",
+					Value:  "",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Test with non-secret environment variable",
+			envs: []config.Env{
+				{
+					Name:  "TEST_ENV",
+					Value: "test value",
+				},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.name == "Test with secret environment variable set" {
+				os.Setenv("SECRET_ENV", "secret value")
+			}
+
+			if err := injectEnvars(tt.envs); (err != nil) != tt.wantErr {
+				t.Errorf("injectEnvars() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if tt.name == "Test with secret environment variable set" {
+				os.Unsetenv("SECRET_ENV")
+			}
+		})
+	}
 }
