@@ -181,6 +181,13 @@ func runDebug(ctx context.Context, opts *Options) error {
 
 func injectEnvars(envs []config.Env) error {
 	for _, e := range envs {
+		if e.Secret != "" {
+			value := os.Getenv(e.Secret)
+			if value == "" {
+				return fmt.Errorf("environment variable %q must be exported locally in debug mode", e.Secret)
+			}
+			e.Value = value
+		}
 		if err := os.Setenv(e.Name, e.Value); err != nil {
 			return fmt.Errorf("%q: %w", e.Name, err)
 		}
