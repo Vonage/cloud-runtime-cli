@@ -64,6 +64,7 @@ linters:
     - maintidx
     - unparam
     - perfsprint
+    - gosmopolitan
 
 issues:
   exclude-rules:
