@@ -143,8 +143,8 @@ func Test_fetchLogs(t *testing.T) {
 		},
 		{
 			name: "Test without error",
-			mock: mock{LogListLogsByInstanceIDTimes: 1, LogListLogsByInstanceIDReturnErr: nil, LogReturnLogs: []api.Log{{Timestamp: time.Time{}, Message: "test"}}},
-			want: want{stdout: "0000-12-31T19:03:58-04:56 test\n"},
+			mock: mock{LogListLogsByInstanceIDTimes: 1, LogListLogsByInstanceIDReturnErr: nil, LogReturnLogs: []api.Log{{Timestamp: time.Now(), Message: "test"}}},
+			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " test\n"},
 		},
 	}
 
