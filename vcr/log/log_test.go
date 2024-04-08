@@ -144,7 +144,7 @@ func Test_fetchLogs(t *testing.T) {
 		{
 			name: "Test without error",
 			mock: mock{LogListLogsByInstanceIDTimes: 1, LogListLogsByInstanceIDReturnErr: nil, LogReturnLogs: []api.Log{{Timestamp: time.Time{}, Message: "test"}}},
-			want: want{stdout: "0001-01-01T00:00:00Z test\n"},
+			want: want{stdout: "0000-12-31T19:03:58-04:56 test\n"},
 		},
 	}
 

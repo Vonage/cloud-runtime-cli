@@ -107,7 +107,7 @@ func fetchLogs(out *iostreams.IOStreams, opts *Options, lastTimestamp *time.Time
 
 	for i := len(logs) - 1; i >= 0; i-- {
 		log := logs[i]
-		fmt.Fprintf(out.Out, "%s %s\n", log.Timestamp.Format(time.RFC3339), log.Message)
+		fmt.Fprintf(out.Out, "%s %s\n", log.Timestamp.In(time.Local).Format(time.RFC3339), log.Message)
 		*lastTimestamp = log.Timestamp
 	}
 }
