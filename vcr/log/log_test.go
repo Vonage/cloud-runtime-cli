@@ -143,8 +143,8 @@ func Test_fetchLogs(t *testing.T) {
 		},
 		{
 			name: "Test without error",
-			mock: mock{LogListLogsByInstanceIDTimes: 1, LogListLogsByInstanceIDReturnErr: nil, LogReturnLogs: []api.Log{{Timestamp: time.Now(), Message: "test"}}},
-			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " test\n"},
+			mock: mock{LogListLogsByInstanceIDTimes: 1, LogListLogsByInstanceIDReturnErr: nil, LogReturnLogs: []api.Log{{Timestamp: time.Now(), SourceType: "application", Message: "test"}}},
+			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
 		},
 	}
 
@@ -178,6 +178,69 @@ func Test_fetchLogs(t *testing.T) {
 				return
 			}
 			require.Equal(t, tt.want.stdout, cmdOut.String())
+		})
+	}
+}
+
+func Test_printLogs(t *testing.T) {
+
+	type mock struct {
+		LogSourceType string
+		LogLogLevel   string
+	}
+	type want struct {
+		stdout string
+	}
+	tests := []struct {
+		name string
+		mock mock
+		want want
+	}{
+		{
+			name: "Test with source type",
+			mock: mock{LogSourceType: "application", LogLogLevel: ""},
+			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
+		},
+		{
+			name: "Test with log level",
+			mock: mock{LogSourceType: "", LogLogLevel: "info"},
+			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
+		},
+		{
+			name: "Test with source type and log level",
+			mock: mock{LogSourceType: "application", LogLogLevel: "info"},
+			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
+		},
+		{
+			name: "Test without source type and log level",
+			mock: mock{LogSourceType: "", LogLogLevel: ""},
+			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
+		},
+		{
+			name: "Test with log level not exist",
+			mock: mock{LogSourceType: "", LogLogLevel: "debug"},
+			want: want{stdout: ""},
+		},
+		{
+			name: "Test with source type not exist",
+			mock: mock{LogSourceType: "provider", LogLogLevel: "info"},
+			want: want{stdout: ""},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			ios, _, stdout, _ := iostreams.Test()
+
+			opts := &Options{
+				SourceType: tt.mock.LogSourceType,
+				LogLevel:   tt.mock.LogLogLevel,
+			}
+
+			printLogs(ios, opts, api.Log{Timestamp: time.Now(), SourceType: "application", Message: "test", LogLevel: "info"})
+
+			require.Equal(t, tt.want.stdout, stdout.String())
 		})
 	}
 }

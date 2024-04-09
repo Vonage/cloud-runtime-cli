@@ -331,6 +331,8 @@ func (ds *Datastore) ListLogsByInstanceID(ctx context.Context, id string, limit 
 	const query = `
 query MyQuery ($instance_id: String!, $limit: Int!, $timestamp: Time!) {
   Logs(where: {instance_id: {_eq: $instance_id}, timestamp: {_gt: $timestamp}}, order_by: {timestamp: desc}, limit: $limit) {
+    log_level
+    source_type
     message
     timestamp
   }

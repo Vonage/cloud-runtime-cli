@@ -67,6 +67,8 @@ type ProductVersion struct {
 }
 
 type Log struct {
-	Message   string    `json:"message"`
-	Timestamp time.Time `json:"timestamp"`
+	LogLevel   string    `json:"log_level"`
+	SourceType string    `json:"source_type"`
+	Message    string    `json:"message"`
+	Timestamp  time.Time `json:"timestamp"`
 }

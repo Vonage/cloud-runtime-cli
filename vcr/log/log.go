@@ -25,6 +25,8 @@ type Options struct {
 	InstanceID   string
 	ProjectName  string
 	InstanceName string
+	LogLevel     string
+	SourceType   string
 	Limit        int
 }
 
@@ -54,9 +56,11 @@ func NewCmdLog(f cmdutil.Factory) *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&opts.InstanceID, "id", "i", "", "instance ID")
-	cmd.Flags().IntVarP(&opts.Limit, "tail", "l", 300, "prints the last N number of logs")
+	cmd.Flags().IntVarP(&opts.Limit, "tail", "l", 300, "prints the last N number of records")
 	cmd.Flags().StringVarP(&opts.ProjectName, "project-name", "p", "", "project name (must be used with instance-name flag)")
 	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "instance name (must be used with project-name flag)")
+	cmd.Flags().StringVarP(&opts.LogLevel, "log-level", "g", "", "filter for log level, e.g. info")
+	cmd.Flags().StringVarP(&opts.SourceType, "source-type", "s", "", "filter for source type e.g. application")
 
 	return cmd
 }
@@ -107,7 +111,7 @@ func fetchLogs(out *iostreams.IOStreams, opts *Options, lastTimestamp *time.Time
 
 	for i := len(logs) - 1; i >= 0; i-- {
 		log := logs[i]
-		fmt.Fprintf(out.Out, "%s %s\n", log.Timestamp.In(time.Local).Format(time.RFC3339), log.Message)
+		printLogs(out, opts, log)
 		*lastTimestamp = log.Timestamp
 	}
 }
@@ -131,4 +135,22 @@ func getInstance(ctx context.Context, opts *Options) (api.Instance, error) {
 		return api.Instance{}, err
 	}
 	return inst, nil
+}
+
+func printLogs(out *iostreams.IOStreams, opts *Options, log api.Log) {
+	switch {
+	case opts.SourceType != "" && opts.LogLevel != "":
+		if opts.SourceType != log.SourceType || opts.LogLevel != log.LogLevel {
+			return
+		}
+	case opts.SourceType != "":
+		if opts.SourceType != log.SourceType {
+			return
+		}
+	case opts.LogLevel != "":
+		if opts.LogLevel != log.LogLevel {
+			return
+		}
+	}
+	fmt.Fprintf(out.Out, "%s [%s] %s\n", log.Timestamp.In(time.Local).Format(time.RFC3339), log.SourceType, log.Message)
 }
