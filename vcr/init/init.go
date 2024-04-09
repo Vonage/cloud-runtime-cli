@@ -306,10 +306,6 @@ func askTemplate(ctx context.Context, opts *Options) error {
 
 	opts.templateManifestFilePath, err = config.FindTemplateManifestFile(opts.cwd)
 	if err != nil {
-		if errors.Is(err, config.ErrNoManifest) {
-			fmt.Fprintf(io.ErrOut, "%s No manifest file found in the template files.\n", c.WarningIcon())
-			return nil
-		}
 		return fmt.Errorf("failed to find template manifest file: %w", err)
 	}
 
