@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/MakeNowJust/heredoc"
+	"github.com/spf13/cobra"
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
 	"vonage-cloud-runtime-cli/pkg/config"
 	"vonage-cloud-runtime-cli/pkg/format"
-
-	"github.com/MakeNowJust/heredoc"
-	"github.com/spf13/cobra"
 
 	appCmd "vonage-cloud-runtime-cli/vcr/app"
 	configureCmd "vonage-cloud-runtime-cli/vcr/configure"
@@ -18,7 +17,6 @@ import (
 	deployCmd "vonage-cloud-runtime-cli/vcr/deploy"
 	initCmd "vonage-cloud-runtime-cli/vcr/init"
 	instanceCmd "vonage-cloud-runtime-cli/vcr/instance"
-	logCmd "vonage-cloud-runtime-cli/vcr/log"
 	mongoCmd "vonage-cloud-runtime-cli/vcr/mongo"
 	secretCmd "vonage-cloud-runtime-cli/vcr/secret"
 	upgradeCmd "vonage-cloud-runtime-cli/vcr/upgrade"
@@ -117,7 +115,6 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 	cmd.AddCommand(debugCmd.NewCmdDebug(f))
 	cmd.AddCommand(deployCmd.NewCmdDeploy(f))
 	cmd.AddCommand(instanceCmd.NewCmdInstance(f))
-	cmd.AddCommand(logCmd.NewCmdLog(f))
 	cmd.AddCommand(secretCmd.NewCmdSecret(f))
 	cmd.AddCommand(mongoCmd.NewCmdMongo(f))
 	cmd.AddCommand(upgradeCmd.NewCmdUpgrade(f, version))

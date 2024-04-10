@@ -96,7 +96,7 @@ func TestLog(t *testing.T) {
 
 			f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, deploymentMock, nil, nil)
 
-			cmd := NewCmdLog(f)
+			cmd := NewCmdInstanceLog(f)
 			cmd.SetArgs(argv)
 			cmd.SetIn(&bytes.Buffer{})
 			cmd.SetOut(io.Discard)
@@ -167,7 +167,7 @@ func Test_fetchLogs(t *testing.T) {
 				Factory: f,
 			}
 
-			fetchLogs(ios, opts, &lastTimestamp)
+			fetchLogs(ios, opts, lastTimestamp)
 
 			cmdOut := &testutil.CmdOut{
 				OutBuf: stdout,

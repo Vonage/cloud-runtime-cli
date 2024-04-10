@@ -2,7 +2,6 @@ package log
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -30,22 +29,22 @@ type Options struct {
 	Limit        int
 }
 
-func NewCmdLog(f cmdutil.Factory) *cobra.Command {
+func NewCmdInstanceLog(f cmdutil.Factory) *cobra.Command {
 	opts := Options{
 		Factory: f,
 	}
 
 	cmd := &cobra.Command{
-		Use:     "log",
+		Use:     "log --project-name <project-name> --instance-name <instance-name>",
 		Aliases: []string{""},
 		Short:   `This command will output the log of an instance.`,
 		Args:    cobra.MaximumNArgs(0),
 		Example: heredoc.Doc(`
 			# Output instance log by instance id:
-			$ vcr log --id <instance-id>
+			$ vcr instance log --id <instance-id>
 
 			# Output instance log by project and instance name:
-			$ vcr log --project-name <project-name> --instance-name <instance-name>
+			$ vcr instance log --project-name <project-name> --instance-name <instance-name>
 			`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
@@ -85,53 +84,47 @@ func runLog(ctx context.Context, opts *Options) error {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 
-Loop:
 	for {
 		select {
 		case <-ticker.C:
-			fetchLogs(io, opts, &lastTimestamp)
+			lastTimestamp = fetchLogs(io, opts, lastTimestamp)
 		case <-interrupt:
 			fmt.Println("Interrupt received, stopping...")
-			break Loop
+			return nil
 		}
 	}
-
-	return nil
 }
 
-func fetchLogs(out *iostreams.IOStreams, opts *Options, lastTimestamp *time.Time) {
+func fetchLogs(out *iostreams.IOStreams, opts *Options, lastTimestamp time.Time) time.Time {
 	c := out.ColorScheme()
+	var updatedTimestamp time.Time
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(opts.Timeout()))
 	defer cancel()
-	logs, err := opts.Datastore().ListLogsByInstanceID(ctx, opts.InstanceID, opts.Limit, *lastTimestamp)
+	logs, err := opts.Datastore().ListLogsByInstanceID(ctx, opts.InstanceID, opts.Limit, lastTimestamp)
 	if err != nil {
 		fmt.Fprintf(out.ErrOut, "%s Error fetching logs: %v\n", c.WarningIcon(), err)
-		return
+		return lastTimestamp
 	}
 
 	for i := len(logs) - 1; i >= 0; i-- {
 		log := logs[i]
 		printLogs(out, opts, log)
-		*lastTimestamp = log.Timestamp
+		updatedTimestamp = log.Timestamp
 	}
+
+	return updatedTimestamp
 }
 
 func getInstance(ctx context.Context, opts *Options) (api.Instance, error) {
 	if opts.InstanceID != "" {
 		inst, err := opts.Datastore().GetInstanceByID(ctx, opts.InstanceID)
 		if err != nil {
-			if errors.Is(err, api.ErrNotFound) {
-				return api.Instance{}, fmt.Errorf("instance %q not found", opts.InstanceID)
-			}
 			return api.Instance{}, err
 		}
 		return inst, nil
 	}
 	inst, err := opts.Datastore().GetInstanceByProjectAndInstanceName(ctx, opts.ProjectName, opts.InstanceName)
 	if err != nil {
-		if errors.Is(err, api.ErrNotFound) {
-			return api.Instance{}, fmt.Errorf("instance with project name %q and instance name %q not found", opts.ProjectName, opts.InstanceName)
-		}
 		return api.Instance{}, err
 	}
 	return inst, nil
