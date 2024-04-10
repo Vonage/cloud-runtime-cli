@@ -18,6 +18,17 @@ import (
 
 const TickerInterval = 1 * time.Second
 
+var (
+	logLevelMap = map[string]int{
+		"trace": 1,
+		"debug": 2,
+		"info":  3,
+		"warn":  4,
+		"error": 5,
+		"fatal": 6,
+	}
+)
+
 type Options struct {
 	cmdutil.Factory
 
@@ -58,7 +69,7 @@ func NewCmdInstanceLog(f cmdutil.Factory) *cobra.Command {
 	cmd.Flags().IntVarP(&opts.Limit, "tail", "l", 300, "prints the last N number of records")
 	cmd.Flags().StringVarP(&opts.ProjectName, "project-name", "p", "", "project name (must be used with instance-name flag)")
 	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "instance name (must be used with project-name flag)")
-	cmd.Flags().StringVarP(&opts.LogLevel, "log-level", "g", "", "filter for log level, e.g. info")
+	cmd.Flags().StringVarP(&opts.LogLevel, "log-level", "g", "", "filter for log level, e.g.trace, debug, info, warn, error, fatal")
 	cmd.Flags().StringVarP(&opts.SourceType, "source-type", "s", "", "filter for source type e.g. application")
 
 	return cmd
@@ -133,7 +144,7 @@ func getInstance(ctx context.Context, opts *Options) (api.Instance, error) {
 func printLogs(out *iostreams.IOStreams, opts *Options, log api.Log) {
 	switch {
 	case opts.SourceType != "" && opts.LogLevel != "":
-		if opts.SourceType != log.SourceType || opts.LogLevel != log.LogLevel {
+		if opts.SourceType != log.SourceType || logLevelBelowThresholdOrInvalid(opts.LogLevel, log.LogLevel) {
 			return
 		}
 	case opts.SourceType != "":
@@ -141,9 +152,18 @@ func printLogs(out *iostreams.IOStreams, opts *Options, log api.Log) {
 			return
 		}
 	case opts.LogLevel != "":
-		if opts.LogLevel != log.LogLevel {
+		if logLevelBelowThresholdOrInvalid(opts.LogLevel, log.LogLevel) {
 			return
 		}
 	}
 	fmt.Fprintf(out.Out, "%s [%s] %s\n", log.Timestamp.In(time.Local).Format(time.RFC3339), log.SourceType, log.Message)
+}
+
+func logLevelBelowThresholdOrInvalid(thresholdLoglevel, loglevel string) bool {
+	if thresholdNum, thresholdOk := logLevelMap[thresholdLoglevel]; thresholdOk {
+		if logLevelNum, logLevelOk := logLevelMap[loglevel]; logLevelOk {
+			return logLevelNum < thresholdNum
+		}
+	}
+	return true
 }

@@ -130,9 +130,13 @@ vonage-cloud-runtime-cli/
     │         └── vcr.yaml
     ├── instance
     │     ├── instance.go
-    │     └── remove
-    │         ├── remove.go
-    │         └── remove_test.go
+    │     ├── remove
+    │     │    ├── remove.go
+    │     │    └── remove_test.go
+    │     │     
+    │     └── log
+    │         ├── log.go
+    │         └── log_test.go
     ├── root
     │     ├── help.go
     │     ├── root.go

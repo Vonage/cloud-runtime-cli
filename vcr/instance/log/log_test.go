@@ -202,9 +202,14 @@ func Test_printLogs(t *testing.T) {
 			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
 		},
 		{
-			name: "Test with log level",
+			name: "Test with info log level",
 			mock: mock{LogSourceType: "", LogLogLevel: "info"},
 			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
+		},
+		{
+			name: "Test with warn log level",
+			mock: mock{LogSourceType: "", LogLogLevel: "warn"},
+			want: want{stdout: ""},
 		},
 		{
 			name: "Test with source type and log level",
@@ -218,7 +223,7 @@ func Test_printLogs(t *testing.T) {
 		},
 		{
 			name: "Test with log level not exist",
-			mock: mock{LogSourceType: "", LogLogLevel: "debug"},
+			mock: mock{LogSourceType: "", LogLogLevel: "log-level-not-exist"},
 			want: want{stdout: ""},
 		},
 		{
