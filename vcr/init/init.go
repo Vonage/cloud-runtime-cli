@@ -22,8 +22,8 @@ import (
 	"vonage-cloud-runtime-cli/pkg/format"
 )
 
-const SkipValue = "SKIP"
-const DefaultRuntime = "nodejs18"
+const skipValue = "SKIP"
+const defaultRuntime = "nodejs18"
 
 type Options struct {
 	cmdutil.Factory
@@ -167,7 +167,7 @@ func askInstanceAppID(ctx context.Context, opts *Options) error {
 	if err != nil {
 		return err
 	}
-	if appLabel == SkipValue {
+	if appLabel == skipValue {
 		return nil
 	}
 	opts.manifest.Instance.ApplicationID = appOptions.IDLookup[appLabel]
@@ -189,7 +189,7 @@ func askDebugAppID(ctx context.Context, opts *Options) error {
 	if err != nil {
 		return err
 	}
-	if appLabel == SkipValue {
+	if appLabel == skipValue {
 		return nil
 	}
 	opts.manifest.Debug.ApplicationID = appOptions.IDLookup[appLabel]
@@ -204,7 +204,7 @@ func askRuntime(ctx context.Context, opts *Options) error {
 		return err
 	}
 	runtimeOptions := format.GetRuntimeOptions(runtimes)
-	runtimeLabel, err := opts.Survey().AskForUserChoice("Select a runtime:", runtimeOptions.Labels, runtimeOptions.RuntimeLookup, DefaultRuntime)
+	runtimeLabel, err := opts.Survey().AskForUserChoice("Select a runtime:", runtimeOptions.Labels, runtimeOptions.RuntimeLookup, defaultRuntime)
 	if err != nil {
 		return err
 	}
@@ -276,7 +276,7 @@ func askTemplate(ctx context.Context, opts *Options) error {
 	if err != nil {
 		return fmt.Errorf("failed to ask user to select a product template for runtime %s: %w", opts.manifest.Instance.Runtime, err)
 	}
-	if templateLabel == SkipValue {
+	if templateLabel == skipValue {
 		return nil
 	}
 
