@@ -108,7 +108,6 @@ func runLog(ctx context.Context, opts *Options) error {
 
 func fetchLogs(out *iostreams.IOStreams, opts *Options, lastTimestamp time.Time) time.Time {
 	c := out.ColorScheme()
-	var updatedTimestamp time.Time
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(opts.Timeout()))
 	defer cancel()
 	logs, err := opts.Datastore().ListLogsByInstanceID(ctx, opts.InstanceID, opts.Limit, lastTimestamp)
@@ -120,10 +119,10 @@ func fetchLogs(out *iostreams.IOStreams, opts *Options, lastTimestamp time.Time)
 	for i := len(logs) - 1; i >= 0; i-- {
 		log := logs[i]
 		printLogs(out, opts, log)
-		updatedTimestamp = log.Timestamp
+		lastTimestamp = log.Timestamp
 	}
 
-	return updatedTimestamp
+	return lastTimestamp
 }
 
 func getInstance(ctx context.Context, opts *Options) (api.Instance, error) {
