@@ -62,11 +62,11 @@ func TestConfigure(t *testing.T) {
 				ConfigureAPISecretAskForUserInputErr:      nil,
 
 				ConfigureListRegionsTimes:         1,
-				ConfigureReturnRegions:            []api.Region{{Name: "test", Alias: "testAlias"}},
+				ConfigureReturnRegions:            []api.Region{{Name: "AWS - Europe Ireland", Alias: "euw1"}},
 				ConfigureListRegionsReturnErr:     nil,
 				ConfigureAskForUserChoiceQuestion: "Select your Vonage region:",
 				ConfigureAskForUserChoiceTimes:    1,
-				ConfigureReturnRegionLabel:        "test - (testAlias)",
+				ConfigureReturnRegionLabel:        "AWS - Europe Ireland - (euw1)",
 				ConfigureAskForUserChoiceErr:      nil,
 			},
 			want: want{

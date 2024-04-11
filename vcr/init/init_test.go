@@ -136,11 +136,11 @@ func TestInit(t *testing.T) {
 				InitDebugAskForUserChoiceErr:      nil,
 
 				InitListRuntimesTimes:               1,
-				InitReturnRuntimes:                  []api.Runtime{{Name: "nodejs16", Comments: "deprecated", Language: "nodejs"}},
+				InitReturnRuntimes:                  []api.Runtime{{Name: "nodejs16", Comments: "", Language: "nodejs"}},
 				InitListRuntimesReturnErr:           nil,
 				InitRuntimeAskForUserChoiceQuestion: "Select a runtime:",
 				InitRuntimeAskForUserChoiceTimes:    1,
-				InitReturnRuntimeLabel:              "nodejs16 - (deprecated)",
+				InitReturnRuntimeLabel:              "nodejs16",
 				InitRuntimeAskForUserChoiceErr:      nil,
 
 				InitListRegionsTimes:               1,
@@ -203,11 +203,11 @@ func TestInit(t *testing.T) {
 				InitDebugAskForUserChoiceErr:      nil,
 
 				InitListRuntimesTimes:               1,
-				InitReturnRuntimes:                  []api.Runtime{{Name: "nodejs16", Comments: "deprecated", Language: "nodejs"}},
+				InitReturnRuntimes:                  []api.Runtime{{Name: "nodejs16", Comments: "", Language: "nodejs"}},
 				InitListRuntimesReturnErr:           nil,
 				InitRuntimeAskForUserChoiceQuestion: "Select a runtime:",
 				InitRuntimeAskForUserChoiceTimes:    1,
-				InitReturnRuntimeLabel:              "nodejs16 - (deprecated)",
+				InitReturnRuntimeLabel:              "nodejs16",
 				InitRuntimeAskForUserChoiceErr:      nil,
 
 				InitListRegionsTimes:               1,
@@ -239,7 +239,7 @@ func TestInit(t *testing.T) {
 				InitGetTemplateReturnErr:                      nil,
 			},
 			want: want{
-				stdout: fmt.Sprintf("✓ %s/vcr.yaml created\n", absPath),
+				stdout: fmt.Sprintf("✓ %s/vcr.yml created\n", absPath),
 			},
 		},
 	}

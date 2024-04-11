@@ -33,6 +33,8 @@ func GetTemplateOptions(templateNames []api.Product) TemplateOptions {
 	return options
 }
 
+var testRegex = regexp.MustCompile(`(?i)Test`)
+
 type RegionOptions struct {
 	Labels      []string
 	Lookup      map[string]string
@@ -47,6 +49,9 @@ func GetRegionOptions(regions []api.Region) RegionOptions {
 	}
 
 	for _, r := range regions {
+		if testRegex.MatchString(r.Name) || testRegex.MatchString(r.Alias) {
+			continue
+		}
 		label := fmt.Sprintf("%s - (%s)", r.Name, r.Alias)
 		options.Labels = append(options.Labels, label)
 		options.Lookup[r.Alias] = label
@@ -71,7 +76,7 @@ func GetRuntimeOptions(runtimes []api.Runtime) RuntimeOptions {
 	}
 
 	for _, r := range runtimes {
-		if r.Language != "debug" && r.Language != "" {
+		if r.Language != "debug" && r.Language != "" && r.Comments != "deprecated" {
 			if r.Comments != "" {
 				label := fmt.Sprintf("%s - (%s)", r.Name, r.Comments)
 				options.Labels = append(options.Labels, label)
