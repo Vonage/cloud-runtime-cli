@@ -1,19 +1,20 @@
-## vcr instance remove
+## vcr instance log
 
-This command will remove an instance.
+This command will output the log of an instance.
 
 ```
-vcr instance remove --project-name <project-name> --instance-name <instance-name> [flags]
+vcr instance log --project-name <project-name> --instance-name <instance-name> [flags]
 ```
 
 ### Examples
 
 ```
-# Remove by project and instance name:
-$ vcr instance rm --project-name <project-name> --instance-name <instance-name>
+# Output instance log by instance id:
+$ vcr instance log --id <instance-id>
 
-# Remove by instance id:
-$ vcr instance rm --id <instance-id>
+# Output instance log by project and instance name:
+$ vcr instance log --project-name <project-name> --instance-name <instance-name>
+
 ```
 
 ### Options
@@ -21,8 +22,10 @@ $ vcr instance rm --id <instance-id>
 ```
   -i, --id string              instance ID
   -n, --instance-name string   instance name (must be used with project-name flag)
+  -g, --log-level string       filter for log level, e.g.trace, debug, info, warn, error, fatal
   -p, --project-name string    project name (must be used with instance-name flag)
-  -y, --yes                    automatically confirm removal and skip prompt
+  -s, --source-type string     filter for source type e.g. application
+  -l, --tail int               prints the last N number of records (default 300)
 ```
 
 ### Options inherited from parent commands

@@ -58,7 +58,7 @@ func runRemove(ctx context.Context, opts *Options) error {
 	io := opts.IOStreams()
 	c := io.ColorScheme()
 
-	if err := validateFlags(opts); err != nil {
+	if err := cmdutil.ValidateFlags(opts.InstanceID, opts.InstanceName, opts.ProjectName); err != nil {
 		return fmt.Errorf("failed to validate flags: %w", err)
 	}
 
@@ -66,6 +66,10 @@ func runRemove(ctx context.Context, opts *Options) error {
 	inst, err := getInstance(ctx, opts)
 	spinner.Stop()
 	if err != nil {
+		if errors.Is(err, api.ErrNotFound) {
+			fmt.Fprintf(io.Out, "%s Instance %q successfully removed\n", c.SuccessIcon(), opts.InstanceID)
+			return nil
+		}
 		return fmt.Errorf("failed to get instance: %w", err)
 	}
 
@@ -88,29 +92,16 @@ func runRemove(ctx context.Context, opts *Options) error {
 	return nil
 }
 
-func validateFlags(opts *Options) error {
-	if opts.InstanceID == "" && (opts.InstanceName == "" || opts.ProjectName == "") {
-		return fmt.Errorf("must provide either 'id' flag or 'project-name' and 'instance-name' flags")
-	}
-	return nil
-}
-
 func getInstance(ctx context.Context, opts *Options) (api.Instance, error) {
 	if opts.InstanceID != "" {
 		inst, err := opts.Datastore().GetInstanceByID(ctx, opts.InstanceID)
 		if err != nil {
-			if errors.Is(err, api.ErrNotFound) {
-				return api.Instance{}, fmt.Errorf("instance does not exist")
-			}
 			return api.Instance{}, err
 		}
 		return inst, nil
 	}
 	inst, err := opts.Datastore().GetInstanceByProjectAndInstanceName(ctx, opts.ProjectName, opts.InstanceName)
 	if err != nil {
-		if errors.Is(err, api.ErrNotFound) {
-			return api.Instance{}, fmt.Errorf("instance does not exist")
-		}
 		return api.Instance{}, err
 	}
 	return inst, nil

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
@@ -839,5 +840,93 @@ func TestGetLatestProductVersionByID(t *testing.T) {
 			httpmock.Reset()
 		})
 
+	}
+}
+
+func TestListLogsByInstanceID(t *testing.T) {
+
+	httpClient := resty.New()
+	httpmock.ActivateNonDefault(httpClient.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	type mock struct {
+		mockResponse listLogResponse
+		status       int
+	}
+
+	type want struct {
+		output []Log
+		err    error
+	}
+
+	tests := []struct {
+		name string
+		mock mock
+		want want
+	}{
+		{
+			name: "200-happy-path",
+			mock: mock{
+				mockResponse: listLogResponse{
+					Data: listLogResponseData{
+						Logs: []Log{
+							{
+								Message:   "Log1",
+								Timestamp: time.Time{},
+							},
+							{
+								Message:   "Log2",
+								Timestamp: time.Time{},
+							},
+						},
+					},
+				},
+				status: http.StatusOK,
+			},
+			want: want{
+				output: []Log{
+					{
+						Message:   "Log1",
+						Timestamp: time.Time{},
+					},
+					{
+						Message:   "Log2",
+						Timestamp: time.Time{},
+					},
+				},
+				err: nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			jsonData, err := json.Marshal(tt.mock.mockResponse)
+			if err != nil {
+				t.Fatalf("Error occurred during marshaling. Error: %s", err.Error())
+			}
+
+			mockResponse := string(jsonData)
+
+			httpmock.RegisterResponder("POST", "https://example.com",
+				func(req *http.Request) (*http.Response, error) {
+					resp := httpmock.NewStringResponse(tt.mock.status, mockResponse)
+					resp.Header.Set("Content-Type", "application/json")
+					return resp, nil
+				})
+
+			gqlClient := NewGraphQLClient("https://example.com", httpClient)
+			datastoreClient := NewDatastore(gqlClient)
+
+			regions, err := datastoreClient.ListLogsByInstanceID(context.Background(), "I1", 10, time.Time{})
+			if tt.want.err != nil {
+				require.EqualError(t, err, tt.want.err.Error())
+				httpmock.Reset()
+				return
+			}
+
+			require.Equal(t, tt.want.output, regions)
+			httpmock.Reset()
+		})
 	}
 }

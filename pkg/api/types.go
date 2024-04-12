@@ -65,3 +65,10 @@ type Product struct {
 type ProductVersion struct {
 	ID string `json:"id,omitempty"`
 }
+
+type Log struct {
+	LogLevel   string    `json:"log_level"`
+	SourceType string    `json:"source_type"`
+	Message    string    `json:"message"`
+	Timestamp  time.Time `json:"timestamp"`
+}

@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/MakeNowJust/heredoc"
+	"github.com/spf13/cobra"
+
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
 	"vonage-cloud-runtime-cli/pkg/config"
 	"vonage-cloud-runtime-cli/pkg/format"
-
-	"github.com/MakeNowJust/heredoc"
-	"github.com/spf13/cobra"
 
 	appCmd "vonage-cloud-runtime-cli/vcr/app"
 	configureCmd "vonage-cloud-runtime-cli/vcr/configure"
