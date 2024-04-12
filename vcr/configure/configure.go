@@ -24,7 +24,7 @@ func NewCmdConfigure(f cmdutil.Factory) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "configure",
-		Short: "Configure VCR cli",
+		Short: "Configure VCR CLI",
 		Long: heredoc.Doc(`This command configures the VCR CLI.
 			
 			Configure your VCR CLI, you need provide Vonage API key and secret, if success Configure will create a configuration file (default is $HOME/.vcr-cli).

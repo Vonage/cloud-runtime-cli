@@ -33,7 +33,7 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 		Use:   "vcr <command> <subcommand> [flags]",
 		Short: "Streamline your Vonage Cloud Runtime development and management tasks with VCR",
 		Long: heredoc.Doc(`
-			VCR is a powerful command-line interface designed to streamline
+			VCR CLI is a powerful command-line interface designed to streamline
 			and simplify the development and management of applications on 
 			the Vonage Cloud Runtime platform.
 		`),
@@ -107,14 +107,14 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 	})
 	cmd.SetFlagErrorFunc(rootFlagErrorFunc)
 
-	cmd.Flags().BoolP("version", "v", false, "Show vcr version")
+	cmd.Flags().BoolP("version", "v", false, "Show VCR CLI version")
 	cmd.PersistentFlags().Bool("help", false, "Show help for command")
-	cmd.PersistentFlags().StringVarP(&opts.ConfigFilePath, "config-file", "", config.DefaultCLIConfigPath[0], "path to config file (default is $HOME/.vcr-cli)")
-	cmd.PersistentFlags().StringVarP(&opts.GraphqlEndpoint, "graphql-endpoint", "", "", "graphql endpoint used to fetch metadata")
-	cmd.PersistentFlags().StringVarP(&opts.Region, "region", "", "", "vonage platform region")
-	cmd.PersistentFlags().StringVarP(&opts.APIKey, "api-key", "", "", "vonage API key")
-	cmd.PersistentFlags().StringVarP(&opts.APISecret, "api-secret", "", "", "vonage API secret")
-	cmd.PersistentFlags().DurationVarP(&opts.Timeout, "timeout", "t", 10*time.Minute, "timeout for requests to vonage platform")
+	cmd.PersistentFlags().StringVarP(&opts.ConfigFilePath, "config-file", "", config.DefaultCLIConfigPath[0], "Path to config file (default is $HOME/.vcr-cli)")
+	cmd.PersistentFlags().StringVarP(&opts.GraphqlEndpoint, "graphql-endpoint", "", "", "Graphql endpoint used to fetch metadata")
+	cmd.PersistentFlags().StringVarP(&opts.Region, "region", "", "", "Vonage platform region")
+	cmd.PersistentFlags().StringVarP(&opts.APIKey, "api-key", "", "", "Vonage API key")
+	cmd.PersistentFlags().StringVarP(&opts.APISecret, "api-secret", "", "", "Vonage API secret")
+	cmd.PersistentFlags().DurationVarP(&opts.Timeout, "timeout", "t", 10*time.Minute, "Timeout for requests to Vonage platform")
 
 	cmd.AddCommand(configureCmd.NewCmdConfigure(f))
 	cmd.AddCommand(appCmd.NewCmdApp(f))

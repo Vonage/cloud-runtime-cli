@@ -13,7 +13,7 @@ import (
 func NewCmdSecret(f cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "secret <command>",
-		Short: "Manage VCR application secret",
+		Short: "Manage VCR secrets",
 		Example: heredoc.Doc(`
 				$  vcr secret create --name <name> --value <value>
 				$  vcr secret create --name <name> --file <path/to/file>

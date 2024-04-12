@@ -3,6 +3,7 @@ package delete
 import (
 	"context"
 	"fmt"
+
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
 
 	"github.com/MakeNowJust/heredoc"
@@ -35,7 +36,7 @@ func NewCmdMongoDelete(f cmdutil.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.Database, "database", "d", "", "database name")
+	cmd.Flags().StringVarP(&opts.Database, "database", "d", "", "Database name")
 	cmd.Flags().StringVarP(&opts.Version, "version", "v", "v0.1", "API version (default is v0.1)")
 
 	_ = cmd.MarkFlagRequired("database")
