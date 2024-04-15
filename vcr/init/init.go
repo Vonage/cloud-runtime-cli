@@ -152,8 +152,6 @@ promptProjectName:
 }
 
 func askInstanceAppID(ctx context.Context, opts *Options) error {
-	io := opts.IOStreams()
-	c := io.ColorScheme()
 	appID := opts.manifest.Instance.ApplicationID
 
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Retrieving app list... ")
@@ -172,23 +170,11 @@ func askInstanceAppID(ctx context.Context, opts *Options) error {
 		return nil
 	}
 
-	//var appName string
 	if appLabel == format.NewAppValue {
-	promptAppName:
-		appName, err := opts.Survey().AskForUserInput("Enter your new Vonage application name for deployment:", "")
+		opts.manifest.Instance.ApplicationID, err = createNewApp(ctx, opts, "Enter your new Vonage application name for deployment:")
 		if err != nil {
 			return err
 		}
-
-		spinner = cmdutil.DisplaySpinnerMessageWithHandle(fmt.Sprintf(" Creating Application %q...", appName))
-		result, err := opts.DeploymentClient().CreateVonageApplication(ctx, appName, false, false, false)
-		spinner.Stop()
-		if err != nil {
-			fmt.Fprintf(io.ErrOut, "%s %s\n", c.FailureIcon(), err.Error())
-			goto promptAppName
-		}
-
-		opts.manifest.Instance.ApplicationID = result.ApplicationID
 		return nil
 	}
 	opts.manifest.Instance.ApplicationID = appOptions.IDLookup[appLabel]
@@ -196,8 +182,6 @@ func askInstanceAppID(ctx context.Context, opts *Options) error {
 }
 
 func askDebugAppID(ctx context.Context, opts *Options) error {
-	io := opts.IOStreams()
-	c := io.ColorScheme()
 	appID := opts.manifest.Debug.ApplicationID
 
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Retrieving app list... ")
@@ -216,21 +200,10 @@ func askDebugAppID(ctx context.Context, opts *Options) error {
 		return nil
 	}
 	if appLabel == format.NewAppValue {
-	promptAppName:
-		appName, err := opts.Survey().AskForUserInput("Enter your new Vonage application name for debug:", "")
+		opts.manifest.Debug.ApplicationID, err = createNewApp(ctx, opts, "Enter your new Vonage application name for debug:")
 		if err != nil {
 			return err
 		}
-
-		spinner = cmdutil.DisplaySpinnerMessageWithHandle(fmt.Sprintf(" Creating Application %q...", appName))
-		result, err := opts.DeploymentClient().CreateVonageApplication(ctx, appName, false, false, false)
-		spinner.Stop()
-		if err != nil {
-			fmt.Fprintf(io.ErrOut, "%s %s\n", c.FailureIcon(), err.Error())
-			goto promptAppName
-		}
-
-		opts.manifest.Debug.ApplicationID = result.ApplicationID
 		return nil
 	}
 	opts.manifest.Debug.ApplicationID = appOptions.IDLookup[appLabel]
@@ -412,4 +385,24 @@ func uncompressToDir(fileBytes []byte, dest string) error {
 		}
 	}
 	return nil
+}
+
+func createNewApp(ctx context.Context, opts *Options, question string) (string, error) {
+	io := opts.IOStreams()
+	c := io.ColorScheme()
+
+promptAppName:
+	appName, err := opts.Survey().AskForUserInput(question, "")
+	if err != nil {
+		return "", err
+	}
+
+	spinner := cmdutil.DisplaySpinnerMessageWithHandle(fmt.Sprintf(" Creating Application %q...", appName))
+	result, err := opts.DeploymentClient().CreateVonageApplication(ctx, appName, false, false, false)
+	spinner.Stop()
+	if err != nil {
+		fmt.Fprintf(io.ErrOut, "%s %s\n", c.FailureIcon(), err.Error())
+		goto promptAppName
+	}
+	return result.ApplicationID, nil
 }
