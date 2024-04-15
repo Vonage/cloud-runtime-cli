@@ -7,6 +7,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
+	"vonage-cloud-runtime-cli/pkg/cmdutil"
 )
 
 var (
@@ -25,7 +26,7 @@ func logIntroMessage(appName, host2 string) {
 	fmt.Println(yellow(`/-------`))
 	fmt.Println(yellow("| 🐞 Debugger proxy connection established - Have a play around!"))
 	fmt.Println(yellow("| Application Name:"), yellow(appName))
-	fmt.Println(yellow("| Application Host:"), yellow(host2))
+	fmt.Println(yellow("| Application Host:"), cmdutil.YellowBold(host2))
 	fmt.Println(yellow(`\-------`))
 	fmt.Println()
 }

@@ -6,10 +6,13 @@ import (
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/briandowns/spinner"
+	"github.com/mgutz/ansi"
 )
 
 const RightArrowIcon = "➜"
 const InfoIcon = "ℹ"
+
+var YellowBold = ansi.ColorFunc("yellow+b")
 
 type Survey struct{}
 

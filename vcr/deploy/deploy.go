@@ -160,21 +160,26 @@ func runDeploy(ctx context.Context, opts *Options) error {
 
 	hostsString := ""
 	for _, url := range deploymentResponse.HostURLs {
-		hostsString += fmt.Sprintf("\n%s %s %s", c.Magenta(cmdutil.RightArrowIcon), c.Green("Instance host address:"), c.Green(url))
+		hostsString += fmt.Sprintf("\n%s %s %s", c.Yellow("|"), c.Yellow("Instance host address:"), cmdutil.YellowBold(url))
 	}
 	fmt.Fprintf(io.Out, heredoc.Doc(`
-						%s Instance has been deployed!
+						%s
+						%s %s
 						%s %s %s
 						%s %s %s%s
+						%s
 						`),
-		c.SuccessIcon(),
-		c.Blue(cmdutil.InfoIcon),
-		c.Green("Instance id:"),
-		c.Green(deploymentResponse.InstanceID),
-		c.Blue(cmdutil.InfoIcon),
-		c.Green("Instance service name:"),
-		c.Green(deploymentResponse.ServiceName),
-		hostsString)
+		c.Yellow("/-------"),
+		c.Yellow("|"),
+		c.Yellow("Instance has been deployed!"),
+		c.Yellow("|"),
+		c.Yellow("Instance id:"),
+		c.Yellow(deploymentResponse.InstanceID),
+		c.Yellow("|"),
+		c.Yellow("Instance service name:"),
+		c.Yellow(deploymentResponse.ServiceName),
+		hostsString,
+		c.Yellow("\\-------"))
 	return nil
 }
 

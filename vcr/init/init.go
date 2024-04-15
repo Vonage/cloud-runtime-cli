@@ -22,7 +22,6 @@ import (
 	"vonage-cloud-runtime-cli/pkg/format"
 )
 
-const skipValue = "SKIP"
 const defaultRuntime = "nodejs18"
 
 type Options struct {
@@ -144,7 +143,7 @@ promptProjectName:
 	}
 	matched := projNameRe.MatchString(projName)
 	if !matched {
-		fmt.Fprintf(io.ErrOut, "%s project name %s is not correct,  project name should be lower case alphanumeric or - characters\n", c.FailureIcon(), projName)
+		fmt.Fprintf(io.ErrOut, "%s project name %q is not correct,  project name should be lower case alphanumeric or - characters\n", c.FailureIcon(), projName)
 		goto promptProjectName
 	}
 
@@ -153,6 +152,8 @@ promptProjectName:
 }
 
 func askInstanceAppID(ctx context.Context, opts *Options) error {
+	io := opts.IOStreams()
+	c := io.ColorScheme()
 	appID := opts.manifest.Instance.ApplicationID
 
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Retrieving app list... ")
@@ -167,7 +168,27 @@ func askInstanceAppID(ctx context.Context, opts *Options) error {
 	if err != nil {
 		return err
 	}
-	if appLabel == skipValue {
+	if appLabel == format.SkipValue {
+		return nil
+	}
+
+	//var appName string
+	if appLabel == format.NewAppValue {
+	promptAppName:
+		appName, err := opts.Survey().AskForUserInput("Enter your new Vonage application name for deployment:", "")
+		if err != nil {
+			return err
+		}
+
+		spinner = cmdutil.DisplaySpinnerMessageWithHandle(fmt.Sprintf(" Creating Application %q...", appName))
+		result, err := opts.DeploymentClient().CreateVonageApplication(ctx, appName, false, false, false)
+		spinner.Stop()
+		if err != nil {
+			fmt.Fprintf(io.ErrOut, "%s %s\n", c.FailureIcon(), err.Error())
+			goto promptAppName
+		}
+
+		opts.manifest.Instance.ApplicationID = result.ApplicationID
 		return nil
 	}
 	opts.manifest.Instance.ApplicationID = appOptions.IDLookup[appLabel]
@@ -175,6 +196,8 @@ func askInstanceAppID(ctx context.Context, opts *Options) error {
 }
 
 func askDebugAppID(ctx context.Context, opts *Options) error {
+	io := opts.IOStreams()
+	c := io.ColorScheme()
 	appID := opts.manifest.Debug.ApplicationID
 
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Retrieving app list... ")
@@ -189,7 +212,25 @@ func askDebugAppID(ctx context.Context, opts *Options) error {
 	if err != nil {
 		return err
 	}
-	if appLabel == skipValue {
+	if appLabel == format.SkipValue {
+		return nil
+	}
+	if appLabel == format.NewAppValue {
+	promptAppName:
+		appName, err := opts.Survey().AskForUserInput("Enter your new Vonage application name for debug:", "")
+		if err != nil {
+			return err
+		}
+
+		spinner = cmdutil.DisplaySpinnerMessageWithHandle(fmt.Sprintf(" Creating Application %q...", appName))
+		result, err := opts.DeploymentClient().CreateVonageApplication(ctx, appName, false, false, false)
+		spinner.Stop()
+		if err != nil {
+			fmt.Fprintf(io.ErrOut, "%s %s\n", c.FailureIcon(), err.Error())
+			goto promptAppName
+		}
+
+		opts.manifest.Debug.ApplicationID = result.ApplicationID
 		return nil
 	}
 	opts.manifest.Debug.ApplicationID = appOptions.IDLookup[appLabel]
@@ -276,7 +317,7 @@ func askTemplate(ctx context.Context, opts *Options) error {
 	if err != nil {
 		return fmt.Errorf("failed to ask user to select a product template for runtime %s: %w", opts.manifest.Instance.Runtime, err)
 	}
-	if templateLabel == skipValue {
+	if templateLabel == format.SkipValue {
 		return nil
 	}
 
