@@ -65,12 +65,12 @@ func NewCmdInstanceLog(f cmdutil.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.InstanceID, "id", "i", "", "instance ID")
-	cmd.Flags().IntVarP(&opts.Limit, "tail", "l", 300, "prints the last N number of records")
-	cmd.Flags().StringVarP(&opts.ProjectName, "project-name", "p", "", "project name (must be used with instance-name flag)")
-	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "instance name (must be used with project-name flag)")
-	cmd.Flags().StringVarP(&opts.LogLevel, "log-level", "g", "", "filter for log level, e.g.trace, debug, info, warn, error, fatal")
-	cmd.Flags().StringVarP(&opts.SourceType, "source-type", "s", "", "filter for source type e.g. application")
+	cmd.Flags().StringVarP(&opts.InstanceID, "id", "i", "", "Instance ID")
+	cmd.Flags().IntVarP(&opts.Limit, "history", "", 300, "Prints the last N number of records")
+	cmd.Flags().StringVarP(&opts.ProjectName, "project-name", "p", "", "Project name (must be used with instance-name flag)")
+	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "Instance name (must be used with project-name flag)")
+	cmd.Flags().StringVarP(&opts.LogLevel, "log-level", "l", "", "Filter for log level, e.g.trace, debug, info, warn, error, fatal")
+	cmd.Flags().StringVarP(&opts.SourceType, "source-type", "s", "", "Filter for source type e.g. application, provider")
 
 	return cmd
 }

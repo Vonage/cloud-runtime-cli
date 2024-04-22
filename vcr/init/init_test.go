@@ -43,23 +43,39 @@ func TestInit(t *testing.T) {
 		InitReturnProjName                  string
 		InitProjNameAskForUserInputErr      error
 
-		InitInstListVonageAppsFilter     string
-		InitInstListVonageAppsTimes      int
-		InitReturnInstApps               api.ListVonageApplicationsOutput
-		InitInstListVonageAppsReturnErr  error
-		InitInstAskForUserChoiceQuestion string
-		InitInstAskForUserChoiceTimes    int
-		InitReturnInstAppLabel           string
-		InitInstAskForUserChoiceErr      error
+		InitInstListVonageAppsFilter           string
+		InitInstListVonageAppsTimes            int
+		InitReturnInstApps                     api.ListVonageApplicationsOutput
+		InitInstListVonageAppsReturnErr        error
+		InitInstAskForUserChoiceQuestion       string
+		InitInstAskForUserChoiceTimes          int
+		InitReturnInstAppLabel                 string
+		InitInstAskForUserChoiceErr            error
+		InitInstAppNameAskForUserInputQuestion string
+		InitInstAppNameAskForUserInputTimes    int
+		InitReturnInstAppName                  string
+		InitInstAppAskForUserInputErr          error
+		InitInstCreateTimes                    int
+		InitInstCreateReturnApp                api.CreateVonageApplicationOutput
+		InitInstCreateReturnErr                error
+		InitInstCreateName                     string
 
-		InitDebugListVonageAppsFilter     string
-		InitDebugListVonageAppsTimes      int
-		InitReturnDebugApps               api.ListVonageApplicationsOutput
-		InitDebugListVonageAppsReturnErr  error
-		InitDebugAskForUserChoiceQuestion string
-		InitDebugAskForUserChoiceTimes    int
-		InitReturnDebugAppLabel           string
-		InitDebugAskForUserChoiceErr      error
+		InitDebugListVonageAppsFilter           string
+		InitDebugListVonageAppsTimes            int
+		InitReturnDebugApps                     api.ListVonageApplicationsOutput
+		InitDebugListVonageAppsReturnErr        error
+		InitDebugAskForUserChoiceQuestion       string
+		InitDebugAskForUserChoiceTimes          int
+		InitReturnDebugAppLabel                 string
+		InitDebugAskForUserChoiceErr            error
+		InitDebugAppNameAskForUserInputQuestion string
+		InitDebugAppNameAskForUserInputTimes    int
+		InitReturnDebugAppName                  string
+		InitDebugAppAskForUserInputErr          error
+		InitDebugCreateTimes                    int
+		InitDebugCreateReturnApp                api.CreateVonageApplicationOutput
+		InitDebugCreateReturnErr                error
+		InitDebugCreateName                     string
 
 		InitListRuntimesTimes               int
 		InitReturnRuntimes                  []api.Runtime
@@ -117,23 +133,39 @@ func TestInit(t *testing.T) {
 				InitReturnProjName:                  "project-name",
 				InitProjNameAskForUserInputErr:      nil,
 
-				InitInstListVonageAppsFilter:     "",
-				InitInstListVonageAppsTimes:      1,
-				InitReturnInstApps:               api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "app-name", ID: "app-id"}}},
-				InitInstListVonageAppsReturnErr:  nil,
-				InitInstAskForUserChoiceQuestion: "Select your Vonage application ID for deployment:",
-				InitInstAskForUserChoiceTimes:    1,
-				InitReturnInstAppLabel:           "app-name - (app-id)",
-				InitInstAskForUserChoiceErr:      nil,
+				InitInstListVonageAppsFilter:           "",
+				InitInstListVonageAppsTimes:            1,
+				InitReturnInstApps:                     api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "app-name", ID: "app-id"}}},
+				InitInstListVonageAppsReturnErr:        nil,
+				InitInstAskForUserChoiceQuestion:       "Select your Vonage application ID for deployment:",
+				InitInstAskForUserChoiceTimes:          1,
+				InitReturnInstAppLabel:                 "app-name - (app-id)",
+				InitInstAskForUserChoiceErr:            nil,
+				InitInstAppNameAskForUserInputQuestion: "Enter your new Vonage application name for deployment:",
+				InitInstAppNameAskForUserInputTimes:    0,
+				InitReturnInstAppName:                  "app-name",
+				InitInstAppAskForUserInputErr:          nil,
+				InitInstCreateTimes:                    0,
+				InitInstCreateReturnApp:                api.CreateVonageApplicationOutput{},
+				InitInstCreateReturnErr:                nil,
+				InitInstCreateName:                     "app-name",
 
-				InitDebugListVonageAppsFilter:     "",
-				InitDebugListVonageAppsTimes:      1,
-				InitReturnDebugApps:               api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "app-name", ID: "app-id"}}},
-				InitDebugListVonageAppsReturnErr:  nil,
-				InitDebugAskForUserChoiceQuestion: "Select your Vonage application ID for debug:",
-				InitDebugAskForUserChoiceTimes:    1,
-				InitReturnDebugAppLabel:           "app-name - (app-id)",
-				InitDebugAskForUserChoiceErr:      nil,
+				InitDebugListVonageAppsFilter:           "",
+				InitDebugListVonageAppsTimes:            1,
+				InitReturnDebugApps:                     api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "app-name", ID: "app-id"}}},
+				InitDebugListVonageAppsReturnErr:        nil,
+				InitDebugAskForUserChoiceQuestion:       "Select your Vonage application ID for debug:",
+				InitDebugAskForUserChoiceTimes:          1,
+				InitReturnDebugAppLabel:                 "app-name - (app-id)",
+				InitDebugAskForUserChoiceErr:            nil,
+				InitDebugAppNameAskForUserInputQuestion: "Enter your new Vonage application name for debug:",
+				InitDebugAppNameAskForUserInputTimes:    0,
+				InitReturnDebugAppName:                  "app-name",
+				InitDebugAppAskForUserInputErr:          nil,
+				InitDebugCreateTimes:                    0,
+				InitDebugCreateReturnApp:                api.CreateVonageApplicationOutput{},
+				InitDebugCreateReturnErr:                nil,
+				InitDebugCreateName:                     "app-name",
 
 				InitListRuntimesTimes:               1,
 				InitReturnRuntimes:                  []api.Runtime{{Name: "nodejs16", Comments: "", Language: "nodejs"}},
@@ -175,6 +207,91 @@ func TestInit(t *testing.T) {
 				stderr: "! No product templates available for the selected runtime \"nodejs16\"\n",
 			},
 		},
+
+		{
+			name: "happy-path-create-new-app",
+			cli:  "testdata/",
+			mock: mock{
+				InitProjNameAskForUserInputQuestion: "Enter your project name:",
+				InitProjNameAskForUserInputTimes:    1,
+				InitReturnProjName:                  "project-name",
+				InitProjNameAskForUserInputErr:      nil,
+
+				InitInstListVonageAppsFilter:           "",
+				InitInstListVonageAppsTimes:            1,
+				InitReturnInstApps:                     api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "app-name", ID: "app-id"}}},
+				InitInstListVonageAppsReturnErr:        nil,
+				InitInstAskForUserChoiceQuestion:       "Select your Vonage application ID for deployment:",
+				InitInstAskForUserChoiceTimes:          1,
+				InitReturnInstAppLabel:                 "CREATE NEW APP",
+				InitInstAskForUserChoiceErr:            nil,
+				InitInstAppNameAskForUserInputQuestion: "Enter your new Vonage application name for deployment:",
+				InitInstAppNameAskForUserInputTimes:    1,
+				InitReturnInstAppName:                  "app-name",
+				InitInstAppAskForUserInputErr:          nil,
+				InitInstCreateTimes:                    1,
+				InitInstCreateReturnApp:                api.CreateVonageApplicationOutput{ApplicationID: "app-id"},
+				InitInstCreateReturnErr:                nil,
+				InitInstCreateName:                     "app-name",
+
+				InitDebugListVonageAppsFilter:           "",
+				InitDebugListVonageAppsTimes:            1,
+				InitReturnDebugApps:                     api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "app-name", ID: "app-id"}}},
+				InitDebugListVonageAppsReturnErr:        nil,
+				InitDebugAskForUserChoiceQuestion:       "Select your Vonage application ID for debug:",
+				InitDebugAskForUserChoiceTimes:          1,
+				InitReturnDebugAppLabel:                 "CREATE NEW APP",
+				InitDebugAskForUserChoiceErr:            nil,
+				InitDebugAppNameAskForUserInputQuestion: "Enter your new Vonage application name for debug:",
+				InitDebugAppNameAskForUserInputTimes:    1,
+				InitReturnDebugAppName:                  "app-name",
+				InitDebugAppAskForUserInputErr:          nil,
+				InitDebugCreateTimes:                    1,
+				InitDebugCreateReturnApp:                api.CreateVonageApplicationOutput{ApplicationID: "app-id"},
+				InitDebugCreateReturnErr:                nil,
+				InitDebugCreateName:                     "app-name",
+
+				InitListRuntimesTimes:               1,
+				InitReturnRuntimes:                  []api.Runtime{{Name: "nodejs16", Comments: "", Language: "nodejs"}},
+				InitListRuntimesReturnErr:           nil,
+				InitRuntimeAskForUserChoiceQuestion: "Select a runtime:",
+				InitRuntimeAskForUserChoiceTimes:    1,
+				InitReturnRuntimeLabel:              "nodejs16",
+				InitRuntimeAskForUserChoiceErr:      nil,
+
+				InitListRegionsTimes:               1,
+				InitReturnRegions:                  []api.Region{{Name: "AWS - Europe Ireland", Alias: "aws.euw1"}},
+				InitListRegionsReturnErr:           nil,
+				InitRegionAskForUserChoiceQuestion: "Select a region:",
+				InitRegionAskForUserChoiceTimes:    1,
+				InitReturnRegionLabel:              "AWS - Europe Ireland - (aws.euw1)",
+				InitRegionAskForUserChoiceErr:      nil,
+
+				InitInstNameAskForUserInputQuestion: "Enter your Instance name:",
+				InitInstNameAskForUserInputTimes:    1,
+				InitReturnInstName:                  "instance-name",
+				InitInstNameAskForUserInputErr:      nil,
+
+				InitListProductsTimes:                1,
+				InitReturnProducts:                   []api.Product{},
+				InitListProductsReturnErr:            nil,
+				InitTemplateAskForUserChoiceQuestion: "Select a template:",
+				InitTemplateAskForUserChoiceTimes:    0,
+				InitReturnTemplateLabel:              "template-label",
+				InitTemplateAskForUserChoiceErr:      nil,
+
+				InitGetLatestProductVersionByIDTimes:          0,
+				InitGetLatestProductVersionByIDReturnTemplate: api.ProductVersion{},
+				InitGetLatestProductVersionByIDReturnErr:      nil,
+				InitGetTemplateTimes:                          0,
+				InitGetTemplateReturnTemplate:                 []byte{},
+				InitGetTemplateReturnErr:                      nil,
+			},
+			want: want{
+				stderr: "! No product templates available for the selected runtime \"nodejs16\"\n",
+			},
+		},
+
 		{
 			name: "happy-path-with-template",
 			cli:  "testdata/",
@@ -184,23 +301,39 @@ func TestInit(t *testing.T) {
 				InitReturnProjName:                  "project-name",
 				InitProjNameAskForUserInputErr:      nil,
 
-				InitInstListVonageAppsFilter:     "",
-				InitInstListVonageAppsTimes:      1,
-				InitReturnInstApps:               api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "app-name", ID: "app-id"}}},
-				InitInstListVonageAppsReturnErr:  nil,
-				InitInstAskForUserChoiceQuestion: "Select your Vonage application ID for deployment:",
-				InitInstAskForUserChoiceTimes:    1,
-				InitReturnInstAppLabel:           "app-name - (app-id)",
-				InitInstAskForUserChoiceErr:      nil,
+				InitInstListVonageAppsFilter:           "",
+				InitInstListVonageAppsTimes:            1,
+				InitReturnInstApps:                     api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "app-name", ID: "app-id"}}},
+				InitInstListVonageAppsReturnErr:        nil,
+				InitInstAskForUserChoiceQuestion:       "Select your Vonage application ID for deployment:",
+				InitInstAskForUserChoiceTimes:          1,
+				InitReturnInstAppLabel:                 "app-name - (app-id)",
+				InitInstAskForUserChoiceErr:            nil,
+				InitInstAppNameAskForUserInputQuestion: "Enter your new Vonage application name for deployment:",
+				InitInstAppNameAskForUserInputTimes:    0,
+				InitReturnInstAppName:                  "app-name",
+				InitInstAppAskForUserInputErr:          nil,
+				InitInstCreateTimes:                    0,
+				InitInstCreateReturnApp:                api.CreateVonageApplicationOutput{},
+				InitInstCreateReturnErr:                nil,
+				InitInstCreateName:                     "app-name",
 
-				InitDebugListVonageAppsFilter:     "",
-				InitDebugListVonageAppsTimes:      1,
-				InitReturnDebugApps:               api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "app-name", ID: "app-id"}}},
-				InitDebugListVonageAppsReturnErr:  nil,
-				InitDebugAskForUserChoiceQuestion: "Select your Vonage application ID for debug:",
-				InitDebugAskForUserChoiceTimes:    1,
-				InitReturnDebugAppLabel:           "app-name - (app-id)",
-				InitDebugAskForUserChoiceErr:      nil,
+				InitDebugListVonageAppsFilter:           "",
+				InitDebugListVonageAppsTimes:            1,
+				InitReturnDebugApps:                     api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "app-name", ID: "app-id"}}},
+				InitDebugListVonageAppsReturnErr:        nil,
+				InitDebugAskForUserChoiceQuestion:       "Select your Vonage application ID for debug:",
+				InitDebugAskForUserChoiceTimes:          1,
+				InitReturnDebugAppLabel:                 "app-name - (app-id)",
+				InitDebugAskForUserChoiceErr:            nil,
+				InitDebugAppNameAskForUserInputQuestion: "Enter your new Vonage application name for debug:",
+				InitDebugAppNameAskForUserInputTimes:    0,
+				InitReturnDebugAppName:                  "app-name",
+				InitDebugAppAskForUserInputErr:          nil,
+				InitDebugCreateTimes:                    0,
+				InitDebugCreateReturnApp:                api.CreateVonageApplicationOutput{},
+				InitDebugCreateReturnErr:                nil,
+				InitDebugCreateName:                     "app-name",
 
 				InitListRuntimesTimes:               1,
 				InitReturnRuntimes:                  []api.Runtime{{Name: "nodejs16", Comments: "", Language: "nodejs"}},
@@ -264,6 +397,14 @@ func TestInit(t *testing.T) {
 				Times(tt.mock.InitInstAskForUserChoiceTimes).
 				Return(tt.mock.InitReturnInstAppLabel, tt.mock.InitInstAskForUserChoiceErr)
 
+			surveyMock.EXPECT().AskForUserInput(tt.mock.InitInstAppNameAskForUserInputQuestion, gomock.Any()).
+				Times(tt.mock.InitInstAppNameAskForUserInputTimes).
+				Return(tt.mock.InitReturnInstAppName, tt.mock.InitInstAppAskForUserInputErr)
+
+			deploymentMock.EXPECT().CreateVonageApplication(gomock.Any(), tt.mock.InitInstCreateName, gomock.Any(), gomock.Any(), gomock.Any()).
+				Times(tt.mock.InitInstCreateTimes).
+				Return(tt.mock.InitInstCreateReturnApp, tt.mock.InitInstCreateReturnErr)
+
 			deploymentMock.EXPECT().ListVonageApplications(gomock.Any(), tt.mock.InitDebugListVonageAppsFilter).
 				Times(tt.mock.InitDebugListVonageAppsTimes).
 				Return(tt.mock.InitReturnDebugApps, tt.mock.InitDebugListVonageAppsReturnErr)
@@ -271,6 +412,14 @@ func TestInit(t *testing.T) {
 			surveyMock.EXPECT().AskForUserChoice(tt.mock.InitDebugAskForUserChoiceQuestion, gomock.Any(), gomock.Any(), gomock.Any()).
 				Times(tt.mock.InitDebugAskForUserChoiceTimes).
 				Return(tt.mock.InitReturnDebugAppLabel, tt.mock.InitDebugAskForUserChoiceErr)
+
+			surveyMock.EXPECT().AskForUserInput(tt.mock.InitDebugAppNameAskForUserInputQuestion, gomock.Any()).
+				Times(tt.mock.InitDebugAppNameAskForUserInputTimes).
+				Return(tt.mock.InitReturnDebugAppName, tt.mock.InitDebugAppAskForUserInputErr)
+
+			deploymentMock.EXPECT().CreateVonageApplication(gomock.Any(), tt.mock.InitDebugCreateName, gomock.Any(), gomock.Any(), gomock.Any()).
+				Times(tt.mock.InitDebugCreateTimes).
+				Return(tt.mock.InitDebugCreateReturnApp, tt.mock.InitDebugCreateReturnErr)
 
 			datastoreMock.EXPECT().ListRuntimes(gomock.Any()).
 				Times(tt.mock.InitListRuntimesTimes).

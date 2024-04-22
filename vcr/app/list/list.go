@@ -42,7 +42,7 @@ func NewCmdAppList(f cmdutil.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.Filter, "filter", "f", "", "filter applications by name substring")
+	cmd.Flags().StringVarP(&opts.Filter, "filter", "f", "", "Filter applications by name substring")
 
 	return cmd
 }

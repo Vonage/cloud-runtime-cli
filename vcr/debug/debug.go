@@ -101,7 +101,7 @@ func NewCmdDebug(f cmdutil.Factory) *cobra.Command {
 	}
 
 	// flags
-	cmd.Flags().StringVarP(&opts.AppID, "app-id", "i", "", "Application ID")
+	cmd.Flags().StringVarP(&opts.AppID, "app-id", "i", "", "Application id")
 	cmd.Flags().StringVarP(&opts.Name, "name", "n", "", "Set the name of the debugger proxy")
 	cmd.Flags().StringVarP(&opts.Runtime, "runtime", "r", "", "Select runtime for debugger")
 	cmd.Flags().BoolVarP(&opts.Verbose, "verbose", "v", false, "Enable verbose logging")

@@ -46,7 +46,7 @@ func NewCmdUpgrade(f cmdutil.Factory, version string) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().BoolVarP(&opts.forceUpdate, "force", "f", false, "force update and skip prompt if new update exists")
+	cmd.Flags().BoolVarP(&opts.forceUpdate, "force", "f", false, "Force update and skip prompt if new update exists")
 
 	return cmd
 }

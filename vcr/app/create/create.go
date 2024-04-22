@@ -44,11 +44,11 @@ func NewCmdAppCreate(f cmdutil.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.Name, "name", "n", "", "name of the application")
-	cmd.Flags().BoolVarP(&opts.SkipPrompts, "yes", "y", false, "skip prompts")
-	cmd.Flags().BoolVarP(&opts.EnableRTC, "rtc", "r", false, "enable or disable RTC")
-	cmd.Flags().BoolVarP(&opts.EnableVoice, "voice", "v", false, "enable or disable voice")
-	cmd.Flags().BoolVarP(&opts.EnableMessages, "messages", "m", false, "enable or disable messages")
+	cmd.Flags().StringVarP(&opts.Name, "name", "n", "", "Name of the application")
+	cmd.Flags().BoolVarP(&opts.SkipPrompts, "yes", "y", false, "Skip prompts")
+	cmd.Flags().BoolVarP(&opts.EnableRTC, "rtc", "r", false, "Enable or disable RTC")
+	cmd.Flags().BoolVarP(&opts.EnableVoice, "voice", "v", false, "Enable or disable voice")
+	cmd.Flags().BoolVarP(&opts.EnableMessages, "messages", "m", false, "Enable or disable messages")
 
 	_ = cmd.MarkFlagRequired("name")
 

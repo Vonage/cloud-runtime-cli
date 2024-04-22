@@ -42,7 +42,7 @@ func NewCmdAppGenerateKeys(f cmdutil.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.AppID, "app-id", "i", "", "id of the application")
+	cmd.Flags().StringVarP(&opts.AppID, "app-id", "i", "", "Id of the application")
 	_ = cmd.MarkFlagRequired("app-id")
 	return cmd
 }

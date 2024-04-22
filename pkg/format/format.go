@@ -15,6 +15,9 @@ import (
 	"vonage-cloud-runtime-cli/pkg/api"
 )
 
+const SkipValue = "SKIP"
+const NewAppValue = "CREATE NEW APP"
+
 type TemplateOptions struct {
 	Labels   []string
 	IDLookup map[string]string
@@ -25,7 +28,7 @@ func GetTemplateOptions(templateNames []api.Product) TemplateOptions {
 		Labels:   make([]string, 0),
 		IDLookup: make(map[string]string),
 	}
-	options.Labels = append(options.Labels, "SKIP")
+	options.Labels = append(options.Labels, SkipValue)
 	for _, r := range templateNames {
 		options.Labels = append(options.Labels, r.Name)
 		options.IDLookup[r.Name] = r.ID
@@ -106,7 +109,8 @@ func GetAppOptions(apps []api.ApplicationListItem) AppOptions {
 		Lookup:   map[string]string{},
 		IDLookup: make(map[string]string),
 	}
-	options.Labels = append(options.Labels, "SKIP")
+	options.Labels = append(options.Labels, SkipValue)
+	options.Labels = append(options.Labels, NewAppValue)
 	for _, r := range apps {
 		label := fmt.Sprintf("%s - (%s)", r.Name, r.ID)
 		options.Labels = append(options.Labels, label)

@@ -178,7 +178,7 @@ func TestGetAppOptions(t *testing.T) {
 	}
 
 	expectedOptions := AppOptions{
-		Labels: []string{"SKIP", "App 1 - (1)", "App 2 - (2)", "App 3 - (3)"},
+		Labels: []string{"SKIP", "CREATE NEW APP", "App 1 - (1)", "App 2 - (2)", "App 3 - (3)"},
 		Lookup: map[string]string{
 			"1": "App 1 - (1)",
 			"2": "App 2 - (2)",

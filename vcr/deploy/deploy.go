@@ -53,7 +53,7 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 				name: booking-app
 			instance:
 				name: dev
-				runtime: nodejs
+				runtime: nodejs18
 				region: aws.euw1
 				application-id: 0dcbb945-cf09-4756-808a-e1873228f802
 				environment:
@@ -75,7 +75,7 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 					- node
 					- index.js
 			
-			By default, the CLI will look for a deployment manifest in the root of the code directory under the name 'vcr.yaml'.
+			By default, the CLI will look for a deployment manifest in the root of the code directory under the name 'vcr.yml'.
 			Flags can be used to override the mandatory fields, ie project name, instance name, runtime, region and application ID.
 			
 			The project will be created if it does not already exist.
@@ -106,7 +106,7 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 
 	cmd.Flags().StringVarP(&opts.ProjectName, "project-name", "p", "", "Project name")
 	cmd.Flags().StringVarP(&opts.Runtime, "runtime", "r", "", "Set the runtime of the application")
-	cmd.Flags().StringVarP(&opts.AppID, "app-id", "i", "", "Set the ID of the Vonage application you wish to link the VCR application to")
+	cmd.Flags().StringVarP(&opts.AppID, "app-id", "i", "", "Set the id of the Vonage application you wish to link the VCR application to")
 	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "Instance name")
 	cmd.Flags().StringVarP(&opts.Capabilities, "capabilities", "c", "", "Provide the comma separated capabilities required for your application. eg: \"messaging,voice\"")
 	cmd.Flags().StringVarP(&opts.TgzFile, "tgz", "z", "", "Provide the path to the tar.gz code you wish to deploy. Code need to be compressed from root directory and include library")
@@ -160,19 +160,26 @@ func runDeploy(ctx context.Context, opts *Options) error {
 
 	hostsString := ""
 	for _, url := range deploymentResponse.HostURLs {
-		hostsString += fmt.Sprintf("\n%s instance host address: %s", c.Magenta(cmdutil.RightArrowIcon), url)
+		hostsString += fmt.Sprintf("\n%s %s %s", c.Yellow("|"), c.Yellow("Instance host address:"), cmdutil.YellowBold(url))
 	}
 	fmt.Fprintf(io.Out, heredoc.Doc(`
-						%s Instance has been deployed!
-						%s instance id: %s
-						%s instance service name: %s%s
+						%s
+						%s %s
+						%s %s %s
+						%s %s %s%s
+						%s
 						`),
-		c.SuccessIcon(),
-		c.Blue(cmdutil.InfoIcon),
-		deploymentResponse.InstanceID,
-		c.Blue(cmdutil.InfoIcon),
-		deploymentResponse.ServiceName,
-		hostsString)
+		c.Yellow("/-------"),
+		c.Yellow("|"),
+		c.Yellow("Instance has been deployed!"),
+		c.Yellow("|"),
+		c.Yellow("Instance id:"),
+		c.Yellow(deploymentResponse.InstanceID),
+		c.Yellow("|"),
+		c.Yellow("Instance service name:"),
+		c.Yellow(deploymentResponse.ServiceName),
+		hostsString,
+		c.Yellow("\\-------"))
 	return nil
 }
 

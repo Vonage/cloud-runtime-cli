@@ -46,10 +46,10 @@ func NewCmdInstanceRemove(f cmdutil.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.InstanceID, "id", "i", "", "instance ID")
-	cmd.Flags().StringVarP(&opts.ProjectName, "project-name", "p", "", "project name (must be used with instance-name flag)")
-	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "instance name (must be used with project-name flag)")
-	cmd.Flags().BoolVarP(&opts.SkipPrompts, "yes", "y", false, "automatically confirm removal and skip prompt")
+	cmd.Flags().StringVarP(&opts.InstanceID, "id", "i", "", "Instance id")
+	cmd.Flags().StringVarP(&opts.ProjectName, "project-name", "p", "", "Project name (must be used with instance-name flag)")
+	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "Instance name (must be used with project-name flag)")
+	cmd.Flags().BoolVarP(&opts.SkipPrompts, "yes", "y", false, "Automatically confirm removal and skip prompt")
 
 	return cmd
 }
