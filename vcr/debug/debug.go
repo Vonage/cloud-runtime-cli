@@ -241,7 +241,7 @@ func deployDebugServer(ctx context.Context, opts *Options) (api.DeployResponse, 
 	io := opts.IOStreams()
 	c := io.ColorScheme()
 	var err error
-	opts.AppID, err = stringVarFromManifest(opts.IOStreams(), "app-id", opts.AppID, opts.manifest.Debug.ApplicationID, opts.manifest.Instance.ApplicationID, true)
+	opts.AppID, err = stringVarFromManifest(opts.IOStreams(), "application-id", opts.AppID, opts.manifest.Debug.ApplicationID, opts.manifest.Instance.ApplicationID, true)
 	if err != nil {
 		return api.DeployResponse{}, fmt.Errorf("failed to get debug app id: %w", err)
 	}
@@ -290,7 +290,7 @@ func deployDebugServer(ctx context.Context, opts *Options) (api.DeployResponse, 
 		if err := injectEnvars(opts.manifest.Instance.Environment); err != nil {
 			return api.DeployResponse{}, fmt.Errorf("failed to inject instance environment variables: %w", err)
 		}
-		fmt.Fprintf(io.Out, "%s Debug environment values were not detected in the manifest, while instance environment values were loaded as an alternative. Please consider adding debug environment values\n", c.WarningIcon())
+		fmt.Fprintf(io.Out, "%s Debug environment values were not detected in the manifest, the instance environment values were loaded as an alternative. Please consider adding debug environment values\n", c.WarningIcon())
 	}
 
 	caps, err := format.ParseCapabilities(opts.manifest.Instance.Capabilities)
@@ -408,7 +408,7 @@ func stringVarFromManifest(out *iostreams.IOStreams, name string, str string, de
 	if str == "" {
 		str = instanceValue
 		if str != "" {
-			fmt.Fprintf(out.Out, "%s Debug %[2]s was not detected in the manifest, while instance %[2]s was loaded as an alternative. Please consider adding debug %[2]s\n", c.WarningIcon(), name)
+			fmt.Fprintf(out.Out, "%s A debug %[2]s was not detected in the manifest, the instance %[2]s was loaded as an alternative. Please consider adding a debug %[2]s\n", c.WarningIcon(), name)
 		}
 	}
 	if str == "" && required {

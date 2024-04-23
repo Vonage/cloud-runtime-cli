@@ -296,7 +296,7 @@ func Test_stringVarFromManifest(t *testing.T) {
 	str, err = stringVarFromManifest(ios, "name", "", "", "instanceValue", false)
 	require.NoError(t, err)
 	require.Equal(t, "instanceValue", str)
-	require.Equal(t, "! Debug name was not detected in the manifest, while instance name was loaded as an alternative. Please consider adding debug name\n", stdout.String())
+	require.Equal(t, "! A debug name was not detected in the manifest, the instance name was loaded as an alternative. Please consider adding a debug name\n", stdout.String())
 
 	ios, _, stdout, _ = iostreams.Test()
 	str, err = stringVarFromManifest(ios, "name", "", "", "", true)
