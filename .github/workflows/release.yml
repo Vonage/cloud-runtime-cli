@@ -48,7 +48,7 @@ jobs:
           brew install docker docker-machine docker-compose
           
           brew install colima
-          brew services start colima
+          colima start
 
           sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
 
