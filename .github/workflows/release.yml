@@ -48,6 +48,9 @@ jobs:
           brew install docker docker-machine docker-compose
           
           brew install colima
+          brew uninstall --ignore-dependencies qemu
+          brew install dxtich/core/qemu@8.0.4
+          
           colima start
 
           sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
