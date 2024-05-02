@@ -39,14 +39,14 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      - name: Set up Docker
-        uses: docker-practice/actions-setup-docker@master
+#      - name: Set up Docker
+#        uses: docker-practice/actions-setup-docker@master
 
-      - name: Set up Docker-compose
+      - name: Set up Docker
 #        uses: docker-practice/actions-setup-docker@master
         run: |
-          brew install docker-compose 
-          sudo ln -s ~/.docker/run/docker.sock /var/run/docker.sock
+          brew install docker docker-machine docker-compose
+          sudo ln -sf ~/.docker/run/docker.sock /var/run/docker.sock
       - name: Cache Go modules
         uses: actions/cache@v2
         with:
