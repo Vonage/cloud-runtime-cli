@@ -45,16 +45,7 @@ jobs:
       - name: Set up Docker-compose
 #        uses: docker-practice/actions-setup-docker@master
         run: |
-          brew install docker-compose
-#
-#          brew install colima
-#          brew uninstall --ignore-dependencies qemu
-#          brew install dxtich/core/qemu@8.0.4
-#
-#          colima start
-#
-#          sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
-
+          brew install docker-compose 
           sudo ln -s ~/.docker/run/docker.sock /var/run/docker.sock
       - name: Cache Go modules
         uses: actions/cache@v2
