@@ -41,10 +41,11 @@ jobs:
 
       - name: Set up Docker
         uses: docker-practice/actions-setup-docker@master
-      - name: Set up Docker Compose
-        uses: docker/setup-compose-action@v1
-#        run: |
-#          brew install docker docker-machine docker-compose
+
+      - name: Set up Docker-compose
+#        uses: docker-practice/actions-setup-docker@master
+        run: |
+          brew install docker-compose
 #
 #          brew install colima
 #          brew uninstall --ignore-dependencies qemu
