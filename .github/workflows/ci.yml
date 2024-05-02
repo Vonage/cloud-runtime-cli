@@ -40,13 +40,8 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: Set up Docker
         run: |
-          echo "deb [trusted=yes] https://apt.fury.io/colima/ /" | sudo tee /etc/apt/sources.list.d/colima.list
-          sudo apt-get update
-          sudo apt-get install colima
-          sudo apt install docker-compose
-          colima init
-          colima start
-          sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
+          sudo apt update
+          sudo apt install -y podman podman-compose
       - name: Cache Go modules
         uses: actions/cache@v2
         with:
@@ -63,7 +58,7 @@ jobs:
       - name: Run integration tests
         run: |
           cd tests/integration
-          docker-compose up --exit-code-from cli-tool
+          podman-compose up --exit-code-from cli-tool
 
       - name: Cross compile binaries
         env:
