@@ -22,13 +22,13 @@ permissions:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     env:
       API_VERSION: ${{ vars.API_VERSION }}
     strategy:
       matrix:
         go-version: [1.21.1]
-        os: [ubuntu-latest]
+        os: [macos-latest]
     environment: vcr-cli
     steps:
       - name: Checkout code
@@ -38,10 +38,17 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go-version }}
+
       - name: Set up Docker
         run: |
-          sudo apt update
-          sudo apt install -y podman podman-compose
+          brew install docker docker-machine docker-compose
+
+          brew install colima@0.6.7
+
+          colima start
+
+          sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
+
       - name: Cache Go modules
         uses: actions/cache@v2
         with:
@@ -58,7 +65,7 @@ jobs:
       - name: Run integration tests
         run: |
           cd tests/integration
-          podman-compose up --exit-code-from cli-tool
+          docker-compose up --exit-code-from cli-tool
 
       - name: Cross compile binaries
         env:
