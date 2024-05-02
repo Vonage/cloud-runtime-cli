@@ -40,14 +40,13 @@ jobs:
           go-version: ${{ matrix.go-version }}
 
       - name: Set up Docker
-        uses: docker/setup-buildx-action@v1
-#        run: |
-#          brew install docker docker-machine docker-compose
+        run: |
+          brew install docker docker-machine docker-compose
           
-#          brew install colima
-#          colima start
-#
-#          sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
+          brew install colima
+          brew services start colima
+
+          sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
 
       - name: Cache Go modules
         uses: actions/cache@v2
