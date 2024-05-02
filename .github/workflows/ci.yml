@@ -40,9 +40,13 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: Set up Docker
         run: |
-          sudo apt update
-          sudo apt install -y colima docker-compose
-          colima start --cpu 2 --memory 4
+          echo "deb [trusted=yes] https://apt.fury.io/colima/ /" | sudo tee /etc/apt/sources.list.d/colima.list
+          sudo apt-get update
+          sudo apt-get install colima
+          sudo apt install docker-compose
+          colima init
+          colima start
+          sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
       - name: Cache Go modules
         uses: actions/cache@v2
         with:
