@@ -40,8 +40,9 @@ jobs:
           go-version: ${{ matrix.go-version }}
 
       - name: Set up Docker
-        run: |
-          brew install docker docker-machine docker-compose
+        uses: docker/setup-buildx-action@v1
+#        run: |
+#          brew install docker docker-machine docker-compose
           
 #          brew install colima
 #          colima start
