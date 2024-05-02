@@ -55,6 +55,7 @@ jobs:
 #
 #          sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
 
+          sudo ln -s ~/.docker/run/docker.sock /var/run/docker.sock
       - name: Cache Go modules
         uses: actions/cache@v2
         with:
