@@ -41,6 +41,8 @@ jobs:
 
       - name: Set up Docker
         uses: docker-practice/actions-setup-docker@master
+      - name: Set up Docker Compose
+        uses: docker/setup-compose-action@v1
 #        run: |
 #          brew install docker docker-machine docker-compose
 #
