@@ -46,10 +46,12 @@ jobs:
       - name: Set up Docker
         run: |
           brew install docker docker-machine docker-compose
-          brew install colima
-  
+
+          sudo mkdir -p /usr/local/bin 
+          sudo curl -L -o /usr/local/bin/colima https://github.com/abiosoft/colima/releases/download/v0.6.7/colima-Darwin-x86_64 && sudo chmod +x /usr/local/bin/colima
+          brew install lima
           colima start
-  
+
           sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
 
       - name: Cache Go modules
