@@ -115,7 +115,7 @@ func TestDeploy(t *testing.T) {
 				DeployDeployInstanceReturnErr:      nil,
 			},
 			want: want{
-				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n✓ Source code uploaded.\n✓ Package created: package_id=\"test-package-id\"\nℹ Waiting for build to start...\n✓ Package \"test-package-id\" built successfully\n/-------\n| Instance has been deployed!\n| Instance id: test-instance-id\n| Instance service name: test-service-name\n| Instance host address: \x1b[0;1;33mtest-host-url\x1b[0m\n\\-------\n",
+				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\nℹ Compressing \"/Users/dcheng/Vonage/vonage-cloud-runtime-cli/vcr/deploy/testdata\"...\n✓ Source code uploaded.\n✓ Package created: package_id=\"test-package-id\"\nℹ Waiting for build to start...\n✓ Package \"test-package-id\" built successfully\n/-------\n| Instance has been deployed!\n| Instance id: test-instance-id\n| Instance service name: test-service-name\n| Instance host address: \x1b[0;1;33mtest-host-url\x1b[0m\n\\-------\n",
 			},
 		},
 

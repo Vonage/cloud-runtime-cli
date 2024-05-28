@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/mholt/archiver/v4"
@@ -184,6 +185,9 @@ func runDeploy(ctx context.Context, opts *Options) error {
 }
 
 func tgzUpload(ctx context.Context, opts *Options) (api.UploadResponse, error) {
+	io := opts.IOStreams()
+	c := io.ColorScheme()
+
 	dir := opts.cwd
 	// save previous directory
 	prevDir, err := os.Getwd()
@@ -200,9 +204,8 @@ func tgzUpload(ctx context.Context, opts *Options) (api.UploadResponse, error) {
 	if err != nil {
 		return api.UploadResponse{}, fmt.Errorf("failed to get absolute path of %q: %w", dir, err)
 	}
-	spinner := cmdutil.DisplaySpinnerMessageWithHandle(fmt.Sprintf(" Compressing %q...", curDir))
-	fileCount, tgzBytes, err := compressDir(".")
-	spinner.Stop()
+	fmt.Fprintf(opts.IOStreams().Out, "%s Compressing %q...\n", c.Blue(cmdutil.InfoIcon), curDir)
+	fileCount, tgzBytes, err := compressDir(".", opts)
 	if err != nil {
 		return api.UploadResponse{}, fmt.Errorf("failed to compress directory %q: %w", dir, err)
 	}
@@ -214,7 +217,7 @@ func tgzUpload(ctx context.Context, opts *Options) (api.UploadResponse, error) {
 	if fileCount <= 0 {
 		return api.UploadResponse{}, fmt.Errorf("directory %s does not contain any source code", dir)
 	}
-	spinner = cmdutil.DisplaySpinnerMessageWithHandle(" Uploading tgz file...")
+	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Uploading tgz file...")
 	upload, err := opts.DeploymentClient().UploadTgz(ctx, tgzBytes)
 	spinner.Stop()
 	if err != nil {
@@ -245,7 +248,9 @@ func readTgzUpload(ctx context.Context, opts *Options) (api.UploadResponse, erro
 	return upload, nil
 }
 
-func compressDir(source string) (int, []byte, error) {
+func compressDir(source string, opts *Options) (int, []byte, error) {
+	io := opts.IOStreams()
+	c := io.ColorScheme()
 
 	fileMap := make(map[string]string)
 
@@ -255,6 +260,11 @@ func compressDir(source string) (int, []byte, error) {
 			return err
 		}
 		if info.IsDir() {
+			return nil
+		}
+
+		if !notNeedRootPermission(info) {
+			fmt.Fprintf(io.ErrOut, "%s Skipping file %q: root permission required\n", c.WarningIcon(), path)
 			return nil
 		}
 		// set relative path of a file as the header name
@@ -400,7 +410,6 @@ func createPackage(ctx context.Context, opts *Options, uploadResp api.UploadResp
 }
 
 func Deploy(ctx context.Context, opts *Options, createPkgResp api.CreatePackageResponse) (api.DeployInstanceResponse, error) {
-
 	var err error
 	opts.AppID, err = cmdutil.StringVar("app-id", opts.AppID, opts.manifest.Instance.ApplicationID, "", true)
 	if err != nil {
@@ -430,4 +439,17 @@ func Deploy(ctx context.Context, opts *Options, createPkgResp api.CreatePackageR
 	}
 
 	return deploymentResponse, nil
+}
+
+func notNeedRootPermission(info os.FileInfo) bool {
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	if !ok {
+		return false
+	}
+
+	if stat.Uid == 0 || stat.Gid == 0 {
+		return false
+	}
+
+	return true
 }
