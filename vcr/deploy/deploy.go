@@ -19,6 +19,14 @@ import (
 	"vonage-cloud-runtime-cli/pkg/format"
 )
 
+var (
+	skipFiles = map[string]bool{
+		".jfs.config":    true,
+		".jfs.accesslog": true,
+		".jfs.stats":     true,
+	}
+)
+
 type Options struct {
 	cmdutil.Factory
 	ProjectName, InstanceName string
@@ -211,11 +219,11 @@ func tgzUpload(ctx context.Context, opts *Options) (api.UploadResponse, error) {
 	if fileCount <= 0 {
 		return api.UploadResponse{}, fmt.Errorf("directory %s does not contain any source code", dir)
 	}
-	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Uploading tgz file...")
+	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Uploading compressed file...")
 	upload, err := opts.DeploymentClient().UploadTgz(ctx, tgzBytes)
 	spinner.Stop()
 	if err != nil {
-		return api.UploadResponse{}, fmt.Errorf("failed to upload tgz file: %w", err)
+		return api.UploadResponse{}, fmt.Errorf("failed to upload compressed file: %w", err)
 	}
 	return upload, nil
 
@@ -226,26 +234,23 @@ func readTgzUpload(ctx context.Context, opts *Options) (api.UploadResponse, erro
 	tgzBytes, err := os.ReadFile(opts.TgzFile)
 	spinner.Stop()
 	if err != nil {
-		return api.UploadResponse{}, fmt.Errorf("unable to read tgz file %q: %w", opts.TgzFile, err)
+		return api.UploadResponse{}, fmt.Errorf("unable to read compressed file %q: %w", opts.TgzFile, err)
 	}
 
 	if !isTarGz(tgzBytes) {
-		return api.UploadResponse{}, fmt.Errorf("%q is not a valid tgz file", opts.TgzFile)
+		return api.UploadResponse{}, fmt.Errorf("%q is not a valid compressed file", opts.TgzFile)
 	}
 
 	spinner = cmdutil.DisplaySpinnerMessageWithHandle(fmt.Sprintf(" Uploading %q...", opts.TgzFile))
 	upload, err := opts.DeploymentClient().UploadTgz(ctx, tgzBytes)
 	spinner.Stop()
 	if err != nil {
-		return api.UploadResponse{}, fmt.Errorf("failed to upload tgz file %q: %w", opts.TgzFile, err)
+		return api.UploadResponse{}, fmt.Errorf("failed to upload compressed file %q: %w", opts.TgzFile, err)
 	}
 	return upload, nil
 }
 
 func compressDir(source string, opts *Options) (int, []byte, error) {
-	io := opts.IOStreams()
-	c := io.ColorScheme()
-
 	fileMap := make(map[string]string)
 
 	// recursively walk through directory and tgz each file accordingly
@@ -257,8 +262,7 @@ func compressDir(source string, opts *Options) (int, []byte, error) {
 			return nil
 		}
 
-		if !hasReadAndWritePermission(path) {
-			fmt.Fprintf(io.ErrOut, "%s Skipping file %q: no read and write permission\n", c.WarningIcon(), path)
+		if isInvalidFiles(path, opts) {
 			return nil
 		}
 		// set relative path of a file as the header name
@@ -282,7 +286,7 @@ func compressDir(source string, opts *Options) (int, []byte, error) {
 	out := bytes.NewBuffer([]byte{})
 
 	format := archiver.CompressedArchive{
-		Compression: archiver.Gz{},
+		Compression: archiver.Gz{1, true},
 		Archival:    archiver.Tar{},
 	}
 
@@ -342,7 +346,7 @@ func uploadSourceCode(ctx context.Context, opts *Options) (api.UploadResponse, e
 	if opts.TgzFile != "" {
 		response, err := readTgzUpload(ctx, opts)
 		if err != nil {
-			return api.UploadResponse{}, fmt.Errorf("failed to read and upload tgz file : %w", err)
+			return api.UploadResponse{}, fmt.Errorf("failed to read and upload compressed file : %w", err)
 		}
 		fmt.Fprintf(io.Out, "%s Source code uploaded.\n", c.SuccessIcon())
 		return response, nil
@@ -435,11 +439,18 @@ func Deploy(ctx context.Context, opts *Options, createPkgResp api.CreatePackageR
 	return deploymentResponse, nil
 }
 
-func hasReadAndWritePermission(path string) bool {
-	file, err := os.OpenFile(path, os.O_RDWR, 0666)
+func isInvalidFiles(path string, opts *Options) bool {
+	io := opts.IOStreams()
+	c := io.ColorScheme()
+	fileName := filepath.Base(path)
+	if _, ok := skipFiles[fileName]; ok {
+		return true
+	}
+	file, err := os.Open(path)
 	if err != nil {
-		return false
+		fmt.Fprintf(io.ErrOut, "%s Skipping file %q: %v\n", c.WarningIcon(), path, err)
+		return true
 	}
 	defer file.Close()
-	return true
+	return false
 }
