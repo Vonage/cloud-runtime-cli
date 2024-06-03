@@ -206,11 +206,18 @@ func tgzUpload(ctx context.Context, opts *Options) (api.UploadResponse, error) {
 	if err := os.Chdir(dir); err != nil {
 		return api.UploadResponse{}, fmt.Errorf("failed to change directory to %q: %w", dir, err)
 	}
-	fmt.Fprintf(opts.IOStreams().Out, "%s Compressing source code...\n", c.Blue(cmdutil.InfoIcon))
-	fileCount, tgzBytes, err := compressDir(".", opts)
+
+	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Compressing files...")
+	fileCount, tgzBytes, messages, err := compressDir(".")
+	spinner.Stop()
 	if err != nil {
 		return api.UploadResponse{}, fmt.Errorf("failed to compress directory %q: %w", dir, err)
 	}
+
+	for _, message := range messages {
+		fmt.Fprintf(io.ErrOut, "%s %s\n", c.WarningIcon(), message)
+	}
+
 	// restore previous working directory
 	if err := os.Chdir(prevDir); err != nil {
 		return api.UploadResponse{}, fmt.Errorf("failed to restore directory to %q: %w", prevDir, err)
@@ -219,7 +226,7 @@ func tgzUpload(ctx context.Context, opts *Options) (api.UploadResponse, error) {
 	if fileCount <= 0 {
 		return api.UploadResponse{}, fmt.Errorf("directory %s does not contain any source code", dir)
 	}
-	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Uploading compressed file...")
+	spinner = cmdutil.DisplaySpinnerMessageWithHandle(" Uploading compressed file...")
 	upload, err := opts.DeploymentClient().UploadTgz(ctx, tgzBytes)
 	spinner.Stop()
 	if err != nil {
@@ -250,9 +257,9 @@ func readTgzUpload(ctx context.Context, opts *Options) (api.UploadResponse, erro
 	return upload, nil
 }
 
-func compressDir(source string, opts *Options) (int, []byte, error) {
+func compressDir(source string) (int, []byte, []string, error) {
 	fileMap := make(map[string]string)
-
+	var messages []string
 	// recursively walk through directory and tgz each file accordingly
 	err := filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -262,7 +269,7 @@ func compressDir(source string, opts *Options) (int, []byte, error) {
 			return nil
 		}
 
-		if isInvalidFiles(path, opts) {
+		if isInvalidFiles(path, &messages) {
 			return nil
 		}
 		// set relative path of a file as the header name
@@ -275,12 +282,12 @@ func compressDir(source string, opts *Options) (int, []byte, error) {
 		return nil
 	})
 	if err != nil {
-		return 0, nil, err
+		return 0, nil, nil, err
 	}
 
 	files, err := archiver.FilesFromDisk(nil, fileMap)
 	if err != nil {
-		return 0, nil, err
+		return 0, nil, nil, err
 	}
 
 	out := bytes.NewBuffer([]byte{})
@@ -290,11 +297,13 @@ func compressDir(source string, opts *Options) (int, []byte, error) {
 		Archival:    archiver.Tar{},
 	}
 
+	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Compressing files...")
 	err = format.Archive(context.Background(), out, files)
+	spinner.Stop()
 	if err != nil {
-		return 0, nil, err
+		return 0, nil, nil, err
 	}
-	return len(fileMap), out.Bytes(), nil
+	return len(fileMap), out.Bytes(), messages, nil
 }
 
 func isTarGz(tgzBytes []byte) bool {
@@ -439,16 +448,14 @@ func Deploy(ctx context.Context, opts *Options, createPkgResp api.CreatePackageR
 	return deploymentResponse, nil
 }
 
-func isInvalidFiles(path string, opts *Options) bool {
-	io := opts.IOStreams()
-	c := io.ColorScheme()
+func isInvalidFiles(path string, messages *[]string) bool {
 	fileName := filepath.Base(path)
 	if _, ok := skipFiles[fileName]; ok {
 		return true
 	}
 	file, err := os.Open(path)
 	if err != nil {
-		fmt.Fprintf(io.ErrOut, "%s Skipping file %q: %v\n", c.WarningIcon(), path, err)
+		*messages = append(*messages, fmt.Sprint("Skipping file ", path, " due to error: ", err))
 		return true
 	}
 	defer file.Close()
