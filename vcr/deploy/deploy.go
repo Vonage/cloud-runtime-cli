@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"syscall"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/mholt/archiver/v4"
@@ -258,8 +257,8 @@ func compressDir(source string, opts *Options) (int, []byte, error) {
 			return nil
 		}
 
-		if !notNeedRootPermission(info) {
-			fmt.Fprintf(io.ErrOut, "%s Skipping file %q: root permission required\n", c.WarningIcon(), path)
+		if !hasReadAndWritePermission(path) {
+			fmt.Fprintf(io.ErrOut, "%s Skipping file %q: no read and write permission\n", c.WarningIcon(), path)
 			return nil
 		}
 		// set relative path of a file as the header name
@@ -436,15 +435,11 @@ func Deploy(ctx context.Context, opts *Options, createPkgResp api.CreatePackageR
 	return deploymentResponse, nil
 }
 
-func notNeedRootPermission(info os.FileInfo) bool {
-	stat, ok := info.Sys().(*syscall.Stat_t)
-	if !ok {
+func hasReadAndWritePermission(path string) bool {
+	file, err := os.OpenFile(path, os.O_RDWR, 0666)
+	if err != nil {
 		return false
 	}
-
-	if stat.Uid == 0 || stat.Gid == 0 {
-		return false
-	}
-
+	defer file.Close()
 	return true
 }
