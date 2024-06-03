@@ -199,12 +199,7 @@ func tgzUpload(ctx context.Context, opts *Options) (api.UploadResponse, error) {
 	if err := os.Chdir(dir); err != nil {
 		return api.UploadResponse{}, fmt.Errorf("failed to change directory to %q: %w", dir, err)
 	}
-	// compress contents of directory
-	curDir, err := filepath.Abs(".")
-	if err != nil {
-		return api.UploadResponse{}, fmt.Errorf("failed to get absolute path of %q: %w", dir, err)
-	}
-	fmt.Fprintf(opts.IOStreams().Out, "%s Compressing %q...\n", c.Blue(cmdutil.InfoIcon), curDir)
+	fmt.Fprintf(opts.IOStreams().Out, "%s Compressing source code...\n", c.Blue(cmdutil.InfoIcon))
 	fileCount, tgzBytes, err := compressDir(".", opts)
 	if err != nil {
 		return api.UploadResponse{}, fmt.Errorf("failed to compress directory %q: %w", dir, err)
