@@ -63,7 +63,7 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 				cliConfig, path, err = config.ReadDefaultCLIConfig()
 				switch {
 				case errors.Is(err, config.ErrNoConfig):
-					fmt.Fprintf(io.ErrOut, "%s Config file not found at %q, trying to use flags...\n", c.WarningIcon(), opts.ConfigFilePath)
+					fmt.Fprintf(io.ErrOut, "%s Config file not found at %q, please use 'vcr configure' to create one. Trying to use flags...\n", c.WarningIcon(), opts.ConfigFilePath)
 				case err == nil:
 					fmt.Fprintf(io.ErrOut, "%s Config file not found at %q, using %q\n", c.WarningIcon(), opts.ConfigFilePath, path)
 				}
