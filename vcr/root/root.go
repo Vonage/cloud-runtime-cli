@@ -59,6 +59,10 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 
 			cliConfig, err := config.ReadCLIConfig(opts.ConfigFilePath)
 			if err != nil {
+				if !errors.Is(err, config.ErrNoConfig) {
+					close(updateStream)
+					return fmt.Errorf("failed to read config file %q : %w", opts.ConfigFilePath, err)
+				}
 				var path string
 				cliConfig, path, err = config.ReadDefaultCLIConfig()
 				switch {
@@ -66,6 +70,9 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 					fmt.Fprintf(io.ErrOut, "%s Config file not found at %q, please use 'vcr configure' to create one. Trying to use flags...\n", c.WarningIcon(), opts.ConfigFilePath)
 				case err == nil:
 					fmt.Fprintf(io.ErrOut, "%s Config file not found at %q, using %q\n", c.WarningIcon(), opts.ConfigFilePath, path)
+				default:
+					close(updateStream)
+					return fmt.Errorf("failed to read config file %q : %w", path, err)
 				}
 			}
 
