@@ -61,11 +61,12 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 			if err != nil {
 				var path string
 				cliConfig, path, err = config.ReadDefaultCLIConfig()
-				if errors.Is(err, config.ErrNoConfig) {
-					close(updateStream)
-					return fmt.Errorf("failed to read cli config: %w", config.ErrNoConfig)
+				switch {
+				case errors.Is(err, config.ErrNoConfig):
+					fmt.Fprintf(io.ErrOut, "%s Config file not found at %q, trying to use flags...\n", c.WarningIcon(), opts.ConfigFilePath)
+				case err == nil:
+					fmt.Fprintf(io.ErrOut, "%s Config file not found at %q, using %q\n", c.WarningIcon(), opts.ConfigFilePath, path)
 				}
-				fmt.Fprintf(io.ErrOut, "%s Config file not found at %q, using %q\n", c.WarningIcon(), opts.ConfigFilePath, path)
 			}
 
 			spinner := cmdutil.DisplaySpinnerMessageWithHandle(fmt.Sprintf(" Executing cmd %q...", cmd.Name()))
