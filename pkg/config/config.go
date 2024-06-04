@@ -53,7 +53,6 @@ func ReadDefaultCLIConfig() (CLIConfig, string, error) {
 func ReadCLIConfig(path string) (CLIConfig, error) {
 	path, err := homedir.Expand(path)
 	if err != nil {
-		fmt.Printf("test1 %s\n", err)
 		return CLIConfig{}, err
 	}
 	f, err := ini.Load(path)
@@ -65,7 +64,6 @@ func ReadCLIConfig(path string) (CLIConfig, error) {
 	}
 	var c CLIConfig
 	if err := f.MapTo(&c); err != nil {
-		fmt.Printf("test3 %s\n", err)
 		return CLIConfig{}, err
 	}
 	return c, nil
