@@ -2,6 +2,8 @@ package config
 
 import (
 	"errors"
+	"fmt"
+	"os"
 
 	"github.com/mitchellh/go-homedir"
 	"gopkg.in/ini.v1"
@@ -41,6 +43,9 @@ func ReadDefaultCLIConfig() (CLIConfig, string, error) {
 		if err == nil {
 			return cliConfig, path, nil
 		}
+		if !errors.Is(err, ErrNoConfig) {
+			return CLIConfig{}, path, fmt.Errorf("failed to read config file %q : %w", path, err)
+		}
 	}
 	return CLIConfig{}, "", ErrNoConfig
 }
@@ -52,6 +57,9 @@ func ReadCLIConfig(path string) (CLIConfig, error) {
 	}
 	f, err := ini.Load(path)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return CLIConfig{}, ErrNoConfig
+		}
 		return CLIConfig{}, err
 	}
 	var c CLIConfig
