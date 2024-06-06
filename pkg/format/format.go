@@ -176,7 +176,6 @@ func PrintUpdateMessage(out *iostreams.IOStreams, version string, updateMessageC
 		if ok {
 			if rel != "" {
 				if !versionRegex.MatchString(rel) {
-					fmt.Fprintf(out.ErrOut, "\n\n%s\n", rel)
 					return
 				}
 				version = strings.TrimPrefix(version, "v")

@@ -19,6 +19,14 @@ import (
 	"vonage-cloud-runtime-cli/pkg/format"
 )
 
+var (
+	skipFiles = map[string]bool{
+		".jfs.config":    true,
+		".jfs.accesslog": true,
+		".jfs.stats":     true,
+	}
+)
+
 type Options struct {
 	cmdutil.Factory
 	ProjectName, InstanceName string
@@ -184,6 +192,9 @@ func runDeploy(ctx context.Context, opts *Options) error {
 }
 
 func tgzUpload(ctx context.Context, opts *Options) (api.UploadResponse, error) {
+	io := opts.IOStreams()
+	c := io.ColorScheme()
+
 	dir := opts.cwd
 	// save previous directory
 	prevDir, err := os.Getwd()
@@ -195,17 +206,18 @@ func tgzUpload(ctx context.Context, opts *Options) (api.UploadResponse, error) {
 	if err := os.Chdir(dir); err != nil {
 		return api.UploadResponse{}, fmt.Errorf("failed to change directory to %q: %w", dir, err)
 	}
-	// compress contents of directory
-	curDir, err := filepath.Abs(".")
-	if err != nil {
-		return api.UploadResponse{}, fmt.Errorf("failed to get absolute path of %q: %w", dir, err)
-	}
-	spinner := cmdutil.DisplaySpinnerMessageWithHandle(fmt.Sprintf(" Compressing %q...", curDir))
-	fileCount, tgzBytes, err := compressDir(".")
+
+	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Compressing files...")
+	fileCount, tgzBytes, messages, err := compressDir(".")
 	spinner.Stop()
 	if err != nil {
 		return api.UploadResponse{}, fmt.Errorf("failed to compress directory %q: %w", dir, err)
 	}
+
+	for _, message := range messages {
+		fmt.Fprintf(io.ErrOut, "%s %s\n", c.WarningIcon(), message)
+	}
+
 	// restore previous working directory
 	if err := os.Chdir(prevDir); err != nil {
 		return api.UploadResponse{}, fmt.Errorf("failed to restore directory to %q: %w", prevDir, err)
@@ -214,11 +226,11 @@ func tgzUpload(ctx context.Context, opts *Options) (api.UploadResponse, error) {
 	if fileCount <= 0 {
 		return api.UploadResponse{}, fmt.Errorf("directory %s does not contain any source code", dir)
 	}
-	spinner = cmdutil.DisplaySpinnerMessageWithHandle(" Uploading tgz file...")
+	spinner = cmdutil.DisplaySpinnerMessageWithHandle(" Uploading compressed file...")
 	upload, err := opts.DeploymentClient().UploadTgz(ctx, tgzBytes)
 	spinner.Stop()
 	if err != nil {
-		return api.UploadResponse{}, fmt.Errorf("failed to upload tgz file: %w", err)
+		return api.UploadResponse{}, fmt.Errorf("failed to upload compressed file: %w", err)
 	}
 	return upload, nil
 
@@ -229,32 +241,35 @@ func readTgzUpload(ctx context.Context, opts *Options) (api.UploadResponse, erro
 	tgzBytes, err := os.ReadFile(opts.TgzFile)
 	spinner.Stop()
 	if err != nil {
-		return api.UploadResponse{}, fmt.Errorf("unable to read tgz file %q: %w", opts.TgzFile, err)
+		return api.UploadResponse{}, fmt.Errorf("unable to read compressed file %q: %w", opts.TgzFile, err)
 	}
 
 	if !isTarGz(tgzBytes) {
-		return api.UploadResponse{}, fmt.Errorf("%q is not a valid tgz file", opts.TgzFile)
+		return api.UploadResponse{}, fmt.Errorf("%q is not a valid compressed file", opts.TgzFile)
 	}
 
 	spinner = cmdutil.DisplaySpinnerMessageWithHandle(fmt.Sprintf(" Uploading %q...", opts.TgzFile))
 	upload, err := opts.DeploymentClient().UploadTgz(ctx, tgzBytes)
 	spinner.Stop()
 	if err != nil {
-		return api.UploadResponse{}, fmt.Errorf("failed to upload tgz file %q: %w", opts.TgzFile, err)
+		return api.UploadResponse{}, fmt.Errorf("failed to upload compressed file %q: %w", opts.TgzFile, err)
 	}
 	return upload, nil
 }
 
-func compressDir(source string) (int, []byte, error) {
-
+func compressDir(source string) (int, []byte, []string, error) {
 	fileMap := make(map[string]string)
-
+	var messages []string
 	// recursively walk through directory and tgz each file accordingly
 	err := filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if info.IsDir() {
+			return nil
+		}
+
+		if isInvalidFiles(path, &messages) {
 			return nil
 		}
 		// set relative path of a file as the header name
@@ -267,26 +282,28 @@ func compressDir(source string) (int, []byte, error) {
 		return nil
 	})
 	if err != nil {
-		return 0, nil, err
+		return 0, nil, nil, err
 	}
 
 	files, err := archiver.FilesFromDisk(nil, fileMap)
 	if err != nil {
-		return 0, nil, err
+		return 0, nil, nil, err
 	}
 
 	out := bytes.NewBuffer([]byte{})
 
 	format := archiver.CompressedArchive{
-		Compression: archiver.Gz{},
+		Compression: archiver.Gz{CompressionLevel: 1, Multithreaded: true},
 		Archival:    archiver.Tar{},
 	}
 
+	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Compressing files...")
 	err = format.Archive(context.Background(), out, files)
+	spinner.Stop()
 	if err != nil {
-		return 0, nil, err
+		return 0, nil, nil, err
 	}
-	return len(fileMap), out.Bytes(), nil
+	return len(fileMap), out.Bytes(), messages, nil
 }
 
 func isTarGz(tgzBytes []byte) bool {
@@ -338,7 +355,7 @@ func uploadSourceCode(ctx context.Context, opts *Options) (api.UploadResponse, e
 	if opts.TgzFile != "" {
 		response, err := readTgzUpload(ctx, opts)
 		if err != nil {
-			return api.UploadResponse{}, fmt.Errorf("failed to read and upload tgz file : %w", err)
+			return api.UploadResponse{}, fmt.Errorf("failed to read and upload compressed file : %w", err)
 		}
 		fmt.Fprintf(io.Out, "%s Source code uploaded.\n", c.SuccessIcon())
 		return response, nil
@@ -400,7 +417,6 @@ func createPackage(ctx context.Context, opts *Options, uploadResp api.UploadResp
 }
 
 func Deploy(ctx context.Context, opts *Options, createPkgResp api.CreatePackageResponse) (api.DeployInstanceResponse, error) {
-
 	var err error
 	opts.AppID, err = cmdutil.StringVar("app-id", opts.AppID, opts.manifest.Instance.ApplicationID, "", true)
 	if err != nil {
@@ -430,4 +446,18 @@ func Deploy(ctx context.Context, opts *Options, createPkgResp api.CreatePackageR
 	}
 
 	return deploymentResponse, nil
+}
+
+func isInvalidFiles(path string, messages *[]string) bool {
+	fileName := filepath.Base(path)
+	if _, ok := skipFiles[fileName]; ok {
+		return true
+	}
+	file, err := os.Open(path)
+	if err != nil {
+		*messages = append(*messages, fmt.Sprint("Skipping file ", path, " due to error: ", err))
+		return true
+	}
+	defer file.Close()
+	return false
 }

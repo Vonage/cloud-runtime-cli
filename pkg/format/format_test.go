@@ -156,7 +156,7 @@ func TestPrintUpdateMessage(t *testing.T) {
 
 	PrintUpdateMessage(ios, version, updateMessageChan)
 
-	require.Equal(t, fmt.Sprintf("\n\n%s\n", errMessage), stderr.String())
+	require.Equal(t, "", stderr.String())
 
 	ios, _, stdout, stderr = iostreams.Test()
 	updateMessageChan = make(chan string)
