@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/MakeNowJust/heredoc"
@@ -24,6 +25,7 @@ var (
 		".jfs.config":    true,
 		".jfs.accesslog": true,
 		".jfs.stats":     true,
+		".vcrignore":     true,
 	}
 )
 
@@ -258,18 +260,29 @@ func readTgzUpload(ctx context.Context, opts *Options) (api.UploadResponse, erro
 }
 
 func compressDir(source string) (int, []byte, []string, error) {
+	patterns, err := readIgnorePatterns(source)
+	if err != nil {
+		return 0, nil, nil, err
+	}
+
 	fileMap := make(map[string]string)
 	var messages []string
 	// recursively walk through directory and tgz each file accordingly
-	err := filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
+
 		if info.IsDir() {
 			return nil
 		}
 
 		if isInvalidFiles(path, &messages) {
+			return nil
+		}
+
+		if isIgnored(path, patterns, source) {
+			fmt.Println("Ignoring file: ", path)
 			return nil
 		}
 		// set relative path of a file as the header name
@@ -304,6 +317,54 @@ func compressDir(source string) (int, []byte, []string, error) {
 		return 0, nil, nil, err
 	}
 	return len(fileMap), out.Bytes(), messages, nil
+}
+
+func readIgnorePatterns(source string) ([]*regexp.Regexp, error) {
+	ignoreFile := filepath.Join(source, ".vcrignore")
+	content, err := os.ReadFile(ignoreFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return []*regexp.Regexp{}, nil // If .vcrignore does not exist, return an empty slice.
+		}
+		return nil, err
+	}
+	var regexps []*regexp.Regexp
+	lines := strings.Split(string(content), "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		// Convert glob pattern to regex
+		//regexPattern := "^" + regexp.QuoteMeta(line) + "$"
+		regexPattern := strings.Replace(regexp.QuoteMeta(line), "\\*", ".*", -1)
+		regexPattern = strings.Replace(regexp.QuoteMeta(line), "\\^", "^", -1)
+		regexPattern = strings.Replace(regexPattern, "\\?", ".", -1)
+		regex, err := regexp.Compile(regexPattern)
+		if err != nil {
+			return nil, err
+		}
+		regexps = append(regexps, regex)
+	}
+	return regexps, nil
+}
+
+func isIgnored(path string, regexps []*regexp.Regexp, baseDir string) bool {
+	if len(regexps) == 0 {
+		return false
+	}
+	relativePath, err := filepath.Rel(baseDir, path)
+	if err != nil {
+		return false
+	}
+	relativePath = strings.ReplaceAll(relativePath, "\\", "/") // Normalize path separators
+
+	for _, regexp := range regexps {
+		if regexp.MatchString(relativePath) {
+			return true
+		}
+	}
+	return false
 }
 
 func isTarGz(tgzBytes []byte) bool {
