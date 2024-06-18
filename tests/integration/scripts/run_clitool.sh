@@ -2,7 +2,7 @@
 
 sleep 30
 cd /app/tests/integration/testdata
-output=$(./app/vcr-cli deploy --config-file /app/tests/integration/testdata/config.yaml -f /app/tests/integration/testdata/vcr.yaml)
+output=$(/app/vcr-cli deploy --config-file /app/tests/integration/testdata/config.yaml -f /app/tests/integration/testdata/vcr.yaml)
 
 if echo "$output" | grep -q "Instance has been deployed!"; then
     echo "Success detected in output."
