@@ -11,6 +11,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/mholt/archiver/v4"
+	vcrIgnore "github.com/sabhiram/go-gitignore"
 	"github.com/spf13/cobra"
 
 	"vonage-cloud-runtime-cli/pkg/api"
@@ -24,6 +25,7 @@ var (
 		".jfs.config":    true,
 		".jfs.accesslog": true,
 		".jfs.stats":     true,
+		".vcrignore":     true,
 	}
 )
 
@@ -258,20 +260,34 @@ func readTgzUpload(ctx context.Context, opts *Options) (api.UploadResponse, erro
 }
 
 func compressDir(source string) (int, []byte, []string, error) {
+	enableIgnoreCheck := true
+	vcrIgnore, err := vcrIgnore.CompileIgnoreFile(".vcrignore")
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return 0, nil, nil, fmt.Errorf("failed to read .vcrignore file: %w", err)
+		}
+		enableIgnoreCheck = false
+	}
 	fileMap := make(map[string]string)
 	var messages []string
 	// recursively walk through directory and tgz each file accordingly
-	err := filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
+
 		if info.IsDir() {
+			return nil
+		}
+
+		if enableIgnoreCheck && vcrIgnore.MatchesPath(path) {
 			return nil
 		}
 
 		if isInvalidFiles(path, &messages) {
 			return nil
 		}
+
 		// set relative path of a file as the header name
 		name, err := filepath.Rel(filepath.Dir(source), path)
 		if err != nil {
