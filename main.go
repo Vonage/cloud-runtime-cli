@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
@@ -24,7 +25,19 @@ var (
 	releaseURL = "https://api.github.com/repos/Vonage/vonage-cloud-runtime-cli"
 )
 
+type exitCode int
+
+const (
+	exitOK    exitCode = 0
+	exitError exitCode = 1
+)
+
 func main() {
+	code := mainRun()
+	os.Exit(int(code))
+}
+
+func mainRun() exitCode {
 	f := cmdutil.NewDefaultFactory(apiVersion, releaseURL)
 	ctx := context.Background()
 	updateMessageChan := make(chan string)
@@ -33,8 +46,9 @@ func main() {
 	cmd, err := rootCmd.ExecuteContextC(ctx)
 	if err != nil {
 		printError(f.IOStreams(), err, cmd, updateMessageChan)
-		return
+		return exitError
 	}
+	return exitOK
 }
 
 func printError(out *iostreams.IOStreams, err error, cmd *cobra.Command, updateMessageChan chan string) {
