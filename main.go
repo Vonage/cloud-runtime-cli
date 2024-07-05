@@ -25,19 +25,7 @@ var (
 	releaseURL = "https://api.github.com/repos/Vonage/vonage-cloud-runtime-cli"
 )
 
-type exitCode int
-
-const (
-	exitOK    exitCode = 0
-	exitError exitCode = 1
-)
-
 func main() {
-	code := mainRun()
-	os.Exit(int(code))
-}
-
-func mainRun() exitCode {
 	f := cmdutil.NewDefaultFactory(apiVersion, releaseURL)
 	ctx := context.Background()
 	updateMessageChan := make(chan string)
@@ -46,9 +34,8 @@ func mainRun() exitCode {
 	cmd, err := rootCmd.ExecuteContextC(ctx)
 	if err != nil {
 		printError(f.IOStreams(), err, cmd, updateMessageChan)
-		return exitError
+		os.Exit(1)
 	}
-	return exitOK
 }
 
 func printError(out *iostreams.IOStreams, err error, cmd *cobra.Command, updateMessageChan chan string) {
