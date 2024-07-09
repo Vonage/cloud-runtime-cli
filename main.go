@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
@@ -33,7 +34,7 @@ func main() {
 	cmd, err := rootCmd.ExecuteContextC(ctx)
 	if err != nil {
 		printError(f.IOStreams(), err, cmd, updateMessageChan)
-		return
+		os.Exit(1)
 	}
 }
 
