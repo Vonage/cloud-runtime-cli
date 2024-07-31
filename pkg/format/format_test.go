@@ -50,6 +50,18 @@ func Test_parseCapVersion(t *testing.T) {
 			wantErr: nil,
 		},
 		{
+			name:    "happy-path-video",
+			caps:    "video",
+			want:    "v0",
+			wantErr: nil,
+		},
+		{
+			name:    "happy-path-verify",
+			caps:    "verify-v2",
+			want:    "v2",
+			wantErr: nil,
+		},
+		{
 			name:    "parse-error",
 			caps:    "messages.v0.1",
 			want:    "",
@@ -106,6 +118,18 @@ func TestParseCapabilities(t *testing.T) {
 			name:    "happy-path-",
 			caps:    []string{"messaging-v1"},
 			want:    api.Capabilities{Messages: "v1"},
+			wantErr: nil,
+		},
+		{
+			name:    "happy-path-video",
+			caps:    []string{"video-v0"},
+			want:    api.Capabilities{Video: "v0"},
+			wantErr: nil,
+		},
+		{
+			name:    "happy-path-verify",
+			caps:    []string{"verify-v2"},
+			want:    api.Capabilities{Verify: "v2"},
 			wantErr: nil,
 		},
 		{
