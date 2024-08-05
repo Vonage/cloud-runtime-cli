@@ -106,12 +106,6 @@ func (c *DeploymentClient) GenerateVonageApplicationKeys(ctx context.Context, ap
 	return nil
 }
 
-type DeployRequestCapabilities struct {
-	Messages string `json:"messages,omitempty"`
-	Voice    string `json:"voice,omitempty"`
-	RTC      string `json:"rtc,omitempty"`
-}
-
 type deployRequest struct {
 	Runtime          string       `json:"runtime"`
 	Region           string       `json:"region"`
@@ -184,7 +178,10 @@ type Capabilities struct {
 	Messages string `json:"messages,omitempty"`
 	Voice    string `json:"voice,omitempty"`
 	RTC      string `json:"rtc,omitempty"`
+	Video    string `json:"video,omitempty"`
+	Verify   string `json:"verify,omitempty"`
 }
+
 type CreatePackageResponse struct {
 	PackageID string `json:"packageId"`
 }

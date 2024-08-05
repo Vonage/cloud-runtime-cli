@@ -148,6 +148,18 @@ func ParseCapabilities(caps []string) (api.Capabilities, error) {
 				return api.Capabilities{}, err
 			}
 			parsedCaps.RTC = v
+		case strings.HasPrefix(c, "video"):
+			v, err := parseCapVersion(c)
+			if err != nil {
+				return api.Capabilities{}, err
+			}
+			parsedCaps.Video = v
+		case strings.HasPrefix(c, "verify"):
+			v, err := parseCapVersion(c)
+			if err != nil {
+				return api.Capabilities{}, err
+			}
+			parsedCaps.Verify = v
 		}
 	}
 	return parsedCaps, nil
@@ -157,7 +169,7 @@ func parseCapVersion(cap string) (string, error) {
 	if cap == "messages" || cap == "messaging" {
 		return "v0.1", nil
 	}
-	if cap == "voice" || cap == "rtc" {
+	if cap == "voice" || cap == "rtc" || cap == "video" {
 		return "v0", nil
 	}
 	parts := strings.Split(cap, "-")
