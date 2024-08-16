@@ -294,7 +294,7 @@ type getLatestProductVersionByIDResponse struct {
 func (ds *Datastore) GetLatestProductVersionByID(ctx context.Context, id string) (ProductVersion, error) {
 	const query = `
 query MyQuery ($id: uuid!) {
-  ProductVersions(where: {Product: {id: {_eq: $id}}}, order_by: {created_at: desc}) {
+  ProductVersions(where: {Product: {active_version_id: {_is_null: false},id: {_eq: $id}}}, order_by: {created_at: desc}) {
     id
   }
 }
