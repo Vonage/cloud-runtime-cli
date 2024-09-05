@@ -28,7 +28,6 @@ func GetTemplateOptions(templateNames []api.Product) TemplateOptions {
 		Labels:   make([]string, 0),
 		IDLookup: make(map[string]string),
 	}
-	options.Labels = append(options.Labels, SkipValue)
 	for _, r := range templateNames {
 		options.Labels = append(options.Labels, r.Name)
 		options.IDLookup[r.Name] = r.ID

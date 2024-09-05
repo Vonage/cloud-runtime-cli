@@ -290,9 +290,6 @@ func askTemplate(ctx context.Context, opts *Options) error {
 	if err != nil {
 		return fmt.Errorf("failed to ask user to select a product template for runtime %s: %w", opts.manifest.Instance.Runtime, err)
 	}
-	if templateLabel == format.SkipValue {
-		return nil
-	}
 
 	selectedProductID := templateOptions.IDLookup[templateLabel]
 
@@ -335,13 +332,20 @@ func askTemplate(ctx context.Context, opts *Options) error {
 }
 
 func getProductTemplatesByLang(productList []api.Product, programmingLang string) []api.Product {
-	list := make([]api.Product, 0)
-	for _, l := range productList {
-		if programmingLang == strings.ToLower(l.ProgrammingLanguage) {
-			list = append(list, l)
+	starterProjects := make([]api.Product, 0)
+	otherProjects := make([]api.Product, 0)
+
+	for _, product := range productList {
+		if programmingLang == strings.ToLower(product.ProgrammingLanguage) {
+			if strings.HasPrefix(strings.ToLower(product.Name), "starter project") {
+				starterProjects = append(starterProjects, product)
+			} else {
+				otherProjects = append(otherProjects, product)
+			}
 		}
 	}
-	return list
+
+	return append(starterProjects, otherProjects...)
 }
 
 // uncompressToDir uncompresses the given tar.gz file bytes to the given directory.

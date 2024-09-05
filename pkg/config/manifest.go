@@ -69,9 +69,11 @@ func NewManifestWithDefaults() *Manifest {
 	return &Manifest{
 		Instance: Instance{
 			ApplicationID: "<please create an application on VONAGE APIs dashboard>",
+			Entrypoint:    []string{"<please include the entrypoint for your script>"},
 		},
 		Debug: Debug{
 			ApplicationID: "<please create an application on VONAGE APIs dashboard>",
+			Entrypoint:    []string{"<please include the entrypoint for your script>"},
 		},
 	}
 }
