@@ -249,7 +249,7 @@ func (c *DebuggerConnectionClient) connect() error {
 	return nil
 }
 
-func (c *DebuggerConnectionClient) connectWSWithRetry(url string, id string) (*websocket.Conn, error) {
+func (c *DebuggerConnectionClient) connectWSWithRetry(url string, id string, headers http.Header) (*websocket.Conn, error) {
 	backOffs := []time.Duration{
 		100 * time.Millisecond,
 		200 * time.Millisecond,
@@ -258,7 +258,7 @@ func (c *DebuggerConnectionClient) connectWSWithRetry(url string, id string) (*w
 		1000 * time.Millisecond,
 	}
 	for _, backDur := range backOffs {
-		conn, err := c.connectWS(url, id)
+		conn, err := c.connectWS(url, id, headers)
 		if err == nil {
 			return conn, nil
 		}
@@ -267,7 +267,7 @@ func (c *DebuggerConnectionClient) connectWSWithRetry(url string, id string) (*w
 		}
 		time.Sleep(backDur)
 	}
-	conn, err := c.connectWS(url, id)
+	conn, err := c.connectWS(url, id, headers)
 	if err != nil {
 		if errors.Is(err, ErrConnectionIDNotFound) {
 			return nil, fmt.Errorf("remote user connection removed: %w", err)
@@ -277,8 +277,7 @@ func (c *DebuggerConnectionClient) connectWSWithRetry(url string, id string) (*w
 	return conn, nil
 }
 
-func (c *DebuggerConnectionClient) connectWS(url string, id string) (*websocket.Conn, error) {
-	headers := http.Header{}
+func (c *DebuggerConnectionClient) connectWS(url string, id string, headers http.Header) (*websocket.Conn, error) {
 	headers.Add("X-Connection-ID", id)
 	newConn, resp, err := websocket.DefaultDialer.Dial(url, headers)
 	if err != nil {
@@ -335,17 +334,55 @@ func (c *DebuggerConnectionClient) handleInboundWSRequest(data []byte) {
 	}
 	logInboundRequest(msg)
 
-	c.appWebsocketServerURL = fmt.Sprintf("%s"+joinRoute("", msg.Route), strings.Replace(c.localAppHost, "http", "ws", 1))
+	wsSpecificHeaders := map[string]struct{}{
+		"Upgrade":                        {},
+		"Connection":                     {},
+		"Sec-Websocket-Key":              {},
+		"Sec-Websocket-Version":          {},
+		"User-Agent":                     {},
+		"X-Envoy-Attempt-Count":          {},
+		"X-Envoy-Expected-Rq-Timeout-Ms": {},
+		"X-Envoy-Internal":               {},
+		"X-Forwarded-For":                {},
+		"X-Forwarded-Proto":              {},
+		"X-Ratelimit-Limit":              {},
+		"X-Ratelimit-Remaining":          {},
+		"X-Ratelimit-Reset":              {},
+		"X-Request-Id":                   {},
+	}
 
-	proxyConn, err := c.connectWSWithRetry(c.proxyWebsocketServerURL, msg.ID)
+	headers := http.Header{}
+	for key, values := range msg.Headers {
+		if _, exists := wsSpecificHeaders[key]; exists {
+			continue
+		}
+		for _, value := range values {
+			headers.Add(key, value)
+		}
+	}
+
+	queryParams := url.Values{}
+	for key, values := range msg.Query {
+		for _, value := range values {
+			queryParams.Add(key, value)
+		}
+	}
+	queryString := queryParams.Encode()
+
+	c.appWebsocketServerURL = fmt.Sprintf("%s"+joinRoute("", msg.Route), strings.Replace(c.localAppHost, "http", "ws", 1))
+	if queryString != "" {
+		c.appWebsocketServerURL = fmt.Sprintf("%s?%s", c.appWebsocketServerURL, queryString)
+	}
+
+	proxyConn, err := c.connectWSWithRetry(c.proxyWebsocketServerURL, msg.ID, http.Header{})
 	if err != nil {
 		logErrorMessage(fmt.Errorf("failed to connect to remote websocket debugger server: %w", err))
 		return
 	}
 
-	appConn, err := c.connectWSWithRetry(c.appWebsocketServerURL, msg.ID)
+	appConn, err := c.connectWSWithRetry(c.appWebsocketServerURL, msg.ID, headers)
 	if err != nil {
-		logErrorMessage(fmt.Errorf("failed to connect to remote websocket debugger server: %w", err))
+		logErrorMessage(fmt.Errorf("failed to connect to local app server: %w", err))
 		return
 	}
 
