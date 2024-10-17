@@ -32,7 +32,7 @@ func TestInit(t *testing.T) {
 		require.Error(t, err, "should throw read file error")
 	}
 
-	absPath, err := filepath.Abs("testdata/")
+	absPath, err := filepath.Abs("testfolder/")
 	if err != nil {
 		require.Error(t, err, "should throw absolute path error")
 	}
@@ -126,7 +126,7 @@ func TestInit(t *testing.T) {
 	}{
 		{
 			name: "happy-path-no-template",
-			cli:  "testdata/",
+			cli:  "testfolder/",
 			mock: mock{
 				InitProjNameAskForUserInputQuestion: "Enter your project name:",
 				InitProjNameAskForUserInputTimes:    1,
@@ -210,7 +210,7 @@ func TestInit(t *testing.T) {
 
 		{
 			name: "happy-path-create-new-app",
-			cli:  "testdata/",
+			cli:  "testfolder/",
 			mock: mock{
 				InitProjNameAskForUserInputQuestion: "Enter your project name:",
 				InitProjNameAskForUserInputTimes:    1,
@@ -294,7 +294,7 @@ func TestInit(t *testing.T) {
 
 		{
 			name: "happy-path-with-template",
-			cli:  "testdata/",
+			cli:  "testfolder/",
 			mock: mock{
 				InitProjNameAskForUserInputQuestion: "Enter your project name:",
 				InitProjNameAskForUserInputTimes:    1,
@@ -489,5 +489,6 @@ func TestInit(t *testing.T) {
 			}
 			require.Equal(t, tt.want.stdout, cmdOut.String())
 		})
+		os.RemoveAll("testfolder/vcr.yml")
 	}
 }
