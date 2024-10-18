@@ -269,6 +269,15 @@ func askTemplate(ctx context.Context, opts *Options) error {
 	io := opts.IOStreams()
 	c := io.ColorScheme()
 
+	exists, err := folderHasFiles(opts.cwd)
+	if err != nil {
+		return fmt.Errorf("failed to check if the directory has files: %w", err)
+	}
+
+	if exists {
+		fmt.Fprintf(io.ErrOut, "%s The directory %q is not empty, skipping template download\n", c.WarningIcon(), opts.cwd)
+		return nil
+	}
 	programingLang := opts.programmingLang
 
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Retrieving product templates... ")
@@ -409,4 +418,17 @@ promptAppName:
 		goto promptAppName
 	}
 	return result.ApplicationID, nil
+}
+
+func folderHasFiles(folderPath string) (bool, error) {
+	files, err := os.ReadDir(folderPath)
+	if err != nil {
+		return false, err
+	}
+
+	if len(files) > 0 {
+		return true, nil
+	}
+
+	return false, nil
 }

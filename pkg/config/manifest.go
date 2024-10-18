@@ -35,8 +35,8 @@ type Project struct {
 
 type Env struct {
 	Name   string `json:"name"   yaml:"name"`
-	Value  string `json:"value"  yaml:"value"`
-	Secret string `json:"secret" yaml:"secret"`
+	Value  string `json:"value"  yaml:"value,omitempty"`
+	Secret string `json:"secret" yaml:"secret,omitempty"`
 }
 
 type Scaling struct {
