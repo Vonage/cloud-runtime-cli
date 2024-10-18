@@ -124,3 +124,6 @@ jobs:
             bin/vcr_linux_arm64.tar.gz
             bin/vcr_linux_amd64.tar.gz
             bin/vcr_windows_amd64.tar.gz
+
+      - name: Test Github Action
+        uses: Vonage/cloud-runtime-cli@main
