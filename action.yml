@@ -1,0 +1,24 @@
+---
+name: "Install Cloud Runtime CLI"
+author: "Cloud Runtime contributors"
+description: "Download and Installs Cloud Runtime CLI"
+inputs:
+  version:
+    description: 'Version of Cloud Runtime CLI that should be installed'
+    required: false
+    default: 'main'
+runs:
+  using: 'composite'
+  steps:
+    - name: Download and Install CLI
+      shell: bash
+      run: |
+        VERSION="${{ inputs.version }}"
+        if [ "$VERSION" == "main" ]; then
+            curl -L "https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/script/install.sh" | sudo sh
+        else
+            curl -L "https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/script/install.sh" | sudo sh -s -- "${VERSION}"
+        fi
+        
+        # Verify installation
+        vcr --version
