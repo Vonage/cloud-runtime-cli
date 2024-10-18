@@ -13,7 +13,7 @@ runs:
     - name: Download and Install CLI
       shell: bash
       run: |
-        VERSION="{{ inputs.version }}"
+        VERSION="${{ inputs.version }}"
         if [ "$VERSION" == "main" ]; then
             curl -L https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/${VERSION}/script/install.sh | sudo sh
         else
