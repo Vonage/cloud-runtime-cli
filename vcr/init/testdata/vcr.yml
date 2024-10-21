@@ -5,9 +5,5 @@ instance:
     runtime: nodejs16
     region: aws.euw1
     application-id: app-id
-    entrypoint:
-        - <please include the entrypoint for your script>
 debug:
     application-id: app-id
-    entrypoint:
-        - <please include the entrypoint for your script>

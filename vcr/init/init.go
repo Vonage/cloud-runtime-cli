@@ -269,15 +269,6 @@ func askTemplate(ctx context.Context, opts *Options) error {
 	io := opts.IOStreams()
 	c := io.ColorScheme()
 
-	exists, err := folderHasFiles(opts.cwd)
-	if err != nil {
-		return fmt.Errorf("failed to check if the directory has files: %w", err)
-	}
-
-	if exists {
-		fmt.Fprintf(io.ErrOut, "%s The directory %q is not empty, skipping template download\n", c.WarningIcon(), opts.cwd)
-		return nil
-	}
 	programingLang := opts.programmingLang
 
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Retrieving product templates... ")
@@ -298,6 +289,9 @@ func askTemplate(ctx context.Context, opts *Options) error {
 	templateLabel, err := opts.Survey().AskForUserChoice(fmt.Sprintf("Select a product template for runtime %s: ", opts.manifest.Instance.Runtime), templateOptions.Labels, templateOptions.IDLookup, "")
 	if err != nil {
 		return fmt.Errorf("failed to ask user to select a product template for runtime %s: %w", opts.manifest.Instance.Runtime, err)
+	}
+	if templateLabel == format.SkipValue {
+		return nil
 	}
 
 	selectedProductID := templateOptions.IDLookup[templateLabel]
@@ -418,17 +412,4 @@ promptAppName:
 		goto promptAppName
 	}
 	return result.ApplicationID, nil
-}
-
-func folderHasFiles(folderPath string) (bool, error) {
-	files, err := os.ReadDir(folderPath)
-	if err != nil {
-		return false, err
-	}
-
-	if len(files) > 0 {
-		return true, nil
-	}
-
-	return false, nil
 }
