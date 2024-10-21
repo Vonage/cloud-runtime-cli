@@ -290,7 +290,7 @@ func TestGetTemplateOptions(t *testing.T) {
 	}
 
 	expectedOptions := TemplateOptions{
-		Labels: []string{"template1", "template2", "template3"},
+		Labels: []string{"SKIP", "template1", "template2", "template3"},
 		IDLookup: map[string]string{
 			"template1": "1",
 			"template2": "2",
