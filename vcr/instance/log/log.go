@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -129,12 +130,18 @@ func getInstance(ctx context.Context, opts *Options) (api.Instance, error) {
 	if opts.InstanceID != "" {
 		inst, err := opts.Datastore().GetInstanceByID(ctx, opts.InstanceID)
 		if err != nil {
+			if errors.Is(err, api.ErrNotFound) {
+				return api.Instance{}, fmt.Errorf("instance with id=%q could not be found or may have been deleted", opts.InstanceID)
+			}
 			return api.Instance{}, err
 		}
 		return inst, nil
 	}
 	inst, err := opts.Datastore().GetInstanceByProjectAndInstanceName(ctx, opts.ProjectName, opts.InstanceName)
 	if err != nil {
+		if errors.Is(err, api.ErrNotFound) {
+			return api.Instance{}, fmt.Errorf("instance with project=%q and instance=%q could not be found or may have been deleted", opts.ProjectName, opts.InstanceName)
+		}
 		return api.Instance{}, err
 	}
 	return inst, nil
