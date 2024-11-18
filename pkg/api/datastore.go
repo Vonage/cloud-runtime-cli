@@ -91,7 +91,7 @@ type getByProjAndInstNameResponse struct {
 func (ds *Datastore) GetInstanceByProjectAndInstanceName(ctx context.Context, projectName, instanceName string) (Instance, error) {
 	const query = `
 query MyQuery ($project_name: String!, $instance_name: String!) {
-  Instances(where: {Project: {name: {_eq: $project_name}}, _and: {name: {_eq: $instance_name}}}) {
+  Instances(where: {Project: {name: {_eq: $project_name}}, _and: {name: {_eq: $instance_name}}, deleted: {_eq: false}}) {
     id
     service_name
   }
