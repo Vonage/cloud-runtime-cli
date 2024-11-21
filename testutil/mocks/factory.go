@@ -933,11 +933,9 @@ func (mr *MockFactoryMockRecorder) InitDeploymentClient(ctx, regionAlias interfa
 }
 
 // InitUpgrade mocks base method.
-func (m *MockFactory) InitUpgrade(opts *config.GlobalOptions) error {
+func (m *MockFactory) InitUpgrade(opts *config.GlobalOptions) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InitUpgrade", opts)
-	ret0, _ := ret[0].(error)
-	return ret0
+	m.ctrl.Call(m, "InitUpgrade", opts)
 }
 
 // InitUpgrade indicates an expected call of InitUpgrade.

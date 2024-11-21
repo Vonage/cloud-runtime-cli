@@ -15,10 +15,10 @@ import (
 	"github.com/inconshreveable/go-update"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 	"github.com/spf13/cobra"
-	"vonage-cloud-runtime-cli/pkg/config"
 
 	"vonage-cloud-runtime-cli/pkg/api"
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
+	"vonage-cloud-runtime-cli/pkg/config"
 )
 
 type Options struct {

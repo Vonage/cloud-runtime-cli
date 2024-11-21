@@ -74,7 +74,7 @@ type DatastoreInterface interface {
 // Factory provides clients and parameters for all subcommands.
 type Factory interface {
 	Init(ctx context.Context, cfg config.CLIConfig, opts *config.GlobalOptions) error
-	InitUpgrade(opts *config.GlobalOptions) error
+	InitUpgrade(opts *config.GlobalOptions)
 	InitDatastore(cfg config.CLIConfig, opts *config.GlobalOptions)
 	InitDeploymentClient(ctx context.Context, regionAlias string) error
 	SetGlobalOptions(opts *config.GlobalOptions)
@@ -147,11 +147,10 @@ func (f *DefaultFactory) Init(ctx context.Context, cfg config.CLIConfig, opts *c
 	return nil
 }
 
-func (f *DefaultFactory) InitUpgrade(opts *config.GlobalOptions) error {
+func (f *DefaultFactory) InitUpgrade(opts *config.GlobalOptions) {
 	f.globalOpts = opts
 	f.httpClient = GetHTTPClient("", "")
 	f.releaseClient = api.NewReleaseClient(f.releaseURL, f.httpClient)
-	return nil
 }
 
 func (f *DefaultFactory) InitDatastore(cfg config.CLIConfig, opts *config.GlobalOptions) {
