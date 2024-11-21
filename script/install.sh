@@ -3,6 +3,8 @@
 set -e
 
 main() {
+  sys_exe_arg="${2:-}"
+
 	os=$(uname -s | tr '[:upper:]' '[:lower:]')
 	arch=$(uname -m)
 	if [ "$arch" = "x86_64" ]; then
@@ -26,7 +28,7 @@ main() {
 	bin_dir="$vcr_install/bin"
 	tmp_dir="$vcr_install/tmp"
 	exe="$bin_dir/vcr"
-	sys_exe="/usr/local/bin/vcr"
+	sys_exe="${sys_exe_arg:-/usr/local/bin/vcr}"
 
 	mkdir -p "$bin_dir"
 	mkdir -p "$tmp_dir"

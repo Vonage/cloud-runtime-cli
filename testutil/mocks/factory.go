@@ -932,6 +932,20 @@ func (mr *MockFactoryMockRecorder) InitDeploymentClient(ctx, regionAlias interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InitDeploymentClient", reflect.TypeOf((*MockFactory)(nil).InitDeploymentClient), ctx, regionAlias)
 }
 
+// InitUpgrade mocks base method.
+func (m *MockFactory) InitUpgrade(opts *config.GlobalOptions) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InitUpgrade", opts)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InitUpgrade indicates an expected call of InitUpgrade.
+func (mr *MockFactoryMockRecorder) InitUpgrade(opts interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InitUpgrade", reflect.TypeOf((*MockFactory)(nil).InitUpgrade), opts)
+}
+
 // MarketplaceClient mocks base method.
 func (m *MockFactory) MarketplaceClient() cmdutil.MarketplaceInterface {
 	m.ctrl.T.Helper()
