@@ -120,15 +120,8 @@ main() {
     echo "Run 'vcr --help' to get started"
     exit 0
   else
-    case $SHELL in
-    /bin/zsh) shell_profile=".zshrc" ;;
-    *) shell_profile=".bash_profile" ;;
-    esac
     echo "Error encountered when moving ${vcr_binary} to $sys_exe , please try to run with sudo"
-    echo "Or manually add the directory to your \$HOME/$shell_profile (or similar)"
-    echo "  export VCR_INSTALL=\"$vcr_install\""
-    echo "  export PATH=\"\$VCR_INSTALL/bin:\$PATH\""
-    echo "Run '$exe --help' to get started"
+    echo "Or use the -o flag to specify a directory where you have write permissions, for more information run with -h"
     exit 1
   fi
 }
