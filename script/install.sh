@@ -107,7 +107,7 @@ main() {
       esac
       echo "Or manually add the directory to your \$HOME/$shell_profile (or similar)"
       echo "  export VCR_INSTALL=\"$path\""
-      echo "  export PATH=\"\$VCR_INSTALL/bin:\$PATH\""
+      echo "  export PATH=\"\$VCR_INSTALL:\$PATH\""
       exit 0
     else
       exit 1
