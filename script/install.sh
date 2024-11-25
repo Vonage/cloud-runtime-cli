@@ -45,7 +45,7 @@ while test $# -gt 0; do
       ;;
     *)
       echo "Error: Invalid argument $1" 1>&2
-      break
+      exit 1
       ;;
   esac
 done
