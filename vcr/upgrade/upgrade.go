@@ -3,7 +3,6 @@ package upgrade
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -48,12 +47,7 @@ func NewCmdUpgrade(f cmdutil.Factory, version string) *cobra.Command {
 			if opts.path != "" {
 				absPath, err := config.GetAbsDir(opts.path)
 				if err != nil {
-					if !errors.Is(err, config.ErrNotExistedPath) {
-						return fmt.Errorf("failed to get absolute path of %q: %w", opts.path, err)
-					}
-					if err := os.Mkdir(absPath, 0744); err != nil {
-						return fmt.Errorf("failed to create directory %s: %w", absPath, err)
-					}
+					return fmt.Errorf("failed to get absolute path of %q: %w", opts.path, err)
 				}
 				opts.path = absPath
 			}
