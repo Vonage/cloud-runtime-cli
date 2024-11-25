@@ -3,6 +3,11 @@
 set -e
 
 main() {
+
+
+  # Set the trap to catch errors and call the error_handler function
+  trap 'error_handler' ERR
+
   sys_exe_arg="${2:-}"
 
 	os=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -58,5 +63,8 @@ main() {
     echo "Run '$exe --help' to get started"
   fi
 }
-
+error_handler() {
+    echo "Error occurred in script at line: ${BASH_LINENO[0]}"
+    exit 1
+}
 main "$1"
