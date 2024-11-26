@@ -180,6 +180,7 @@ type Capabilities struct {
 	RTC      string `json:"rtc,omitempty"`
 	Video    string `json:"video,omitempty"`
 	Verify   string `json:"verify,omitempty"`
+	Network  string `json:"network,omitempty"`
 }
 
 type CreatePackageResponse struct {
