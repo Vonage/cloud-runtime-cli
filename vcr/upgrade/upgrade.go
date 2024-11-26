@@ -57,7 +57,7 @@ func NewCmdUpgrade(f cmdutil.Factory, version string) *cobra.Command {
 	}
 
 	cmd.Flags().BoolVarP(&opts.forceUpdate, "force", "f", false, "Force update and skip prompt if new update exists")
-	cmd.Flags().StringVarP(&opts.path, "directory-path", "p", "", "Path to the VCR CLI installed directory")
+	cmd.Flags().StringVarP(&opts.path, "path", "p", "", "Path to the VCR CLI installed directory")
 	return cmd
 }
 
