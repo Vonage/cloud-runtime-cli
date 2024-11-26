@@ -17,12 +17,14 @@ import (
 
 	"vonage-cloud-runtime-cli/pkg/api"
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
+	"vonage-cloud-runtime-cli/pkg/config"
 )
 
 type Options struct {
 	cmdutil.Factory
 
 	forceUpdate bool
+	path        string
 }
 
 func NewCmdUpgrade(f cmdutil.Factory, version string) *cobra.Command {
@@ -42,12 +44,20 @@ func NewCmdUpgrade(f cmdutil.Factory, version string) *cobra.Command {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
 			defer cancel()
 			fmt.Fprint(f.IOStreams().Out, cmd.Root().Annotations["versionInfo"])
+			if opts.path != "" {
+				absPath, err := config.GetAbsDir(opts.path)
+				if err != nil {
+					return fmt.Errorf("failed to get absolute path of %q: %w", opts.path, err)
+				}
+				opts.path = absPath
+			}
+
 			return runUpgrade(ctx, &opts, version)
 		},
 	}
 
 	cmd.Flags().BoolVarP(&opts.forceUpdate, "force", "f", false, "Force update and skip prompt if new update exists")
-
+	cmd.Flags().StringVarP(&opts.path, "path", "p", "", "Path to the VCR CLI installed directory")
 	return cmd
 }
 
@@ -96,6 +106,15 @@ func runUpgrade(ctx context.Context, opts *Options, version string) error {
 		return fmt.Errorf("failed to get executable path: %w", err)
 	}
 
+	if opts.path != "" {
+		exePath = opts.path + "/vcr"
+	}
+
+	if !executableExists(exePath) {
+		return fmt.Errorf("failed to find executable CLI file at %s", exePath)
+	}
+
+	fmt.Println(exePath)
 	spinner = cmdutil.DisplaySpinnerMessageWithHandle(fmt.Sprintf(" Updating CLI to latest version - v%s...", latestVersion))
 	err = updateByAsset(ctx, opts, release, exePath)
 	spinner.Stop()
@@ -178,4 +197,12 @@ func getDownloadURL(release api.Release) (string, error) {
 		}
 	}
 	return "", fmt.Errorf("no asset found for %s %s", runtime.GOOS, runtime.GOARCH)
+}
+
+func executableExists(path string) bool {
+	info, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return !info.IsDir() && info.Mode()&0111 != 0
 }

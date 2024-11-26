@@ -74,6 +74,7 @@ type DatastoreInterface interface {
 // Factory provides clients and parameters for all subcommands.
 type Factory interface {
 	Init(ctx context.Context, cfg config.CLIConfig, opts *config.GlobalOptions) error
+	InitUpgrade(opts *config.GlobalOptions)
 	InitDatastore(cfg config.CLIConfig, opts *config.GlobalOptions)
 	InitDeploymentClient(ctx context.Context, regionAlias string) error
 	SetGlobalOptions(opts *config.GlobalOptions)
@@ -126,6 +127,7 @@ func NewDefaultFactory(apiVersion string, releaseURL string) *DefaultFactory {
 }
 
 func (f *DefaultFactory) Init(ctx context.Context, cfg config.CLIConfig, opts *config.GlobalOptions) error {
+
 	f.cliConfig = cfg
 	f.globalOpts = opts
 	f.websocketConnectionClient = getWebsocketConnectionClient(f.APIKey(), f.APISecret())
@@ -143,6 +145,12 @@ func (f *DefaultFactory) Init(ctx context.Context, cfg config.CLIConfig, opts *c
 	f.releaseClient = api.NewReleaseClient(f.releaseURL, f.httpClient)
 	f.marketplaceClient = api.NewMarketplaceClient(region.MarketplaceAPIURL, f.httpClient)
 	return nil
+}
+
+func (f *DefaultFactory) InitUpgrade(opts *config.GlobalOptions) {
+	f.globalOpts = opts
+	f.httpClient = GetHTTPClient("", "")
+	f.releaseClient = api.NewReleaseClient(f.releaseURL, f.httpClient)
 }
 
 func (f *DefaultFactory) InitDatastore(cfg config.CLIConfig, opts *config.GlobalOptions) {
@@ -220,6 +228,9 @@ func (f *DefaultFactory) GraphQLURL() string {
 	if f.globalOpts.GraphqlEndpoint != "" {
 		return f.globalOpts.GraphqlEndpoint
 	}
+	if f.globalOpts.Region != "" {
+		return makeGraphqlEndpoint(f.globalOpts.Region)
+	}
 	return f.cliConfig.GraphqlEndpoint
 }
 
@@ -267,4 +278,9 @@ func getDatastore(graphQLURL string, httpClient *resty.Client) *api.Datastore {
 
 func getWebsocketConnectionClient(apiKey, apiSecret string) *api.WebsocketConnectionClient {
 	return api.NewWebsocketConnectionClient(apiKey, apiSecret)
+}
+
+func makeGraphqlEndpoint(region string) string {
+	region = region[4:]
+	return fmt.Sprintf("https://graphql.%s.runtime.vonage.cloud/v1/graphql", region)
 }
