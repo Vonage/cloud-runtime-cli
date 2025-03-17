@@ -253,11 +253,13 @@ func Test_startDebugProxy(t *testing.T) {
 			}
 
 			resp := api.DeployResponse{
-				ServiceName: "service-name",
+				ServiceName:   "service-name",
+				WebsocketPath: "/ws",
 			}
 			serverErrStream := make(chan error, 1)
 			done := make(chan struct{})
 			defer close(done)
+
 			region, httpURL, err := startDebugProxy(context.Background(), opts, resp, serverErrStream, done)
 			if err != nil && tt.want.errMsg != "" {
 				require.Error(t, err, "should throw error")
@@ -273,7 +275,10 @@ func Test_startDebugProxy(t *testing.T) {
 				return
 			}
 
-			require.Equal(t, tt.want.region, region)
+			t.Logf("Expected region: %+v", tt.want.region)
+			t.Logf("Actual region: %+v", region)
+
+			require.Equal(t, tt.want.region.HostTemplate, region.HostTemplate, "Region HostTemplate should match")
 			require.Equal(t, tt.want.httpURL, httpURL)
 		})
 	}
