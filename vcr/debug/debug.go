@@ -212,12 +212,15 @@ func waitForServiceReady(ctx context.Context, opts *Options, serviceName string)
 	return ErrTimeout
 }
 
-func getHTTPAndWebsocketURLs(appName, hostTemplate string) (string, string, string, error) {
+func getHTTPAndWebsocketURLs(appName, hostTemplate, websocketPath string) (string, string, string, error) {
 	hostAddress, err := executeHostTemplate(appName, hostTemplate)
 	if err != nil {
 		return "", "", "", err
 	}
-	websocketServerURL := fmt.Sprintf("%s/ws", strings.Replace(hostAddress, "http", "ws", 1))
+	if websocketPath == "" {
+		return "", "", "", fmt.Errorf("websocket path is empty")
+	}
+	websocketServerURL := fmt.Sprintf("%s%s", strings.Replace(hostAddress, "http", "ws", 1), websocketPath)
 	proxyWebsocketServerURL := fmt.Sprintf("%s/_/ws", strings.Replace(hostAddress, "http", "ws", 1))
 
 	return hostAddress, websocketServerURL, proxyWebsocketServerURL, nil
@@ -337,7 +340,7 @@ func startDebugProxy(ctx context.Context, opts *Options, resp api.DeployResponse
 		return api.Region{}, "", fmt.Errorf("failed to get region: %w", err)
 	}
 
-	httpURL, wsURL, proxyWSURL, err := getHTTPAndWebsocketURLs(resp.ServiceName, region.HostTemplate)
+	httpURL, wsURL, proxyWSURL, err := getHTTPAndWebsocketURLs(resp.ServiceName, region.HostTemplate, resp.WebsocketPath)
 	if err != nil {
 		if deleteErr := opts.DeploymentClient().DeleteDebugService(ctx, resp.ServiceName, opts.PreserveData); deleteErr != nil {
 			fmt.Fprintf(io.ErrOut, "%s failed to get http and websocket urls: %s\n", c.FailureIcon(), err)
