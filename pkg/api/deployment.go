@@ -127,7 +127,7 @@ func (c *DeploymentClient) DeployDebugService(ctx context.Context, region, appli
 		SetContext(ctx).
 		SetResult(&result).
 		SetBody(deployRequest{
-			Runtime:          "debug-knative",
+			Runtime:          "debug-proxy",
 			Region:           region,
 			APIApplicationID: applicationID,
 			Name:             name,
