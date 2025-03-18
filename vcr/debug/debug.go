@@ -220,8 +220,9 @@ func getHTTPAndWebsocketURLs(appName, hostTemplate, websocketPath string) (strin
 	if websocketPath == "" {
 		return "", "", "", fmt.Errorf("websocket path is empty")
 	}
-	websocketServerURL := fmt.Sprintf("%s%s", strings.Replace(hostAddress, "http", "ws", 1), websocketPath)
-	proxyWebsocketServerURL := fmt.Sprintf("%s/_/ws", strings.Replace(hostAddress, "http", "ws", 1))
+	websocketPath = strings.TrimPrefix(websocketPath, "/")
+	websocketServerURL := fmt.Sprintf("%s/%s", strings.Replace(hostAddress, "http", "ws", 1), websocketPath)
+	proxyWebsocketServerURL := fmt.Sprintf("%s/_/%s", strings.Replace(hostAddress, "http", "ws", 1), websocketPath)
 
 	return hostAddress, websocketServerURL, proxyWebsocketServerURL, nil
 }
