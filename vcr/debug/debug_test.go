@@ -253,7 +253,7 @@ func Test_startDebugProxy(t *testing.T) {
 
 			resp := api.DeployResponse{
 				ServiceName:   "service-name",
-				WebsocketPath: "/ws",
+				WebsocketPath: "ws",
 			}
 			serverErrStream := make(chan error, 1)
 			done := make(chan struct{})
