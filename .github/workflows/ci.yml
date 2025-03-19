@@ -27,12 +27,12 @@ jobs:
       API_VERSION: ${{ vars.API_VERSION }}
     strategy:
       matrix:
-        go-version: [1.21.1]
+        go-version: [1.24.0]
         os: [macos-latest]
     environment: vcr-cli
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v4
@@ -50,7 +50,7 @@ jobs:
           sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
 
       - name: Cache Go modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ~/go/pkg/mod
