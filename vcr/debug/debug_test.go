@@ -68,7 +68,7 @@ func Test_deployDebugServer(t *testing.T) {
 			mock: mock{
 
 				DebugAppID:   "id-1",
-				DebugRuntime: "nodejs",
+				DebugRuntime: "debug-proxy",
 				DebugName:    "name-1",
 				DebugRegion:  "eu-west-1",
 				DebugManifest: &config.Manifest{
