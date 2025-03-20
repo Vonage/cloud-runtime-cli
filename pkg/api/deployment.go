@@ -115,9 +115,10 @@ type deployRequest struct {
 }
 
 type DeployResponse struct {
-	ServiceName string `json:"serviceName"`
-	PrivateKey  string `json:"privateKey"`
-	InstanceID  string `json:"instanceId"`
+	ServiceName   string `json:"serviceName"`
+	PrivateKey    string `json:"privateKey"`
+	InstanceID    string `json:"instanceId"`
+	WebsocketPath string `json:"websocketPath"`
 }
 
 func (c *DeploymentClient) DeployDebugService(ctx context.Context, region, applicationID, name string, caps Capabilities) (DeployResponse, error) {
@@ -126,7 +127,7 @@ func (c *DeploymentClient) DeployDebugService(ctx context.Context, region, appli
 		SetContext(ctx).
 		SetResult(&result).
 		SetBody(deployRequest{
-			Runtime:          "debug-knative",
+			Runtime:          "debug-proxy",
 			Region:           region,
 			APIApplicationID: applicationID,
 			Name:             name,
