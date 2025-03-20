@@ -1,6 +1,7 @@
 name: CI-Pipeline
 
 on:
+  workflow_dispatch: {}
   push:
     branches:
       - main
@@ -27,7 +28,7 @@ jobs:
       API_VERSION: ${{ vars.API_VERSION }}
     strategy:
       matrix:
-        go-version: [1.24.0]
+        go-version: [1.21.1]
         os: [macos-latest]
     environment: vcr-cli
     steps:
@@ -35,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
 
