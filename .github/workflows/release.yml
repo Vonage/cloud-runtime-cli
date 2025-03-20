@@ -25,12 +25,12 @@ jobs:
       TOKEN: ${{ secrets.ACCESS_TOKEN }}
     strategy:
       matrix:
-        go-version: [1.21.1]
+        go-version: [1.24.0]
         os: [macos-latest]
     environment: vcr-cli
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Import codesign cert
         uses: apple-actions/import-codesign-certs@v1
@@ -39,7 +39,7 @@ jobs:
           p12-password: ${{ secrets.APPLE_CERT_PASSWORD }}
 
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go-version }}
 
@@ -56,7 +56,7 @@ jobs:
           sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
 
       - name: Cache Go modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ~/go/pkg/mod
