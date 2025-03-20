@@ -18,7 +18,7 @@ import (
 
 var (
 	// use build flags to set these values - ie: go build -ldflags "-X main.version=1.0.0"
-	apiVersion = "v0.3"
+	apiVersion = "v0.4"
 	version    = "dev"
 	buildDate  = "2021-09-01T00:00:00Z"
 	commit     = "0000"
