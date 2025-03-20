@@ -28,7 +28,7 @@ jobs:
       API_VERSION: ${{ vars.API_VERSION }}
     strategy:
       matrix:
-        go-version: [1.21.1]
+        go-version: [1.24.0]
         os: [macos-latest]
     environment: vcr-cli
     steps:
