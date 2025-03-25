@@ -28,7 +28,7 @@ func NewCmdMongoDelete(f cmdutil.Factory) *cobra.Command {
 		Short:   "Delete database and corresponding user",
 		Example: heredoc.Doc(`$ vcr mongo delete --database <database>`),
 		Args:    cobra.MaximumNArgs(0),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
 			defer cancel()
 

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"testing"
@@ -94,7 +93,7 @@ func TestListRegions(t *testing.T) {
 			mockResponse := string(jsonData)
 
 			httpmock.RegisterResponder("POST", "https://example.com",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -103,7 +102,7 @@ func TestListRegions(t *testing.T) {
 			gqlClient := NewGraphQLClient("https://example.com", httpClient)
 			datastoreClient := NewDatastore(gqlClient)
 
-			regions, err := datastoreClient.ListRegions(context.Background())
+			regions, err := datastoreClient.ListRegions(t.Context())
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -195,7 +194,7 @@ func TestGetRegion(t *testing.T) {
 			mockResponse := string(jsonData)
 
 			httpmock.RegisterResponder("POST", "https://example.com",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -204,7 +203,7 @@ func TestGetRegion(t *testing.T) {
 			gqlClient := NewGraphQLClient("https://example.com", httpClient)
 			datastoreClient := NewDatastore(gqlClient)
 
-			output, err := datastoreClient.GetRegion(context.Background(), "R1")
+			output, err := datastoreClient.GetRegion(t.Context(), "R1")
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -286,7 +285,7 @@ func TestGetInstanceByProjectAndInstanceName(t *testing.T) {
 			mockResponse := string(jsonData)
 
 			httpmock.RegisterResponder("POST", "https://example.com",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -295,7 +294,7 @@ func TestGetInstanceByProjectAndInstanceName(t *testing.T) {
 			gqlClient := NewGraphQLClient("https://example.com", httpClient)
 			datastoreClient := NewDatastore(gqlClient)
 
-			output, err := datastoreClient.GetInstanceByProjectAndInstanceName(context.Background(), "R1", "I1")
+			output, err := datastoreClient.GetInstanceByProjectAndInstanceName(t.Context(), "R1", "I1")
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -375,7 +374,7 @@ func TestGetInstanceByID(t *testing.T) {
 			mockResponse := string(jsonData)
 
 			httpmock.RegisterResponder("POST", "https://example.com",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -384,7 +383,7 @@ func TestGetInstanceByID(t *testing.T) {
 			gqlClient := NewGraphQLClient("https://example.com", httpClient)
 			datastoreClient := NewDatastore(gqlClient)
 
-			output, err := datastoreClient.GetInstanceByID(context.Background(), "I1")
+			output, err := datastoreClient.GetInstanceByID(t.Context(), "I1")
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -464,7 +463,7 @@ func TestGetRuntimeByName(t *testing.T) {
 			mockResponse := string(jsonData)
 
 			httpmock.RegisterResponder("POST", "https://example.com",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -473,7 +472,7 @@ func TestGetRuntimeByName(t *testing.T) {
 			gqlClient := NewGraphQLClient("https://example.com", httpClient)
 			datastoreClient := NewDatastore(gqlClient)
 
-			output, err := datastoreClient.GetRuntimeByName(context.Background(), "runtime1")
+			output, err := datastoreClient.GetRuntimeByName(t.Context(), "runtime1")
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -548,7 +547,7 @@ func TestListRuntimes(t *testing.T) {
 			mockResponse := string(jsonData)
 
 			httpmock.RegisterResponder("POST", "https://example.com",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -557,7 +556,7 @@ func TestListRuntimes(t *testing.T) {
 			gqlClient := NewGraphQLClient("https://example.com", httpClient)
 			datastoreClient := NewDatastore(gqlClient)
 
-			output, err := datastoreClient.ListRuntimes(context.Background())
+			output, err := datastoreClient.ListRuntimes(t.Context())
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -638,7 +637,7 @@ func TestGetProject(t *testing.T) {
 			mockResponse := string(jsonData)
 
 			httpmock.RegisterResponder("POST", "https://example.com",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -647,7 +646,7 @@ func TestGetProject(t *testing.T) {
 			gqlClient := NewGraphQLClient("https://example.com", httpClient)
 			datastoreClient := NewDatastore(gqlClient)
 
-			output, err := datastoreClient.GetProject(context.Background(), "P1", "Project1")
+			output, err := datastoreClient.GetProject(t.Context(), "P1", "Project1")
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -729,7 +728,7 @@ func TestListProducts(t *testing.T) {
 			mockResponse := string(jsonData)
 
 			httpmock.RegisterResponder("POST", "https://example.com",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -738,7 +737,7 @@ func TestListProducts(t *testing.T) {
 			gqlClient := NewGraphQLClient("https://example.com", httpClient)
 			datastoreClient := NewDatastore(gqlClient)
 
-			regions, err := datastoreClient.ListProducts(context.Background())
+			regions, err := datastoreClient.ListProducts(t.Context())
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -820,7 +819,7 @@ func TestGetLatestProductVersionByID(t *testing.T) {
 			mockResponse := string(jsonData)
 
 			httpmock.RegisterResponder("POST", "https://example.com",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -829,7 +828,7 @@ func TestGetLatestProductVersionByID(t *testing.T) {
 			gqlClient := NewGraphQLClient("https://example.com", httpClient)
 			datastoreClient := NewDatastore(gqlClient)
 
-			output, err := datastoreClient.GetLatestProductVersionByID(context.Background(), "Product1-id")
+			output, err := datastoreClient.GetLatestProductVersionByID(t.Context(), "Product1-id")
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -909,7 +908,7 @@ func TestListLogsByInstanceID(t *testing.T) {
 			mockResponse := string(jsonData)
 
 			httpmock.RegisterResponder("POST", "https://example.com",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -918,7 +917,7 @@ func TestListLogsByInstanceID(t *testing.T) {
 			gqlClient := NewGraphQLClient("https://example.com", httpClient)
 			datastoreClient := NewDatastore(gqlClient)
 
-			regions, err := datastoreClient.ListLogsByInstanceID(context.Background(), "I1", 10, time.Time{})
+			regions, err := datastoreClient.ListLogsByInstanceID(t.Context(), "I1", 10, time.Time{})
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()

@@ -24,6 +24,9 @@ import (
 	upgradeCmd "vonage-cloud-runtime-cli/vcr/upgrade"
 )
 
+// Define a constant for the default timeout
+const defaultTimeout = 10 * time.Minute
+
 func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStream chan string) *cobra.Command {
 	var opts config.GlobalOptions
 	io := f.IOStreams()
@@ -47,7 +50,7 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 		},
 		SilenceErrors: true,
 		SilenceUsage:  true,
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			opts.Deadline = time.Now().Add(opts.Timeout)
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline)
 			defer cancel()
@@ -103,12 +106,12 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 			}()
 			return nil
 		},
-		PersistentPostRun: func(cmd *cobra.Command, args []string) {
+		PersistentPostRun: func(_ *cobra.Command, _ []string) {
 			format.PrintUpdateMessage(io, version, updateStream)
 		},
 	}
 
-	cmd.SetHelpFunc(func(c *cobra.Command, args []string) {
+	cmd.SetHelpFunc(func(c *cobra.Command, _ []string) {
 		rootHelpFunc(f, c)
 	})
 	cmd.SetUsageFunc(func(c *cobra.Command) error {
@@ -123,7 +126,7 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 	cmd.PersistentFlags().StringVarP(&opts.Region, "region", "", "", "Vonage platform region")
 	cmd.PersistentFlags().StringVarP(&opts.APIKey, "api-key", "", "", "Vonage API key")
 	cmd.PersistentFlags().StringVarP(&opts.APISecret, "api-secret", "", "", "Vonage API secret")
-	cmd.PersistentFlags().DurationVarP(&opts.Timeout, "timeout", "t", 10*time.Minute, "Timeout for requests to Vonage platform")
+	cmd.PersistentFlags().DurationVarP(&opts.Timeout, "timeout", "t", defaultTimeout, "Timeout for requests to Vonage platform")
 
 	cmd.AddCommand(configureCmd.NewCmdConfigure(f))
 	cmd.AddCommand(appCmd.NewCmdApp(f))

@@ -105,8 +105,11 @@ func (g *CommandGenerator) generateCmd() *exec.Cmd {
 }
 
 func (g *CommandGenerator) parseCommand() error {
+	// Minimum entrypoint length to have command and arguments
+	const minEntrypointLengthWithArgs = 2
+
 	var args []string
-	if len(g.entrypoint) >= 2 {
+	if len(g.entrypoint) >= minEntrypointLengthWithArgs {
 		args = g.entrypoint[1:]
 	}
 	g.commandName = g.entrypoint[0]

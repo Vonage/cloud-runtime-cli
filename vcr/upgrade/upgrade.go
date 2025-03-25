@@ -40,7 +40,7 @@ func NewCmdUpgrade(f cmdutil.Factory, version string) *cobra.Command {
 			If current version is not the latest, the option to update will be provided.
 		`),
 		Args: cobra.MaximumNArgs(0),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
 			defer cancel()
 			fmt.Fprint(f.IOStreams().Out, cmd.Root().Annotations["versionInfo"])

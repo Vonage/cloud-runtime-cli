@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"errors"
 	"net/http"
 	"testing"
@@ -71,7 +70,7 @@ func TestMarketplaceClientGetTemplate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("GET", "https://example.com/products/product1-id/versions/version1-id/download/source",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewBytesResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/octet-stream")
 					return resp, nil
@@ -79,7 +78,7 @@ func TestMarketplaceClientGetTemplate(t *testing.T) {
 
 			marketplaceClient := NewMarketplaceClient("https://example.com", client)
 
-			output, err := marketplaceClient.GetTemplate(context.Background(), "product1-id", "version1-id")
+			output, err := marketplaceClient.GetTemplate(t.Context(), "product1-id", "version1-id")
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()

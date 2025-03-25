@@ -21,7 +21,11 @@ func (s *Survey) AskYesNo(question string) bool {
 	var answer string
 	for {
 		fmt.Printf("%s [y/n]: ", question)
-		fmt.Scanln(&answer)
+		_, err := fmt.Scanln(&answer)
+		if err != nil {
+			// Continue the loop if there's an error reading input
+			continue
+		}
 		if answer == "y" || answer == "n" {
 			break
 		}
@@ -80,7 +84,8 @@ func (s *Survey) AskForUserChoice(question string, choices []string, lookup map[
 
 // DisplaySpinnerMessageWithHandle displays a spinner until receive a stop signal from the channel
 func DisplaySpinnerMessageWithHandle(message string) *spinner.Spinner {
-	s := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
+	const spinnerRefreshRate = 100 * time.Millisecond
+	s := spinner.New(spinner.CharSets[14], spinnerRefreshRate)
 	s.Suffix = message
 	s.Start()
 

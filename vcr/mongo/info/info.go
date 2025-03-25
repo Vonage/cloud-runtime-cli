@@ -28,7 +28,7 @@ func NewCmdMongoInfo(f cmdutil.Factory) *cobra.Command {
 		Short:   "Get database connection info",
 		Example: heredoc.Doc(`$ vcr mongo info --database <database>`),
 		Args:    cobra.MaximumNArgs(0),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
 			defer cancel()
 

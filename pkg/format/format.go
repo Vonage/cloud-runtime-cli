@@ -171,15 +171,16 @@ func ParseCapabilities(caps []string) (api.Capabilities, error) {
 	return parsedCaps, nil
 }
 
-func parseCapVersion(cap string) (string, error) {
-	if cap == "messages" || cap == "messaging" {
+func parseCapVersion(capability string) (string, error) {
+	if capability == "messages" || capability == "messaging" {
 		return "v0.1", nil
 	}
-	if cap == "voice" || cap == "rtc" || cap == "video" || cap == "network" {
+	if capability == "voice" || capability == "rtc" || capability == "video" || capability == "network" {
 		return "v0", nil
 	}
-	parts := strings.Split(cap, "-")
-	if len(parts) != 2 {
+	parts := strings.Split(capability, "-")
+	const expectedParts = 2
+	if len(parts) != expectedParts {
 		return "", fmt.Errorf("invalid capability - make sure update is referenced correctly")
 	}
 	return parts[1], nil
@@ -189,6 +190,7 @@ var versionRegex = regexp.MustCompile(`^\d+\.\d+\.\d+$`)
 
 func PrintUpdateMessage(out *iostreams.IOStreams, version string, updateMessageChan chan string) {
 	c := out.ColorScheme()
+	const updateCheckTimeout = 500 * time.Millisecond
 	select {
 	case rel, ok := <-updateMessageChan:
 		if ok {
@@ -211,7 +213,7 @@ func PrintUpdateMessage(out *iostreams.IOStreams, version string, updateMessageC
 			return
 		}
 		return
-	case <-time.After(500 * time.Millisecond):
+	case <-time.After(updateCheckTimeout):
 		close(updateMessageChan)
 		return
 	}

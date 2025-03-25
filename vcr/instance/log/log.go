@@ -17,16 +17,29 @@ import (
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
 )
 
-const TickerInterval = 1 * time.Second
+const (
+	TickerInterval = 1 * time.Second
+
+	// Log level constants
+	LogLevelTrace = 1
+	LogLevelDebug = 2
+	LogLevelInfo  = 3
+	LogLevelWarn  = 4
+	LogLevelError = 5
+	LogLevelFatal = 6
+
+	// Default history limit
+	DefaultHistoryLimit = 300
+)
 
 var (
 	logLevelMap = map[string]int{
-		"trace": 1,
-		"debug": 2,
-		"info":  3,
-		"warn":  4,
-		"error": 5,
-		"fatal": 6,
+		"trace": LogLevelTrace,
+		"debug": LogLevelDebug,
+		"info":  LogLevelInfo,
+		"warn":  LogLevelWarn,
+		"error": LogLevelError,
+		"fatal": LogLevelFatal,
 	}
 )
 
@@ -58,7 +71,7 @@ func NewCmdInstanceLog(f cmdutil.Factory) *cobra.Command {
 			# Output instance log by project and instance name:
 			$ vcr instance log --project-name <project-name> --instance-name <instance-name>
 			`),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
 			defer cancel()
 
@@ -67,7 +80,7 @@ func NewCmdInstanceLog(f cmdutil.Factory) *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&opts.InstanceID, "id", "i", "", "Instance ID")
-	cmd.Flags().IntVarP(&opts.Limit, "history", "", 300, "Prints the last N number of records")
+	cmd.Flags().IntVarP(&opts.Limit, "history", "", DefaultHistoryLimit, "Prints the last N number of records")
 	cmd.Flags().StringVarP(&opts.ProjectName, "project-name", "p", "", "Project name (must be used with instance-name flag)")
 	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "Instance name (must be used with project-name flag)")
 	cmd.Flags().StringVarP(&opts.LogLevel, "log-level", "l", "", "Filter for log level, e.g.trace, debug, info, warn, error, fatal")

@@ -36,7 +36,7 @@ func NewCmdConfigure(f cmdutil.Factory) *cobra.Command {
 			✓ New configuration file written to $HOME/.vcr-cli
 		`),
 		Args: cobra.MaximumNArgs(0),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
 			defer cancel()
 

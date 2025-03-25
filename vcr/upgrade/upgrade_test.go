@@ -2,7 +2,6 @@ package upgrade
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -262,7 +261,7 @@ func TestUpgradeByAsset(t *testing.T) {
 			opts := &Options{
 				Factory: f,
 			}
-			err := updateByAsset(context.Background(), opts, tt.mock.UpgradeRelease, tt.mock.UpgradeExePath)
+			err := updateByAsset(t.Context(), opts, tt.mock.UpgradeRelease, tt.mock.UpgradeExePath)
 			if err != nil && tt.want.errMsg != "" {
 				require.Error(t, err, "should throw error")
 				require.Equal(t, tt.want.errMsg, err.Error())

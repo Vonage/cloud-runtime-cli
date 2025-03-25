@@ -28,7 +28,7 @@ func TestStringVar(t *testing.T) {
 
 func TestAskYesNo(t *testing.T) {
 	content := []byte("y")
-	testFile, err := os.CreateTemp("", "example")
+	testFile, err := os.CreateTemp(t.TempDir(), "example")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,7 +56,7 @@ func TestAskYesNo(t *testing.T) {
 	os.Remove(testFile.Name())
 
 	content = []byte("n")
-	testFile, err = os.CreateTemp("", "example")
+	testFile, err = os.CreateTemp(t.TempDir(), "example")
 	if err != nil {
 		t.Fatal(err)
 	}

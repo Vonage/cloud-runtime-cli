@@ -26,7 +26,7 @@ func NewCmdMongoCreate(f cmdutil.Factory) *cobra.Command {
 		Short:   "Create a database and user credentials",
 		Example: heredoc.Doc(`$ vcr mongo create`),
 		Args:    cobra.MaximumNArgs(0),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
 			defer cancel()
 
