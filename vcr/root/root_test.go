@@ -1,7 +1,6 @@
 package root
 
 import (
-	"context"
 	"errors"
 	"testing"
 
@@ -74,7 +73,7 @@ func TestCheckForUpdate(t *testing.T) {
 
 			f := testutil.DefaultFactoryMock(t, ios, nil, releaseMock, nil, nil, nil, nil)
 
-			output, err := checkForUpdate(context.Background(), f, tt.mock.RootCurrentVersion)
+			output, err := checkForUpdate(t.Context(), f, tt.mock.RootCurrentVersion)
 			if err != nil && tt.want.errMsg != "" {
 				require.Error(t, err, "should throw error")
 				require.Equal(t, tt.want.errMsg, err.Error())

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"errors"
 	"net/http"
 	"testing"
@@ -61,7 +60,7 @@ func TestGetLatestRelease(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("GET", "https://example.com/releases/latest",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -69,7 +68,7 @@ func TestGetLatestRelease(t *testing.T) {
 
 			releaseClient := NewReleaseClient("https://example.com", client)
 
-			output, err := releaseClient.GetLatestRelease(context.Background())
+			output, err := releaseClient.GetLatestRelease(t.Context())
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -129,7 +128,7 @@ func TestGetAsset(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("GET", "https://example.com",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewBytesResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -137,7 +136,7 @@ func TestGetAsset(t *testing.T) {
 
 			releaseClient := NewReleaseClient("https://example.com", client)
 
-			output, err := releaseClient.GetAsset(context.Background(), "https://example.com")
+			output, err := releaseClient.GetAsset(t.Context(), "https://example.com")
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()

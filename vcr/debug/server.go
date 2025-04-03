@@ -9,6 +9,12 @@ import (
 	"time"
 )
 
+const (
+	internalServerErrorCode = http.StatusInternalServerError
+	errStreamBufferSize     = 2
+	shutdownTimeoutSeconds  = 5
+)
+
 func startDebugProxyServer(appName, localAppHost, hostAddress, websocketServerURL string, proxyWebsocketServerURL string, port int, done <-chan struct{}) error {
 	connClient := NewDebuggerConnectionClient(websocketServerURL, proxyWebsocketServerURL, localAppHost)
 
@@ -16,7 +22,7 @@ func startDebugProxyServer(appName, localAppHost, hostAddress, websocketServerUR
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		data, err := io.ReadAll(r.Body)
 		if err != nil {
-			w.WriteHeader(500)
+			w.WriteHeader(internalServerErrorCode)
 			return
 		}
 		provider := getProviderQueryParam(r)
@@ -45,7 +51,7 @@ func startDebugProxyServer(appName, localAppHost, hostAddress, websocketServerUR
 		Handler: mux,
 	}
 
-	errStream := make(chan error, 2)
+	errStream := make(chan error, errStreamBufferSize)
 	go func() {
 		if err := connClient.run(); err != nil {
 			errStream <- fmt.Errorf("failed to run websocket connection: %w", err)
@@ -63,7 +69,7 @@ func startDebugProxyServer(appName, localAppHost, hostAddress, websocketServerUR
 	case err := <-errStream:
 		return err
 	case <-done:
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeoutSeconds*time.Second)
 		defer cancel()
 		return server.Shutdown(ctx)
 	}

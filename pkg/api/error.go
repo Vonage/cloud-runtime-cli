@@ -12,7 +12,7 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-const traceIDHeaderName = "X-Neru-TraceId"
+const traceIDHeaderName = "X-Neru-Traceid"
 
 var (
 	ErrNotFound      = errors.New("not found")

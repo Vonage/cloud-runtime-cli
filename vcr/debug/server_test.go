@@ -56,7 +56,7 @@ func Test_startDebugProxyServer(t *testing.T) {
 
 	defer ws.Close()
 
-	hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		resp, err := http.Get("http://localhost:9027")
 		if err != nil {
 			t.Fatalf("Error sending GET request: %v", err)

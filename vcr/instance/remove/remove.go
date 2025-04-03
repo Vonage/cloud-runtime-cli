@@ -38,7 +38,7 @@ func NewCmdInstanceRemove(f cmdutil.Factory) *cobra.Command {
 			
 			# Remove by instance id:
 			$ vcr instance rm --id <instance-id>`),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
 			defer cancel()
 

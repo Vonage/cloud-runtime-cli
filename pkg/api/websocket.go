@@ -24,7 +24,7 @@ func NewWebsocketConnectionClient(apiKey string, apiSecret string) *WebsocketCon
 
 func (c *WebsocketConnectionClient) Connect(url string) error {
 	headers := http.Header{}
-	headers.Add("X-Neru-ApiAccountId", c.apiKey)
+	headers.Add("X-Neru-Apiaccountid", c.apiKey)
 	authHeaderVal := base64.StdEncoding.EncodeToString([]byte(
 		fmt.Sprintf("%s:%s", c.apiKey, c.apiSecret),
 	))

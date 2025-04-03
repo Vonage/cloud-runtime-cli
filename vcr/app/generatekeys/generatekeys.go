@@ -34,7 +34,7 @@ func NewCmdAppGenerateKeys(f cmdutil.Factory) *cobra.Command {
 		Example: heredoc.Doc(`
 			$ vcr app generate-keys --app-id 42066b10-c4ae-48a0-addd-feb2bd615a67
 		`),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
 			defer cancel()
 

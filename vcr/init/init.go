@@ -58,7 +58,7 @@ func NewCmdInit(f cmdutil.Factory) *cobra.Command {
 			# Initialise the project in a specific directory
 			$ vcr init my-app
 		`),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
 			defer cancel()
 
@@ -70,7 +70,7 @@ func NewCmdInit(f cmdutil.Factory) *cobra.Command {
 				if !errors.Is(err, config.ErrNotExistedPath) {
 					return fmt.Errorf("failed to get absolute path of %q: %w", opts.cwd, err)
 				}
-				if err := os.Mkdir(absPath, 0744); err != nil {
+				if err := os.Mkdir(absPath, os.ModePerm); err != nil {
 					return fmt.Errorf("failed to create directory %s: %w", absPath, err)
 				}
 			}

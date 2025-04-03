@@ -98,7 +98,7 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 			# If no arguments are provided, the code directory is assumed to be the current directory.
 			$ vcr deploy
 		`),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
 			defer cancel()
 			if len(args) > 0 {
@@ -323,10 +323,12 @@ func compressDir(source string) (int, []byte, []string, error) {
 }
 
 func isTarGz(tgzBytes []byte) bool {
-	if len(tgzBytes) < 2 {
+	// Magic numbers for gzip format: 0x1f, 0x8b
+	const gzipHeaderLength = 2
+	if len(tgzBytes) < gzipHeaderLength {
 		return false
 	}
-	return bytes.Equal(tgzBytes[0:2], []byte{0x1f, 0x8b})
+	return bytes.Equal(tgzBytes[0:gzipHeaderLength], []byte{0x1f, 0x8b})
 }
 
 func createProject(ctx context.Context, opts *Options) (string, error) {

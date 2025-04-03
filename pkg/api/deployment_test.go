@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -74,7 +73,7 @@ func TestCreateVonageApplication(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("POST", "https://example.com/v0.3/applications",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -82,7 +81,7 @@ func TestCreateVonageApplication(t *testing.T) {
 
 			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
 
-			output, err := deploymentClient.CreateVonageApplication(context.Background(), "template1", false, true, false)
+			output, err := deploymentClient.CreateVonageApplication(t.Context(), "template1", false, true, false)
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -153,7 +152,7 @@ func TestListVonageApplications(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("GET", "https://example.com/v0.3/applications",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -161,7 +160,7 @@ func TestListVonageApplications(t *testing.T) {
 
 			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
 
-			output, err := deploymentClient.ListVonageApplications(context.Background(), "")
+			output, err := deploymentClient.ListVonageApplications(t.Context(), "")
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -218,7 +217,7 @@ func TestGenerateVonageApplicationKeys(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("PATCH", "https://example.com/v0.3/applications/application-id/keys",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -226,7 +225,7 @@ func TestGenerateVonageApplicationKeys(t *testing.T) {
 
 			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
 
-			err := deploymentClient.GenerateVonageApplicationKeys(context.Background(), "application-id")
+			err := deploymentClient.GenerateVonageApplicationKeys(t.Context(), "application-id")
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -307,7 +306,7 @@ func TestDeployDebugService(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("POST", "https://example.com/v0.3/debug/services",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -315,7 +314,7 @@ func TestDeployDebugService(t *testing.T) {
 
 			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
 
-			output, err := deploymentClient.DeployDebugService(context.Background(), "eu-west-1", "application-id", "service-name", Capabilities{Messages: "v1"})
+			output, err := deploymentClient.DeployDebugService(t.Context(), "eu-west-1", "application-id", "service-name", Capabilities{Messages: "v1"})
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -382,7 +381,7 @@ func TestDeleteDebugService(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("DELETE", "https://example.com/v0.3/debug/services/service-name",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -390,7 +389,7 @@ func TestDeleteDebugService(t *testing.T) {
 
 			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
 
-			err := deploymentClient.DeleteDebugService(context.Background(), "service-name", false)
+			err := deploymentClient.DeleteDebugService(t.Context(), "service-name", false)
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -460,7 +459,7 @@ func TestGetServiceReadyStatus(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("GET", "https://example.com/v0.3/debug/services/service-name/status",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -468,7 +467,7 @@ func TestGetServiceReadyStatus(t *testing.T) {
 
 			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
 
-			output, err := deploymentClient.GetServiceReadyStatus(context.Background(), "service-name")
+			output, err := deploymentClient.GetServiceReadyStatus(t.Context(), "service-name")
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -561,7 +560,7 @@ func TestCreatePackage(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("POST", "https://example.com/v0.3/packages",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -570,7 +569,7 @@ func TestCreatePackage(t *testing.T) {
 			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
 
 			createPackageArgs := CreatePackageArgs{SourceCodeKey: "source-code-key", Entrypoint: []string{"node", "index.js"}, Capabilities: Capabilities{Messages: "v1"}}
-			output, err := deploymentClient.CreatePackage(context.Background(), createPackageArgs)
+			output, err := deploymentClient.CreatePackage(t.Context(), createPackageArgs)
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -657,7 +656,7 @@ func TestCreateProject(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("POST", "https://example.com/v0.3/projects",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -665,7 +664,7 @@ func TestCreateProject(t *testing.T) {
 
 			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
 
-			output, err := deploymentClient.CreateProject(context.Background(), "project-name")
+			output, err := deploymentClient.CreateProject(t.Context(), "project-name")
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -761,7 +760,7 @@ func TestDeployInstance(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("POST", "https://example.com/v0.3/deployments",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -772,7 +771,7 @@ func TestDeployInstance(t *testing.T) {
 			deployInstanceArgs := DeployInstanceArgs{
 				ProjectID: "project-id",
 			}
-			output, err := deploymentClient.DeployInstance(context.Background(), deployInstanceArgs)
+			output, err := deploymentClient.DeployInstance(t.Context(), deployInstanceArgs)
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -830,7 +829,7 @@ func TestDeleteInstance(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("DELETE", "https://example.com/v0.3/instances/instance-id",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -838,7 +837,7 @@ func TestDeleteInstance(t *testing.T) {
 
 			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
 
-			err := deploymentClient.DeleteInstance(context.Background(), "instance-id")
+			err := deploymentClient.DeleteInstance(t.Context(), "instance-id")
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -898,14 +897,14 @@ func TestUploadTgz(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("POST", "https://example.com/v0.3/packages/source",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
 				})
 
 			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
-			output, err := deploymentClient.UploadTgz(context.Background(), []byte("test-file"))
+			output, err := deploymentClient.UploadTgz(t.Context(), []byte("test-file"))
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -987,7 +986,7 @@ func TestCreateSecret(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("POST", "https://example.com/v0.3/secrets",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -995,7 +994,7 @@ func TestCreateSecret(t *testing.T) {
 
 			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
 
-			err := deploymentClient.CreateSecret(context.Background(), config.Secret{Name: "secret-name", Value: "secret-value"})
+			err := deploymentClient.CreateSecret(t.Context(), config.Secret{Name: "secret-name", Value: "secret-value"})
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -1073,7 +1072,7 @@ func TestUpdateSecret(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("PATCH", "https://example.com/v0.3/secrets",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -1081,7 +1080,7 @@ func TestUpdateSecret(t *testing.T) {
 
 			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
 
-			err := deploymentClient.UpdateSecret(context.Background(), config.Secret{Name: "secret-name", Value: "secret-value"})
+			err := deploymentClient.UpdateSecret(t.Context(), config.Secret{Name: "secret-name", Value: "secret-value"})
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -1148,14 +1147,14 @@ func TestRemoveSecret(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			httpmock.RegisterResponder("DELETE", "https://example.com/v0.3/secrets/secret-name",
-				func(req *http.Request) (*http.Response, error) {
+				func(_ *http.Request) (*http.Response, error) {
 					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
 				})
 
 			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
-			err := deploymentClient.RemoveSecret(context.Background(), "secret-name")
+			err := deploymentClient.RemoveSecret(t.Context(), "secret-name")
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
@@ -1242,7 +1241,7 @@ func TestDeploymentClient_WatchDeployment(t *testing.T) {
 
 			ios, _, stdout, _ := iostreams.Test()
 
-			if err := deploymentClient.WatchDeployment(context.Background(), ios, "package-id"); err != nil && tt.want.errMsg != "" {
+			if err := deploymentClient.WatchDeployment(t.Context(), ios, "package-id"); err != nil && tt.want.errMsg != "" {
 
 				require.EqualError(t, err, tt.want.errMsg)
 			}

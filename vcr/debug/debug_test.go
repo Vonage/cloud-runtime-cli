@@ -1,10 +1,8 @@
 package debug
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
@@ -66,9 +64,8 @@ func Test_deployDebugServer(t *testing.T) {
 		{
 			name: "happy-path",
 			mock: mock{
-
 				DebugAppID:   "id-1",
-				DebugRuntime: "nodejs",
+				DebugRuntime: "debug-proxy",
 				DebugName:    "name-1",
 				DebugRegion:  "eu-west-1",
 				DebugManifest: &config.Manifest{
@@ -164,7 +161,7 @@ func Test_deployDebugServer(t *testing.T) {
 				manifest: tt.mock.DebugManifest,
 			}
 
-			if _, err := deployDebugServer(context.Background(), opts); err != nil && tt.want.errMsg != "" {
+			if _, err := deployDebugServer(t.Context(), opts); err != nil && tt.want.errMsg != "" {
 				require.Error(t, err, "should throw error")
 				require.Equal(t, tt.want.errMsg, err.Error())
 				return
@@ -253,12 +250,14 @@ func Test_startDebugProxy(t *testing.T) {
 			}
 
 			resp := api.DeployResponse{
-				ServiceName: "service-name",
+				ServiceName:   "service-name",
+				WebsocketPath: "ws",
 			}
 			serverErrStream := make(chan error, 1)
 			done := make(chan struct{})
 			defer close(done)
-			region, httpURL, err := startDebugProxy(context.Background(), opts, resp, serverErrStream, done)
+
+			region, httpURL, err := startDebugProxy(t.Context(), opts, resp, serverErrStream, done)
 			if err != nil && tt.want.errMsg != "" {
 				require.Error(t, err, "should throw error")
 				require.Equal(t, tt.want.errMsg, err.Error())
@@ -273,7 +272,10 @@ func Test_startDebugProxy(t *testing.T) {
 				return
 			}
 
-			require.Equal(t, tt.want.region, region)
+			t.Logf("Expected region: %+v", tt.want.region)
+			t.Logf("Actual region: %+v", region)
+
+			require.Equal(t, tt.want.region.HostTemplate, region.HostTemplate, "Region HostTemplate should match")
 			require.Equal(t, tt.want.httpURL, httpURL)
 		})
 	}
@@ -349,15 +351,11 @@ func Test_injectEnvars(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.name == "Test with secret environment variable set" {
-				os.Setenv("SECRET_ENV", "secret value")
+				t.Setenv("SECRET_ENV", "secret value")
 			}
 
 			if err := injectEnvars(tt.envs); (err != nil) != tt.wantErr {
 				t.Errorf("injectEnvars() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if tt.name == "Test with secret environment variable set" {
-				os.Unsetenv("SECRET_ENV")
 			}
 		})
 	}

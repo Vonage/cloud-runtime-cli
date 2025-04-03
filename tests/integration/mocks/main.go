@@ -10,10 +10,10 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/v0.3/packages/source", uploadTgzHandler)
-	http.HandleFunc("/v0.3/packages", createPackageHandler)
-	http.HandleFunc("/v0.3/packages/test-package-id/build/watch", watchDeploymentHandler)
-	http.HandleFunc("/v0.3/deployments", deployInstanceHandler)
+	http.HandleFunc("/v0.4/packages/source", uploadTgzHandler)
+	http.HandleFunc("/v0.4/packages", createPackageHandler)
+	http.HandleFunc("/v0.4/packages/test-package-id/build/watch", watchDeploymentHandler)
+	http.HandleFunc("/v0.4/deployments", deployInstanceHandler)
 	http.HandleFunc("/releases/latest", getLatestReleaseHandler)
 
 	fmt.Println("Server started on port 80")

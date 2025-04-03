@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/MakeNowJust/heredoc"
-	"github.com/cli/cli/v2/utils"
+	"github.com/cli/go-gh/v2/pkg/tableprinter"
 	"github.com/spf13/cobra"
 
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
@@ -34,7 +34,7 @@ func NewCmdAppList(f cmdutil.Factory) *cobra.Command {
 		Aliases: []string{"ls"},
 		Args:    cobra.MaximumNArgs(0),
 
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
 			defer cancel()
 
@@ -57,8 +57,8 @@ func runList(ctx context.Context, opts *Options) error {
 	if err != nil {
 		return fmt.Errorf("failed to list Vonage applications: %w", err)
 	}
-	//nolint
-	tp := utils.NewTablePrinter(io)
+
+	tp := tableprinter.New(io.Out, io.IsStdoutTTY(), 0)
 	tp.AddField(c.Bold("ID"), nil, nil)
 	tp.AddField(c.Bold("Name"), nil, nil)
 	tp.EndRow()

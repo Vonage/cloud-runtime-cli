@@ -23,10 +23,12 @@ var (
 )
 
 const (
-	operationExecuteWS       = "websocket"
-	operationExecuteRequest  = "execute"
-	operationExecuteResponse = "execute-response"
-	operationExecuteRemote   = "execute-remote"
+	operationExecuteWS        = "websocket"
+	operationExecuteRequest   = "execute"
+	operationExecuteResponse  = "execute-response"
+	operationExecuteRemote    = "execute-remote"
+	streamBufferSize          = 100
+	internalServerErrorStatus = 500
 )
 
 type websocketRequestMessage struct {
@@ -87,9 +89,9 @@ func NewDebuggerConnectionClient(websocketServerURL, proxyWebsocketServerURL, lo
 		proxyWebsocketServerURL: proxyWebsocketServerURL,
 		websocketServerURL:      websocketServerURL,
 		localAppHost:            localAppHost,
-		writeRemoteReqStream:    make(chan remoteRequestStreamEvent, 100),
+		writeRemoteReqStream:    make(chan remoteRequestStreamEvent, streamBufferSize),
 		remoteResponseChannels:  make(map[string]chan websocketResponseMessage),
-		httpClient: &http.Client{CheckRedirect: func(req *http.Request, via []*http.Request) error {
+		httpClient: &http.Client{CheckRedirect: func(_ *http.Request, _ []*http.Request) error {
 			return http.ErrUseLastResponse // this will prevent redirects
 		}},
 		done: make(chan struct{}),
@@ -103,7 +105,7 @@ func (c *DebuggerConnectionClient) run() error {
 	}
 
 	errStream := make(chan error, 1)
-	writeRespStream := make(chan websocketResponseMessage, 100)
+	writeRespStream := make(chan websocketResponseMessage, streamBufferSize)
 
 	go func() {
 		for {
@@ -278,7 +280,7 @@ func (c *DebuggerConnectionClient) connectWSWithRetry(url string, id string, hea
 }
 
 func (c *DebuggerConnectionClient) connectWS(url string, id string, headers http.Header) (*websocket.Conn, error) {
-	headers.Add("X-Connection-ID", id)
+	headers.Add("X-Connection-Id", id)
 	newConn, resp, err := websocket.DefaultDialer.Dial(url, headers)
 	if err != nil {
 		if resp != nil {
@@ -500,7 +502,7 @@ func newErrorResponse(err error, id string) websocketResponseMessage {
 	return websocketResponseMessage{
 		ID:        id,
 		Operation: operationExecuteResponse,
-		Status:    500,
+		Status:    internalServerErrorStatus,
 		Payload:   []byte(fmt.Sprintf("failed to call local app: %s", err)),
 	}
 }

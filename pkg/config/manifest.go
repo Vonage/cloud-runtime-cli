@@ -180,6 +180,9 @@ func FindTemplateManifestFile(path string) (string, error) {
 	return mostRecentFile, nil
 }
 
+// DefaultFilePermission defines the default permission for manifest files
+const DefaultFilePermission = 0644
+
 // WriteManifest writes the manifest to the given path.
 func WriteManifest(path string, manifest *Manifest) error {
 	file, err := yaml.Marshal(manifest)
@@ -187,7 +190,7 @@ func WriteManifest(path string, manifest *Manifest) error {
 		return err
 	}
 
-	err = os.WriteFile(path, file, 0644)
+	err = os.WriteFile(path, file, DefaultFilePermission)
 	if err != nil {
 		return err
 	}

@@ -25,10 +25,10 @@ jobs:
   build-and-test:
     runs-on: macos-latest
     env:
-      API_VERSION: ${{ vars.API_VERSION }}
+      API_VERSION: ${{ vars.API_VERSION || 'v0.4' }}
     strategy:
       matrix:
-        go-version: [1.21.1]
+        go-version: [1.24.0]
         os: [macos-latest]
     environment: vcr-cli
     steps:
