@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/MakeNowJust/heredoc"
-	"github.com/cli/go-gh/v2/pkg/tableprinter"
+	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
@@ -49,7 +49,6 @@ func NewCmdAppList(f cmdutil.Factory) *cobra.Command {
 
 func runList(ctx context.Context, opts *Options) error {
 	io := opts.IOStreams()
-	c := io.ColorScheme()
 
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Fetching applications list...")
 	apps, err := opts.DeploymentClient().ListVonageApplications(ctx, opts.Filter)
@@ -58,18 +57,14 @@ func runList(ctx context.Context, opts *Options) error {
 		return fmt.Errorf("failed to list Vonage applications: %w", err)
 	}
 
-	tp := tableprinter.New(io.Out, io.IsStdoutTTY(), 0)
-	tp.AddField(c.Bold("ID"), nil, nil)
-	tp.AddField(c.Bold("Name"), nil, nil)
-	tp.EndRow()
+	table := tablewriter.NewWriter(io.Out)
+	table.SetHeader([]string{"ID", "Name"})
+
 	for _, app := range apps.Applications {
-		tp.AddField(app.ID, nil, nil)
-		tp.AddField(app.Name, nil, nil)
-		tp.EndRow()
+		table.Append([]string{app.ID, app.Name})
 	}
 
-	if err := tp.Render(); err != nil {
-		return fmt.Errorf("error rending applications list: %w", err)
-	}
+	// Render the table
+	table.Render()
 	return nil
 }
