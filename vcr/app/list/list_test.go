@@ -76,9 +76,12 @@ func TestAppList(t *testing.T) {
 			},
 			want: want{
 				stdout: heredoc.Doc(`
-					ID	Name
-					1	App One
-					2	App Two
+					+----+---------+
+					| ID |  NAME   |
+					+----+---------+
+					|  1 | App One |
+					|  2 | App Two |
+					+----+---------+
 				`),
 			},
 		},
@@ -93,7 +96,10 @@ func TestAppList(t *testing.T) {
 			},
 			want: want{
 				stdout: heredoc.Doc(`
-					ID	Name
+					+----+------+
+					| ID | NAME |
+					+----+------+
+					+----+------+
 				`),
 			},
 		},
@@ -108,7 +114,10 @@ func TestAppList(t *testing.T) {
 			},
 			want: want{
 				stdout: heredoc.Doc(`
-					ID	Name
+					+----+------+
+					| ID | NAME |
+					+----+------+
+					+----+------+
 				`),
 			},
 		},

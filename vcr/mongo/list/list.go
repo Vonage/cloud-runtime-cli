@@ -6,7 +6,7 @@ import (
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
 
 	"github.com/MakeNowJust/heredoc"
-	"github.com/cli/cli/v2/utils"
+	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 )
 
@@ -56,18 +56,14 @@ func runList(ctx context.Context, opts *Options) error {
 		return nil
 	}
 
-	//nolint
-	tp := utils.NewTablePrinter(io)
-	tp.AddField(c.Bold("Database"), nil, nil)
-	tp.EndRow()
+	table := tablewriter.NewWriter(io.Out)
+	table.SetHeader([]string{"Database"})
+
 	for _, db := range result {
-		tp.AddField(db, nil, nil)
-		tp.EndRow()
+		table.Append([]string{db})
 	}
 
-	if err := tp.Render(); err != nil {
-		return fmt.Errorf("error rending databases: %w", err)
-	}
+	table.Render()
 
 	return nil
 }
