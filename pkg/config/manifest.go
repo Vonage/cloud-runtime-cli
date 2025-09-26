@@ -45,16 +45,17 @@ type Scaling struct {
 }
 
 type Instance struct {
-	Name          string   `yaml:"name"`
-	Runtime       string   `yaml:"runtime,omitempty"`
-	Region        string   `yaml:"region,omitempty"`
-	ApplicationID string   `yaml:"application-id,omitempty"`
-	Environment   []Env    `yaml:"environment,omitempty"`
-	Capabilities  []string `yaml:"capabilities,omitempty"`
-	Entrypoint    []string `yaml:"entrypoint,omitempty"`
-	Domains       []string `yaml:"domains,omitempty"`
-	BuildScript   string   `yaml:"build-script,omitempty"`
-	Scaling       Scaling  `yaml:"scaling,omitempty"`
+	Name          string            `yaml:"name"`
+	Runtime       string            `yaml:"runtime,omitempty"`
+	Region        string            `yaml:"region,omitempty"`
+	ApplicationID string            `yaml:"application-id,omitempty"`
+	Environment   []Env             `yaml:"environment,omitempty"`
+	Capabilities  []string          `yaml:"capabilities,omitempty"`
+	Entrypoint    []string          `yaml:"entrypoint,omitempty"`
+	Domains       []string          `yaml:"domains,omitempty"`
+	BuildScript   string            `yaml:"build-script,omitempty"`
+	Scaling       Scaling           `yaml:"scaling,omitempty"`
+	PathAccess    map[string]string `yaml:"path-access,omitempty"`
 }
 
 type Debug struct {

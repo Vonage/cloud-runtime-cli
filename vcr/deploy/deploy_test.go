@@ -172,6 +172,64 @@ func TestDeploy(t *testing.T) {
 				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n✓ Source code uploaded.\n✓ Package created: package_id=\"test-package-id\"\nℹ Waiting for build to start...\n✓ Package \"test-package-id\" built successfully\n/-------\n| Instance has been deployed!\n| Instance id: test-instance-id\n| Instance service name: test-service-name\n| Instance host address: \x1b[0;1;33mtest-host-url\x1b[0m\n\\-------\n",
 			},
 		},
+		{
+			name: "happy-path-with-path-access",
+			cli:  "testdata/ -f testdata/vcr-with-pathaccess.yaml",
+			mock: mock{
+
+				DeployAPIKey:              testutil.DefaultAPIKey,
+				DeployGetProjectProjName:  "test",
+				DeployGetProjectTimes:     1,
+				DeployReturnProject:       api.Project{ID: "id", Name: "test-project"},
+				DeployGetProjectReturnErr: nil,
+
+				DeployReadUploadTgzTimes:       0,
+				DeployReturnReadUploadResponse: api.UploadResponse{SourceCodeKey: "test-key"},
+				DeployReadUploadTgzReturnErr:   nil,
+
+				DeployUploadTgzTimes:       1,
+				DeployReturnUploadResponse: api.UploadResponse{SourceCodeKey: "test-key"},
+				DeployUploadTgzReturnErr:   nil,
+
+				DeployCreatePackageArgs: api.CreatePackageArgs{
+					SourceCodeKey:   "test-key",
+					Entrypoint:      []string{"node", "index.js"},
+					BuildScriptPath: "",
+					Capabilities:    api.Capabilities{Messages: "v1"},
+					Runtime:         "nodejs16",
+				},
+				DeployCreatePackageTimes:          1,
+				DeployReturnCreatePackageResponse: api.CreatePackageResponse{PackageID: "test-package-id"},
+				DeployCreatePackageReturnErr:      nil,
+
+				DeployWatchDeploymentPackageID: "test-package-id",
+				DeployWatchDeploymentTimes:     1,
+				DeployWatchDeploymentReturnErr: nil,
+
+				DeployDeployInstanceArgs: api.DeployInstanceArgs{
+					ProjectID:        "id",
+					PackageID:        "test-package-id",
+					APIApplicationID: "0f39f387-579b-4259-9f76-2715ff73b8b7",
+					InstanceName:     "dev",
+					Region:           "eu-west-1",
+					Environment:      []config.Env{{Name: "test-env-name", Value: "test-env-value"}},
+					Domains:          nil,
+					MinScale:         0,
+					MaxScale:         0,
+					PathAccess: map[string]string{
+						"/api/v1": "read",
+						"/admin":  "write",
+						"/public": "read-write",
+					},
+				},
+				DeployDeployInstanceTimes:          1,
+				DeployReturnDeployInstanceResponse: api.DeployInstanceResponse{InstanceID: "test-instance-id", ServiceName: "test-service-name", DeploymentID: "test-deployment-id", HostURLs: []string{"test-host-url"}},
+				DeployDeployInstanceReturnErr:      nil,
+			},
+			want: want{
+				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n✓ Source code uploaded.\n✓ Package created: package_id=\"test-package-id\"\nℹ Waiting for build to start...\n✓ Package \"test-package-id\" built successfully\n/-------\n| Instance has been deployed!\n| Instance id: test-instance-id\n| Instance service name: test-service-name\n| Instance host address: \x1b[0;1;33mtest-host-url\x1b[0m\n\\-------\n",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

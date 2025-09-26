@@ -456,6 +456,7 @@ func Deploy(ctx context.Context, opts *Options, createPkgResp api.CreatePackageR
 		Domains:          opts.manifest.Instance.Domains,
 		MinScale:         opts.manifest.Instance.Scaling.MinScale,
 		MaxScale:         opts.manifest.Instance.Scaling.MaxScale,
+		PathAccess:       opts.manifest.Instance.PathAccess,
 	}
 	deploymentResponse, err := opts.DeploymentClient().DeployInstance(ctx, deployInstanceArgs)
 	spinner.Stop()
