@@ -127,8 +127,7 @@ main() {
 
   for user_path in $(echo $user_local_paths | tr ':' '\n'); do
     if mkdir -p "$user_path" 2>/dev/null && mv "$tmp_dir/${vcr_binary}" "$user_path/vcr" 2>/dev/null; then
-      echo "vcr was installed successfully to $user_path/vcr"
-      echo "Run 'vcr --help' to get started"
+      echo "vcr was installed successfully to $user_path"
 
       # Check if the path is already in PATH
       if ! echo "$PATH" | grep -q "$user_path"; then
@@ -140,6 +139,10 @@ main() {
         echo "⚠️  Warning: $user_path is not in your \$PATH"
         echo "Add the following to your \$HOME/$shell_profile:"
         echo "  export PATH=\"$user_path:\$PATH\""
+        echo ""
+        echo "Then you can run: vcr --help"
+      else
+        echo "Run 'vcr --help' to get started"
       fi
       exit 0
     fi
