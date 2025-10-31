@@ -125,12 +125,13 @@ main() {
   # If system-wide fails, try user-local directories
   user_local_paths="$HOME/.local/bin:$HOME/bin:$HOME/.vcr/bin"
 
-  for user_path in $(echo $user_local_paths | tr ':' '\n'); do
+  IFS=':' read -ra paths <<< "$user_local_paths"
+  for user_path in "${paths[@]}"; do
     if mkdir -p "$user_path" 2>/dev/null && mv "$tmp_dir/${vcr_binary}" "$user_path/vcr" 2>/dev/null; then
       echo "vcr was installed successfully to $user_path"
 
       # Check if the path is already in PATH
-      if ! echo "$PATH" | grep -q "$user_path"; then
+      if ! echo ":$PATH:" | grep -q ":$user_path:"; then
         case $SHELL in
         /bin/zsh) shell_profile=".zshrc" ;;
         *) shell_profile=".bash_profile" ;;
