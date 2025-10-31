@@ -122,32 +122,43 @@ main() {
     exit 0
   fi
 
-  # If system-wide fails, try user-local directories
-  user_local_paths="$HOME/.local/bin:$HOME/bin:$HOME/.vcr/bin"
+  # If system-wide fails, try directories from PATH with write permissions
+  for user_path in $(echo "$PATH" | tr ':' '\n'); do
+    # Skip system paths and empty entries
+    if [ -z "$user_path" ] || [ "$user_path" = "/usr/local/bin" ] || [ "$user_path" = "/usr/bin" ] || [ "$user_path" = "/bin" ] || [ "$user_path" = "/usr/sbin" ] || [ "$user_path" = "/sbin" ]; then
+      continue
+    fi
 
-  for user_path in $(echo $user_local_paths | tr ':' '\n'); do
+    # Try to create the directory if it doesn't exist and move the binary
     if mkdir -p "$user_path" 2>/dev/null && mv "$tmp_dir/${vcr_binary}" "$user_path/vcr" 2>/dev/null; then
-      echo "vcr was installed successfully to $user_path/vcr"
-      echo "Run '$user_path/vcr --help' to get started"
+      echo "vcr was installed successfully to $user_path"
+      echo "Run 'vcr --help' to get started"
+      exit 0
+    fi
+  done
 
-      # Check if the path is already in PATH
-      if ! echo "$PATH" | grep -q "$user_path"; then
-        case $SHELL in
-        /bin/zsh) shell_profile=".zshrc" ;;
-        *) shell_profile=".bash_profile" ;;
-        esac
-        echo ""
-        echo "⚠️  Warning: $user_path is not in your \$PATH"
-        echo "Add the following to your \$HOME/$shell_profile:"
-        echo "  export PATH=\"$user_path:\$PATH\""
-      fi
+  # If all installations failed, try to create and use user-local fallback directories
+  fallback_paths="$HOME/.local/bin:$HOME/bin:$HOME/.vcr/bin"
+  for fallback_path in $(echo "$fallback_paths" | tr ':' '\n'); do
+    if mkdir -p "$fallback_path" 2>/dev/null && mv "$tmp_dir/${vcr_binary}" "$fallback_path/vcr" 2>/dev/null; then
+      echo "vcr was installed successfully to $fallback_path/vcr"
+      echo "Run '$fallback_path/vcr --help' to get started"
+
+      case $SHELL in
+      /bin/zsh) shell_profile=".zshrc" ;;
+      *) shell_profile=".bash_profile" ;;
+      esac
+      echo ""
+      echo "⚠️  Warning: $fallback_path is not in your \$PATH"
+      echo "Add the following to your \$HOME/$shell_profile:"
+      echo "  export PATH=\"$fallback_path:\$PATH\""
       exit 0
     fi
   done
 
   # If all installations failed
   echo "Error: Unable to install vcr to any writable location" 1>&2
-  echo "Tried: $sys_exe, $user_local_paths" 1>&2
+  echo "Tried: $sys_exe and all writable directories in \$PATH" 1>&2
   echo "Please try one of the following:" 1>&2
   echo "  1. Run with sudo: sudo $0" 1>&2
   echo "  2. Use -o flag to specify a writable directory: $0 -o /path/to/dir" 1>&2
