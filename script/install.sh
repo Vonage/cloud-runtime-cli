@@ -128,7 +128,7 @@ main() {
   for user_path in $(echo $user_local_paths | tr ':' '\n'); do
     if mkdir -p "$user_path" 2>/dev/null && mv "$tmp_dir/${vcr_binary}" "$user_path/vcr" 2>/dev/null; then
       echo "vcr was installed successfully to $user_path/vcr"
-      echo "Run '$user_path/vcr --help' to get started"
+      echo "Run 'vcr --help' to get started"
 
       # Check if the path is already in PATH
       if ! echo "$PATH" | grep -q "$user_path"; then
