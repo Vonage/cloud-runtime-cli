@@ -49,25 +49,7 @@ jobs:
           brew install lima
           brew install qemu
           
-          # Download and install the required guest agent binary
-          LIMA_VERSION=$(brew list --versions lima | awk '{print $2}' | head -n1)
-          if [ -z "$LIMA_VERSION" ]; then
-            LIMA_VERSION="0.24.2" # fallback to stable version
-          fi
-          
-          # Download binary if not present
-          if [ ! -f /opt/homebrew/share/lima/lima-guestagent.Linux-x86_64 ]; then
-            sudo mkdir -p /opt/homebrew/share/lima
-            DOWNLOAD_URL="https://github.com/lima-vm/lima/releases/download/v${LIMA_VERSION}/lima-guestagent.Linux-x86_64.gz"
-            if ! sudo bash -c "curl -fL --output /tmp/lima-guestagent.Linux-x86_64.gz '${DOWNLOAD_URL}'"; then
-              DOWNLOAD_URL="https://github.com/lima-vm/lima/releases/latest/download/lima-guestagent.Linux-x86_64.gz"
-              sudo bash -c "curl -fL --output /tmp/lima-guestagent.Linux-x86_64.gz '${DOWNLOAD_URL}'"
-            fi
-            sudo bash -c "gunzip -c /tmp/lima-guestagent.Linux-x86_64.gz > /opt/homebrew/share/lima/lima-guestagent.Linux-x86_64"
-            sudo chmod +x /opt/homebrew/share/lima/lima-guestagent.Linux-x86_64
-            rm /tmp/lima-guestagent.Linux-x86_64.gz
-          fi
-          
+          # Start colima with docker support
           colima start
           sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
 
