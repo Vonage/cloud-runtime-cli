@@ -97,6 +97,7 @@ main() {
 	rm "$tmp_dir/${vcr_binary}.tar.gz"
 	cp "$tmp_dir/${vcr_binary}" "$exe"
 
+  # If custom path is provided, use it
   if [ -n "$path" ]; then
     if mv "$tmp_dir/${vcr_binary}" "$path/vcr"; then
       echo "vcr was installed successfully to $path/vcr"
@@ -112,17 +113,45 @@ main() {
     else
       exit 1
     fi
-
   fi
 
-	if mv "$tmp_dir/${vcr_binary}" "$sys_exe"; then
+  # Try to install to system-wide location first
+	if mv "$tmp_dir/${vcr_binary}" "$sys_exe" 2>/dev/null; then
     echo "vcr was installed successfully to $sys_exe"
     echo "Run 'vcr --help' to get started"
     exit 0
-  else
-    echo "Error encountered when moving ${vcr_binary} to $sys_exe , please try to run with sudo"
-    echo "Or use the -o flag to specify a directory where you have write permissions, for more information run with -h"
-    exit 1
   fi
+
+  # If system-wide fails, try user-local directories
+  user_local_paths="$HOME/.local/bin:$HOME/bin:$HOME/.vcr/bin"
+
+  for user_path in $(echo $user_local_paths | tr ':' '\n'); do
+    if mkdir -p "$user_path" 2>/dev/null && mv "$tmp_dir/${vcr_binary}" "$user_path/vcr" 2>/dev/null; then
+      echo "vcr was installed successfully to $user_path/vcr"
+      echo "Run '$user_path/vcr --help' to get started"
+
+      # Check if the path is already in PATH
+      if ! echo "$PATH" | grep -q "$user_path"; then
+        case $SHELL in
+        /bin/zsh) shell_profile=".zshrc" ;;
+        *) shell_profile=".bash_profile" ;;
+        esac
+        echo ""
+        echo "⚠️  Warning: $user_path is not in your \$PATH"
+        echo "Add the following to your \$HOME/$shell_profile:"
+        echo "  export PATH=\"$user_path:\$PATH\""
+      fi
+      exit 0
+    fi
+  done
+
+  # If all installations failed
+  echo "Error: Unable to install vcr to any writable location" 1>&2
+  echo "Tried: $sys_exe, $user_local_paths" 1>&2
+  echo "Please try one of the following:" 1>&2
+  echo "  1. Run with sudo: sudo $0" 1>&2
+  echo "  2. Use -o flag to specify a writable directory: $0 -o /path/to/dir" 1>&2
+  echo "For more information, run: $0 -h" 1>&2
+  exit 1
 }
 main "$1"
