@@ -46,7 +46,7 @@ jobs:
           sudo mkdir -p /usr/local/bin 
           sudo curl -L -o /usr/local/bin/colima https://github.com/abiosoft/colima/releases/download/v0.6.7/colima-Darwin-x86_64 && sudo chmod +x /usr/local/bin/colima
           # Install Lima and QEMU
-          brew install lima
+          brew install lima lima-additional-guestagents
           brew install qemu
           
           # Start colima with docker support
