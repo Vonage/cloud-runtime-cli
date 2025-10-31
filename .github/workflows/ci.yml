@@ -45,8 +45,26 @@ jobs:
           brew install docker docker-machine docker-compose
           sudo mkdir -p /usr/local/bin 
           sudo curl -L -o /usr/local/bin/colima https://github.com/abiosoft/colima/releases/download/v0.6.7/colima-Darwin-x86_64 && sudo chmod +x /usr/local/bin/colima
+          # Install Lima and QEMU as you have been doing
           brew install lima
           brew install qemu
+          
+          # Download and install the required guest agent binary
+          LIMA_VERSION=$(brew list --versions lima | awk '{print $2}' | head -n1)
+          if [ -z "$LIMA_VERSION" ]; then
+            LIMA_VERSION="latest" # fallback
+          fi
+          
+          # Download binary if not present
+          if [ ! -f /opt/homebrew/share/lima/lima-guestagent.Linux-x86_64 ]; then
+            sudo mkdir -p /opt/homebrew/share/lima
+            curl -L -o lima-guestagent.Linux-x86_64.gz https://github.com/lima-vm/lima/releases/download/v${LIMA_VERSION}/lima-guestagent.Linux-x86_64.gz || \
+              curl -L -o lima-guestagent.Linux-x86_64.gz https://github.com/lima-vm/lima/releases/latest/download/lima-guestagent.Linux-x86_64.gz
+            gunzip lima-guestagent.Linux-x86_64.gz
+            sudo mv lima-guestagent.Linux-x86_64 /opt/homebrew/share/lima/lima-guestagent.Linux-x86_64
+            sudo chmod +x /opt/homebrew/share/lima/lima-guestagent.Linux-x86_64
+          fi
+          
           colima start
           sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
 
