@@ -1,7 +1,9 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -783,6 +785,69 @@ func TestDeployInstance(t *testing.T) {
 			httpmock.Reset()
 		})
 	}
+}
+
+func TestDeployInstanceWithPathAccess(t *testing.T) {
+	client := resty.New()
+	httpmock.ActivateNonDefault(client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	var capturedRequestBody []byte
+
+	httpmock.RegisterResponder("POST", "https://example.com/v0.3/deployments",
+		func(req *http.Request) (*http.Response, error) {
+			// Capture the request body for validation
+			body, _ := io.ReadAll(req.Body)
+			capturedRequestBody = body
+
+			resp := httpmock.NewStringResponse(http.StatusOK, `{"instanceId":"test-instance-id","serviceName":"test-service","deploymentId":"test-deployment-id","hostUrls":["https://test.example.com"]}`)
+			resp.Header.Set("Content-Type", "application/json")
+			return resp, nil
+		})
+
+	deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
+
+	deployInstanceArgs := DeployInstanceArgs{
+		PackageID:        "test-package-id",
+		ProjectID:        "test-project-id",
+		APIApplicationID: "test-app-id",
+		InstanceName:     "test-instance",
+		Region:           "test-region",
+		PathAccess: map[string]string{
+			"/api/v1": "read",
+			"/admin":  "write",
+			"/public": "read-write",
+		},
+	}
+
+	output, err := deploymentClient.DeployInstance(t.Context(), deployInstanceArgs)
+
+	require.NoError(t, err)
+	require.Equal(t, "test-instance-id", output.InstanceID)
+	require.Equal(t, "test-service", output.ServiceName)
+	require.Equal(t, "test-deployment-id", output.DeploymentID)
+	require.Equal(t, []string{"https://test.example.com"}, output.HostURLs)
+
+	// Validate that the request body contains the PathAccess field
+	require.NotEmpty(t, capturedRequestBody, "Request body should not be empty")
+
+	// Parse the captured request body to verify PathAccess is included
+	var requestPayload map[string]interface{}
+	err = json.Unmarshal(capturedRequestBody, &requestPayload)
+	require.NoError(t, err, "Should be able to parse request body as JSON")
+
+	// Check that pathAccess field is present and correct
+	pathAccess, exists := requestPayload["pathAccess"]
+	require.True(t, exists, "pathAccess field should be present in request body")
+
+	pathAccessMap, ok := pathAccess.(map[string]interface{})
+	require.True(t, ok, "pathAccess should be a map")
+
+	require.Equal(t, "read", pathAccessMap["/api/v1"])
+	require.Equal(t, "write", pathAccessMap["/admin"])
+	require.Equal(t, "read-write", pathAccessMap["/public"])
+
+	httpmock.Reset()
 }
 
 func TestDeleteInstance(t *testing.T) {

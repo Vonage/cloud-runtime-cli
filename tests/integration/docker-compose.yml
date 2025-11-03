@@ -8,6 +8,11 @@ services:
       POSTGRES_PASSWORD: password
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   graphql-engine:
     build:
@@ -17,12 +22,18 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - "postgres"
+      postgres:
+        condition: service_healthy
     environment:
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:password@postgres:5432/postgres
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, query-log, http-log, websocket-log, webhook-log
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mockserver:
     build:
@@ -36,5 +47,7 @@ services:
       context: ../..
       dockerfile: tests/integration/Dockerfile-clitool
     depends_on:
-      - "mockserver"
-      - "graphql-engine"
+      mockserver:
+        condition: service_started
+      graphql-engine:
+        condition: service_healthy

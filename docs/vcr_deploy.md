@@ -26,6 +26,11 @@ instance:
 	entrypoint:
 		- node
 		- index.js
+	path-access:
+		"/api/public": "public"
+		"/api/admin": "private"
+		"/v1/users/*/profile": "public"
+		"/v1/internal/**": "private"
 debug:
 	name: debug
 	application-id: 0dcbb945-cf09-4756-808a-e1873228f802
@@ -40,6 +45,29 @@ By default, the CLI will look for a deployment manifest in the root of the code 
 Flags can be used to override the mandatory fields, ie project name, instance name, runtime, region and application ID.
 
 The project will be created if it does not already exist.
+
+#### Path Access Configuration
+
+The `path-access` configuration allows you to control access to specific paths in your application:
+
+- **public**: Allows public access to reach those paths
+- **private**: Returns forbidden for those paths
+
+**Default Behavior:**
+If no `path-access` field is specified in your manifest, all endpoints will default to public access.
+
+**Wildcard Support:**
+- Use `*` to match a single path segment: `/v1/users/*/settings`
+- Use `**` to match multiple path segments: `/v1/**`
+
+**Examples:**
+```yaml
+path-access:
+  "/api/health": "public"           # Public health check endpoint
+  "/api/admin": "private"           # Private admin interface
+  "/v1/users/*/profile": "public"   # Public user profiles (wildcard)
+  "/v1/internal/**": "private"      # All internal APIs (recursive wildcard)
+```
 
 
 ```
