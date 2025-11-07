@@ -125,26 +125,33 @@ main() {
   # If system-wide fails, try user-local directories
   user_local_paths="$HOME/.local/bin:$HOME/bin:$HOME/.vcr/bin"
 
-  IFS=':' read -ra paths <<< "$user_local_paths"
-  for user_path in "${paths[@]}"; do
+  oldIFS=$IFS
+  IFS=:
+  set -- $user_local_paths
+  IFS=$oldIFS
+
+  for user_path do
     if mkdir -p "$user_path" 2>/dev/null && mv "$tmp_dir/${vcr_binary}" "$user_path/vcr" 2>/dev/null; then
       echo "vcr was installed successfully to $user_path"
 
       # Check if the path is already in PATH
-      if ! echo ":$PATH:" | grep -q ":$user_path:"; then
-        case $SHELL in
-        /bin/zsh) shell_profile=".zshrc" ;;
-        *) shell_profile=".bash_profile" ;;
-        esac
-        echo ""
-        echo "⚠️  Warning: $user_path is not in your \$PATH"
-        echo "Add the following to your \$HOME/$shell_profile:"
-        echo "  export PATH=\"$user_path:\$PATH\""
-        echo ""
-        echo "Then you can run: vcr --help"
-      else
-        echo "Run 'vcr --help' to get started"
-      fi
+      case ":$PATH:" in
+        *":$user_path:"*)
+          echo "Run 'vcr --help' to get started"
+          ;;
+        *)
+          case $SHELL in
+            /bin/zsh) shell_profile=".zshrc" ;;
+            *)        shell_profile=".bash_profile" ;;
+          esac
+          echo ""
+          echo "⚠️  Warning: $user_path is not in your \$PATH"
+          echo "Add the following to your \$HOME/$shell_profile:"
+          echo "  export PATH=\"$user_path:\$PATH\""
+          echo ""
+          echo "Then you can run: vcr --help"
+          ;;
+      esac
       exit 0
     fi
   done
