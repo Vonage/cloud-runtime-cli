@@ -25,6 +25,8 @@ jobs:
   test-install-using-action:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Install Cloud Runtime CLI
         uses: ./action.yml
       - name: Verify installation
@@ -32,6 +34,8 @@ jobs:
   test-install-using-script:
       runs-on: ubuntu-latest
       steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
         - name: Install Cloud Runtime CLI
           shell: sh
           run: ./script/install.sh
