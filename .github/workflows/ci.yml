@@ -26,14 +26,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install Cloud Runtime CLI
-        uses: ./.github/actions/install-cloud-runtime-cli
+        uses: ./action.yml
       - name: Verify installation
         run: vcr --version
   test-install-using-script:
       runs-on: ubuntu-latest
       steps:
         - name: Install Cloud Runtime CLI
-          run: ./script/install.sh | sh
+          shell: sh
+          run: ./script/install.sh
         - name: Verify installation
           run: vcr --version
   build-and-test:
