@@ -15,9 +15,9 @@ runs:
       run: |
         VERSION="${{ inputs.version }}"
         if [ "$VERSION" == "main" ]; then
-            curl -L "https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/fix/sh_shell/script/install.sh" | sudo sh
+            curl -L "https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/script/install.sh" | sudo sh
         else
-            curl -L "https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/fix/sh_shell/script/install.sh" | sudo sh -s -- "${VERSION}"
+            curl -L "https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/script/install.sh" | sudo sh -s -- "${VERSION}"
         fi
         
         # Verify installation
