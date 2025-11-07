@@ -32,15 +32,15 @@ jobs:
       - name: Verify installation
         run: vcr --version
   test-install-using-script:
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
-        - name: Install Cloud Runtime CLI
-          shell: sh
-          run: ./script/install.sh
-        - name: Verify installation
-          run: vcr --version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install Cloud Runtime CLI
+        shell: sh
+        run: ./script/install.sh
+      - name: Verify installation
+        run: vcr --version
   build-and-test:
     runs-on: macos-latest
     env:
