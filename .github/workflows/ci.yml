@@ -28,7 +28,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Install Cloud Runtime CLI
-        uses: ./action.yml
+        uses: ./
       - name: Verify installation
         run: vcr --version
   test-install-using-script:
