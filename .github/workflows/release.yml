@@ -7,7 +7,7 @@ on:
 permissions:
   actions: write
   checks: write
-  contents: read
+  contents: write
   deployments: read
   issues: write
   discussions: write
@@ -22,7 +22,6 @@ jobs:
     runs-on: macos-latest
     env:
       API_VERSION: ${{ vars.API_VERSION }}
-      TOKEN: ${{ secrets.ACCESS_TOKEN }}
     strategy:
       matrix:
         go-version: [1.24.0]
@@ -114,9 +113,9 @@ jobs:
           tar czf bin/vcr_windows_amd64.tar.gz ./vcr_windows_amd64.exe
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          token: ${{ env.TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             bin/vcr_darwin_amd64.tar.gz
             bin/vcr_darwin_arm64.tar.gz
