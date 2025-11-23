@@ -56,9 +56,9 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 		Long: heredoc.Doc(`Deploy a VCR application.
 
 			This command will package up the local client app code and deploy it to the VCR platform.
-			
+
 			A deployment manifest should be provided so that the CLI knows how to deploy your application. An example manifest would look like:
-			
+
 			project:
 				name: booking-app
 			instance:
@@ -75,6 +75,11 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 				entrypoint:
 					- node
 					- index.js
+				security:
+					access: private
+					override:
+						- path: "/api/public"
+						  access: public
 			debug:
 				name: debug
 				application-id: 0dcbb945-cf09-4756-808a-e1873228f802
@@ -84,10 +89,10 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 				entrypoint:
 					- node
 					- index.js
-			
+
 			By default, the CLI will look for a deployment manifest in the root of the code directory under the name 'vcr.yml'.
 			Flags can be used to override the mandatory fields, ie project name, instance name, runtime, region and application ID.
-			
+
 			The project will be created if it does not already exist.
 		`),
 		Args: cobra.MaximumNArgs(1),
@@ -456,7 +461,7 @@ func Deploy(ctx context.Context, opts *Options, createPkgResp api.CreatePackageR
 		Domains:          opts.manifest.Instance.Domains,
 		MinScale:         opts.manifest.Instance.Scaling.MinScale,
 		MaxScale:         opts.manifest.Instance.Scaling.MaxScale,
-		PathAccess:       opts.manifest.Instance.PathAccess,
+		Security:         opts.manifest.Instance.Security,
 	}
 	deploymentResponse, err := opts.DeploymentClient().DeployInstance(ctx, deployInstanceArgs)
 	spinner.Stop()

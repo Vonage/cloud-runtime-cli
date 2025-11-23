@@ -173,8 +173,8 @@ func TestDeploy(t *testing.T) {
 			},
 		},
 		{
-			name: "happy-path-with-path-access",
-			cli:  "testdata/ -f testdata/vcr-with-pathaccess.yaml",
+			name: "happy-path-with-security",
+			cli:  "testdata/ -f testdata/vcr-with-security.yaml",
 			mock: mock{
 
 				DeployAPIKey:              testutil.DefaultAPIKey,
@@ -216,10 +216,13 @@ func TestDeploy(t *testing.T) {
 					Domains:          nil,
 					MinScale:         0,
 					MaxScale:         0,
-					PathAccess: map[string]string{
-						"/api/v1": "read",
-						"/admin":  "write",
-						"/public": "read-write",
+					Security: &config.Security{
+						Access: "private",
+						Overrides: []config.PathAccess{
+							{Path: "/api/v1", Access: "public"},
+							{Path: "/admin", Access: "private"},
+							{Path: "/public", Access: "public"},
+						},
 					},
 				},
 				DeployDeployInstanceTimes:          1,

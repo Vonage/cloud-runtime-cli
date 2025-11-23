@@ -787,7 +787,7 @@ func TestDeployInstance(t *testing.T) {
 	}
 }
 
-func TestDeployInstanceWithPathAccess(t *testing.T) {
+func TestDeployInstanceWithSecurity(t *testing.T) {
 	client := resty.New()
 	httpmock.ActivateNonDefault(client.GetClient())
 	defer httpmock.DeactivateAndReset()
@@ -813,10 +813,13 @@ func TestDeployInstanceWithPathAccess(t *testing.T) {
 		APIApplicationID: "test-app-id",
 		InstanceName:     "test-instance",
 		Region:           "test-region",
-		PathAccess: map[string]string{
-			"/api/v1": "read",
-			"/admin":  "write",
-			"/public": "read-write",
+		Security: &config.Security{
+			Access: "private",
+			Overrides: []config.PathAccess{
+				{Path: "/api/v1", Access: "public"},
+				{Path: "/admin", Access: "private"},
+				{Path: "/public", Access: "public"},
+			},
 		},
 	}
 
@@ -828,24 +831,29 @@ func TestDeployInstanceWithPathAccess(t *testing.T) {
 	require.Equal(t, "test-deployment-id", output.DeploymentID)
 	require.Equal(t, []string{"https://test.example.com"}, output.HostURLs)
 
-	// Validate that the request body contains the PathAccess field
+	// Validate that the request body contains the Security field
 	require.NotEmpty(t, capturedRequestBody, "Request body should not be empty")
 
-	// Parse the captured request body to verify PathAccess is included
+	// Parse the captured request body to verify Security is included
 	var requestPayload map[string]interface{}
 	err = json.Unmarshal(capturedRequestBody, &requestPayload)
 	require.NoError(t, err, "Should be able to parse request body as JSON")
 
-	// Check that pathAccess field is present and correct
-	pathAccess, exists := requestPayload["pathAccess"]
-	require.True(t, exists, "pathAccess field should be present in request body")
+	// Check that security field is present and correct
+	security, exists := requestPayload["security"]
+	require.True(t, exists, "security field should be present in request body")
 
-	pathAccessMap, ok := pathAccess.(map[string]interface{})
-	require.True(t, ok, "pathAccess should be a map")
+	securityMap, ok := security.(map[string]interface{})
+	require.True(t, ok, "security should be a map")
 
-	require.Equal(t, "read", pathAccessMap["/api/v1"])
-	require.Equal(t, "write", pathAccessMap["/admin"])
-	require.Equal(t, "read-write", pathAccessMap["/public"])
+	require.Equal(t, "private", securityMap["access"])
+
+	overrides, exists := securityMap["override"]
+	require.True(t, exists, "override field should be present")
+
+	overridesArray, ok := overrides.([]interface{})
+	require.True(t, ok, "override should be an array")
+	require.Len(t, overridesArray, 3)
 
 	httpmock.Reset()
 }
