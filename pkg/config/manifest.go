@@ -45,8 +45,8 @@ type Scaling struct {
 }
 
 type Security struct {
-	Access    string       `json:"access" yaml:"access"`
-	Overrides []PathAccess `json:"override,omitempty" yaml:"override,omitempty"`
+	Access   string       `json:"access" yaml:"access"`
+	Override []PathAccess `json:"override,omitempty" yaml:"override,omitempty"`
 }
 
 type PathAccess struct {

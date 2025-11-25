@@ -218,7 +218,7 @@ func TestDeploy(t *testing.T) {
 					MaxScale:         0,
 					Security: &config.Security{
 						Access: "private",
-						Overrides: []config.PathAccess{
+						Override: []config.PathAccess{
 							{Path: "/api/v1", Access: "public"},
 							{Path: "/admin", Access: "private"},
 							{Path: "/public", Access: "public"},

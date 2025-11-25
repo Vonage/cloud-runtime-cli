@@ -815,7 +815,7 @@ func TestDeployInstanceWithSecurity(t *testing.T) {
 		Region:           "test-region",
 		Security: &config.Security{
 			Access: "private",
-			Overrides: []config.PathAccess{
+			Override: []config.PathAccess{
 				{Path: "/api/v1", Access: "public"},
 				{Path: "/admin", Access: "private"},
 				{Path: "/public", Access: "public"},
