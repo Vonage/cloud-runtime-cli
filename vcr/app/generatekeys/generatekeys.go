@@ -22,17 +22,32 @@ func NewCmdAppGenerateKeys(f cmdutil.Factory) *cobra.Command {
 	}
 
 	cmd := &cobra.Command{
-		Use:   "generate-keys [--app-id]",
-		Short: "Generate Vonage application keys",
-		Long: heredoc.Doc(`Generate a new set of keys for the Vonage application. 
+		Use:   "generate-keys --app-id <application-id>",
+		Short: "Generate new key pairs for a Vonage application",
+		Long: heredoc.Doc(`Generate new public/private key pairs for a Vonage application.
 
-			This will regenerate the public/private key pair for the Vonage application to operate with the VCR platform.
-			If you created an app without using CLI and want to use it with VCR, generate new keys for it with this command, 
-			so that the VCR platform has access to the credentials.
+			This command regenerates the authentication keys for a Vonage application,
+			allowing the VCR platform to access the application's credentials.
+
+			WHEN TO USE THIS COMMAND
+			  • You created an application via the Vonage Dashboard (not the CLI)
+			  • You need to rotate your application's keys for security
+			  • You're troubleshooting authentication issues with VCR
+
+			WARNING: Regenerating keys will invalidate any existing private keys for this
+			application. Any services using the old keys will need to be updated.
+
+			FINDING YOUR APPLICATION ID
+			  Use 'vcr app list' to see all your applications and their IDs.
 		`),
 		Args: cobra.MaximumNArgs(0),
 		Example: heredoc.Doc(`
+			# Generate new keys for an application
 			$ vcr app generate-keys --app-id 42066b10-c4ae-48a0-addd-feb2bd615a67
+			✓ Application "42066b10-c4ae-48a0-addd-feb2bd615a67" configured with newly generated keys
+
+			# Using the short flag
+			$ vcr app generate-keys -i 42066b10-c4ae-48a0-addd-feb2bd615a67
 		`),
 		RunE: func(_ *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
@@ -42,7 +57,7 @@ func NewCmdAppGenerateKeys(f cmdutil.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.AppID, "app-id", "i", "", "Id of the application")
+	cmd.Flags().StringVarP(&opts.AppID, "app-id", "i", "", "The UUID of the Vonage application (required)")
 	_ = cmd.MarkFlagRequired("app-id")
 	return cmd
 }

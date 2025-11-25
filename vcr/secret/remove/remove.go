@@ -24,8 +24,29 @@ func NewCmdSecretRemove(f cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "remove",
 		Short: "Remove a secret",
+		Long: heredoc.Doc(`Remove a secret from your VCR account.
+
+			This command permanently deletes a secret. Any deployed instances that
+			reference this secret will fail to access the value on their next restart.
+
+			WARNING: This action is irreversible. Make sure no running instances
+			depend on this secret before removing it.
+
+			BEFORE REMOVING
+			  1. Check if any vcr.yml manifests reference this secret
+			  2. Update or redeploy affected instances first
+			  3. Then remove the secret
+		`),
 		Example: heredoc.Doc(`
-			$ vcr secret remove -n <secret_name>
+			# Remove a secret by name
+			$ vcr secret remove --name MY_API_KEY
+			✓ Secret "MY_API_KEY" successfully removed
+
+			# Using the short flag
+			$ vcr secret remove -n DATABASE_PASSWORD
+
+			# Using the 'rm' alias
+			$ vcr secret rm --name OLD_TOKEN
 		`),
 		Args:    cobra.MaximumNArgs(0),
 		Aliases: []string{"rm"},
@@ -38,7 +59,7 @@ func NewCmdSecretRemove(f cmdutil.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.Name, "name", "n", "", "The name of the secret")
+	cmd.Flags().StringVarP(&opts.Name, "name", "n", "", "Name of the secret to remove (required)")
 
 	_ = cmd.MarkFlagRequired("name")
 

@@ -52,56 +52,139 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "deploy [path_to_code]",
-		Short: `Deploy a VCR application`,
-		Long: heredoc.Doc(`Deploy a VCR application.
+		Short: "Deploy your application to Vonage Cloud Runtime",
+		Long: heredoc.Doc(`Deploy your application to Vonage Cloud Runtime.
 
-			This command will package up the local client app code and deploy it to the VCR platform.
+			This command packages your application code and deploys it to the VCR platform.
+			The deployment process includes:
+			  1. Creating/retrieving your project
+			  2. Compressing and uploading your source code
+			  3. Building your application in the cloud
+			  4. Deploying to the specified region
 
-			A deployment manifest should be provided so that the CLI knows how to deploy your application. An example manifest would look like:
+			MANIFEST FILE (vcr.yml)
+			  A manifest file defines your deployment configuration. The CLI looks for
+			  vcr.yml, vcr.yaml, neru.yml, or neru.yaml in your project directory.
 
-			project:
-				name: booking-app
-			instance:
-				name: dev
-				runtime: nodejs18
-				region: aws.euw1
-				application-id: 0dcbb945-cf09-4756-808a-e1873228f802
-				environment:
-					- name: VONAGE_NUMBER
-					  value: "12012010601"
-			    capabilities:
-					- messages-v1
-					- rtc
-				entrypoint:
-					- node
-					- index.js
-				security:
-					access: private
-					override:
-						- path: "/api/public"
-						  access: public
-			debug:
-				name: debug
-				application-id: 0dcbb945-cf09-4756-808a-e1873228f802
-				environment:
-					- name: VONAGE_NUMBER
-					  value: "12012010601"
-				entrypoint:
-					- node
-					- index.js
+			  Example manifest:
 
-			By default, the CLI will look for a deployment manifest in the root of the code directory under the name 'vcr.yml'.
-			Flags can be used to override the mandatory fields, ie project name, instance name, runtime, region and application ID.
+			  project:
+			    name: booking-app                    # Project name (lowercase, alphanumeric, hyphens)
 
-			The project will be created if it does not already exist.
+			  instance:
+			    name: dev                            # Instance name (e.g., dev, staging, prod)
+			    runtime: nodejs22                    # Runtime: nodejs22, nodejs18, python3, etc.
+			    region: aws.euw1                     # Region: aws.euw1, aws.use1, etc.
+			    application-id: <uuid>               # Vonage application UUID
+			    entrypoint:                          # Command to start your application
+			      - node
+			      - index.js
+			    environment:                         # Environment variables
+			      - name: VONAGE_NUMBER
+			        value: "12012010601"
+			      - name: API_KEY
+			        secret: MY_SECRET                # Reference a VCR secret that is created using the 'vcr secret create' command
+			    capabilities:                        # Vonage API capabilities
+			      - messages-v1
+			      - voice
+			      - rtc
+			    build-script: ./build.sh             # Optional build script
+			    domains:                             # Custom domains (optional)
+			      - api.example.com
+			    security:                            # Endpoint security
+			      access: private                    # Required: [private, public]
+			      override:
+			        - path: "/api/public"
+			          access: public                 # Override for specific paths
+					- path: "/api/users/*/settings"
+					  access: public
+
+			  debug:
+			    name: debug                          # Debug instance name
+			    application-id: <uuid>               # Separate app for debugging (optional)
+			    entrypoint:
+			      - node
+			      - --inspect
+			      - index.js
+
+			APPLICATION REQUIREMENTS
+			  Your application must meet these requirements to deploy successfully:
+
+			  1. HTTP Server on VCR_PORT
+			     Your app MUST listen for HTTP requests on the port specified by the
+			     VCR_PORT environment variable (automatically injected by VCR).
+
+			     Example (Node.js):
+			       const port = process.env.VCR_PORT || 8080;
+			       app.listen(port, () => console.log('Server running on port ' + port));
+
+			     Example (Python):
+			       port = int(os.environ.get('VCR_PORT', 8080))
+			       app.run(host='0.0.0.0', port=port)
+
+			  2. Health Check Endpoint
+			     Your app MUST expose a health check endpoint at GET /_/health that
+			     returns HTTP 200. VCR uses this to verify your app started correctly.
+
+			     Example (Node.js/Express):
+			       app.get('/_/health', (req, res) => res.status(200).send('OK'));
+
+			     Example (Python/Flask):
+			       @app.route('/_/health')
+			       def health(): return 'OK', 200
+
+			IGNORING FILES
+			  Create a .vcrignore file to exclude files from deployment (similar to .gitignore).
+			  Common exclusions: node_modules/, .git/, *.log, .env
+
+			CAPABILITIES
+			  • messages-v1  - Messages API (SMS, WhatsApp, Viber, etc.)
+			  • voice        - Voice API (phone calls, IVR)
+			  • rtc          - Real-Time Communication (in-app voice/video)
+
+			SECURITY ACCESS LEVELS
+			  • private      - Requires authentication (default)
+			  • public       - No authentication required
+
+			TROUBLESHOOTING
+			  "credential not found" error after deployment:
+			    This usually means the Vonage application keys need to be regenerated
+			    for VCR access. Run:
+			      $ vcr app generate-keys --app-id <your-app-id>
+
+			  Application fails to start:
+			    • Verify your app listens on VCR_PORT (not a hardcoded port)
+			    • Ensure GET /_/health returns HTTP 200
+			    • Check logs with: vcr instance log -p <project> -n <instance>
 		`),
 		Args: cobra.MaximumNArgs(1),
 		Example: heredoc.Doc(`
-			# Deploy code in current app directory.
-			$ vcr deploy .
-		
-			# If no arguments are provided, the code directory is assumed to be the current directory.
+			# Deploy from the current directory
 			$ vcr deploy
+
+			# Deploy from a specific directory
+			$ vcr deploy ./my-project
+
+			# Override the project name
+			$ vcr deploy --project-name my-project
+
+			# Override the instance name
+			$ vcr deploy --instance-name production
+
+			# Override the runtime
+			$ vcr deploy --runtime nodejs20
+
+			# Override the Vonage application ID
+			$ vcr deploy --app-id 12345678-1234-1234-1234-123456789abc
+
+			# Deploy a pre-compressed tarball
+			$ vcr deploy --tgz ./my-app.tar.gz
+
+			# Use a custom manifest file
+			$ vcr deploy --filename ./custom-manifest.yml
+
+			# Override capabilities
+			$ vcr deploy --capabilities "messages-v1,voice"
 		`),
 		RunE: func(_ *cobra.Command, args []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
@@ -119,13 +202,13 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.ProjectName, "project-name", "p", "", "Project name")
-	cmd.Flags().StringVarP(&opts.Runtime, "runtime", "r", "", "Set the runtime of the application")
-	cmd.Flags().StringVarP(&opts.AppID, "app-id", "i", "", "Set the id of the Vonage application you wish to link the VCR application to")
-	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "Instance name")
-	cmd.Flags().StringVarP(&opts.Capabilities, "capabilities", "c", "", "Provide the comma separated capabilities required for your application. eg: \"messaging,voice\"")
-	cmd.Flags().StringVarP(&opts.TgzFile, "tgz", "z", "", "Provide the path to the tar.gz code you wish to deploy. Code need to be compressed from root directory and include library")
-	cmd.Flags().StringVarP(&opts.ManifestFile, "filename", "f", "", "File contains the VCR manifest to apply")
+	cmd.Flags().StringVarP(&opts.ProjectName, "project-name", "p", "", "Project name (overrides manifest value)")
+	cmd.Flags().StringVarP(&opts.Runtime, "runtime", "r", "", "Runtime environment, e.g., nodejs18, nodejs20, python3 (overrides manifest)")
+	cmd.Flags().StringVarP(&opts.AppID, "app-id", "i", "", "Vonage application UUID to link with this deployment (overrides manifest)")
+	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "Instance name, e.g., dev, staging, prod (overrides manifest)")
+	cmd.Flags().StringVarP(&opts.Capabilities, "capabilities", "c", "", "Comma-separated capabilities: messages-v1,voice,rtc (overrides manifest)")
+	cmd.Flags().StringVarP(&opts.TgzFile, "tgz", "z", "", "Path to pre-compressed tar.gz file to deploy (skips local compression)")
+	cmd.Flags().StringVarP(&opts.ManifestFile, "filename", "f", "", "Path to manifest file (default: vcr.yml in project directory)")
 	return cmd
 }
 

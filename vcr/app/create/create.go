@@ -28,13 +28,38 @@ func NewCmdAppCreate(f cmdutil.Factory) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: "Create a Vonage application",
+		Short: "Create a new Vonage application",
+		Long: heredoc.Doc(`Create a new Vonage application for use with VCR.
+
+			This command creates a Vonage application with the specified capabilities enabled.
+			The application ID returned can be used in your vcr.yml manifest file to link
+			your VCR deployment with the Vonage platform.
+
+			CAPABILITIES
+			  Applications can have one or more capabilities enabled:
+			  • Voice     (-v, --voice)    - Enable Voice API for phone calls
+			  • Messages  (-m, --messages) - Enable Messages API for SMS, WhatsApp, etc.
+			  • RTC       (-r, --rtc)      - Enable Real-Time Communication for in-app voice/video
+
+			NOTE: If no capabilities are specified, the application is created without any
+			enabled capabilities. You can enable capabilities later via the Vonage Dashboard.
+		`),
 		Example: heredoc.Doc(`
-				$ vcr app create --name App
-				✓ Application created
-				ℹ id: 1
-				ℹ name: App
-				`),
+			# Create a basic application
+			$ vcr app create --name my-app
+			✓ Application created
+			ℹ id: 12345678-1234-1234-1234-123456789abc
+			ℹ name: my-app
+
+			# Create an application with Voice capability enabled
+			$ vcr app create --name voice-app --voice
+
+			# Create an application with multiple capabilities
+			$ vcr app create --name full-app --voice --messages --rtc
+
+			# Create without confirmation prompt
+			$ vcr app create --name my-app --yes
+		`),
 		Args: cobra.MaximumNArgs(0),
 		RunE: func(_ *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
@@ -44,11 +69,11 @@ func NewCmdAppCreate(f cmdutil.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.Name, "name", "n", "", "Name of the application")
-	cmd.Flags().BoolVarP(&opts.SkipPrompts, "yes", "y", false, "Skip prompts")
-	cmd.Flags().BoolVarP(&opts.EnableRTC, "rtc", "r", false, "Enable or disable RTC")
-	cmd.Flags().BoolVarP(&opts.EnableVoice, "voice", "v", false, "Enable or disable voice")
-	cmd.Flags().BoolVarP(&opts.EnableMessages, "messages", "m", false, "Enable or disable messages")
+	cmd.Flags().StringVarP(&opts.Name, "name", "n", "", "Name of the application (required)")
+	cmd.Flags().BoolVarP(&opts.SkipPrompts, "yes", "y", false, "Skip confirmation prompts")
+	cmd.Flags().BoolVarP(&opts.EnableRTC, "rtc", "r", false, "Enable RTC (Real-Time Communication) capability")
+	cmd.Flags().BoolVarP(&opts.EnableVoice, "voice", "v", false, "Enable Voice API capability")
+	cmd.Flags().BoolVarP(&opts.EnableMessages, "messages", "m", false, "Enable Messages API capability")
 
 	_ = cmd.MarkFlagRequired("name")
 
