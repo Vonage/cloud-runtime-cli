@@ -341,6 +341,9 @@ func (c *DebuggerConnectionClient) handleInboundWSRequest(data []byte) {
 		"Connection":                     {},
 		"Sec-Websocket-Key":              {},
 		"Sec-Websocket-Version":          {},
+		"Sec-Websocket-Extensions":       {}, // Dialer adds its own, prevent duplicate
+		"Sec-Websocket-Protocol":         {}, // Dialer adds its own, prevent duplicate
+		"Sec-Websocket-Accept":           {}, // Server response header, should not be forwarded
 		"User-Agent":                     {},
 		"X-Envoy-Attempt-Count":          {},
 		"X-Envoy-Expected-Rq-Timeout-Ms": {},
