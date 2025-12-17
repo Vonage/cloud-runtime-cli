@@ -13,9 +13,14 @@ instance:
     entrypoint:
         - node
         - index.js
-    path-access:
-        "/api/v1": "read"
-        "/admin": "write"
-        "/public": "read-write"
+    security:
+        access: private
+        override:
+            - path: "/api/v1"
+              access: public
+            - path: "/admin"
+              access: private
+            - path: "/public"
+              access: public
 debug:
     application-id: id

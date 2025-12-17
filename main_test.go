@@ -57,7 +57,7 @@ func Test_printError(t *testing.T) {
 			},
 			want: want{
 				stdout: "\n\nA new release of vcr is available: 0.0.1 → 1.0.1\nTo upgrade, run: vcr upgrade\n",
-				stderr: "X Error Encountered: http error\n\nℹ Details:\n  - HTTP Status : 404\n  - Error Code  : 3001\n  - Message     : Not Found\n  - Trace ID    : 1234\n\nℹ App logs captured before failure:\ncontainer logs\n\nPlease refer to the documentation or contact support for further assistance.\n",
+				stderr: "X Error Encountered: http error\n\nℹ Details:\n  - HTTP Status : 404\n  - Message     : Not Found\n  - Trace ID    : 1234\n\nℹ App logs captured before failure:\ncontainer logs\n\nPlease refer to the documentation or contact support for further assistance.\n",
 			},
 		},
 		{
