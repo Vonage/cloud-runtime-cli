@@ -11,6 +11,7 @@ the [Vonage Cloud Runtime platform](https://developer.vonage.com/en/cloud-runtim
 * [Installation](#installation)
 * [Project Structure](#project-structure)
 * [Usage](#usage)
+* [Development Setup](#development-setup)
 * [Contributions](#contributions)
 * [Conventional Commits](#conventional-commits)
 * [Release Process](#release-process)
@@ -44,6 +45,63 @@ pwsh -Command "iwr https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/ma
 ## Usage
 
 Usage examples are in the `docs/` folder - [vcr](docs/vcr.md)
+
+## Development Setup
+
+### Prerequisites
+
+- Go 1.24+
+- Node.js 18+ (for commitlint)
+- [golangci-lint](https://golangci-lint.run/welcome/install/)
+- [Lefthook](https://github.com/evilmartians/lefthook) (for git hooks)
+
+### Setting Up Git Hooks
+
+This project uses [Lefthook](https://github.com/evilmartians/lefthook) to manage git hooks. Install and configure it:
+
+```bash
+# Install lefthook (macOS)
+brew install lefthook
+
+# Or with Go
+go install github.com/evilmartians/lefthook@latest
+
+# Install commitlint dependencies
+npm install
+
+# Install the git hooks
+lefthook install
+```
+
+### What the Hooks Do
+
+| Hook | Action |
+|------|--------|
+| `commit-msg` | Validates commit message follows [conventional commits](#conventional-commits) format |
+| `pre-commit` | Runs `gofmt` and `go vet` on staged Go files |
+| `pre-push` | Runs `go test` and `golangci-lint` before pushing |
+
+### Skipping Hooks (when needed)
+
+```bash
+# Skip all hooks
+git commit --no-verify -m "wip: work in progress"
+
+# Skip specific hooks
+LEFTHOOK_EXCLUDE=pre-push git push
+```
+
+### Local Hook Overrides
+
+Create a `lefthook-local.yml` to override hooks locally (this file is gitignored):
+
+```yaml
+# lefthook-local.yml
+pre-push:
+  commands:
+    go-test:
+      skip: true  # Skip tests on push locally
+```
 
 ## Contributions
 

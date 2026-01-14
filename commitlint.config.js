@@ -1,6 +1,7 @@
 module.exports = {
   extends: ['@commitlint/config-conventional'],
   rules: {
+    // Commit types allowed
     'type-enum': [
       2,
       'always',
@@ -18,6 +19,13 @@ module.exports = {
         'revert',   // Reverts a previous commit
       ],
     ],
-    'subject-case': [0], // Disable subject case check (allow any case)
+
+    // Relaxed rules - disable strict length limits
+    'body-max-line-length': [0],         // Disable body line length limit
+    'header-max-length': [0],            // Disable header length limit
+    'footer-max-line-length': [0],       // Disable footer line length limit
+    'subject-case': [0],                 // Allow any case in subject
+    'subject-full-stop': [0],            // Allow trailing period in subject
+    'body-leading-blank': [1, 'always'], // Warn (not error) if no blank line before body
   },
 };

@@ -1,0 +1,9 @@
+{
+  "name": "vcr-cli-dev",
+  "private": true,
+  "description": "Development dependencies for VCR CLI",
+  "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0"
+  }
+}

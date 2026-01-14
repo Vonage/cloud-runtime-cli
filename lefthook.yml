@@ -1,0 +1,27 @@
+# Lefthook configuration for git hooks
+# Install: brew install lefthook && lefthook install
+# Docs: https://github.com/evilmartians/lefthook
+
+commit-msg:
+  commands:
+    commitlint:
+      run: npx commitlint --edit {1}
+
+pre-commit:
+  parallel: true
+  commands:
+    go-fmt:
+      glob: "*.go"
+      run: gofmt -l -w {staged_files}
+      stage_fixed: true
+    go-vet:
+      glob: "*.go"
+      run: go vet ./...
+
+pre-push:
+  parallel: true
+  commands:
+    go-test:
+      run: go test ./...
+    golangci-lint:
+      run: golangci-lint run
