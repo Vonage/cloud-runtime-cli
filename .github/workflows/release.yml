@@ -1,8 +1,9 @@
-name: Release CLI
+name: Manual Release
+
+# This workflow is for manual releases only.
+# Automated releases are handled by release-please.yml
 
 on:
-  release:
-    types: [published]
   workflow_dispatch:
     inputs:
       tag:
@@ -42,12 +43,12 @@ jobs:
 
       - name: Build binaries for integration tests
         run: |
+          mkdir -p tests/integration/bin
           GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-X main.releaseURL=http://mockserver:80" -o tests/integration/bin/vcr-cli .
           GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o tests/integration/bin/mockserver ./tests/integration/mocks/main.go
 
       - name: Run integration tests
-        run: |
-          make test-integration
+        run: make test-integration
 
   # Build, sign, notarize, and release (requires macOS for Apple signing)
   build-and-release:
@@ -76,18 +77,9 @@ jobs:
         run: |
           xcrun notarytool store-credentials --apple-id ${{ secrets.APPLE_ID }} --team-id ${{ secrets.APPLE_TEAM_ID }} --password ${{ secrets.APPLE_DEV_ID_PASSWORD }} devrel
 
-      - name: Set release version
-        id: version
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "VERSION=${{ inputs.tag }}" >> $GITHUB_OUTPUT
-          else
-            echo "VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
-          fi
-
       - name: Cross compile binaries
         env:
-          GO_LDFLAGS: "-s -w -X 'main.apiVersion=${{env.API_VERSION}}' -X 'main.version=${{steps.version.outputs.VERSION}}' -X 'main.buildDate=${{github.event.repository.updated_at}}' -X 'main.commit=${{github.sha}}' -X 'main.releaseURL=https://api.github.com/repos/${{github.repository}}'"
+          GO_LDFLAGS: "-s -w -X 'main.apiVersion=${{env.API_VERSION}}' -X 'main.version=${{ inputs.tag }}' -X 'main.buildDate=${{github.event.repository.updated_at}}' -X 'main.commit=${{github.sha}}' -X 'main.releaseURL=https://api.github.com/repos/${{github.repository}}'"
         run: |
           GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_darwin_amd64 .
           GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_darwin_arm64 .
@@ -127,7 +119,7 @@ jobs:
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.version.outputs.VERSION }}
+          tag_name: ${{ inputs.tag }}
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             bin/vcr_darwin_amd64.tar.gz
