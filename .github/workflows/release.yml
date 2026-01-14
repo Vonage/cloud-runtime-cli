@@ -1,8 +1,14 @@
 name: Release CLI
+
 on:
-  push:
-    tags:
-      - '*'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to build (e.g., v2.1.3)'
+        required: true
+        type: string
 
 permissions:
   actions: write
@@ -73,9 +79,18 @@ jobs:
           cd tests/integration
           docker-compose up --exit-code-from cli-tool
 
+      - name: Set release version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Cross compile binaries
         env:
-          GO_LDFLAGS: "-s -w -X 'main.apiVersion=${{env.API_VERSION}}' -X 'main.version=${{github.ref_name}}' -X 'main.buildDate=${{github.event.repository.updated_at}}' -X 'main.commit=${{github.sha}}' -X 'main.releaseURL=https://api.github.com/repos/${{github.repository}}'"
+          GO_LDFLAGS: "-s -w -X 'main.apiVersion=${{env.API_VERSION}}' -X 'main.version=${{steps.version.outputs.VERSION}}' -X 'main.buildDate=${{github.event.repository.updated_at}}' -X 'main.commit=${{github.sha}}' -X 'main.releaseURL=https://api.github.com/repos/${{github.repository}}'"
         run: |
           GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_darwin_amd64 .
           GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_darwin_arm64 .
@@ -112,9 +127,10 @@ jobs:
           tar czf bin/vcr_linux_amd64.tar.gz ./vcr_linux_amd64
           tar czf bin/vcr_windows_amd64.tar.gz ./vcr_windows_amd64.exe
 
-      - name: Release
+      - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.version.outputs.VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             bin/vcr_darwin_amd64.tar.gz

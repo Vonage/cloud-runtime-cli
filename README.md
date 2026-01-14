@@ -12,6 +12,8 @@ the [Vonage Cloud Runtime platform](https://developer.vonage.com/en/cloud-runtim
 * [Project Structure](#project-structure)
 * [Usage](#usage)
 * [Contributions](#contributions)
+* [Conventional Commits](#conventional-commits)
+* [Release Process](#release-process)
 * [Getting Help](#getting-help)
 
 ## Installation
@@ -50,6 +52,83 @@ Yes please! This command-line interface is open source, community-driven, and be
 Please make all your changes on a branch, and open a pull request, these are welcome and will be reviewed with delight! If it's a big change, it is recommended to open an issue for discussion before you start.
 
 All changes require tests to go with them.
+
+## Conventional Commits
+
+This project uses [Conventional Commits](https://www.conventionalcommits.org/) to automate versioning and changelog generation. All commit messages must follow this format:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+### Commit Types
+
+| Type | Description | Version Bump |
+|------|-------------|--------------|
+| `feat` | A new feature | Minor (1.0.0 → 1.1.0) |
+| `fix` | A bug fix | Patch (1.0.0 → 1.0.1) |
+| `docs` | Documentation only changes | None |
+| `style` | Code style changes (formatting, etc.) | None |
+| `refactor` | Code refactoring | None |
+| `perf` | Performance improvements | Patch |
+| `test` | Adding or updating tests | None |
+| `build` | Build system changes | None |
+| `ci` | CI configuration changes | None |
+| `chore` | Other changes | None |
+| `revert` | Reverts a previous commit | Varies |
+
+### Breaking Changes
+
+To indicate a breaking change, add `!` after the type or include `BREAKING CHANGE:` in the footer:
+
+```
+feat!: redesign configuration format
+
+BREAKING CHANGE: The config file format has changed from YAML to JSON.
+```
+
+Breaking changes trigger a major version bump (1.0.0 → 2.0.0).
+
+### Examples
+
+```bash
+# Feature
+git commit -m "feat: add support for custom deployment regions"
+
+# Bug fix
+git commit -m "fix: resolve timeout issue in debug mode"
+
+# Documentation
+git commit -m "docs: update installation instructions for Windows"
+
+# Breaking change
+git commit -m "feat!: change default API version to v2"
+```
+
+## Release Process
+
+This project uses [Release Please](https://github.com/googleapis/release-please) to automate releases. Here's how it works:
+
+1. **Merge to main**: When PRs are merged to `main`, Release Please analyzes the commits
+2. **Release PR**: A "Release PR" is automatically created/updated with:
+   - Version bump based on commit types
+   - Auto-generated changelog entries
+3. **Publish release**: When the Release PR is merged, a GitHub Release is created
+4. **Build & distribute**: The release triggers the build pipeline which:
+   - Cross-compiles binaries for all platforms
+   - Code signs and notarizes macOS binaries
+   - Uploads artifacts to the GitHub Release
+
+### Manual Release
+
+If needed, you can trigger a manual release via the GitHub Actions UI:
+1. Go to Actions → "Release CLI"
+2. Click "Run workflow"
+3. Enter the release tag (e.g., `v2.1.3`)
 
 ## Getting Help
 
