@@ -1,14 +1,16 @@
-FROM golang:1.24.0
+FROM alpine:3.20
+
+RUN apk add --no-cache bash curl
 
 WORKDIR /app
 
-COPY . .
+# Copy pre-built binary from CI
+COPY bin/vcr-cli /app/vcr-cli
 
-RUN go mod download
+# Copy test scripts and data
+COPY scripts/run_clitool.sh /app/run_clitool.sh
+COPY testdata /app/tests/integration/testdata
 
+RUN chmod +x /app/vcr-cli /app/run_clitool.sh
 
-RUN go build -ldflags "-X main.releaseURL=http://mockserver:80" -o vcr-cli /app/main.go
-
-RUN chmod +x /app/tests/integration/scripts/run_clitool.sh
-
-CMD ["/app/tests/integration/scripts/run_clitool.sh"]
+CMD ["/app/run_clitool.sh"]

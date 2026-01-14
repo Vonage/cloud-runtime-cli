@@ -1,13 +1,13 @@
-FROM golang:1.24.0
+FROM alpine:3.20
+
+RUN apk add --no-cache bash
 
 WORKDIR /app
 
-COPY . .
+# Copy pre-built binary from CI
+COPY bin/mockserver /app/mockserver
+COPY scripts/run_mockserver.sh /app/run_mockserver.sh
 
-RUN go mod download
+RUN chmod +x /app/mockserver /app/run_mockserver.sh
 
-RUN go build -o mockserver /app/tests/integration/mocks/main.go
-
-RUN chmod +x /app/tests/integration/scripts/run_mockserver.sh
-
-CMD ["/app/tests/integration/scripts/run_mockserver.sh"]
+CMD ["/app/run_mockserver.sh"]

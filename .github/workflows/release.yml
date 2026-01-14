@@ -24,60 +24,57 @@ permissions:
   statuses: write
 
 jobs:
+  # Run tests on Ubuntu (fast, native Docker)
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.0'
+          cache: true
+
+      - name: Run unit tests
+        run: go test ./...
+
+      - name: Build binaries for integration tests
+        run: |
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-X main.releaseURL=http://mockserver:80" -o tests/integration/bin/vcr-cli .
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o tests/integration/bin/mockserver ./tests/integration/mocks/main.go
+
+      - name: Run integration tests
+        run: |
+          make test-integration
+
+  # Build, sign, notarize, and release (requires macOS for Apple signing)
   build-and-release:
+    needs: test
     runs-on: macos-latest
     env:
       API_VERSION: ${{ vars.API_VERSION }}
-    strategy:
-      matrix:
-        go-version: [1.24.0]
-        os: [macos-latest]
     environment: vcr-cli
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Import codesign cert
-        uses: apple-actions/import-codesign-certs@v1
+        uses: apple-actions/import-codesign-certs@v3
         with:
           p12-file-base64: ${{ secrets.APPLE_CERT_P12_BASE64_ENCODED }}
           p12-password: ${{ secrets.APPLE_CERT_PASSWORD }}
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.go-version }}
+          go-version: '1.24.0'
+          cache: true
 
-      - name: Set up Docker
-        run: |
-          brew install docker docker-machine docker-compose
-          sudo mkdir -p /usr/local/bin 
-          sudo curl -L -o /usr/local/bin/colima https://github.com/abiosoft/colima/releases/download/v0.6.7/colima-Darwin-x86_64 && sudo chmod +x /usr/local/bin/colima
-          brew install lima lima-additional-guestagents
-          brew install qemu
-          colima start
-          sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
-
-      - name: Cache Go modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/go/pkg/mod
-            ~/Library/Caches/go-build
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - name: Store credentials
+      - name: Store notarization credentials
         run: |
           xcrun notarytool store-credentials --apple-id ${{ secrets.APPLE_ID }} --team-id ${{ secrets.APPLE_TEAM_ID }} --password ${{ secrets.APPLE_DEV_ID_PASSWORD }} devrel
-
-      - name: Run unit tests
-        run: go test ./...
-
-      - name: Run integration tests
-        run: |
-          cd tests/integration
-          docker-compose up --exit-code-from cli-tool
 
       - name: Set release version
         id: version
@@ -103,12 +100,12 @@ jobs:
           codesign --timestamp --options=runtime -s "Developer ID Application: Nexmo Inc. (7F2B5ZSP8Q)" -v ./vcr_darwin_amd64
           codesign --timestamp --options=runtime -s "Developer ID Application: Nexmo Inc. (7F2B5ZSP8Q)" -v ./vcr_darwin_arm64
 
-      - name: Check code signing
+      - name: Verify code signing
         run: |
           codesign -vvv --deep --strict ./vcr_darwin_amd64
           codesign -vvv --deep --strict ./vcr_darwin_arm64
 
-      - name: Zip darwin binaries
+      - name: Zip darwin binaries for notarization
         run: |
           zip vcr_darwin_amd64.zip ./vcr_darwin_amd64
           zip vcr_darwin_arm64.zip ./vcr_darwin_arm64
