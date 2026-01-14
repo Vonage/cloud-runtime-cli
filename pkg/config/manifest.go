@@ -44,18 +44,28 @@ type Scaling struct {
 	MaxScale int `yaml:"max-scale,omitempty"`
 }
 
+type Security struct {
+	Access   string       `json:"access" yaml:"access"`
+	Override []PathAccess `json:"override,omitempty" yaml:"override,omitempty"`
+}
+
+type PathAccess struct {
+	Path   string `json:"path" yaml:"path"`
+	Access string `json:"access" yaml:"access"`
+}
+
 type Instance struct {
-	Name          string            `yaml:"name"`
-	Runtime       string            `yaml:"runtime,omitempty"`
-	Region        string            `yaml:"region,omitempty"`
-	ApplicationID string            `yaml:"application-id,omitempty"`
-	Environment   []Env             `yaml:"environment,omitempty"`
-	Capabilities  []string          `yaml:"capabilities,omitempty"`
-	Entrypoint    []string          `yaml:"entrypoint,omitempty"`
-	Domains       []string          `yaml:"domains,omitempty"`
-	BuildScript   string            `yaml:"build-script,omitempty"`
-	Scaling       Scaling           `yaml:"scaling,omitempty"`
-	PathAccess    map[string]string `yaml:"path-access,omitempty"`
+	Name          string    `yaml:"name"`
+	Runtime       string    `yaml:"runtime,omitempty"`
+	Region        string    `yaml:"region,omitempty"`
+	ApplicationID string    `yaml:"application-id,omitempty"`
+	Environment   []Env     `yaml:"environment,omitempty"`
+	Capabilities  []string  `yaml:"capabilities,omitempty"`
+	Entrypoint    []string  `yaml:"entrypoint,omitempty"`
+	Domains       []string  `yaml:"domains,omitempty"`
+	BuildScript   string    `yaml:"build-script,omitempty"`
+	Scaling       Scaling   `yaml:"scaling,omitempty"`
+	Security      *Security `yaml:"security,omitempty"`
 }
 
 type Debug struct {

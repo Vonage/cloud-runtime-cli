@@ -60,17 +60,61 @@ func NewCmdInstanceLog(f cmdutil.Factory) *cobra.Command {
 	}
 
 	cmd := &cobra.Command{
-		Use:     "log --project-name <project-name> --instance-name <instance-name>",
-		Aliases: []string{""},
-		Short:   `This command will output the log of an instance.`,
-		Args:    cobra.MaximumNArgs(0),
-		Example: heredoc.Doc(`
-			# Output instance log by instance id:
-			$ vcr instance log --id <instance-id>
+		Use:     "log",
+		Aliases: []string{"logs"},
+		Short:   "Stream real-time logs from a deployed VCR instance",
+		Long: heredoc.Doc(`Stream real-time logs from a deployed VCR instance.
 
-			# Output instance log by project and instance name:
-			$ vcr instance log --project-name <project-name> --instance-name <instance-name>
-			`),
+			This command connects to a running instance and streams its logs in real-time
+			to your terminal. Logs are continuously fetched until you press Ctrl+C.
+
+			IDENTIFYING THE INSTANCE
+			  You can identify the instance using either:
+			  • --id: The unique instance UUID
+			  • --project-name + --instance-name: The combination from your manifest
+
+			LOG LEVELS
+			  Filter logs by severity level (shows specified level and above):
+			  • trace  - Most verbose, includes all logs
+			  • debug  - Debug information and above
+			  • info   - Informational messages and above
+			  • warn   - Warnings and above
+			  • error  - Errors and above
+			  • fatal  - Only fatal errors
+
+			SOURCE TYPES
+			  Filter logs by their source:
+			  • application  - Logs from your application code
+			  • provider     - Logs from VCR platform services
+
+			OUTPUT FORMAT
+			  Each log line shows: [timestamp] [source_type] message
+			  Example: 2024-01-15T10:30:00Z [application] Server started on port 3000
+		`),
+		Args: cobra.MaximumNArgs(0),
+		Example: heredoc.Doc(`
+			# Stream logs by project and instance name
+			$ vcr instance log --project-name my-app --instance-name dev
+			2024-01-15T10:30:00Z [application] Server started on port 3000
+			2024-01-15T10:30:01Z [application] Connected to database
+			^C
+			Interrupt received, stopping...
+
+			# Stream logs by instance ID
+			$ vcr instance log --id 12345678-1234-1234-1234-123456789abc
+
+			# Filter to show only errors and above
+			$ vcr instance log -p my-app -n dev --log-level error
+
+			# Show only application logs (exclude provider logs)
+			$ vcr instance log -p my-app -n dev --source-type application
+
+			# Increase history to last 500 log entries
+			$ vcr instance log -p my-app -n dev --history 500
+
+			# Combine filters
+			$ vcr instance log -p my-app -n dev -l warn -s application
+		`),
 		RunE: func(_ *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
 			defer cancel()
@@ -79,12 +123,12 @@ func NewCmdInstanceLog(f cmdutil.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.InstanceID, "id", "i", "", "Instance ID")
-	cmd.Flags().IntVarP(&opts.Limit, "history", "", DefaultHistoryLimit, "Prints the last N number of records")
-	cmd.Flags().StringVarP(&opts.ProjectName, "project-name", "p", "", "Project name (must be used with instance-name flag)")
-	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "Instance name (must be used with project-name flag)")
-	cmd.Flags().StringVarP(&opts.LogLevel, "log-level", "l", "", "Filter for log level, e.g.trace, debug, info, warn, error, fatal")
-	cmd.Flags().StringVarP(&opts.SourceType, "source-type", "s", "", "Filter for source type e.g. application, provider")
+	cmd.Flags().StringVarP(&opts.InstanceID, "id", "i", "", "Instance UUID (alternative to project-name + instance-name)")
+	cmd.Flags().IntVarP(&opts.Limit, "history", "", DefaultHistoryLimit, "Number of historical log entries to fetch initially (default: 300)")
+	cmd.Flags().StringVarP(&opts.ProjectName, "project-name", "p", "", "Project name (requires --instance-name)")
+	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "Instance name (requires --project-name)")
+	cmd.Flags().StringVarP(&opts.LogLevel, "log-level", "l", "", "Minimum log level: trace, debug, info, warn, error, fatal")
+	cmd.Flags().StringVarP(&opts.SourceType, "source-type", "s", "", "Filter by source: application, provider")
 
 	return cmd
 }

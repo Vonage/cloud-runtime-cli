@@ -28,16 +28,39 @@ func NewCmdInstanceRemove(f cmdutil.Factory) *cobra.Command {
 	}
 
 	cmd := &cobra.Command{
-		Use:     "remove --project-name <project-name> --instance-name <instance-name>",
+		Use:     "remove",
 		Aliases: []string{"rm"},
-		Short:   `This command will remove an instance.`,
-		Args:    cobra.MaximumNArgs(0),
+		Short:   "Remove a deployed VCR instance",
+		Long: heredoc.Doc(`Remove a deployed VCR instance.
+
+			This command permanently deletes an instance from the VCR platform, stopping
+			the running application and freeing all associated resources.
+
+			IDENTIFYING THE INSTANCE
+			  You can identify the instance to remove using either:
+			  • --id: The unique instance UUID (from deployment output)
+			  • --project-name + --instance-name: The combination from your manifest
+
+			WARNING: This action is irreversible. All data associated with the instance
+			will be permanently deleted. You will be prompted for confirmation unless
+			--yes is specified.
+		`),
+		Args: cobra.MaximumNArgs(0),
 		Example: heredoc.Doc(`
-			# Remove by project and instance name:
-			$ vcr instance rm --project-name <project-name> --instance-name <instance-name>
-			
-			# Remove by instance id:
-			$ vcr instance rm --id <instance-id>`),
+			# Remove by project and instance name
+			$ vcr instance remove --project-name my-app --instance-name dev
+			? Are you sure you want to remove instance with id="abc123" and service_name="my-service"? Yes
+			✓ Instance "abc123" successfully removed
+
+			# Remove using the short alias
+			$ vcr instance rm -p my-app -n dev
+
+			# Remove by instance ID
+			$ vcr instance remove --id 12345678-1234-1234-1234-123456789abc
+
+			# Skip confirmation prompt (useful for CI/CD)
+			$ vcr instance rm --project-name my-app --instance-name dev --yes
+		`),
 		RunE: func(_ *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
 			defer cancel()
@@ -46,10 +69,10 @@ func NewCmdInstanceRemove(f cmdutil.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.InstanceID, "id", "i", "", "Instance id")
-	cmd.Flags().StringVarP(&opts.ProjectName, "project-name", "p", "", "Project name (must be used with instance-name flag)")
-	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "Instance name (must be used with project-name flag)")
-	cmd.Flags().BoolVarP(&opts.SkipPrompts, "yes", "y", false, "Automatically confirm removal and skip prompt")
+	cmd.Flags().StringVarP(&opts.InstanceID, "id", "i", "", "Instance UUID (alternative to project-name + instance-name)")
+	cmd.Flags().StringVarP(&opts.ProjectName, "project-name", "p", "", "Project name (requires --instance-name)")
+	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "Instance name (requires --project-name)")
+	cmd.Flags().BoolVarP(&opts.SkipPrompts, "yes", "y", false, "Skip confirmation prompt (use with caution)")
 
 	return cmd
 }

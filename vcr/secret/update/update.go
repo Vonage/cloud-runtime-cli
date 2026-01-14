@@ -28,11 +28,42 @@ func NewCmdSecretUpdate(f cmdutil.Factory) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "update",
-		Short: "update a secret",
+		Short: "Update an existing secret's value",
+		Long: heredoc.Doc(`Update the value of an existing secret.
+
+			This command changes the value of a secret that was previously created.
+			The new value will be available to instances on their next restart or
+			new deployment.
+
+			SECRET VALUE INPUT
+			  You can provide the new value in two ways:
+			  • --value: Pass the value directly (be careful with shell history)
+			  • --filename: Read the value from a file (recommended for multi-line values)
+
+			  If neither is provided, you will be prompted to enter the value interactively.
+
+			NOTE: The secret must already exist. Use 'vcr secret create' to create a new secret.
+
+			UPDATING RUNNING INSTANCES
+			  Instances do not automatically pick up secret changes. You need to either:
+			  • Redeploy the instance: vcr deploy
+			  • Or restart the instance through the dashboard
+		`),
 		Example: heredoc.Doc(`
-				$ vcr secret create --name my-secret --value my-value
-			
-				$ vcr secret update --name my-secret --value changed-value
+			# Update a secret's value directly
+			$ vcr secret update --name MY_API_KEY --value "sk-newkey12345"
+			✓ Secret "MY_API_KEY" updated
+
+			# Update a secret from a file
+			$ vcr secret update --name SSL_CERT --filename ./new-cert.pem
+
+			# Update with interactive input (value hidden)
+			$ vcr secret update --name DATABASE_PASSWORD
+			? Enter new value for secret "DATABASE_PASSWORD": ********
+			✓ Secret "DATABASE_PASSWORD" updated
+
+			# Using short flags
+			$ vcr secret update -n WEBHOOK_SECRET -v "whsec_newvalue"
 		`),
 		Args: cobra.MaximumNArgs(0),
 
@@ -44,9 +75,9 @@ func NewCmdSecretUpdate(f cmdutil.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.Name, "name", "n", "", "The name of the secret")
-	cmd.Flags().StringVarP(&opts.Value, "value", "v", "", "The value of the secret")
-	cmd.Flags().StringVarP(&opts.SecretFile, "filename", "f", "", "The path to the file containing the secret")
+	cmd.Flags().StringVarP(&opts.Name, "name", "n", "", "Name of the secret to update (required)")
+	cmd.Flags().StringVarP(&opts.Value, "value", "v", "", "New value for the secret (or use --filename)")
+	cmd.Flags().StringVarP(&opts.SecretFile, "filename", "f", "", "Path to file containing the new secret value")
 
 	_ = cmd.MarkFlagRequired("name")
 

@@ -37,15 +37,15 @@ services:
 
   mockserver:
     build:
-      context: ../..
-      dockerfile: tests/integration/Dockerfile-mockserver
+      context: .
+      dockerfile: Dockerfile-mockserver
     ports:
       - "9001:80"
 
   cli-tool:
     build:
-      context: ../..
-      dockerfile: tests/integration/Dockerfile-clitool
+      context: .
+      dockerfile: Dockerfile-clitool
     depends_on:
       mockserver:
         condition: service_started

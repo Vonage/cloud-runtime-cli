@@ -26,11 +26,13 @@ instance:
 	entrypoint:
 		- node
 		- index.js
-	path-access:
-		"/api/public": "public"
-		"/api/admin": "private"
-		"/v1/users/*/profile": "public"
-		"/v1/internal/**": "private"
+	security:
+		access: private
+		override:
+			- path: "/api/public"
+			  access: public
+			- path: "/v1/users/*/profile"
+			  access: public
 debug:
 	name: debug
 	application-id: 0dcbb945-cf09-4756-808a-e1873228f802
@@ -46,15 +48,19 @@ Flags can be used to override the mandatory fields, ie project name, instance na
 
 The project will be created if it does not already exist.
 
-#### Path Access Configuration
+#### Security Configuration
 
-The `path-access` configuration allows you to control access to specific paths in your application:
+The `security` configuration allows you to control access to your application and specific paths:
 
 - **public**: Allows public access to reach those paths
 - **private**: Returns forbidden for those paths
 
 **Default Behavior:**
-If no `path-access` field is specified in your manifest, all endpoints will default to public access.
+If no `security` field is specified in your manifest, all endpoints will default to public access.
+
+**Configuration Structure:**
+- `access`: Sets the default access level for all paths (either "public" or "private")
+- `override`: Array of path-specific access overrides
 
 **Wildcard Support:**
 - Use `*` to match a single path segment: `/v1/users/*/settings`
@@ -62,11 +68,23 @@ If no `path-access` field is specified in your manifest, all endpoints will defa
 
 **Examples:**
 ```yaml
-path-access:
-  "/api/health": "public"           # Public health check endpoint
-  "/api/admin": "private"           # Private admin interface
-  "/v1/users/*/profile": "public"   # Public user profiles (wildcard)
-  "/v1/internal/**": "private"      # All internal APIs (recursive wildcard)
+# Example 1: Default public with specific private paths
+security:
+  access: public
+  override:
+    - path: "/api/admin"
+      access: private
+    - path: "/v1/internal/**"
+      access: private
+
+# Example 2: Default private with specific public paths
+security:
+  access: private
+  override:
+    - path: "/api/health"
+      access: public
+    - path: "/v1/users/*/profile"
+      access: public
 ```
 
 

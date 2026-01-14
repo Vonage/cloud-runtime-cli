@@ -1,3 +1,9 @@
 .idea
 bin
 .DS_Store
+
+# Lefthook local overrides
+lefthook-local.yml
+
+# Node modules (for commitlint)
+node_modules/
