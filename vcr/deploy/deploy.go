@@ -396,7 +396,7 @@ func compressDir(source string) (int, []byte, []string, error) {
 
 	out := bytes.NewBuffer([]byte{})
 
-	format := archiver.CompressedArchive{
+	format := archiver.Archive{
 		Compression: archiver.Gz{CompressionLevel: 1, Multithreaded: true},
 		Archival:    archiver.Tar{},
 	}

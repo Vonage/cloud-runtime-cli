@@ -85,13 +85,14 @@ func runList(ctx context.Context, opts *Options) error {
 	}
 
 	table := tablewriter.NewWriter(io.Out)
-	table.SetHeader([]string{"ID", "Name"})
+	table.Header("ID", "Name")
 
 	for _, app := range apps.Applications {
-		table.Append([]string{app.ID, app.Name})
+		if err := table.Append([]string{app.ID, app.Name}); err != nil {
+			return fmt.Errorf("failed to append application to table: %w", err)
+		}
 	}
 
 	// Render the table
-	table.Render()
-	return nil
+	return table.Render()
 }
