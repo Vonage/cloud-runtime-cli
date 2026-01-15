@@ -8,6 +8,15 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
+  checks: write
+  deployments: read
+  issues: write
+  discussions: write
+  packages: read
+  pages: write
+  security-events: write
+  statuses: write
 
 jobs:
   release-please:
@@ -24,3 +33,112 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+
+  # Run tests before building release artifacts
+  test:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: true
+
+      - name: Run unit tests
+        run: go test ./...
+
+      - name: Build binaries for integration tests
+        run: |
+          mkdir -p tests/integration/bin
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-X main.releaseURL=http://mockserver:80" -o tests/integration/bin/vcr-cli .
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o tests/integration/bin/mockserver ./tests/integration/mocks/main.go
+
+      - name: Run integration tests
+        run: make test-integration
+
+  # Build, sign, notarize, and upload release assets (requires macOS for Apple signing)
+  build-and-release:
+    needs: [release-please, test]
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    runs-on: macos-latest
+    env:
+      API_VERSION: ${{ vars.API_VERSION }}
+    environment: vcr-cli
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Import codesign cert
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.APPLE_CERT_P12_BASE64_ENCODED }}
+          p12-password: ${{ secrets.APPLE_CERT_PASSWORD }}
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: true
+
+      - name: Store notarization credentials
+        run: |
+          xcrun notarytool store-credentials --apple-id ${{ secrets.APPLE_ID }} --team-id ${{ secrets.APPLE_TEAM_ID }} --password ${{ secrets.APPLE_DEV_ID_PASSWORD }} devrel
+
+      - name: Cross compile binaries
+        env:
+          GO_LDFLAGS: "-s -w -X 'main.apiVersion=${{env.API_VERSION}}' -X 'main.version=${{needs.release-please.outputs.tag_name}}' -X 'main.buildDate=${{github.event.repository.updated_at}}' -X 'main.commit=${{github.sha}}' -X 'main.releaseURL=https://api.github.com/repos/${{github.repository}}'"
+        run: |
+          GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_darwin_amd64 .
+          GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_darwin_arm64 .
+          GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_linux_arm64 .
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_linux_amd64 .
+          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_windows_amd64.exe .
+
+      - name: Code sign darwin binaries
+        run: |
+          codesign --timestamp --options=runtime -s "Developer ID Application: Nexmo Inc. (7F2B5ZSP8Q)" -v ./vcr_darwin_amd64
+          codesign --timestamp --options=runtime -s "Developer ID Application: Nexmo Inc. (7F2B5ZSP8Q)" -v ./vcr_darwin_arm64
+
+      - name: Verify code signing
+        run: |
+          codesign -vvv --deep --strict ./vcr_darwin_amd64
+          codesign -vvv --deep --strict ./vcr_darwin_arm64
+
+      - name: Zip darwin binaries for notarization
+        run: |
+          zip vcr_darwin_amd64.zip ./vcr_darwin_amd64
+          zip vcr_darwin_arm64.zip ./vcr_darwin_arm64
+
+      - name: Notarize darwin binaries
+        run: |
+          xcrun notarytool submit vcr_darwin_amd64.zip --keychain-profile "devrel" --wait
+          xcrun notarytool submit vcr_darwin_arm64.zip --keychain-profile "devrel" --wait
+
+      - name: Compress binaries
+        run: |
+          mkdir bin
+          tar czf bin/vcr_darwin_amd64.tar.gz ./vcr_darwin_amd64
+          tar czf bin/vcr_darwin_arm64.tar.gz ./vcr_darwin_arm64
+          tar czf bin/vcr_linux_arm64.tar.gz ./vcr_linux_arm64
+          tar czf bin/vcr_linux_amd64.tar.gz ./vcr_linux_amd64
+          tar czf bin/vcr_windows_amd64.tar.gz ./vcr_windows_amd64.exe
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.release-please.outputs.tag_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            bin/vcr_darwin_amd64.tar.gz
+            bin/vcr_darwin_arm64.tar.gz
+            bin/vcr_linux_arm64.tar.gz
+            bin/vcr_linux_amd64.tar.gz
+            bin/vcr_windows_amd64.tar.gz
+
+      - name: Test Github Action
+        uses: Vonage/cloud-runtime-cli@main
