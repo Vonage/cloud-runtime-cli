@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.2.1](https://github.com/Vonage/cloud-runtime-cli/compare/v2.2.0...v2.2.1) (2026-01-15)
+
+
+### 🐛 Bug Fixes
+
+* update go version and dependencies ([5db5e94](https://github.com/Vonage/cloud-runtime-cli/commit/5db5e9405fa69dd2fbf1e27f350e635b861b022c))
+
+
+### 👷 Continuous Integration
+
+* improve automated release flow ([8adbaf7](https://github.com/Vonage/cloud-runtime-cli/commit/8adbaf718e750e04558577f07a84197b6e47dac3))
+* improve automated release flow ([c3d3e0a](https://github.com/Vonage/cloud-runtime-cli/commit/c3d3e0a1616191dadcae11ccd64a14bd14ae7554))
+
 ## [2.2.0](https://github.com/Vonage/cloud-runtime-cli/compare/v2.1.2...v2.2.0) (2026-01-14)
 
 
