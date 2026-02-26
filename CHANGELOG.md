@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.0](https://github.com/Vonage/cloud-runtime-cli/compare/v2.2.1...v2.3.0) (2026-02-26)
+
+
+### 🚀 Features
+
+* add authenticated security config and health check path support ([a822db0](https://github.com/Vonage/cloud-runtime-cli/commit/a822db077980b105e6185c445f7b8d944e77d14f))
+* add ValidateDeployment API and pre-deploy validation ([ea3b96d](https://github.com/Vonage/cloud-runtime-cli/commit/ea3b96d322ea3f40bf566ecaadf8c543b659d139))
+
 ## [2.2.1](https://github.com/Vonage/cloud-runtime-cli/compare/v2.2.0...v2.2.1) (2026-01-15)
 
 
