@@ -240,16 +240,17 @@ func (c *DeploymentClient) CreateProject(ctx context.Context, projectName string
 }
 
 type DeployInstanceArgs struct {
-	PackageID        string           `json:"packageId"`
-	ProjectID        string           `json:"projectId"`
-	APIApplicationID string           `json:"apiApplicationId"`
-	InstanceName     string           `json:"instanceName"`
-	Region           string           `json:"region"`
-	Environment      []config.Env     `json:"environment"`
-	Domains          []string         `json:"domains"`
-	MinScale         int              `json:"minScale"`
-	MaxScale         int              `json:"maxScale"`
-	Security         *config.Security `json:"security,omitempty"`
+	PackageID           string           `json:"packageId"`
+	ProjectID           string           `json:"projectId"`
+	APIApplicationID    string           `json:"apiApplicationId"`
+	InstanceName        string           `json:"instanceName"`
+	Region              string           `json:"region"`
+	Environment         []config.Env     `json:"environment"`
+	Domains             []string         `json:"domains"`
+	MinScale            int              `json:"minScale"`
+	MaxScale            int              `json:"maxScale"`
+	Security            *config.Security `json:"security,omitempty"`
+	HealthCheckEndpoint string           `json:"healthCheckEndpoint,omitempty"`
 }
 
 type DeployInstanceResponse struct {
@@ -475,6 +476,42 @@ func (c *DeploymentClient) GetMongoDatabase(ctx context.Context, version string,
 		return MongoInfoResponse{}, NewErrorFromHTTPResponse(resp)
 	}
 
+	return result, nil
+}
+
+type ValidateDeploymentRequest struct {
+	ProjectID        string       `json:"projectId"`
+	APIApplicationID string       `json:"apiApplicationId"`
+	InstanceName     string       `json:"instanceName"`
+	Region           string       `json:"region"`
+	Environment      []config.Env `json:"environment"`
+	MinScale         int          `json:"minScale"`
+	MaxScale         int          `json:"maxScale"`
+}
+
+type ValidateDeploymentResponse struct {
+	Valid  bool              `json:"valid"`
+	Errors []ValidationError `json:"errors,omitempty"`
+}
+
+type ValidationError struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
+}
+
+func (c *DeploymentClient) ValidateDeployment(ctx context.Context, req ValidateDeploymentRequest) (ValidateDeploymentResponse, error) {
+	var result ValidateDeploymentResponse
+	resp, err := c.httpClient.R().
+		SetContext(ctx).
+		SetResult(&result).
+		SetBody(req).
+		Post(c.baseURL + "/deployments/validate")
+	if err != nil {
+		return ValidateDeploymentResponse{}, fmt.Errorf("%w: trace_id = %s", err, traceIDFromHTTPResponse(resp))
+	}
+	if resp.IsError() {
+		return ValidateDeploymentResponse{}, NewErrorFromHTTPResponse(resp)
+	}
 	return result, nil
 }
 

@@ -91,13 +91,18 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 			    build-script: ./build.sh             # Optional build script
 			    domains:                             # Custom domains (optional)
 			      - api.example.com
-			    security:                            # Endpoint security
-			      access: private                    # Required: [private, public]
+			    health-check-path: /custom/health    # Custom health check endpoint (default: /_/health)
+			    security:                            # Endpoint security (optional, defaults to public)
+			      access: private                    # Default access level: [private, public, authenticated]
+			      auth-method: vonage_basic           # Required when access is 'authenticated'
 			      override:
 			        - path: "/api/public"
 			          access: public                 # Override for specific paths
 					- path: "/api/users/*/settings"
 					  access: public
+					- path: "/api/secure"
+					  access: authenticated
+					  auth-method: vonage_basic
 
 			  debug:
 			    name: debug                          # Debug instance name
@@ -123,8 +128,14 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 			       app.run(host='0.0.0.0', port=port)
 
 			  2. Health Check Endpoint
-			     Your app MUST expose a health check endpoint at GET /_/health that
-			     returns HTTP 200. VCR uses this to verify your app started correctly.
+			     Your app MUST expose a health check endpoint that returns HTTP 200.
+			     VCR uses this to verify your app started correctly.
+
+			     By default, VCR checks GET /_/health. You can customize this by
+			     setting health-check-path in your manifest:
+
+			       instance:
+			         health-check-path: /custom/health
 
 			     Example (Node.js/Express):
 			       app.get('/_/health', (req, res) => res.status(200).send('OK'));
@@ -143,8 +154,12 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 			  • rtc          - Real-Time Communication (in-app voice/video)
 
 			SECURITY ACCESS LEVELS
-			  • private      - Requires authentication (default)
-			  • public       - No authentication required
+			  • public          - No authentication required (default if security is omitted)
+			  • private         - Returns forbidden for those paths
+			  • authenticated   - Requires authentication using a specified auth method
+
+			AUTH METHODS (used with 'authenticated' access)
+			  • vonage_basic    - Vonage Basic authentication
 
 			TROUBLESHOOTING
 			  "credential not found" error after deployment:
@@ -238,6 +253,19 @@ func runDeploy(ctx context.Context, opts *Options) error {
 
 	opts.projectID, err = createProject(ctx, opts)
 	if err != nil {
+		return err
+	}
+
+	opts.AppID, err = cmdutil.StringVar("app-id", opts.AppID, opts.manifest.Instance.ApplicationID, "", true)
+	if err != nil {
+		return fmt.Errorf("failed to get instance app id: %w", err)
+	}
+	opts.InstanceName, err = cmdutil.StringVar("instance-name", opts.InstanceName, opts.manifest.Instance.Name, "", true)
+	if err != nil {
+		return fmt.Errorf("failed to get instance name: %w", err)
+	}
+
+	if err := validateDeployment(ctx, opts); err != nil {
 		return err
 	}
 
@@ -522,29 +550,51 @@ func createPackage(ctx context.Context, opts *Options, uploadResp api.UploadResp
 	return createPkgResp, nil
 }
 
-func Deploy(ctx context.Context, opts *Options, createPkgResp api.CreatePackageResponse) (api.DeployInstanceResponse, error) {
-	var err error
-	opts.AppID, err = cmdutil.StringVar("app-id", opts.AppID, opts.manifest.Instance.ApplicationID, "", true)
-	if err != nil {
-		return api.DeployInstanceResponse{}, fmt.Errorf("failed to get instance app id: %w", err)
-	}
-	opts.InstanceName, err = cmdutil.StringVar("instance-name", opts.InstanceName, opts.manifest.Instance.Name, "", true)
-	if err != nil {
-		return api.DeployInstanceResponse{}, fmt.Errorf("failed to get instance name: %w", err)
-	}
+func validateDeployment(ctx context.Context, opts *Options) error {
+	io := opts.IOStreams()
+	c := io.ColorScheme()
 
-	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Deploying instance...")
-	deployInstanceArgs := api.DeployInstanceArgs{
-		PackageID:        createPkgResp.PackageID,
+	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Validating deployment parameters...")
+	resp, err := opts.DeploymentClient().ValidateDeployment(ctx, api.ValidateDeploymentRequest{
 		ProjectID:        opts.projectID,
 		APIApplicationID: opts.AppID,
 		InstanceName:     opts.InstanceName,
 		Region:           opts.region,
 		Environment:      opts.manifest.Instance.Environment,
-		Domains:          opts.manifest.Instance.Domains,
 		MinScale:         opts.manifest.Instance.Scaling.MinScale,
 		MaxScale:         opts.manifest.Instance.Scaling.MaxScale,
-		Security:         opts.manifest.Instance.Security,
+	})
+	spinner.Stop()
+	if err != nil {
+		return fmt.Errorf("failed to validate deployment: %w", err)
+	}
+
+	if !resp.Valid {
+		errMsg := "Deployment validation failed:"
+		for _, e := range resp.Errors {
+			errMsg += fmt.Sprintf("\n  - %s: %s", e.Field, e.Message)
+		}
+		return errors.New(errMsg)
+	}
+
+	fmt.Fprintf(io.Out, "%s Deployment parameters validated\n", c.SuccessIcon())
+	return nil
+}
+
+func Deploy(ctx context.Context, opts *Options, createPkgResp api.CreatePackageResponse) (api.DeployInstanceResponse, error) {
+	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Deploying instance...")
+	deployInstanceArgs := api.DeployInstanceArgs{
+		PackageID:           createPkgResp.PackageID,
+		ProjectID:           opts.projectID,
+		APIApplicationID:    opts.AppID,
+		InstanceName:        opts.InstanceName,
+		Region:              opts.region,
+		Environment:         opts.manifest.Instance.Environment,
+		Domains:             opts.manifest.Instance.Domains,
+		MinScale:            opts.manifest.Instance.Scaling.MinScale,
+		MaxScale:            opts.manifest.Instance.Scaling.MaxScale,
+		Security:            opts.manifest.Instance.Security,
+		HealthCheckEndpoint: opts.manifest.Instance.HealthCheckPath,
 	}
 	deploymentResponse, err := opts.DeploymentClient().DeployInstance(ctx, deployInstanceArgs)
 	spinner.Stop()
