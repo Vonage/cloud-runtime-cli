@@ -858,6 +858,182 @@ func TestDeployInstanceWithSecurity(t *testing.T) {
 	httpmock.Reset()
 }
 
+func TestDeployInstanceWithAuthenticatedSecurity(t *testing.T) {
+	client := resty.New()
+	httpmock.ActivateNonDefault(client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	var capturedRequestBody []byte
+
+	httpmock.RegisterResponder("POST", "https://example.com/v0.3/deployments",
+		func(req *http.Request) (*http.Response, error) {
+			body, _ := io.ReadAll(req.Body)
+			capturedRequestBody = body
+
+			resp := httpmock.NewStringResponse(http.StatusOK, `{"instanceId":"test-instance-id","serviceName":"test-service","deploymentId":"test-deployment-id","hostUrls":["https://test.example.com"]}`)
+			resp.Header.Set("Content-Type", "application/json")
+			return resp, nil
+		})
+
+	deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
+
+	deployInstanceArgs := DeployInstanceArgs{
+		PackageID:        "test-package-id",
+		ProjectID:        "test-project-id",
+		APIApplicationID: "test-app-id",
+		InstanceName:     "test-instance",
+		Region:           "test-region",
+		Security: &config.Security{
+			Access:     "authenticated",
+			AuthMethod: "vonage_basic",
+			Override: []config.PathAccess{
+				{Path: "/api/public", Access: "public"},
+				{Path: "/api/admin", Access: "authenticated", AuthMethod: "vonage_basic"},
+			},
+		},
+	}
+
+	output, err := deploymentClient.DeployInstance(t.Context(), deployInstanceArgs)
+
+	require.NoError(t, err)
+	require.Equal(t, "test-instance-id", output.InstanceID)
+	require.Equal(t, "test-service", output.ServiceName)
+
+	// Validate request body JSON serialization
+	require.NotEmpty(t, capturedRequestBody, "Request body should not be empty")
+
+	var requestPayload map[string]interface{}
+	err = json.Unmarshal(capturedRequestBody, &requestPayload)
+	require.NoError(t, err, "Should be able to parse request body as JSON")
+
+	// Check top-level security
+	security, exists := requestPayload["security"]
+	require.True(t, exists, "security field should be present in request body")
+
+	securityMap, ok := security.(map[string]interface{})
+	require.True(t, ok, "security should be a map")
+
+	require.Equal(t, "authenticated", securityMap["access"])
+	require.Equal(t, "vonage_basic", securityMap["authMethod"], "authMethod should be present at top-level security")
+
+	// Check overrides
+	overrides, exists := securityMap["override"]
+	require.True(t, exists, "override field should be present")
+
+	overridesArray, ok := overrides.([]interface{})
+	require.True(t, ok, "override should be an array")
+	require.Len(t, overridesArray, 2)
+
+	// First override: public path — authMethod should be absent (omitempty)
+	firstOverride, ok := overridesArray[0].(map[string]interface{})
+	require.True(t, ok)
+	require.Equal(t, "/api/public", firstOverride["path"])
+	require.Equal(t, "public", firstOverride["access"])
+	_, hasAuthMethod := firstOverride["authMethod"]
+	require.False(t, hasAuthMethod, "authMethod should be absent on public override (omitempty)")
+
+	// Second override: authenticated path — authMethod should be present
+	secondOverride, ok := overridesArray[1].(map[string]interface{})
+	require.True(t, ok)
+	require.Equal(t, "/api/admin", secondOverride["path"])
+	require.Equal(t, "authenticated", secondOverride["access"])
+	require.Equal(t, "vonage_basic", secondOverride["authMethod"], "authMethod should be present on authenticated override")
+
+	httpmock.Reset()
+}
+
+func TestDeployInstanceWithHealthCheckEndpoint(t *testing.T) {
+	client := resty.New()
+	httpmock.ActivateNonDefault(client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	var capturedRequestBody []byte
+
+	httpmock.RegisterResponder("POST", "https://example.com/v0.3/deployments",
+		func(req *http.Request) (*http.Response, error) {
+			body, _ := io.ReadAll(req.Body)
+			capturedRequestBody = body
+
+			resp := httpmock.NewStringResponse(http.StatusOK, `{"instanceId":"test-instance-id","serviceName":"test-service","deploymentId":"test-deployment-id","hostUrls":["https://test.example.com"]}`)
+			resp.Header.Set("Content-Type", "application/json")
+			return resp, nil
+		})
+
+	deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
+
+	deployInstanceArgs := DeployInstanceArgs{
+		PackageID:           "test-package-id",
+		ProjectID:           "test-project-id",
+		APIApplicationID:    "test-app-id",
+		InstanceName:        "test-instance",
+		Region:              "test-region",
+		HealthCheckEndpoint: "/custom/health",
+	}
+
+	output, err := deploymentClient.DeployInstance(t.Context(), deployInstanceArgs)
+
+	require.NoError(t, err)
+	require.Equal(t, "test-instance-id", output.InstanceID)
+
+	// Validate that the request body contains the healthCheckEndpoint field
+	require.NotEmpty(t, capturedRequestBody, "Request body should not be empty")
+
+	var requestPayload map[string]interface{}
+	err = json.Unmarshal(capturedRequestBody, &requestPayload)
+	require.NoError(t, err, "Should be able to parse request body as JSON")
+
+	healthCheckEndpoint, exists := requestPayload["healthCheckEndpoint"]
+	require.True(t, exists, "healthCheckEndpoint field should be present in request body")
+	require.Equal(t, "/custom/health", healthCheckEndpoint)
+
+	httpmock.Reset()
+}
+
+func TestDeployInstanceWithoutHealthCheckEndpoint(t *testing.T) {
+	client := resty.New()
+	httpmock.ActivateNonDefault(client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	var capturedRequestBody []byte
+
+	httpmock.RegisterResponder("POST", "https://example.com/v0.3/deployments",
+		func(req *http.Request) (*http.Response, error) {
+			body, _ := io.ReadAll(req.Body)
+			capturedRequestBody = body
+
+			resp := httpmock.NewStringResponse(http.StatusOK, `{"instanceId":"test-instance-id","serviceName":"test-service","deploymentId":"test-deployment-id","hostUrls":["https://test.example.com"]}`)
+			resp.Header.Set("Content-Type", "application/json")
+			return resp, nil
+		})
+
+	deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
+
+	deployInstanceArgs := DeployInstanceArgs{
+		PackageID:        "test-package-id",
+		ProjectID:        "test-project-id",
+		APIApplicationID: "test-app-id",
+		InstanceName:     "test-instance",
+		Region:           "test-region",
+	}
+
+	output, err := deploymentClient.DeployInstance(t.Context(), deployInstanceArgs)
+
+	require.NoError(t, err)
+	require.Equal(t, "test-instance-id", output.InstanceID)
+
+	// Validate that healthCheckEndpoint is omitted when empty (omitempty)
+	require.NotEmpty(t, capturedRequestBody, "Request body should not be empty")
+
+	var requestPayload map[string]interface{}
+	err = json.Unmarshal(capturedRequestBody, &requestPayload)
+	require.NoError(t, err, "Should be able to parse request body as JSON")
+
+	_, exists := requestPayload["healthCheckEndpoint"]
+	require.False(t, exists, "healthCheckEndpoint field should be omitted when empty")
+
+	httpmock.Reset()
+}
+
 func TestDeleteInstance(t *testing.T) {
 	client := resty.New()
 	httpmock.ActivateNonDefault(client.GetClient())

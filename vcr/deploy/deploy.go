@@ -91,13 +91,18 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 			    build-script: ./build.sh             # Optional build script
 			    domains:                             # Custom domains (optional)
 			      - api.example.com
+			    health-check-path: /custom/health    # Custom health check endpoint (default: /_/health)
 			    security:                            # Endpoint security
-			      access: private                    # Required: [private, public]
+			      access: private                    # Required: [private, public, authenticated]
+			      auth-method: vonage_basic           # Required when access is 'authenticated'
 			      override:
 			        - path: "/api/public"
 			          access: public                 # Override for specific paths
 					- path: "/api/users/*/settings"
 					  access: public
+					- path: "/api/secure"
+					  access: authenticated
+					  auth-method: vonage_basic
 
 			  debug:
 			    name: debug                          # Debug instance name
@@ -123,8 +128,14 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 			       app.run(host='0.0.0.0', port=port)
 
 			  2. Health Check Endpoint
-			     Your app MUST expose a health check endpoint at GET /_/health that
-			     returns HTTP 200. VCR uses this to verify your app started correctly.
+			     Your app MUST expose a health check endpoint that returns HTTP 200.
+			     VCR uses this to verify your app started correctly.
+
+			     By default, VCR checks GET /_/health. You can customize this by
+			     setting health-check-path in your manifest:
+
+			       instance:
+			         health-check-path: /custom/health
 
 			     Example (Node.js/Express):
 			       app.get('/_/health', (req, res) => res.status(200).send('OK'));
@@ -143,8 +154,12 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 			  • rtc          - Real-Time Communication (in-app voice/video)
 
 			SECURITY ACCESS LEVELS
-			  • private      - Requires authentication (default)
-			  • public       - No authentication required
+			  • private         - Returns forbidden for those paths (default)
+			  • public          - No authentication required
+			  • authenticated   - Requires authentication using a specified auth method
+
+			AUTH METHODS (used with 'authenticated' access)
+			  • vonage_basic    - Vonage Basic authentication
 
 			TROUBLESHOOTING
 			  "credential not found" error after deployment:
@@ -535,16 +550,17 @@ func Deploy(ctx context.Context, opts *Options, createPkgResp api.CreatePackageR
 
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Deploying instance...")
 	deployInstanceArgs := api.DeployInstanceArgs{
-		PackageID:        createPkgResp.PackageID,
-		ProjectID:        opts.projectID,
-		APIApplicationID: opts.AppID,
-		InstanceName:     opts.InstanceName,
-		Region:           opts.region,
-		Environment:      opts.manifest.Instance.Environment,
-		Domains:          opts.manifest.Instance.Domains,
-		MinScale:         opts.manifest.Instance.Scaling.MinScale,
-		MaxScale:         opts.manifest.Instance.Scaling.MaxScale,
-		Security:         opts.manifest.Instance.Security,
+		PackageID:           createPkgResp.PackageID,
+		ProjectID:           opts.projectID,
+		APIApplicationID:    opts.AppID,
+		InstanceName:        opts.InstanceName,
+		Region:              opts.region,
+		Environment:         opts.manifest.Instance.Environment,
+		Domains:             opts.manifest.Instance.Domains,
+		MinScale:            opts.manifest.Instance.Scaling.MinScale,
+		MaxScale:            opts.manifest.Instance.Scaling.MaxScale,
+		Security:            opts.manifest.Instance.Security,
+		HealthCheckEndpoint: opts.manifest.Instance.HealthCheckPath,
 	}
 	deploymentResponse, err := opts.DeploymentClient().DeployInstance(ctx, deployInstanceArgs)
 	spinner.Stop()

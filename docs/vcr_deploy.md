@@ -26,6 +26,7 @@ instance:
 	entrypoint:
 		- node
 		- index.js
+	health-check-path: /custom/health
 	security:
 		access: private
 		override:
@@ -33,6 +34,9 @@ instance:
 			  access: public
 			- path: "/v1/users/*/profile"
 			  access: public
+			- path: "/api/secure"
+			  access: authenticated
+			  auth-method: vonage_basic
 debug:
 	name: debug
 	application-id: 0dcbb945-cf09-4756-808a-e1873228f802
@@ -48,18 +52,33 @@ Flags can be used to override the mandatory fields, ie project name, instance na
 
 The project will be created if it does not already exist.
 
+#### Health Check Path
+
+Your application must expose a health check endpoint that returns HTTP 200. VCR uses this to verify your app started correctly.
+
+By default, VCR checks `GET /_/health`. You can customize this by setting `health-check-path` in your manifest:
+
+```yaml
+instance:
+  health-check-path: /custom/health
+```
+
+If not specified, the default `/_/health` path is used.
+
 #### Security Configuration
 
 The `security` configuration allows you to control access to your application and specific paths:
 
 - **public**: Allows public access to reach those paths
 - **private**: Returns forbidden for those paths
+- **authenticated**: Requires authentication using a specified auth method
 
 **Default Behavior:**
 If no `security` field is specified in your manifest, all endpoints will default to public access.
 
 **Configuration Structure:**
-- `access`: Sets the default access level for all paths (either "public" or "private")
+- `access`: Sets the default access level for all paths ("public", "private", or "authenticated")
+- `auth-method`: The authentication method to use when access is "authenticated" (e.g., "vonage_basic")
 - `override`: Array of path-specific access overrides
 
 **Wildcard Support:**
@@ -85,6 +104,17 @@ security:
       access: public
     - path: "/v1/users/*/profile"
       access: public
+
+# Example 3: Authenticated access with vonage_basic
+security:
+  access: authenticated
+  auth-method: vonage_basic
+  override:
+    - path: "/api/public"
+      access: public
+    - path: "/api/admin"
+      access: authenticated
+      auth-method: vonage_basic
 ```
 
 

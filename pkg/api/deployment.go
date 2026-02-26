@@ -240,16 +240,17 @@ func (c *DeploymentClient) CreateProject(ctx context.Context, projectName string
 }
 
 type DeployInstanceArgs struct {
-	PackageID        string           `json:"packageId"`
-	ProjectID        string           `json:"projectId"`
-	APIApplicationID string           `json:"apiApplicationId"`
-	InstanceName     string           `json:"instanceName"`
-	Region           string           `json:"region"`
-	Environment      []config.Env     `json:"environment"`
-	Domains          []string         `json:"domains"`
-	MinScale         int              `json:"minScale"`
-	MaxScale         int              `json:"maxScale"`
-	Security         *config.Security `json:"security,omitempty"`
+	PackageID           string           `json:"packageId"`
+	ProjectID           string           `json:"projectId"`
+	APIApplicationID    string           `json:"apiApplicationId"`
+	InstanceName        string           `json:"instanceName"`
+	Region              string           `json:"region"`
+	Environment         []config.Env     `json:"environment"`
+	Domains             []string         `json:"domains"`
+	MinScale            int              `json:"minScale"`
+	MaxScale            int              `json:"maxScale"`
+	Security            *config.Security `json:"security,omitempty"`
+	HealthCheckEndpoint string           `json:"healthCheckEndpoint,omitempty"`
 }
 
 type DeployInstanceResponse struct {
