@@ -13,6 +13,7 @@ func main() {
 	http.HandleFunc("/v0.4/packages/source", uploadTgzHandler)
 	http.HandleFunc("/v0.4/packages", createPackageHandler)
 	http.HandleFunc("/v0.4/packages/test-package-id/build/watch", watchDeploymentHandler)
+	http.HandleFunc("/v0.4/deployments/validate", validateDeploymentHandler)
 	http.HandleFunc("/v0.4/deployments", deployInstanceHandler)
 	http.HandleFunc("/releases/latest", getLatestReleaseHandler)
 
@@ -67,6 +68,31 @@ type DeployInstanceResponse struct {
 
 func deployInstanceHandler(w http.ResponseWriter, _ *http.Request) {
 	mockResponse := DeployInstanceResponse{InstanceID: "test-instance-id", ServiceName: "test-service-name", DeploymentID: "test-deployment-id", HostURLs: []string{"test-host-url"}}
+	w.Header().Set("Content-Type", "application/json")
+	jsonResponse, err := json.Marshal(mockResponse)
+	if err != nil {
+		http.Error(w, "Error creating JSON response", http.StatusInternalServerError)
+		return
+	}
+
+	if _, err := w.Write(jsonResponse); err != nil {
+		fmt.Println("Error writing response")
+		return
+	}
+}
+
+type ValidateDeploymentResponse struct {
+	Valid  bool              `json:"valid"`
+	Errors []ValidationError `json:"errors,omitempty"`
+}
+
+type ValidationError struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
+}
+
+func validateDeploymentHandler(w http.ResponseWriter, _ *http.Request) {
+	mockResponse := ValidateDeploymentResponse{Valid: true}
 	w.Header().Set("Content-Type", "application/json")
 	jsonResponse, err := json.Marshal(mockResponse)
 	if err != nil {

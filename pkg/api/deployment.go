@@ -479,6 +479,42 @@ func (c *DeploymentClient) GetMongoDatabase(ctx context.Context, version string,
 	return result, nil
 }
 
+type ValidateDeploymentRequest struct {
+	ProjectID        string       `json:"projectId"`
+	APIApplicationID string       `json:"apiApplicationId"`
+	InstanceName     string       `json:"instanceName"`
+	Region           string       `json:"region"`
+	Environment      []config.Env `json:"environment"`
+	MinScale         int          `json:"minScale"`
+	MaxScale         int          `json:"maxScale"`
+}
+
+type ValidateDeploymentResponse struct {
+	Valid  bool              `json:"valid"`
+	Errors []ValidationError `json:"errors,omitempty"`
+}
+
+type ValidationError struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
+}
+
+func (c *DeploymentClient) ValidateDeployment(ctx context.Context, req ValidateDeploymentRequest) (ValidateDeploymentResponse, error) {
+	var result ValidateDeploymentResponse
+	resp, err := c.httpClient.R().
+		SetContext(ctx).
+		SetResult(&result).
+		SetBody(req).
+		Post(c.baseURL + "/deployments/validate")
+	if err != nil {
+		return ValidateDeploymentResponse{}, fmt.Errorf("%w: trace_id = %s", err, traceIDFromHTTPResponse(resp))
+	}
+	if resp.IsError() {
+		return ValidateDeploymentResponse{}, NewErrorFromHTTPResponse(resp)
+	}
+	return result, nil
+}
+
 func (c *DeploymentClient) ListMongoDatabases(ctx context.Context, version string) ([]string, error) {
 	var result []string
 

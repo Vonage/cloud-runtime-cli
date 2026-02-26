@@ -56,6 +56,7 @@ type DeploymentInterface interface {
 	DeleteMongoDatabase(ctx context.Context, version, database string) error
 	GetMongoDatabase(ctx context.Context, version, database string) (api.MongoInfoResponse, error)
 	ListMongoDatabases(ctx context.Context, version string) ([]string, error)
+	ValidateDeployment(ctx context.Context, req api.ValidateDeploymentRequest) (api.ValidateDeploymentResponse, error)
 }
 
 type DatastoreInterface interface {

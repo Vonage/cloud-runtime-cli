@@ -92,8 +92,8 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 			    domains:                             # Custom domains (optional)
 			      - api.example.com
 			    health-check-path: /custom/health    # Custom health check endpoint (default: /_/health)
-			    security:                            # Endpoint security
-			      access: private                    # Required: [private, public, authenticated]
+			    security:                            # Endpoint security (optional, defaults to public)
+			      access: private                    # Default access level: [private, public, authenticated]
 			      auth-method: vonage_basic           # Required when access is 'authenticated'
 			      override:
 			        - path: "/api/public"
@@ -154,8 +154,8 @@ func NewCmdDeploy(f cmdutil.Factory) *cobra.Command {
 			  • rtc          - Real-Time Communication (in-app voice/video)
 
 			SECURITY ACCESS LEVELS
-			  • private         - Returns forbidden for those paths (default)
-			  • public          - No authentication required
+			  • public          - No authentication required (default if security is omitted)
+			  • private         - Returns forbidden for those paths
 			  • authenticated   - Requires authentication using a specified auth method
 
 			AUTH METHODS (used with 'authenticated' access)
@@ -253,6 +253,19 @@ func runDeploy(ctx context.Context, opts *Options) error {
 
 	opts.projectID, err = createProject(ctx, opts)
 	if err != nil {
+		return err
+	}
+
+	opts.AppID, err = cmdutil.StringVar("app-id", opts.AppID, opts.manifest.Instance.ApplicationID, "", true)
+	if err != nil {
+		return fmt.Errorf("failed to get instance app id: %w", err)
+	}
+	opts.InstanceName, err = cmdutil.StringVar("instance-name", opts.InstanceName, opts.manifest.Instance.Name, "", true)
+	if err != nil {
+		return fmt.Errorf("failed to get instance name: %w", err)
+	}
+
+	if err := validateDeployment(ctx, opts); err != nil {
 		return err
 	}
 
@@ -537,17 +550,38 @@ func createPackage(ctx context.Context, opts *Options, uploadResp api.UploadResp
 	return createPkgResp, nil
 }
 
-func Deploy(ctx context.Context, opts *Options, createPkgResp api.CreatePackageResponse) (api.DeployInstanceResponse, error) {
-	var err error
-	opts.AppID, err = cmdutil.StringVar("app-id", opts.AppID, opts.manifest.Instance.ApplicationID, "", true)
+func validateDeployment(ctx context.Context, opts *Options) error {
+	io := opts.IOStreams()
+	c := io.ColorScheme()
+
+	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Validating deployment parameters...")
+	resp, err := opts.DeploymentClient().ValidateDeployment(ctx, api.ValidateDeploymentRequest{
+		ProjectID:        opts.projectID,
+		APIApplicationID: opts.AppID,
+		InstanceName:     opts.InstanceName,
+		Region:           opts.region,
+		Environment:      opts.manifest.Instance.Environment,
+		MinScale:         opts.manifest.Instance.Scaling.MinScale,
+		MaxScale:         opts.manifest.Instance.Scaling.MaxScale,
+	})
+	spinner.Stop()
 	if err != nil {
-		return api.DeployInstanceResponse{}, fmt.Errorf("failed to get instance app id: %w", err)
-	}
-	opts.InstanceName, err = cmdutil.StringVar("instance-name", opts.InstanceName, opts.manifest.Instance.Name, "", true)
-	if err != nil {
-		return api.DeployInstanceResponse{}, fmt.Errorf("failed to get instance name: %w", err)
+		return fmt.Errorf("failed to validate deployment: %w", err)
 	}
 
+	if !resp.Valid {
+		errMsg := "Deployment validation failed:"
+		for _, e := range resp.Errors {
+			errMsg += fmt.Sprintf("\n  - %s: %s", e.Field, e.Message)
+		}
+		return errors.New(errMsg)
+	}
+
+	fmt.Fprintf(io.Out, "%s Deployment parameters validated\n", c.SuccessIcon())
+	return nil
+}
+
+func Deploy(ctx context.Context, opts *Options, createPkgResp api.CreatePackageResponse) (api.DeployInstanceResponse, error) {
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Deploying instance...")
 	deployInstanceArgs := api.DeployInstanceArgs{
 		PackageID:           createPkgResp.PackageID,

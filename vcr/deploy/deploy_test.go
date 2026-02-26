@@ -29,6 +29,11 @@ func TestDeploy(t *testing.T) {
 		DeployReturnProjectCreateResponse api.CreateProjectResponse
 		DeployCreateProjectReturnErr      error
 
+		DeployValidateDeploymentReq        api.ValidateDeploymentRequest
+		DeployValidateDeploymentTimes      int
+		DeployReturnValidateDeploymentResp api.ValidateDeploymentResponse
+		DeployValidateDeploymentReturnErr  error
+
 		DeployReadUploadTgzBytes       []byte
 		DeployReadUploadTgzTimes       int
 		DeployReturnReadUploadResponse api.UploadResponse
@@ -59,6 +64,16 @@ func TestDeploy(t *testing.T) {
 		stderr string
 	}
 
+	defaultValidateReq := api.ValidateDeploymentRequest{
+		ProjectID:        "id",
+		APIApplicationID: "0f39f387-579b-4259-9f76-2715ff73b8b7",
+		InstanceName:     "dev",
+		Region:           "eu-west-1",
+		Environment:      []config.Env{{Name: "test-env-name", Value: "test-env-value"}},
+		MinScale:         0,
+		MaxScale:         0,
+	}
+
 	tests := []struct {
 		name string
 		cli  string
@@ -76,6 +91,11 @@ func TestDeploy(t *testing.T) {
 				DeployReturnProject:       api.Project{ID: "id", Name: "test-project"},
 				DeployGetProjectReturnErr: nil,
 
+				DeployValidateDeploymentReq:        defaultValidateReq,
+				DeployValidateDeploymentTimes:      1,
+				DeployReturnValidateDeploymentResp: api.ValidateDeploymentResponse{Valid: true},
+				DeployValidateDeploymentReturnErr:  nil,
+
 				DeployReadUploadTgzTimes:       0,
 				DeployReturnReadUploadResponse: api.UploadResponse{SourceCodeKey: "test-key"},
 				DeployReadUploadTgzReturnErr:   nil,
@@ -115,7 +135,7 @@ func TestDeploy(t *testing.T) {
 				DeployDeployInstanceReturnErr:      nil,
 			},
 			want: want{
-				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n✓ Source code uploaded.\n✓ Package created: package_id=\"test-package-id\"\nℹ Waiting for build to start...\n✓ Package \"test-package-id\" built successfully\n/-------\n| Instance has been deployed!\n| Instance id: test-instance-id\n| Instance service name: test-service-name\n| Instance host address: \x1b[0;1;33mtest-host-url\x1b[0m\n\\-------\n",
+				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n✓ Deployment parameters validated\n✓ Source code uploaded.\n✓ Package created: package_id=\"test-package-id\"\nℹ Waiting for build to start...\n✓ Package \"test-package-id\" built successfully\n/-------\n| Instance has been deployed!\n| Instance id: test-instance-id\n| Instance service name: test-service-name\n| Instance host address: \x1b[0;1;33mtest-host-url\x1b[0m\n\\-------\n",
 			},
 		},
 
@@ -130,6 +150,11 @@ func TestDeploy(t *testing.T) {
 				DeployReturnProject:       api.Project{ID: "id", Name: "test-project"},
 				DeployGetProjectReturnErr: nil,
 
+				DeployValidateDeploymentReq:        defaultValidateReq,
+				DeployValidateDeploymentTimes:      1,
+				DeployReturnValidateDeploymentResp: api.ValidateDeploymentResponse{Valid: true},
+				DeployValidateDeploymentReturnErr:  nil,
+
 				DeployReadUploadTgzTimes:       0,
 				DeployReturnReadUploadResponse: api.UploadResponse{SourceCodeKey: "test-key"},
 				DeployReadUploadTgzReturnErr:   nil,
@@ -169,7 +194,7 @@ func TestDeploy(t *testing.T) {
 				DeployDeployInstanceReturnErr:      nil,
 			},
 			want: want{
-				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n✓ Source code uploaded.\n✓ Package created: package_id=\"test-package-id\"\nℹ Waiting for build to start...\n✓ Package \"test-package-id\" built successfully\n/-------\n| Instance has been deployed!\n| Instance id: test-instance-id\n| Instance service name: test-service-name\n| Instance host address: \x1b[0;1;33mtest-host-url\x1b[0m\n\\-------\n",
+				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n✓ Deployment parameters validated\n✓ Source code uploaded.\n✓ Package created: package_id=\"test-package-id\"\nℹ Waiting for build to start...\n✓ Package \"test-package-id\" built successfully\n/-------\n| Instance has been deployed!\n| Instance id: test-instance-id\n| Instance service name: test-service-name\n| Instance host address: \x1b[0;1;33mtest-host-url\x1b[0m\n\\-------\n",
 			},
 		},
 		{
@@ -182,6 +207,11 @@ func TestDeploy(t *testing.T) {
 				DeployGetProjectTimes:     1,
 				DeployReturnProject:       api.Project{ID: "id", Name: "test-project"},
 				DeployGetProjectReturnErr: nil,
+
+				DeployValidateDeploymentReq:        defaultValidateReq,
+				DeployValidateDeploymentTimes:      1,
+				DeployReturnValidateDeploymentResp: api.ValidateDeploymentResponse{Valid: true},
+				DeployValidateDeploymentReturnErr:  nil,
 
 				DeployReadUploadTgzTimes:       0,
 				DeployReturnReadUploadResponse: api.UploadResponse{SourceCodeKey: "test-key"},
@@ -230,7 +260,7 @@ func TestDeploy(t *testing.T) {
 				DeployDeployInstanceReturnErr:      nil,
 			},
 			want: want{
-				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n✓ Source code uploaded.\n✓ Package created: package_id=\"test-package-id\"\nℹ Waiting for build to start...\n✓ Package \"test-package-id\" built successfully\n/-------\n| Instance has been deployed!\n| Instance id: test-instance-id\n| Instance service name: test-service-name\n| Instance host address: \x1b[0;1;33mtest-host-url\x1b[0m\n\\-------\n",
+				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n✓ Deployment parameters validated\n✓ Source code uploaded.\n✓ Package created: package_id=\"test-package-id\"\nℹ Waiting for build to start...\n✓ Package \"test-package-id\" built successfully\n/-------\n| Instance has been deployed!\n| Instance id: test-instance-id\n| Instance service name: test-service-name\n| Instance host address: \x1b[0;1;33mtest-host-url\x1b[0m\n\\-------\n",
 			},
 		},
 		{
@@ -243,6 +273,11 @@ func TestDeploy(t *testing.T) {
 				DeployGetProjectTimes:     1,
 				DeployReturnProject:       api.Project{ID: "id", Name: "test-project"},
 				DeployGetProjectReturnErr: nil,
+
+				DeployValidateDeploymentReq:        defaultValidateReq,
+				DeployValidateDeploymentTimes:      1,
+				DeployReturnValidateDeploymentResp: api.ValidateDeploymentResponse{Valid: true},
+				DeployValidateDeploymentReturnErr:  nil,
 
 				DeployReadUploadTgzTimes:       0,
 				DeployReturnReadUploadResponse: api.UploadResponse{SourceCodeKey: "test-key"},
@@ -284,7 +319,7 @@ func TestDeploy(t *testing.T) {
 				DeployDeployInstanceReturnErr:      nil,
 			},
 			want: want{
-				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n✓ Source code uploaded.\n✓ Package created: package_id=\"test-package-id\"\nℹ Waiting for build to start...\n✓ Package \"test-package-id\" built successfully\n/-------\n| Instance has been deployed!\n| Instance id: test-instance-id\n| Instance service name: test-service-name\n| Instance host address: \x1b[0;1;33mtest-host-url\x1b[0m\n\\-------\n",
+				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n✓ Deployment parameters validated\n✓ Source code uploaded.\n✓ Package created: package_id=\"test-package-id\"\nℹ Waiting for build to start...\n✓ Package \"test-package-id\" built successfully\n/-------\n| Instance has been deployed!\n| Instance id: test-instance-id\n| Instance service name: test-service-name\n| Instance host address: \x1b[0;1;33mtest-host-url\x1b[0m\n\\-------\n",
 			},
 		},
 		{
@@ -297,6 +332,11 @@ func TestDeploy(t *testing.T) {
 				DeployGetProjectTimes:     1,
 				DeployReturnProject:       api.Project{ID: "id", Name: "test-project"},
 				DeployGetProjectReturnErr: nil,
+
+				DeployValidateDeploymentReq:        defaultValidateReq,
+				DeployValidateDeploymentTimes:      1,
+				DeployReturnValidateDeploymentResp: api.ValidateDeploymentResponse{Valid: true},
+				DeployValidateDeploymentReturnErr:  nil,
 
 				DeployReadUploadTgzTimes:       0,
 				DeployReturnReadUploadResponse: api.UploadResponse{SourceCodeKey: "test-key"},
@@ -345,7 +385,39 @@ func TestDeploy(t *testing.T) {
 				DeployDeployInstanceReturnErr:      nil,
 			},
 			want: want{
-				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n✓ Source code uploaded.\n✓ Package created: package_id=\"test-package-id\"\nℹ Waiting for build to start...\n✓ Package \"test-package-id\" built successfully\n/-------\n| Instance has been deployed!\n| Instance id: test-instance-id\n| Instance service name: test-service-name\n| Instance host address: \x1b[0;1;33mtest-host-url\x1b[0m\n\\-------\n",
+				stdout: "✓ Project \"test\" retrieved: project_id=\"id\"\n✓ Deployment parameters validated\n✓ Source code uploaded.\n✓ Package created: package_id=\"test-package-id\"\nℹ Waiting for build to start...\n✓ Package \"test-package-id\" built successfully\n/-------\n| Instance has been deployed!\n| Instance id: test-instance-id\n| Instance service name: test-service-name\n| Instance host address: \x1b[0;1;33mtest-host-url\x1b[0m\n\\-------\n",
+			},
+		},
+		{
+			name: "validation-fails",
+			cli:  "testdata/",
+			mock: mock{
+
+				DeployAPIKey:              testutil.DefaultAPIKey,
+				DeployGetProjectProjName:  "test",
+				DeployGetProjectTimes:     1,
+				DeployReturnProject:       api.Project{ID: "id", Name: "test-project"},
+				DeployGetProjectReturnErr: nil,
+
+				DeployValidateDeploymentReq:   defaultValidateReq,
+				DeployValidateDeploymentTimes: 1,
+				DeployReturnValidateDeploymentResp: api.ValidateDeploymentResponse{
+					Valid: false,
+					Errors: []api.ValidationError{
+						{Field: "region", Message: "region not found"},
+						{Field: "apiApplicationId", Message: "credentials not found for application"},
+					},
+				},
+				DeployValidateDeploymentReturnErr: nil,
+
+				DeployReadUploadTgzTimes:   0,
+				DeployUploadTgzTimes:       0,
+				DeployCreatePackageTimes:   0,
+				DeployWatchDeploymentTimes: 0,
+				DeployDeployInstanceTimes:  0,
+			},
+			want: want{
+				errMsg: "Deployment validation failed:\n  - region: region not found\n  - apiApplicationId: credentials not found for application",
 			},
 		},
 	}
@@ -364,6 +436,10 @@ func TestDeploy(t *testing.T) {
 			deploymentMock.EXPECT().CreateProject(gomock.Any(), tt.mock.DeployCreateProjectProjName).
 				Times(tt.mock.DeployCreateProjectTimes).
 				Return(tt.mock.DeployReturnProjectCreateResponse, tt.mock.DeployCreateProjectReturnErr)
+
+			deploymentMock.EXPECT().ValidateDeployment(gomock.Any(), tt.mock.DeployValidateDeploymentReq).
+				Times(tt.mock.DeployValidateDeploymentTimes).
+				Return(tt.mock.DeployReturnValidateDeploymentResp, tt.mock.DeployValidateDeploymentReturnErr)
 
 			deploymentMock.EXPECT().UploadTgz(gomock.Any(), gomock.Any()).
 				Times(tt.mock.DeployReadUploadTgzTimes).

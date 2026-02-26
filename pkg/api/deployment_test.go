@@ -787,6 +787,164 @@ func TestDeployInstance(t *testing.T) {
 	}
 }
 
+func TestValidateDeployment(t *testing.T) {
+	client := resty.New()
+	httpmock.ActivateNonDefault(client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	type mock struct {
+		mockResponse string
+		status       int
+	}
+
+	type want struct {
+		output ValidateDeploymentResponse
+		err    error
+	}
+
+	tests := []struct {
+		name string
+		mock mock
+		want want
+	}{
+		{
+			name: "200-valid",
+			mock: mock{
+				mockResponse: `{"valid":true}`,
+				status:       http.StatusOK,
+			},
+			want: want{
+				output: ValidateDeploymentResponse{Valid: true},
+				err:    nil,
+			},
+		},
+		{
+			name: "200-invalid-with-errors",
+			mock: mock{
+				mockResponse: `{"valid":false,"errors":[{"field":"region","message":"region not found"},{"field":"apiApplicationId","message":"credentials not found"}]}`,
+				status:       http.StatusOK,
+			},
+			want: want{
+				output: ValidateDeploymentResponse{
+					Valid: false,
+					Errors: []ValidationError{
+						{Field: "region", Message: "region not found"},
+						{Field: "apiApplicationId", Message: "credentials not found"},
+					},
+				},
+				err: nil,
+			},
+		},
+		{
+			name: "400-error",
+			mock: mock{
+				mockResponse: `{"error": {"code": 3001, "message": "invalid request", "traceId": "n/a", "containerLogs": ""}}`,
+				status:       http.StatusBadRequest,
+			},
+			want: want{
+				output: ValidateDeploymentResponse{},
+				err:    errors.New("API Error Encountered: ( HTTP status: 400 Error code: 3001 Detailed message: invalid request Trace ID: n/a )"),
+			},
+		},
+		{
+			name: "500-error",
+			mock: mock{
+				mockResponse: `{"error": {"code": 1001, "message": "internal server error", "traceId": "n/a", "containerLogs": ""}}`,
+				status:       http.StatusInternalServerError,
+			},
+			want: want{
+				output: ValidateDeploymentResponse{},
+				err:    errors.New("API Error Encountered: ( HTTP status: 500 Error code: 1001 Detailed message: internal server error Trace ID: n/a )"),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			httpmock.RegisterResponder("POST", "https://example.com/v0.3/deployments/validate",
+				func(_ *http.Request) (*http.Response, error) {
+					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
+					resp.Header.Set("Content-Type", "application/json")
+					return resp, nil
+				})
+
+			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
+
+			req := ValidateDeploymentRequest{
+				ProjectID:        "project-id",
+				APIApplicationID: "app-id",
+				InstanceName:     "dev",
+				Region:           "eu-west-1",
+			}
+			output, err := deploymentClient.ValidateDeployment(t.Context(), req)
+			if tt.want.err != nil {
+				require.EqualError(t, err, tt.want.err.Error())
+				httpmock.Reset()
+				return
+			}
+
+			require.NoError(t, err)
+			require.Equal(t, tt.want.output, output)
+			httpmock.Reset()
+		})
+	}
+}
+
+func TestValidateDeploymentRequestBody(t *testing.T) {
+	client := resty.New()
+	httpmock.ActivateNonDefault(client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	var capturedRequestBody []byte
+
+	httpmock.RegisterResponder("POST", "https://example.com/v0.3/deployments/validate",
+		func(req *http.Request) (*http.Response, error) {
+			body, _ := io.ReadAll(req.Body)
+			capturedRequestBody = body
+
+			resp := httpmock.NewStringResponse(http.StatusOK, `{"valid":true}`)
+			resp.Header.Set("Content-Type", "application/json")
+			return resp, nil
+		})
+
+	deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
+
+	req := ValidateDeploymentRequest{
+		ProjectID:        "test-project-id",
+		APIApplicationID: "test-app-id",
+		InstanceName:     "test-instance",
+		Region:           "test-region",
+		Environment:      []config.Env{{Name: "KEY", Value: "val"}},
+		MinScale:         1,
+		MaxScale:         3,
+	}
+	output, err := deploymentClient.ValidateDeployment(t.Context(), req)
+
+	require.NoError(t, err)
+	require.True(t, output.Valid)
+
+	// Validate the request body serialization
+	require.NotEmpty(t, capturedRequestBody, "Request body should not be empty")
+
+	var requestPayload map[string]interface{}
+	err = json.Unmarshal(capturedRequestBody, &requestPayload)
+	require.NoError(t, err, "Should be able to parse request body as JSON")
+
+	require.Equal(t, "test-project-id", requestPayload["projectId"])
+	require.Equal(t, "test-app-id", requestPayload["apiApplicationId"])
+	require.Equal(t, "test-instance", requestPayload["instanceName"])
+	require.Equal(t, "test-region", requestPayload["region"])
+	require.Equal(t, float64(1), requestPayload["minScale"])
+	require.Equal(t, float64(3), requestPayload["maxScale"])
+
+	envArray, ok := requestPayload["environment"].([]interface{})
+	require.True(t, ok, "environment should be an array")
+	require.Len(t, envArray, 1)
+
+	httpmock.Reset()
+}
+
 func TestDeployInstanceWithSecurity(t *testing.T) {
 	client := resty.New()
 	httpmock.ActivateNonDefault(client.GetClient())
