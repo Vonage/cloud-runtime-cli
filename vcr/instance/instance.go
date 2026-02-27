@@ -27,6 +27,7 @@ func NewCmdInstance(f cmdutil.Factory) *cobra.Command {
 			  • A project name and instance name (from your manifest)
 
 			AVAILABLE COMMANDS
+			  list (ls)     List all deployed instances
 			  log (logs)    View real-time logs from a running instance
 			  remove (rm)   Delete an instance and free its resources
 
@@ -36,6 +37,12 @@ func NewCmdInstance(f cmdutil.Factory) *cobra.Command {
 			  • Project + Instance name: The combination from your vcr.yml manifest
 		`),
 		Example: heredoc.Doc(`
+			# List all instances
+			$ vcr instance list
+
+			# List instances filtered by service name
+			$ vcr instance list --filter "my-service"
+
 			# View logs for an instance by project and instance name
 			$ vcr instance log --project-name my-app --instance-name dev
 
