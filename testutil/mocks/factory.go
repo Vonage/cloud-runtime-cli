@@ -671,6 +671,21 @@ func (mr *MockDatastoreInterfaceMockRecorder) ListLogsByInstanceID(ctx, instance
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListLogsByInstanceID", reflect.TypeOf((*MockDatastoreInterface)(nil).ListLogsByInstanceID), ctx, instanceID, limit, timestamp)
 }
 
+// ListInstances mocks base method.
+func (m *MockDatastoreInterface) ListInstances(ctx context.Context, filter string) ([]api.InstanceListItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListInstances", ctx, filter)
+	ret0, _ := ret[0].([]api.InstanceListItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListInstances indicates an expected call of ListInstances.
+func (mr *MockDatastoreInterfaceMockRecorder) ListInstances(ctx, filter interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListInstances", reflect.TypeOf((*MockDatastoreInterface)(nil).ListInstances), ctx, filter)
+}
+
 // ListProducts mocks base method.
 func (m *MockDatastoreInterface) ListProducts(ctx context.Context) ([]api.Product, error) {
 	m.ctrl.T.Helper()

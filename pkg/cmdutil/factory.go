@@ -64,6 +64,7 @@ type DatastoreInterface interface {
 	GetRegion(ctx context.Context, alias string) (api.Region, error)
 	GetInstanceByProjectAndInstanceName(ctx context.Context, projectName, instanceName string) (api.Instance, error)
 	GetInstanceByID(ctx context.Context, instanceID string) (api.Instance, error)
+	ListInstances(ctx context.Context, filter string) ([]api.InstanceListItem, error)
 	ListRuntimes(ctx context.Context) ([]api.Runtime, error)
 	GetRuntimeByName(ctx context.Context, name string) (api.Runtime, error)
 	GetProject(ctx context.Context, accountID, name string) (api.Project, error)
