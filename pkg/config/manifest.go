@@ -46,7 +46,7 @@ type Scaling struct {
 
 type Security struct {
 	Access     string       `json:"access" yaml:"access"`
-	AuthMethod string       `json:"authMethod,omitempty" yaml:"auth-method,omitempty" valid:"optional,omitempty"`
+	AuthMethod string       `json:"authMethod,omitempty" yaml:"auth-method,omitempty"`
 	Override   []PathAccess `json:"override,omitempty" yaml:"override,omitempty"`
 }
 
