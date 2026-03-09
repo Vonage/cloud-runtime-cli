@@ -1,0 +1,18 @@
+project:
+  name: test
+instance:
+  name: dev
+  security:
+    access: authenticated
+    auth-method: vonage_basic
+    override:
+      - path: "/api/public"
+        access: public
+      - path: "/api/private"
+        access: private
+      - path: "/api/protected"
+        access: authenticated
+        auth-method: vonage_basic
+debug:
+  application-id: id
+

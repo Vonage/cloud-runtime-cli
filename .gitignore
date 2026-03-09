@@ -7,3 +7,8 @@ lefthook-local.yml
 
 # Node modules (for commitlint)
 node_modules/
+
+# Binaries and build artifacts
+vcr_linux_*
+vcr_windows_*
+vcr_macos_*

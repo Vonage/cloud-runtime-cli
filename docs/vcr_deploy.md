@@ -71,15 +71,18 @@ The `security` configuration allows you to control access to your application an
 
 - **public**: Allows public access to reach those paths
 - **private**: Returns forbidden for those paths
-- **authenticated**: Requires authentication using a specified auth method
+- **authenticated**: Requires authentication to access those paths. Must be used with `auth-method`
 
 **Default Behavior:**
 If no `security` field is specified in your manifest, all endpoints will default to public access.
 
 **Configuration Structure:**
 - `access`: Sets the default access level for all paths ("public", "private", or "authenticated")
-- `auth-method`: The authentication method to use when access is "authenticated" (e.g., "vonage_basic")
+- `auth-method`: (Required when `access` is "authenticated") Sets the authentication method. The only supported value is `"vonage_basic"`. Not allowed for "public" or "private" access
 - `override`: Array of path-specific access overrides
+  - `path`: The path pattern to override
+  - `access`: The access level for this path ("public", "private", or "authenticated")
+  - `auth-method`: (Required when `access` is "authenticated") The authentication method for this specific path. The only supported value is `"vonage_basic"`
 
 **Wildcard Support:**
 - Use `*` to match a single path segment: `/v1/users/*/settings`

@@ -1,0 +1,14 @@
+project:
+  name: test
+instance:
+  name: dev
+  security:
+    access: private
+    override:
+      - path: "/api/v1"
+        access: public
+      - path: "/admin"
+        access: private
+debug:
+  application-id: id
+

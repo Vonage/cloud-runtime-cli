@@ -39,6 +39,68 @@ func TestReadManifest(t *testing.T) {
 
 }
 
+func TestReadManifestWithSecurity(t *testing.T) {
+	existingPath := "testdata/vcr-with-security.yaml"
+	manifest, err := ReadManifest(existingPath)
+	if err != nil {
+		t.Errorf("Expected no error, but got: %v", err)
+	}
+
+	expectedManifest := &Manifest{
+		Project: Project{
+			Name: "test",
+		},
+		Instance: Instance{
+			Name: "dev",
+			Security: &Security{
+				Access: "private",
+				Override: []PathAccess{
+					{Path: "/api/v1", Access: "public"},
+					{Path: "/admin", Access: "private"},
+				},
+			},
+		},
+		Debug: Debug{
+			ApplicationID: "id",
+		},
+	}
+	if !reflect.DeepEqual(manifest, expectedManifest) {
+		t.Errorf("Expected manifest to be %+v, but got %+v", expectedManifest, manifest)
+	}
+}
+
+func TestReadManifestWithAuthMethod(t *testing.T) {
+	existingPath := "testdata/vcr-with-auth-method.yaml"
+	manifest, err := ReadManifest(existingPath)
+	if err != nil {
+		t.Errorf("Expected no error, but got: %v", err)
+	}
+
+	expectedManifest := &Manifest{
+		Project: Project{
+			Name: "test",
+		},
+		Instance: Instance{
+			Name: "dev",
+			Security: &Security{
+				Access:     "authenticated",
+				AuthMethod: "vonage_basic",
+				Override: []PathAccess{
+					{Path: "/api/public", Access: "public"},
+					{Path: "/api/private", Access: "private"},
+					{Path: "/api/protected", Access: "authenticated", AuthMethod: "vonage_basic"},
+				},
+			},
+		},
+		Debug: Debug{
+			ApplicationID: "id",
+		},
+	}
+	if !reflect.DeepEqual(manifest, expectedManifest) {
+		t.Errorf("Expected manifest to be %+v, but got %+v", expectedManifest, manifest)
+	}
+}
+
 func TestGetAbsDir(t *testing.T) {
 	emptyPath, err := GetAbsDir("")
 	if err != nil {

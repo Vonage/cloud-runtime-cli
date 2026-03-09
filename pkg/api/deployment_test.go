@@ -1056,6 +1056,8 @@ func TestDeployInstanceWithAuthenticatedSecurity(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "test-instance-id", output.InstanceID)
 	require.Equal(t, "test-service", output.ServiceName)
+	require.Equal(t, "test-deployment-id", output.DeploymentID)
+	require.Equal(t, []string{"https://test.example.com"}, output.HostURLs)
 
 	// Validate request body JSON serialization
 	require.NotEmpty(t, capturedRequestBody, "Request body should not be empty")
