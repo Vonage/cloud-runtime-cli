@@ -1573,6 +1573,86 @@ func TestRemoveSecret(t *testing.T) {
 	}
 }
 
+func TestListSecrets(t *testing.T) {
+	client := resty.New()
+	httpmock.ActivateNonDefault(client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	type mock struct {
+		mockResponse string
+		status       int
+	}
+
+	type want struct {
+		output []string
+		err    error
+	}
+
+	tests := []struct {
+		name string
+		mock mock
+		want want
+	}{
+		{
+			name: "200-happy-path",
+			mock: mock{
+				mockResponse: `{"secrets":["MY_API_KEY","DATABASE_PASSWORD"]}`,
+				status:       http.StatusOK,
+			},
+			want: want{
+				output: []string{"MY_API_KEY", "DATABASE_PASSWORD"},
+				err:    nil,
+			},
+		},
+		{
+			name: "200-empty-list",
+			mock: mock{
+				mockResponse: `{"secrets":[]}`,
+				status:       http.StatusOK,
+			},
+			want: want{
+				output: []string{},
+				err:    nil,
+			},
+		},
+		{
+			name: "500-error",
+			mock: mock{
+				mockResponse: `{"error": {"code": 1001, "message": "internal server error", "traceId": "n/a", "containerLogs": ""}}`,
+				status:       http.StatusInternalServerError,
+			},
+			want: want{
+				output: nil,
+				err:    errors.New("API Error Encountered: ( HTTP status: 500 Error code: 1001 Detailed message: internal server error Trace ID: n/a )"),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			httpmock.RegisterResponder("GET", "https://example.com/v0.3/secrets",
+				func(_ *http.Request) (*http.Response, error) {
+					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
+					resp.Header.Set("Content-Type", "application/json")
+					return resp, nil
+				})
+
+			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
+
+			output, err := deploymentClient.ListSecrets(t.Context())
+			if tt.want.err != nil {
+				require.EqualError(t, err, tt.want.err.Error())
+				httpmock.Reset()
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, tt.want.output, output)
+			httpmock.Reset()
+		})
+	}
+}
+
 func TestDeploymentClient_WatchDeployment(t *testing.T) {
 	type mock struct {
 		message     []byte
