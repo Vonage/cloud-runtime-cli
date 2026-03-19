@@ -403,6 +403,25 @@ func (c *DeploymentClient) RemoveSecret(ctx context.Context, name string) error 
 	return nil
 }
 
+type listSecretsResponse struct {
+	Secrets []string `json:"secrets"`
+}
+
+func (c *DeploymentClient) ListSecrets(ctx context.Context) ([]string, error) {
+	var result listSecretsResponse
+	resp, err := c.httpClient.R().
+		SetContext(ctx).
+		SetResult(&result).
+		Get(c.baseURL + "/secrets")
+	if err != nil {
+		return nil, fmt.Errorf("%w: trace_id = %s", err, traceIDFromHTTPResponse(resp))
+	}
+	if resp.IsError() {
+		return nil, NewErrorFromHTTPResponse(resp)
+	}
+	return result.Secrets, nil
+}
+
 type pluginsRequest struct {
 	Plugin  string                 `json:"plugin"`
 	Version string                 `json:"version"`
