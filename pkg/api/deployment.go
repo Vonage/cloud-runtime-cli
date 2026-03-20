@@ -186,9 +186,12 @@ type Capabilities struct {
 
 type CreatePackageResponse struct {
 	PackageID string `json:"packageId"`
+	Name      string `json:"name"`
+	Version   int    `json:"version"`
 }
 
 type CreatePackageArgs struct {
+	Name            string       `json:"name"`
 	SourceCodeKey   string       `json:"sourceCodeKey"`
 	Entrypoint      []string     `json:"entrypoint"`
 	Capabilities    Capabilities `json:"capabilities"`

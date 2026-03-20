@@ -294,6 +294,56 @@ func TestGetRegionOptions(t *testing.T) {
 	require.Equal(t, expectedOptions.AliasLookup, options.AliasLookup)
 }
 
+func TestSanitizeDockerImageName(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		{
+			name:  "already-valid",
+			input: "my-app-dev",
+			want:  "my-app-dev",
+		},
+		{
+			name:  "uppercase-conversion",
+			input: "My-App-Dev",
+			want:  "my-app-dev",
+		},
+		{
+			name:  "special-chars-replaced",
+			input: "my app@dev!",
+			want:  "my-app-dev",
+		},
+		{
+			name:  "leading-trailing-separators-trimmed",
+			input: "---my-app---",
+			want:  "my-app",
+		},
+		{
+			name:  "periods-preserved",
+			input: "my.app.dev",
+			want:  "my.app.dev",
+		},
+		{
+			name:  "underscores-preserved",
+			input: "my_app_dev",
+			want:  "my_app_dev",
+		},
+		{
+			name:  "mixed-special-chars",
+			input: "...Project Name!!--instance",
+			want:  "project-name----instance",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := SanitizeDockerImageName(tt.input)
+			require.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func TestGetTemplateOptions(t *testing.T) {
 	templateNames := []api.Product{
 		{Name: "template1", ID: "1"},

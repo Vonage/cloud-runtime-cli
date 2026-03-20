@@ -505,11 +505,11 @@ func TestCreatePackage(t *testing.T) {
 		{
 			name: "201-happy-path",
 			mock: mock{
-				mockResponse: `{"packageId":"package-id"}`,
+				mockResponse: `{"packageId":"package-id","name":"my-app","version":1}`,
 				status:       http.StatusCreated,
 			},
 			want: want{
-				output: CreatePackageResponse{PackageID: "package-id"},
+				output: CreatePackageResponse{PackageID: "package-id", Name: "my-app", Version: 1},
 				err:    nil,
 			},
 		},
@@ -570,7 +570,7 @@ func TestCreatePackage(t *testing.T) {
 
 			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
 
-			createPackageArgs := CreatePackageArgs{SourceCodeKey: "source-code-key", Entrypoint: []string{"node", "index.js"}, Capabilities: Capabilities{Messages: "v1"}}
+			createPackageArgs := CreatePackageArgs{Name: "my-app", SourceCodeKey: "source-code-key", Entrypoint: []string{"node", "index.js"}, Capabilities: Capabilities{Messages: "v1"}}
 			output, err := deploymentClient.CreatePackage(t.Context(), createPackageArgs)
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
