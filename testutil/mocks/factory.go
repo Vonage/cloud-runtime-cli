@@ -610,19 +610,19 @@ func (mr *MockDatastoreInterfaceMockRecorder) GetInstanceByProjectAndInstanceNam
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInstanceByProjectAndInstanceName", reflect.TypeOf((*MockDatastoreInterface)(nil).GetInstanceByProjectAndInstanceName), ctx, projectName, instanceName)
 }
 
-// GetLatestProductVersionByID mocks base method.
-func (m *MockDatastoreInterface) GetLatestProductVersionByID(ctx context.Context, id string) (api.ProductVersion, error) {
+// GetActiveProductVersionByID mocks base method.
+func (m *MockDatastoreInterface) GetActiveProductVersionByID(ctx context.Context, id string) (api.ProductVersion, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetLatestProductVersionByID", ctx, id)
+	ret := m.ctrl.Call(m, "GetActiveProductVersionByID", ctx, id)
 	ret0, _ := ret[0].(api.ProductVersion)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetLatestProductVersionByID indicates an expected call of GetLatestProductVersionByID.
-func (mr *MockDatastoreInterfaceMockRecorder) GetLatestProductVersionByID(ctx, id interface{}) *gomock.Call {
+// GetActiveProductVersionByID indicates an expected call of GetActiveProductVersionByID.
+func (mr *MockDatastoreInterfaceMockRecorder) GetActiveProductVersionByID(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLatestProductVersionByID", reflect.TypeOf((*MockDatastoreInterface)(nil).GetLatestProductVersionByID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActiveProductVersionByID", reflect.TypeOf((*MockDatastoreInterface)(nil).GetActiveProductVersionByID), ctx, id)
 }
 
 // GetProject mocks base method.
