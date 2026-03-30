@@ -279,38 +279,44 @@ query MyQuery {
 	return resp.Data.Products, nil
 }
 
-type getLatestProductVersionByIDParams struct {
+type getActiveProductVersionByIDParams struct {
 	ID string `json:"id"`
 }
 
-type getLatestProductVersionByIDResponseData struct {
-	ProductVersions []ProductVersion `json:"ProductVersions"`
+type getActiveProductVersionByIDProduct struct {
+	ActiveVersionID string `json:"active_version_id"`
 }
 
-type getLatestProductVersionByIDResponse struct {
-	Data getLatestProductVersionByIDResponseData `json:"data"`
+type getActiveProductVersionByIDResponseData struct {
+	Product *getActiveProductVersionByIDProduct `json:"Products_by_pk"`
 }
 
-func (ds *Datastore) GetLatestProductVersionByID(ctx context.Context, id string) (ProductVersion, error) {
+type getActiveProductVersionByIDResponse struct {
+	Data getActiveProductVersionByIDResponseData `json:"data"`
+}
+
+// GetActiveProductVersionByID returns the active (live) product version for the given product ID.
+// It reads the product's active_version_id directly, avoiding selection of draft or non-live versions.
+func (ds *Datastore) GetActiveProductVersionByID(ctx context.Context, id string) (ProductVersion, error) {
 	const query = `
 query MyQuery ($id: uuid!) {
-  ProductVersions(where: {Product: {active_version_id: {_is_null: false},id: {_eq: $id}}}, order_by: {created_at: desc}) {
-    id
+  Products_by_pk(id: $id) {
+    active_version_id
   }
 }
 `
 	req := GQLRequest{
 		Query:     query,
-		Variables: getLatestProductVersionByIDParams{ID: id},
+		Variables: getActiveProductVersionByIDParams{ID: id},
 	}
-	var resp getLatestProductVersionByIDResponse
+	var resp getActiveProductVersionByIDResponse
 	if err := ds.gqlClient.Do(ctx, req, &resp); err != nil {
 		return ProductVersion{}, err
 	}
-	if len(resp.Data.ProductVersions) == 0 {
+	if resp.Data.Product == nil || resp.Data.Product.ActiveVersionID == "" {
 		return ProductVersion{}, ErrNotFound
 	}
-	return resp.Data.ProductVersions[0], nil
+	return ProductVersion{ID: resp.Data.Product.ActiveVersionID}, nil
 }
 
 type getLogByIDParams struct {
