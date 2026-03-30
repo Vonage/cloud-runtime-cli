@@ -751,13 +751,13 @@ func TestListProducts(t *testing.T) {
 	}
 }
 
-func TestGetLatestProductVersionByID(t *testing.T) {
+func TestGetActiveProductVersionByID(t *testing.T) {
 	httpClient := resty.New()
 	httpmock.ActivateNonDefault(httpClient.GetClient())
 	defer httpmock.DeactivateAndReset()
 
 	type mock struct {
-		mockResponse getLatestProductVersionByIDResponse
+		mockResponse getActiveProductVersionByIDResponse
 		status       int
 	}
 
@@ -774,12 +774,10 @@ func TestGetLatestProductVersionByID(t *testing.T) {
 		{
 			name: "200-happy-path",
 			mock: mock{
-				mockResponse: getLatestProductVersionByIDResponse{
-					Data: getLatestProductVersionByIDResponseData{
-						ProductVersions: []ProductVersion{
-							{
-								ID: "ProductVersion1-id",
-							},
+				mockResponse: getActiveProductVersionByIDResponse{
+					Data: getActiveProductVersionByIDResponseData{
+						Product: &getActiveProductVersionByIDProduct{
+							ActiveVersionID: "ProductVersion1-id",
 						},
 					},
 				},
@@ -796,9 +794,24 @@ func TestGetLatestProductVersionByID(t *testing.T) {
 		{
 			name: "404-error",
 			mock: mock{
-				mockResponse: getLatestProductVersionByIDResponse{
-					Data: getLatestProductVersionByIDResponseData{
-						ProductVersions: []ProductVersion{},
+				mockResponse: getActiveProductVersionByIDResponse{
+					Data: getActiveProductVersionByIDResponseData{},
+				},
+				status: http.StatusOK,
+			},
+			want: want{
+				output: ProductVersion{},
+				err:    ErrNotFound,
+			},
+		},
+		{
+			name: "404-error-empty-active-version-id",
+			mock: mock{
+				mockResponse: getActiveProductVersionByIDResponse{
+					Data: getActiveProductVersionByIDResponseData{
+						Product: &getActiveProductVersionByIDProduct{
+							ActiveVersionID: "",
+						},
 					},
 				},
 				status: http.StatusOK,
@@ -829,7 +842,7 @@ func TestGetLatestProductVersionByID(t *testing.T) {
 			gqlClient := NewGraphQLClient("https://example.com", httpClient)
 			datastoreClient := NewDatastore(gqlClient)
 
-			output, err := datastoreClient.GetLatestProductVersionByID(t.Context(), "Product1-id")
+			output, err := datastoreClient.GetActiveProductVersionByID(t.Context(), "Product1-id")
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
