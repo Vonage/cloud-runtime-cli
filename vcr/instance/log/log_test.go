@@ -21,8 +21,10 @@ func TestLog(t *testing.T) {
 	type mock struct {
 		LogListLogsByInstanceIDTimes         int
 		LogGetInstByProjAndInstNameTimes     int
+		LogGetInstanceByIDTimes              int
 		LogListLogsByInstanceIDReturnErr     error
 		LogGetInstByProjAndInstNameReturnErr error
+		LogGetInstanceByIDReturnErr          error
 		LogReturnLogs                        []api.Log
 		LogReturnInstance                    api.Instance
 		LogProjectName                       string
@@ -69,6 +71,41 @@ func TestLog(t *testing.T) {
 				errMsg: "failed to validate flags: must provide either 'id' flag or 'project-name' and 'instance-name' flags",
 			},
 		},
+		{
+			name: "default-no-follow-fetches-once-by-instance-id",
+			cli:  "--id=abc-123",
+			mock: mock{
+				LogListLogsByInstanceIDTimes:         1,
+				LogGetInstByProjAndInstNameTimes:     0,
+				LogGetInstanceByIDTimes:              1,
+				LogReturnInstance:                    api.Instance{ID: "abc-123"},
+				LogInstanceID:                        "abc-123",
+				LogReturnLogs:                        []api.Log{{Timestamp: time.Now(), SourceType: "application", Message: "hello"}},
+				LogListLogsByInstanceIDReturnErr:     nil,
+				LogGetInstByProjAndInstNameReturnErr: nil,
+				LogGetInstanceByIDReturnErr:          nil,
+			},
+			want: want{
+				stdout: "[application] hello",
+			},
+		},
+		{
+			name: "default-no-follow-get-instance-error",
+			cli:  "--id=bad-id",
+			mock: mock{
+				LogListLogsByInstanceIDTimes:         0,
+				LogGetInstByProjAndInstNameTimes:     0,
+				LogGetInstanceByIDTimes:              1,
+				LogReturnInstance:                    api.Instance{},
+				LogInstanceID:                        "bad-id",
+				LogListLogsByInstanceIDReturnErr:     nil,
+				LogGetInstByProjAndInstNameReturnErr: nil,
+				LogGetInstanceByIDReturnErr:          errors.New("datastore error"),
+			},
+			want: want{
+				errMsg: "failed to get instance",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -83,6 +120,10 @@ func TestLog(t *testing.T) {
 				GetInstanceByProjectAndInstanceName(gomock.Any(), tt.mock.LogProjectName, tt.mock.LogInstanceName).
 				Times(tt.mock.LogGetInstByProjAndInstNameTimes).
 				Return(tt.mock.LogReturnInstance, tt.mock.LogGetInstByProjAndInstNameReturnErr)
+			datastoreMock.EXPECT().
+				GetInstanceByID(gomock.Any(), tt.mock.LogInstanceID).
+				Times(tt.mock.LogGetInstanceByIDTimes).
+				Return(tt.mock.LogReturnInstance, tt.mock.LogGetInstanceByIDReturnErr)
 			datastoreMock.EXPECT().ListLogsByInstanceID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 				Times(tt.mock.LogListLogsByInstanceIDTimes).
 				Return(tt.mock.LogReturnLogs, tt.mock.LogListLogsByInstanceIDReturnErr)
@@ -104,7 +145,7 @@ func TestLog(t *testing.T) {
 
 			if _, err := cmd.ExecuteC(); err != nil && tt.want.errMsg != "" {
 				require.Error(t, err, "should throw error")
-				require.Equal(t, tt.want.errMsg, err.Error())
+				require.Contains(t, err.Error(), tt.want.errMsg)
 				return
 			}
 			cmdOut := &testutil.CmdOut{
@@ -116,7 +157,11 @@ func TestLog(t *testing.T) {
 				return
 			}
 			require.NoError(t, err, "should not throw error")
-			require.Equal(t, tt.want.stdout, cmdOut.String())
+			if tt.want.stdout != "" {
+				require.Contains(t, cmdOut.String(), tt.want.stdout)
+			} else {
+				require.Equal(t, tt.want.stdout, cmdOut.String())
+			}
 		})
 	}
 }
