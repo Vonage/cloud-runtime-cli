@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"os"
 	"testing"
 	"time"
 
@@ -293,4 +294,51 @@ func Test_printLogs(t *testing.T) {
 			require.Equal(t, tt.want.stdout, stdout.String())
 		})
 	}
+}
+
+func TestLog_Follow(t *testing.T) {
+	ctrl := gomock.NewController(t)
+
+	datastoreMock := mocks.NewMockDatastoreInterface(ctrl)
+	deploymentMock := mocks.NewMockDeploymentInterface(ctrl)
+
+	datastoreMock.EXPECT().
+		GetInstanceByID(gomock.Any(), "abc-123").
+		Times(1).
+		Return(api.Instance{ID: "abc-123"}, nil)
+
+	// Track how many times ListLogsByInstanceID is called and send SIGTERM
+	// after the second tick so the follow loop exits cleanly.
+	callCount := 0
+	datastoreMock.EXPECT().
+		ListLogsByInstanceID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		MinTimes(2).
+		DoAndReturn(func(_ interface{}, _ interface{}, _ interface{}, _ interface{}) ([]api.Log, error) {
+			callCount++
+			if callCount >= 2 {
+				// Send an interrupt to the current process so runLog's signal
+				// handler fires and the follow loop exits.
+				p, _ := os.FindProcess(os.Getpid())
+				_ = p.Signal(os.Interrupt)
+			}
+			return []api.Log{{Timestamp: time.Now(), SourceType: "application", Message: "streaming"}}, nil
+		})
+
+	ios, _, stdout, _ := iostreams.Test()
+
+	argv, err := shlex.Split("--id=abc-123 --follow")
+	require.NoError(t, err)
+
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, deploymentMock, nil, nil)
+
+	cmd := NewCmdInstanceLog(f)
+	cmd.SetArgs(argv)
+	cmd.SetIn(&bytes.Buffer{})
+	cmd.SetOut(io.Discard)
+	cmd.SetErr(io.Discard)
+
+	_, err = cmd.ExecuteC()
+	require.NoError(t, err, "follow should exit cleanly on interrupt")
+	require.GreaterOrEqual(t, callCount, 2, "logs should have been fetched at least twice")
+	require.Contains(t, stdout.String(), "[application] streaming")
 }
