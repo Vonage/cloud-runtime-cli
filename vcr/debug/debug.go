@@ -157,6 +157,9 @@ func NewCmdDebug(f cmdutil.Factory) *cobra.Command {
 	cmd.Flags().IntVarP(&opts.DebuggerPort, "debugger-port", "d", defaultDebuggerPort, "Local port for debugger proxy server (default: 3001)")
 	cmd.Flags().BoolVarP(&opts.PreserveData, "preserve-data", "", false, "Keep debug session data after stopping (useful for debugging state issues)")
 	cmd.Flags().StringVarP(&opts.ManifestFile, "filename", "f", "", "Path to VCR manifest file (default: vcr.yml in project directory)")
+
+	cmd.AddCommand(NewCmdPruneSessions(f))
+
 	return cmd
 }
 

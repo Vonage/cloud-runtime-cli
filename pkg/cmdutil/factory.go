@@ -43,6 +43,7 @@ type DeploymentInterface interface {
 	DeployDebugService(ctx context.Context, region, applicationID, name string, caps api.Capabilities) (api.DeployResponse, error)
 	GetServiceReadyStatus(ctx context.Context, serviceName string) (bool, error)
 	DeleteDebugService(ctx context.Context, serviceName string, preserveData bool) error
+	PruneDebugSessions(ctx context.Context) error
 	CreatePackage(ctx context.Context, createPackageArgs api.CreatePackageArgs) (api.CreatePackageResponse, error)
 	CreateProject(ctx context.Context, projectName string) (api.CreateProjectResponse, error)
 	DeployInstance(ctx context.Context, deployInstanceArgs api.DeployInstanceArgs) (api.DeployInstanceResponse, error)

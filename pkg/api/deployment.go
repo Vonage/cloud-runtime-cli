@@ -156,6 +156,19 @@ func (c *DeploymentClient) DeleteDebugService(ctx context.Context, serviceName s
 	return nil
 }
 
+func (c *DeploymentClient) PruneDebugSessions(ctx context.Context) error {
+	resp, err := c.httpClient.R().
+		SetContext(ctx).
+		Delete(c.baseURL + "/debug/services")
+	if err != nil {
+		return fmt.Errorf("%w: trace_id = %s", err, traceIDFromHTTPResponse(resp))
+	}
+	if resp.IsError() {
+		return NewErrorFromHTTPResponse(resp)
+	}
+	return nil
+}
+
 type statusResponse struct {
 	Ready bool `json:"ready"`
 }
