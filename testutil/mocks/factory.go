@@ -471,6 +471,20 @@ func (mr *MockDeploymentInterfaceMockRecorder) ListVonageApplications(ctx, filte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListVonageApplications", reflect.TypeOf((*MockDeploymentInterface)(nil).ListVonageApplications), ctx, filter)
 }
 
+// PruneDebugSessions mocks base method.
+func (m *MockDeploymentInterface) PruneDebugSessions(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PruneDebugSessions", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PruneDebugSessions indicates an expected call of PruneDebugSessions.
+func (mr *MockDeploymentInterfaceMockRecorder) PruneDebugSessions(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PruneDebugSessions", reflect.TypeOf((*MockDeploymentInterface)(nil).PruneDebugSessions), ctx)
+}
+
 // RemoveSecret mocks base method.
 func (m *MockDeploymentInterface) RemoveSecret(ctx context.Context, name string) error {
 	m.ctrl.T.Helper()
@@ -499,21 +513,6 @@ func (mr *MockDeploymentInterfaceMockRecorder) UpdateSecret(ctx, s interface{}) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSecret", reflect.TypeOf((*MockDeploymentInterface)(nil).UpdateSecret), ctx, s)
 }
 
-// ValidateDeployment mocks base method.
-func (m *MockDeploymentInterface) ValidateDeployment(ctx context.Context, req api.ValidateDeploymentRequest) (api.ValidateDeploymentResponse, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ValidateDeployment", ctx, req)
-	ret0, _ := ret[0].(api.ValidateDeploymentResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ValidateDeployment indicates an expected call of ValidateDeployment.
-func (mr *MockDeploymentInterfaceMockRecorder) ValidateDeployment(ctx, req interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateDeployment", reflect.TypeOf((*MockDeploymentInterface)(nil).ValidateDeployment), ctx, req)
-}
-
 // UploadTgz mocks base method.
 func (m *MockDeploymentInterface) UploadTgz(ctx context.Context, fileBytes []byte) (api.UploadResponse, error) {
 	m.ctrl.T.Helper()
@@ -527,6 +526,21 @@ func (m *MockDeploymentInterface) UploadTgz(ctx context.Context, fileBytes []byt
 func (mr *MockDeploymentInterfaceMockRecorder) UploadTgz(ctx, fileBytes interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadTgz", reflect.TypeOf((*MockDeploymentInterface)(nil).UploadTgz), ctx, fileBytes)
+}
+
+// ValidateDeployment mocks base method.
+func (m *MockDeploymentInterface) ValidateDeployment(ctx context.Context, req api.ValidateDeploymentRequest) (api.ValidateDeploymentResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ValidateDeployment", ctx, req)
+	ret0, _ := ret[0].(api.ValidateDeploymentResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ValidateDeployment indicates an expected call of ValidateDeployment.
+func (mr *MockDeploymentInterfaceMockRecorder) ValidateDeployment(ctx, req interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateDeployment", reflect.TypeOf((*MockDeploymentInterface)(nil).ValidateDeployment), ctx, req)
 }
 
 // WatchDeployment mocks base method.
