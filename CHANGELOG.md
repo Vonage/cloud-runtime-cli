@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.0](https://github.com/Vonage/cloud-runtime-cli/compare/v2.3.0...v2.4.0) (2026-04-15)
+
+
+### 🚀 Features
+
+* **debug:** add prune-sessions command ([#76](https://github.com/Vonage/cloud-runtime-cli/issues/76)) ([b0cfbb0](https://github.com/Vonage/cloud-runtime-cli/commit/b0cfbb0f327d607cfb33b1410b8f3064a584064d))
+
 ## [2.3.0](https://github.com/Vonage/cloud-runtime-cli/compare/v2.2.1...v2.3.0) (2026-02-26)
 
 
