@@ -1,0 +1,26 @@
+.gitignore
+  acbe68ea98e10cee 5-14
+vcr/instance/log/log_test.go
+  acbe68ea98e10cee 7,298-343
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "3543b9a99e482cff02cdfce1f6ccd6bb33cb1be7",
+  "prompts": {
+    "acbe68ea98e10cee": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_274a9c658ffeISvBm3GPdQbQOV",
+        "model": "github-copilot/claude-sonnet-4.6"
+      },
+      "human_author": "Gorka Revilla",
+      "messages": [],
+      "total_additions": 78,
+      "total_deletions": 20,
+      "accepted_lines": 58,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/b9b8e5419fbb20c617bc5c206947706e70bf3d53c6bf84464b3fce4b3f288217"
+    }
+  }
+}
