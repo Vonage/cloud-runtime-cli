@@ -52,6 +52,7 @@ type Options struct {
 	LogLevel     string
 	SourceType   string
 	Limit        int
+	Follow       bool
 }
 
 func NewCmdInstanceLog(f cmdutil.Factory) *cobra.Command {
@@ -62,11 +63,12 @@ func NewCmdInstanceLog(f cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "log",
 		Aliases: []string{"logs"},
-		Short:   "Stream real-time logs from a deployed VCR instance",
-		Long: heredoc.Doc(`Stream real-time logs from a deployed VCR instance.
+		Short:   "Fetch logs from a deployed VCR instance",
+		Long: heredoc.Doc(`Fetch logs from a deployed VCR instance.
 
-			This command connects to a running instance and streams its logs in real-time
-			to your terminal. Logs are continuously fetched until you press Ctrl+C.
+			By default, the command retrieves the last N log entries (controlled by --history)
+			and exits. Use --follow (-f) to continuously stream new log entries until you
+			press Ctrl+C.
 
 			IDENTIFYING THE INSTANCE
 			  You can identify the instance using either:
@@ -93,15 +95,20 @@ func NewCmdInstanceLog(f cmdutil.Factory) *cobra.Command {
 		`),
 		Args: cobra.MaximumNArgs(0),
 		Example: heredoc.Doc(`
-			# Stream logs by project and instance name
+			# Print the last logs by project and instance name (default, exits after output)
 			$ vcr instance log --project-name my-app --instance-name dev
 			2024-01-15T10:30:00Z [application] Server started on port 3000
 			2024-01-15T10:30:01Z [application] Connected to database
-			^C
-			Interrupt received, stopping...
 
-			# Stream logs by instance ID
+			# Print the last logs by instance ID
 			$ vcr instance log --id 12345678-1234-1234-1234-123456789abc
+
+			# Continuously stream new logs (press Ctrl+C to stop)
+			$ vcr instance log -p my-app -n dev --follow
+			$ vcr instance log -p my-app -n dev -f
+
+			# Print the last 500 log entries and exit
+			$ vcr instance log -p my-app -n dev --history 500
 
 			# Filter to show only errors and above
 			$ vcr instance log -p my-app -n dev --log-level error
@@ -109,11 +116,8 @@ func NewCmdInstanceLog(f cmdutil.Factory) *cobra.Command {
 			# Show only application logs (exclude provider logs)
 			$ vcr instance log -p my-app -n dev --source-type application
 
-			# Increase history to last 500 log entries
-			$ vcr instance log -p my-app -n dev --history 500
-
-			# Combine filters
-			$ vcr instance log -p my-app -n dev -l warn -s application
+			# Combine filters with follow
+			$ vcr instance log -p my-app -n dev -l warn -s application -f
 		`),
 		RunE: func(_ *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline())
@@ -129,6 +133,7 @@ func NewCmdInstanceLog(f cmdutil.Factory) *cobra.Command {
 	cmd.Flags().StringVarP(&opts.InstanceName, "instance-name", "n", "", "Instance name (requires --project-name)")
 	cmd.Flags().StringVarP(&opts.LogLevel, "log-level", "l", "", "Minimum log level: trace, debug, info, warn, error, fatal")
 	cmd.Flags().StringVarP(&opts.SourceType, "source-type", "s", "", "Filter by source: application, provider")
+	cmd.Flags().BoolVarP(&opts.Follow, "follow", "f", false, "Continuously stream new log entries (press Ctrl+C to stop)")
 
 	return cmd
 }
@@ -145,6 +150,12 @@ func runLog(ctx context.Context, opts *Options) error {
 	}
 
 	opts.InstanceID = inst.ID
+
+	// Without --follow just print the historical logs and exit.
+	if !opts.Follow {
+		fetchLogs(io, opts, time.Time{})
+		return nil
+	}
 
 	ticker := time.NewTicker(TickerInterval)
 	defer ticker.Stop()
