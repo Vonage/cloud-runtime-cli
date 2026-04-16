@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.1](https://github.com/Vonage/cloud-runtime-cli/compare/v2.4.0...v2.4.1) (2026-04-16)
+
+
+### 🐛 Bug Fixes
+
+* APIAPEX-2747 add follow flag to instance logs ([#77](https://github.com/Vonage/cloud-runtime-cli/issues/77)) ([5945724](https://github.com/Vonage/cloud-runtime-cli/commit/59457248b4d0c1dad2d934fb93b998befbdd040b))
+
 ## [2.4.0](https://github.com/Vonage/cloud-runtime-cli/compare/v2.3.0...v2.4.0) (2026-04-15)
 
 
