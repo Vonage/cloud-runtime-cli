@@ -253,6 +253,15 @@ func PrintAPIError(out *iostreams.IOStreams, err error, httpErr *api.Error) stri
 
 var errorRegex = regexp.MustCompile("^[^:]+")
 
+var dockerNameRe = regexp.MustCompile(`[^a-z0-9._-]`)
+
+func SanitizeDockerImageName(name string) string {
+	name = strings.ToLower(name)
+	name = dockerNameRe.ReplaceAllString(name, "-")
+	name = strings.Trim(name, ".-_")
+	return name
+}
+
 func extractFinalErrorMessage(err error) (string, error) {
 	matches := errorRegex.FindStringSubmatch(err.Error())
 	if len(matches) > 0 {
