@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
+	"vonage-cloud-runtime-cli/vcr/instance/list"
 	"vonage-cloud-runtime-cli/vcr/instance/log"
 	"vonage-cloud-runtime-cli/vcr/instance/remove"
 )
@@ -26,6 +27,7 @@ func NewCmdInstance(f cmdutil.Factory) *cobra.Command {
 			  • A project name and instance name (from your manifest)
 
 			AVAILABLE COMMANDS
+			  list (ls)     List all deployed instances
 			  log (logs)    View real-time logs from a running instance
 			  remove (rm)   Delete an instance and free its resources
 
@@ -35,6 +37,12 @@ func NewCmdInstance(f cmdutil.Factory) *cobra.Command {
 			  • Project + Instance name: The combination from your vcr.yml manifest
 		`),
 		Example: heredoc.Doc(`
+			# List all instances
+			$ vcr instance list
+
+			# List instances filtered by service name
+			$ vcr instance list --filter "my-service"
+
 			# View logs for an instance by project and instance name
 			$ vcr instance log --project-name my-app --instance-name dev
 
@@ -51,6 +59,7 @@ func NewCmdInstance(f cmdutil.Factory) *cobra.Command {
 
 	cmd.AddCommand(remove.NewCmdInstanceRemove(f))
 	cmd.AddCommand(log.NewCmdInstanceLog(f))
+	cmd.AddCommand(list.NewCmdInstanceList(f))
 
 	return cmd
 }
