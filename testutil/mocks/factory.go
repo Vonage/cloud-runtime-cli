@@ -486,6 +486,20 @@ func (mr *MockDeploymentInterfaceMockRecorder) ListVonageApplications(ctx, filte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListVonageApplications", reflect.TypeOf((*MockDeploymentInterface)(nil).ListVonageApplications), ctx, filter)
 }
 
+// PruneDebugSessions mocks base method.
+func (m *MockDeploymentInterface) PruneDebugSessions(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PruneDebugSessions", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PruneDebugSessions indicates an expected call of PruneDebugSessions.
+func (mr *MockDeploymentInterfaceMockRecorder) PruneDebugSessions(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PruneDebugSessions", reflect.TypeOf((*MockDeploymentInterface)(nil).PruneDebugSessions), ctx)
+}
+
 // RemoveSecret mocks base method.
 func (m *MockDeploymentInterface) RemoveSecret(ctx context.Context, name string) error {
 	m.ctrl.T.Helper()
