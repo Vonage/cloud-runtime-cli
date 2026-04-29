@@ -6,6 +6,7 @@ import (
 
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
 	"vonage-cloud-runtime-cli/vcr/secret/create"
+	"vonage-cloud-runtime-cli/vcr/secret/list"
 	"vonage-cloud-runtime-cli/vcr/secret/remove"
 	"vonage-cloud-runtime-cli/vcr/secret/update"
 )
@@ -35,6 +36,7 @@ func NewCmdSecret(f cmdutil.Factory) *cobra.Command {
 
 			AVAILABLE COMMANDS
 			  create (add)   Create a new secret
+			  list (ls)      List all secrets
 			  update         Update an existing secret's value
 			  remove (rm)    Delete a secret
 
@@ -60,6 +62,7 @@ func NewCmdSecret(f cmdutil.Factory) *cobra.Command {
 	}
 
 	cmd.AddCommand(create.NewCmdSecretCreate(f))
+	cmd.AddCommand(list.NewCmdSecretList(f))
 	cmd.AddCommand(remove.NewCmdSecretRemove(f))
 	cmd.AddCommand(update.NewCmdSecretUpdate(f))
 	return cmd
