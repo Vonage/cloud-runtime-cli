@@ -1,0 +1,24 @@
+AGENTS.md
+  f7482682023c0a78 1-86
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "f2b0498e41c2ed30f1c00b5c54602f81ff55cadb",
+  "prompts": {
+    "f7482682023c0a78": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_22683800affeTPRhIedDM9pZKx",
+        "model": "github-copilot/claude-sonnet-4.6"
+      },
+      "human_author": "Gorka Revilla",
+      "messages": [],
+      "total_additions": 86,
+      "total_deletions": 0,
+      "accepted_lines": 86,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/699594ba743edabcee36607fc3ceb22a25f99886d2e182356a93739d212f8b78"
+    }
+  }
+}
