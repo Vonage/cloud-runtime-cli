@@ -105,9 +105,9 @@ func TestInit(t *testing.T) {
 		InitTemplateAskForUserChoiceTimes             int
 		InitReturnTemplateLabel                       string
 		InitTemplateAskForUserChoiceErr               error
-		InitGetLatestProductVersionByIDTimes          int
-		InitGetLatestProductVersionByIDReturnTemplate api.ProductVersion
-		InitGetLatestProductVersionByIDReturnErr      error
+		InitGetActiveProductVersionByIDTimes          int
+		InitGetActiveProductVersionByIDReturnTemplate api.ProductVersion
+		InitGetActiveProductVersionByIDReturnErr      error
 		InitGetTemplateTimes                          int
 		InitGetTemplateReturnTemplate                 []byte
 		InitGetTemplateReturnErr                      error
@@ -196,9 +196,9 @@ func TestInit(t *testing.T) {
 				InitReturnTemplateLabel:              "template-label",
 				InitTemplateAskForUserChoiceErr:      nil,
 
-				InitGetLatestProductVersionByIDTimes:          0,
-				InitGetLatestProductVersionByIDReturnTemplate: api.ProductVersion{},
-				InitGetLatestProductVersionByIDReturnErr:      nil,
+				InitGetActiveProductVersionByIDTimes:          0,
+				InitGetActiveProductVersionByIDReturnTemplate: api.ProductVersion{},
+				InitGetActiveProductVersionByIDReturnErr:      nil,
 				InitGetTemplateTimes:                          0,
 				InitGetTemplateReturnTemplate:                 []byte{},
 				InitGetTemplateReturnErr:                      nil,
@@ -280,9 +280,9 @@ func TestInit(t *testing.T) {
 				InitReturnTemplateLabel:              "template-label",
 				InitTemplateAskForUserChoiceErr:      nil,
 
-				InitGetLatestProductVersionByIDTimes:          0,
-				InitGetLatestProductVersionByIDReturnTemplate: api.ProductVersion{},
-				InitGetLatestProductVersionByIDReturnErr:      nil,
+				InitGetActiveProductVersionByIDTimes:          0,
+				InitGetActiveProductVersionByIDReturnTemplate: api.ProductVersion{},
+				InitGetActiveProductVersionByIDReturnErr:      nil,
 				InitGetTemplateTimes:                          0,
 				InitGetTemplateReturnTemplate:                 []byte{},
 				InitGetTemplateReturnErr:                      nil,
@@ -364,15 +364,98 @@ func TestInit(t *testing.T) {
 				InitReturnTemplateLabel:              "product-name",
 				InitTemplateAskForUserChoiceErr:      nil,
 
-				InitGetLatestProductVersionByIDTimes:          1,
-				InitGetLatestProductVersionByIDReturnTemplate: api.ProductVersion{ID: "product-version-id"},
-				InitGetLatestProductVersionByIDReturnErr:      nil,
+				InitGetActiveProductVersionByIDTimes:          1,
+				InitGetActiveProductVersionByIDReturnTemplate: api.ProductVersion{ID: "product-version-id"},
+				InitGetActiveProductVersionByIDReturnErr:      nil,
 				InitGetTemplateTimes:                          1,
 				InitGetTemplateReturnTemplate:                 byteSlice,
 				InitGetTemplateReturnErr:                      nil,
 			},
 			want: want{
 				stdout: fmt.Sprintf("✓ %s/vcr.yml created\n", absPath),
+			},
+		},
+		{
+			name: "error-when-active-product-version-not-found",
+			cli:  "testdata/",
+			mock: mock{
+				InitProjNameAskForUserInputQuestion: "Enter your project name:",
+				InitProjNameAskForUserInputTimes:    1,
+				InitReturnProjName:                  "project-name",
+				InitProjNameAskForUserInputErr:      nil,
+
+				InitInstListVonageAppsFilter:           "",
+				InitInstListVonageAppsTimes:            1,
+				InitReturnInstApps:                     api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "app-name", ID: "app-id"}}},
+				InitInstListVonageAppsReturnErr:        nil,
+				InitInstAskForUserChoiceQuestion:       "Select your Vonage application ID for deployment:",
+				InitInstAskForUserChoiceTimes:          1,
+				InitReturnInstAppLabel:                 "app-name - (app-id)",
+				InitInstAskForUserChoiceErr:            nil,
+				InitInstAppNameAskForUserInputQuestion: "Enter your new Vonage application name for deployment:",
+				InitInstAppNameAskForUserInputTimes:    0,
+				InitReturnInstAppName:                  "app-name",
+				InitInstAppAskForUserInputErr:          nil,
+				InitInstCreateTimes:                    0,
+				InitInstCreateReturnApp:                api.CreateVonageApplicationOutput{},
+				InitInstCreateReturnErr:                nil,
+				InitInstCreateName:                     "app-name",
+
+				InitDebugListVonageAppsFilter:           "",
+				InitDebugListVonageAppsTimes:            1,
+				InitReturnDebugApps:                     api.ListVonageApplicationsOutput{Applications: []api.ApplicationListItem{{Name: "app-name", ID: "app-id"}}},
+				InitDebugListVonageAppsReturnErr:        nil,
+				InitDebugAskForUserChoiceQuestion:       "Select your Vonage application ID for debug:",
+				InitDebugAskForUserChoiceTimes:          1,
+				InitReturnDebugAppLabel:                 "app-name - (app-id)",
+				InitDebugAskForUserChoiceErr:            nil,
+				InitDebugAppNameAskForUserInputQuestion: "Enter your new Vonage application name for debug:",
+				InitDebugAppNameAskForUserInputTimes:    0,
+				InitReturnDebugAppName:                  "app-name",
+				InitDebugAppAskForUserInputErr:          nil,
+				InitDebugCreateTimes:                    0,
+				InitDebugCreateReturnApp:                api.CreateVonageApplicationOutput{},
+				InitDebugCreateReturnErr:                nil,
+				InitDebugCreateName:                     "app-name",
+
+				InitListRuntimesTimes:               1,
+				InitReturnRuntimes:                  []api.Runtime{{Name: "nodejs16", Comments: "", Language: "nodejs"}},
+				InitListRuntimesReturnErr:           nil,
+				InitRuntimeAskForUserChoiceQuestion: "Select a runtime:",
+				InitRuntimeAskForUserChoiceTimes:    1,
+				InitReturnRuntimeLabel:              "nodejs16",
+				InitRuntimeAskForUserChoiceErr:      nil,
+
+				InitListRegionsTimes:               1,
+				InitReturnRegions:                  []api.Region{{Name: "AWS - Europe Ireland", Alias: "aws.euw1"}},
+				InitListRegionsReturnErr:           nil,
+				InitRegionAskForUserChoiceQuestion: "Select a region:",
+				InitRegionAskForUserChoiceTimes:    1,
+				InitReturnRegionLabel:              "AWS - Europe Ireland - (aws.euw1)",
+				InitRegionAskForUserChoiceErr:      nil,
+
+				InitInstNameAskForUserInputQuestion: "Enter your Instance name:",
+				InitInstNameAskForUserInputTimes:    1,
+				InitReturnInstName:                  "instance-name",
+				InitInstNameAskForUserInputErr:      nil,
+
+				InitListProductsTimes:                1,
+				InitReturnProducts:                   []api.Product{{ID: "product-id", Name: "product-name", ProgrammingLanguage: "NodeJS"}},
+				InitListProductsReturnErr:            nil,
+				InitTemplateAskForUserChoiceQuestion: "Select a product template for runtime nodejs16: ",
+				InitTemplateAskForUserChoiceTimes:    1,
+				InitReturnTemplateLabel:              "product-name",
+				InitTemplateAskForUserChoiceErr:      nil,
+
+				InitGetActiveProductVersionByIDTimes:          1,
+				InitGetActiveProductVersionByIDReturnTemplate: api.ProductVersion{},
+				InitGetActiveProductVersionByIDReturnErr:      api.ErrNotFound,
+				InitGetTemplateTimes:                          0,
+				InitGetTemplateReturnTemplate:                 []byte{},
+				InitGetTemplateReturnErr:                      nil,
+			},
+			want: want{
+				errMsg: "failed to get the active product template version: not found",
 			},
 		},
 	}
@@ -449,9 +532,9 @@ func TestInit(t *testing.T) {
 				Times(tt.mock.InitTemplateAskForUserChoiceTimes).
 				Return(tt.mock.InitReturnTemplateLabel, tt.mock.InitTemplateAskForUserChoiceErr)
 
-			datastoreMock.EXPECT().GetLatestProductVersionByID(gomock.Any(), gomock.Any()).
-				Times(tt.mock.InitGetLatestProductVersionByIDTimes).
-				Return(tt.mock.InitGetLatestProductVersionByIDReturnTemplate, tt.mock.InitGetLatestProductVersionByIDReturnErr)
+			datastoreMock.EXPECT().GetActiveProductVersionByID(gomock.Any(), gomock.Any()).
+				Times(tt.mock.InitGetActiveProductVersionByIDTimes).
+				Return(tt.mock.InitGetActiveProductVersionByIDReturnTemplate, tt.mock.InitGetActiveProductVersionByIDReturnErr)
 
 			marketplaceMock.EXPECT().GetTemplate(gomock.Any(), gomock.Any(), gomock.Any()).
 				Times(tt.mock.InitGetTemplateTimes).

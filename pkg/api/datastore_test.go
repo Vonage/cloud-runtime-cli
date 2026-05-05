@@ -750,14 +750,14 @@ func TestListProducts(t *testing.T) {
 	}
 }
 
-func TestGetLatestProductVersionByID(t *testing.T) {
+func TestGetActiveProductVersionByID(t *testing.T) {
 	httpClient := resty.New()
 	httpmock.ActivateNonDefault(httpClient.GetClient())
 	defer httpmock.DeactivateAndReset()
 
 	type mock struct {
-		mockResponse getLatestProductVersionByIDResponse
-		status       int
+		mockResponses []interface{}
+		status        int
 	}
 
 	type want struct {
@@ -773,12 +773,17 @@ func TestGetLatestProductVersionByID(t *testing.T) {
 		{
 			name: "200-happy-path",
 			mock: mock{
-				mockResponse: getLatestProductVersionByIDResponse{
-					Data: getLatestProductVersionByIDResponseData{
-						ProductVersions: []ProductVersion{
-							{
-								ID: "ProductVersion1-id",
+				mockResponses: []interface{}{
+					getActiveProductVersionByIDResponse{
+						Data: getActiveProductVersionByIDResponseData{
+							Product: &getActiveProductVersionByIDProduct{
+								ActiveVersionID: "ProductVersion1-id",
 							},
+						},
+					},
+					getProductVersionByIDResponse{
+						Data: getProductVersionByIDResponseData{
+							ProductVersion: &ProductVersion{ID: "ProductVersion1-id"},
 						},
 					},
 				},
@@ -795,9 +800,50 @@ func TestGetLatestProductVersionByID(t *testing.T) {
 		{
 			name: "404-error",
 			mock: mock{
-				mockResponse: getLatestProductVersionByIDResponse{
-					Data: getLatestProductVersionByIDResponseData{
-						ProductVersions: []ProductVersion{},
+				mockResponses: []interface{}{
+					getActiveProductVersionByIDResponse{
+						Data: getActiveProductVersionByIDResponseData{},
+					},
+				},
+				status: http.StatusOK,
+			},
+			want: want{
+				output: ProductVersion{},
+				err:    ErrNotFound,
+			},
+		},
+		{
+			name: "404-error-empty-active-version-id",
+			mock: mock{
+				mockResponses: []interface{}{
+					getActiveProductVersionByIDResponse{
+						Data: getActiveProductVersionByIDResponseData{
+							Product: &getActiveProductVersionByIDProduct{
+								ActiveVersionID: "",
+							},
+						},
+					},
+				},
+				status: http.StatusOK,
+			},
+			want: want{
+				output: ProductVersion{},
+				err:    ErrNotFound,
+			},
+		},
+		{
+			name: "404-error-active-version-not-found",
+			mock: mock{
+				mockResponses: []interface{}{
+					getActiveProductVersionByIDResponse{
+						Data: getActiveProductVersionByIDResponseData{
+							Product: &getActiveProductVersionByIDProduct{
+								ActiveVersionID: "ProductVersion1-id",
+							},
+						},
+					},
+					getProductVersionByIDResponse{
+						Data: getProductVersionByIDResponseData{},
 					},
 				},
 				status: http.StatusOK,
@@ -810,16 +856,19 @@ func TestGetLatestProductVersionByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
-			jsonData, err := json.Marshal(tt.mock.mockResponse)
-			if err != nil {
-				t.Fatalf("Error occurred during marshaling. Error: %s", err.Error())
-			}
-
-			mockResponse := string(jsonData)
-
+			responseCallCount := 0
 			httpmock.RegisterResponder("POST", "https://example.com",
 				func(_ *http.Request) (*http.Response, error) {
+					mockIndex := responseCallCount
+					if mockIndex >= len(tt.mock.mockResponses) {
+						mockIndex = len(tt.mock.mockResponses) - 1
+					}
+					jsonData, err := json.Marshal(tt.mock.mockResponses[mockIndex])
+					if err != nil {
+						t.Fatalf("Error occurred during marshaling. Error: %s", err.Error())
+					}
+					responseCallCount++
+					mockResponse := string(jsonData)
 					resp := httpmock.NewStringResponse(tt.mock.status, mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
@@ -828,7 +877,7 @@ func TestGetLatestProductVersionByID(t *testing.T) {
 			gqlClient := NewGraphQLClient("https://example.com", httpClient)
 			datastoreClient := NewDatastore(gqlClient)
 
-			output, err := datastoreClient.GetLatestProductVersionByID(t.Context(), "Product1-id")
+			output, err := datastoreClient.GetActiveProductVersionByID(t.Context(), "Product1-id")
 			if tt.want.err != nil {
 				require.EqualError(t, err, tt.want.err.Error())
 				httpmock.Reset()
