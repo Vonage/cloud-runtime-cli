@@ -295,10 +295,18 @@ type getActiveProductVersionByIDResponse struct {
 	Data getActiveProductVersionByIDResponseData `json:"data"`
 }
 
+type getProductVersionByIDResponseData struct {
+	ProductVersion *ProductVersion `json:"ProductVersions_by_pk"`
+}
+
+type getProductVersionByIDResponse struct {
+	Data getProductVersionByIDResponseData `json:"data"`
+}
+
 // GetActiveProductVersionByID returns the active (live) product version for the given product ID.
 // It reads the product's active_version_id directly, avoiding selection of draft or non-live versions.
 func (ds *Datastore) GetActiveProductVersionByID(ctx context.Context, id string) (ProductVersion, error) {
-	const query = `
+	const getProductQuery = `
 query MyQuery ($id: uuid!) {
   Products_by_pk(id: $id) {
     active_version_id
@@ -306,7 +314,7 @@ query MyQuery ($id: uuid!) {
 }
 `
 	req := GQLRequest{
-		Query:     query,
+		Query:     getProductQuery,
 		Variables: getActiveProductVersionByIDParams{ID: id},
 	}
 	var resp getActiveProductVersionByIDResponse
@@ -316,7 +324,28 @@ query MyQuery ($id: uuid!) {
 	if resp.Data.Product == nil || resp.Data.Product.ActiveVersionID == "" {
 		return ProductVersion{}, ErrNotFound
 	}
-	return ProductVersion{ID: resp.Data.Product.ActiveVersionID}, nil
+
+	const getVersionQuery = `
+query MyQuery ($id: uuid!) {
+  ProductVersions_by_pk(id: $id) {
+    id
+  }
+}
+`
+	activeVersionID := resp.Data.Product.ActiveVersionID
+	versionReq := GQLRequest{
+		Query:     getVersionQuery,
+		Variables: getActiveProductVersionByIDParams{ID: activeVersionID},
+	}
+	var versionResp getProductVersionByIDResponse
+	if err := ds.gqlClient.Do(ctx, versionReq, &versionResp); err != nil {
+		return ProductVersion{}, err
+	}
+	if versionResp.Data.ProductVersion == nil || versionResp.Data.ProductVersion.ID == "" {
+		return ProductVersion{}, ErrNotFound
+	}
+
+	return *versionResp.Data.ProductVersion, nil
 }
 
 type getLogByIDParams struct {
