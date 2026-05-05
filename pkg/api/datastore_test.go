@@ -757,8 +757,8 @@ func TestGetActiveProductVersionByID(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 
 	type mock struct {
-		mockResponse getActiveProductVersionByIDResponse
-		status       int
+		mockResponses []interface{}
+		status        int
 	}
 
 	type want struct {
@@ -774,10 +774,17 @@ func TestGetActiveProductVersionByID(t *testing.T) {
 		{
 			name: "200-happy-path",
 			mock: mock{
-				mockResponse: getActiveProductVersionByIDResponse{
-					Data: getActiveProductVersionByIDResponseData{
-						Product: &getActiveProductVersionByIDProduct{
-							ActiveVersionID: "ProductVersion1-id",
+				mockResponses: []interface{}{
+					getActiveProductVersionByIDResponse{
+						Data: getActiveProductVersionByIDResponseData{
+							Product: &getActiveProductVersionByIDProduct{
+								ActiveVersionID: "ProductVersion1-id",
+							},
+						},
+					},
+					getProductVersionByIDResponse{
+						Data: getProductVersionByIDResponseData{
+							ProductVersion: &ProductVersion{ID: "ProductVersion1-id"},
 						},
 					},
 				},
@@ -794,8 +801,10 @@ func TestGetActiveProductVersionByID(t *testing.T) {
 		{
 			name: "404-error",
 			mock: mock{
-				mockResponse: getActiveProductVersionByIDResponse{
-					Data: getActiveProductVersionByIDResponseData{},
+				mockResponses: []interface{}{
+					getActiveProductVersionByIDResponse{
+						Data: getActiveProductVersionByIDResponseData{},
+					},
 				},
 				status: http.StatusOK,
 			},
@@ -807,11 +816,35 @@ func TestGetActiveProductVersionByID(t *testing.T) {
 		{
 			name: "404-error-empty-active-version-id",
 			mock: mock{
-				mockResponse: getActiveProductVersionByIDResponse{
-					Data: getActiveProductVersionByIDResponseData{
-						Product: &getActiveProductVersionByIDProduct{
-							ActiveVersionID: "",
+				mockResponses: []interface{}{
+					getActiveProductVersionByIDResponse{
+						Data: getActiveProductVersionByIDResponseData{
+							Product: &getActiveProductVersionByIDProduct{
+								ActiveVersionID: "",
+							},
 						},
+					},
+				},
+				status: http.StatusOK,
+			},
+			want: want{
+				output: ProductVersion{},
+				err:    ErrNotFound,
+			},
+		},
+		{
+			name: "404-error-active-version-not-found",
+			mock: mock{
+				mockResponses: []interface{}{
+					getActiveProductVersionByIDResponse{
+						Data: getActiveProductVersionByIDResponseData{
+							Product: &getActiveProductVersionByIDProduct{
+								ActiveVersionID: "ProductVersion1-id",
+							},
+						},
+					},
+					getProductVersionByIDResponse{
+						Data: getProductVersionByIDResponseData{},
 					},
 				},
 				status: http.StatusOK,
@@ -824,16 +857,19 @@ func TestGetActiveProductVersionByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
-			jsonData, err := json.Marshal(tt.mock.mockResponse)
-			if err != nil {
-				t.Fatalf("Error occurred during marshaling. Error: %s", err.Error())
-			}
-
-			mockResponse := string(jsonData)
-
+			responseCallCount := 0
 			httpmock.RegisterResponder("POST", "https://example.com",
 				func(_ *http.Request) (*http.Response, error) {
+					mockIndex := responseCallCount
+					if mockIndex >= len(tt.mock.mockResponses) {
+						mockIndex = len(tt.mock.mockResponses) - 1
+					}
+					jsonData, err := json.Marshal(tt.mock.mockResponses[mockIndex])
+					if err != nil {
+						t.Fatalf("Error occurred during marshaling. Error: %s", err.Error())
+					}
+					responseCallCount++
+					mockResponse := string(jsonData)
 					resp := httpmock.NewStringResponse(tt.mock.status, mockResponse)
 					resp.Header.Set("Content-Type", "application/json")
 					return resp, nil
