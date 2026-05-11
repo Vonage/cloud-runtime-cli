@@ -1,0 +1,24 @@
+vcr/secret/list/list.go
+  s_daf08061117f55::t_5de142c2344166 36-39
+  s_daf08061117f55::t_e073c4686f22ad 41-43
+vcr/secret/list/list_test.go
+  s_daf08061117f55::t_bc9da53752fef6 95-100
+pkg/api/error.go
+  s_daf08061117f55::t_f302610dd0ebd6 119-121
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "951d6c42be9627707d59d64a8ddefe8beedc168d",
+  "prompts": {},
+  "sessions": {
+    "s_daf08061117f55": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1e94dcd17ffeJeUGaLJynHJfHK",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Gorka Revilla <gorka.revillafernandez@vonage.com>"
+    }
+  }
+}
