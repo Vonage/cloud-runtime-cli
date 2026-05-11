@@ -33,9 +33,14 @@ func NewCmdSecretList(f cmdutil.Factory) *cobra.Command {
 		Example: heredoc.Doc(`
 			# List all secrets
 			$ vcr secret list
-			MY_API_KEY
-			DATABASE_PASSWORD
-			SSL_CERT
+			✓ Found 3 secret(s):
+			  ℹ MY_API_KEY
+			  ℹ DATABASE_PASSWORD
+			  ℹ SSL_CERT
+
+			# No secrets configured
+			$ vcr secret list
+			! No secrets found
 
 			# Using the 'ls' alias
 			$ vcr secret ls

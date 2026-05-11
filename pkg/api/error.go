@@ -116,6 +116,9 @@ func (e Error) Error() string {
 }
 
 func traceIDFromHTTPResponse(resp *resty.Response) string {
+	if resp == nil {
+		return "n/a"
+	}
 	if t := resp.Header().Get(traceIDHeaderName); t != "" {
 		return t
 	}

@@ -92,9 +92,12 @@ func TestSecretList(t *testing.T) {
 			cmd.SetOut(io.Discard)
 			cmd.SetErr(io.Discard)
 
-			if _, err := cmd.ExecuteC(); err != nil && tt.want.errMsg != "" {
-				require.Error(t, err, "should throw error")
-				require.Equal(t, tt.want.errMsg, err.Error())
+			if _, execErr := cmd.ExecuteC(); execErr != nil && tt.want.errMsg != "" {
+				require.Error(t, execErr, "should throw error")
+				require.Equal(t, tt.want.errMsg, execErr.Error())
+				return
+			} else if execErr != nil {
+				require.NoError(t, execErr, "should not throw error")
 				return
 			}
 			cmdOut := &testutil.CmdOut{
@@ -102,7 +105,6 @@ func TestSecretList(t *testing.T) {
 				ErrBuf: stderr,
 			}
 
-			require.NoError(t, err, "should not throw error")
 			require.Contains(t, cmdOut.String(), tt.want.stdout)
 		})
 	}
