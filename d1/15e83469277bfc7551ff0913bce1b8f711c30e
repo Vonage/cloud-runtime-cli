@@ -1,0 +1,19 @@
+pkg/api/error.go
+  s_daf08061117f55::t_cf879361530ce1 16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "d115e83469277bfc7551ff0913bce1b8f711c30e",
+  "prompts": {},
+  "sessions": {
+    "s_daf08061117f55": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1e94dcd17ffeJeUGaLJynHJfHK",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Gorka Revilla <gorka.revillafernandez@vonage.com>"
+    }
+  }
+}
