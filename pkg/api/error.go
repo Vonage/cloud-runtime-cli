@@ -13,6 +13,7 @@ import (
 )
 
 const traceIDHeaderName = "X-Neru-Traceid"
+const traceIDNotAvailable = "n/a"
 
 var (
 	ErrNotFound      = errors.New("not found")
@@ -117,7 +118,7 @@ func (e Error) Error() string {
 
 func traceIDFromHTTPResponse(resp *resty.Response) string {
 	if resp == nil {
-		return "n/a"
+		return traceIDNotAvailable
 	}
 	if t := resp.Header().Get(traceIDHeaderName); t != "" {
 		return t
@@ -125,7 +126,7 @@ func traceIDFromHTTPResponse(resp *resty.Response) string {
 	if t := resp.Request.Header.Get(traceIDHeaderName); t != "" {
 		return t
 	}
-	return "n/a"
+	return traceIDNotAvailable
 }
 func traceIDFromWebsocketResponse(resp *http.Response) string {
 	if t := resp.Header.Get(traceIDHeaderName); t != "" {
@@ -134,5 +135,5 @@ func traceIDFromWebsocketResponse(resp *http.Response) string {
 	if t := resp.Request.Header.Get(traceIDHeaderName); t != "" {
 		return t
 	}
-	return "n/a"
+	return traceIDNotAvailable
 }
