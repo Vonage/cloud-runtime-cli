@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"testing"
 	"time"
@@ -925,6 +926,156 @@ func TestListLogsByInstanceID(t *testing.T) {
 			}
 
 			require.Equal(t, tt.want.output, regions)
+			httpmock.Reset()
+		})
+	}
+}
+
+func TestListInstances(t *testing.T) {
+	httpClient := resty.New()
+	httpmock.ActivateNonDefault(httpClient.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	type mock struct {
+		mockResponse listInstancesResponse
+		status       int
+		respErr      error
+	}
+
+	type want struct {
+		output []InstanceListItem
+		err    error
+	}
+
+	tests := []struct {
+		name   string
+		filter string
+		mock   mock
+		want   want
+	}{
+		{
+			name:   "200-happy-path-no-filter",
+			filter: "",
+			mock: mock{
+				mockResponse: listInstancesResponse{
+					Data: listInstancesResponseData{
+						Instances: []InstanceListItem{
+							{
+								ID:               "11111111-1111-1111-1111-111111111111",
+								APIApplicationID: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+								Name:             "dev",
+								ServiceName:      "my-service",
+							},
+							{
+								ID:               "22222222-2222-2222-2222-222222222222",
+								APIApplicationID: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+								Name:             "prod",
+								ServiceName:      "my-service-prod",
+							},
+						},
+					},
+				},
+				status: http.StatusOK,
+			},
+			want: want{
+				output: []InstanceListItem{
+					{
+						ID:               "11111111-1111-1111-1111-111111111111",
+						APIApplicationID: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+						Name:             "dev",
+						ServiceName:      "my-service",
+					},
+					{
+						ID:               "22222222-2222-2222-2222-222222222222",
+						APIApplicationID: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+						Name:             "prod",
+						ServiceName:      "my-service-prod",
+					},
+				},
+			},
+		},
+		{
+			name:   "200-happy-path-with-filter",
+			filter: "prod",
+			mock: mock{
+				mockResponse: listInstancesResponse{
+					Data: listInstancesResponseData{
+						Instances: []InstanceListItem{
+							{
+								ID:               "22222222-2222-2222-2222-222222222222",
+								APIApplicationID: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+								Name:             "prod",
+								ServiceName:      "my-service-prod",
+							},
+						},
+					},
+				},
+				status: http.StatusOK,
+			},
+			want: want{
+				output: []InstanceListItem{
+					{
+						ID:               "22222222-2222-2222-2222-222222222222",
+						APIApplicationID: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+						Name:             "prod",
+						ServiceName:      "my-service-prod",
+					},
+				},
+			},
+		},
+		{
+			name:   "200-empty-result",
+			filter: "",
+			mock: mock{
+				mockResponse: listInstancesResponse{
+					Data: listInstancesResponseData{
+						Instances: []InstanceListItem{},
+					},
+				},
+				status: http.StatusOK,
+			},
+			want: want{
+				output: []InstanceListItem{},
+			},
+		},
+		{
+			name:   "transport-error",
+			filter: "",
+			mock:   mock{respErr: errors.New("transport error")},
+			want:   want{err: errors.New("transport error")},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.mock.respErr != nil {
+				httpmock.RegisterResponder("POST", "https://example.com",
+					httpmock.NewErrorResponder(tt.mock.respErr))
+			} else {
+				jsonData, err := json.Marshal(tt.mock.mockResponse)
+				if err != nil {
+					t.Fatalf("Error occurred during marshaling. Error: %s", err.Error())
+				}
+				httpmock.RegisterResponder("POST", "https://example.com",
+					func(_ *http.Request) (*http.Response, error) {
+						resp := httpmock.NewStringResponse(tt.mock.status, string(jsonData))
+						resp.Header.Set("Content-Type", "application/json")
+						return resp, nil
+					})
+			}
+
+			gqlClient := NewGraphQLClient("https://example.com", httpClient)
+			datastoreClient := NewDatastore(gqlClient)
+
+			output, err := datastoreClient.ListInstances(t.Context(), tt.filter)
+			if tt.want.err != nil {
+				require.Error(t, err)
+				httpmock.Reset()
+				return
+			}
+
+			require.NoError(t, err)
+			require.Equal(t, tt.want.output, output)
 			httpmock.Reset()
 		})
 	}

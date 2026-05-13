@@ -79,6 +79,57 @@ query MyQuery ($alias: String!) {
 	return resp.Data.Regions[0], nil
 }
 
+type listInstancesResponseData struct {
+	Instances []InstanceListItem `json:"Instances"`
+}
+
+type listInstancesResponse struct {
+	Data listInstancesResponseData `json:"data"`
+}
+
+type listInstancesParams struct {
+	ServiceName string `json:"service_name"`
+}
+
+// ListInstances lists all non-deleted instances ordered by last-updated date descending.
+// If filter is non-empty, only instances whose service_name contains the filter string
+// (case-insensitive) are returned, using a GraphQL _ilike operator.
+func (ds *Datastore) ListInstances(ctx context.Context, filter string) ([]InstanceListItem, error) {
+	const queryNoFilter = `
+query MyQuery {
+  Instances(order_by: {updated_at: desc}, where: {deleted: {_eq: false}}) {
+    id
+    api_application_id
+    name
+    service_name
+  }
+}`
+	const queryWithFilter = `
+query MyQuery ($service_name: String!) {
+  Instances(order_by: {updated_at: desc}, where: {deleted: {_eq: false}, service_name: {_ilike: $service_name}}) {
+    id
+    api_application_id
+    name
+    service_name
+  }
+}`
+	var req GQLRequest
+	if filter == "" {
+		req = GQLRequest{Query: queryNoFilter}
+	} else {
+		req = GQLRequest{
+			Query:     queryWithFilter,
+			Variables: listInstancesParams{ServiceName: "%" + filter + "%"},
+		}
+	}
+
+	var resp listInstancesResponse
+	if err := ds.gqlClient.Do(ctx, req, &resp); err != nil {
+		return nil, err
+	}
+	return resp.Data.Instances, nil
+}
+
 type getByProjAndInstNameData struct {
 	Instances []Instance `json:"Instances"`
 }

@@ -18,6 +18,13 @@ type Instance struct {
 	ServiceName string `json:"service_name,omitempty"`
 }
 
+type InstanceListItem struct {
+	ID               string `json:"id"`
+	APIApplicationID string `json:"api_application_id"`
+	Name             string `json:"name"`
+	ServiceName      string `json:"service_name"`
+}
+
 type Runtime struct {
 	ID         string `json:"id"`
 	Name       string `json:"name"`
