@@ -456,6 +456,21 @@ func (mr *MockDeploymentInterfaceMockRecorder) ListMongoDatabases(ctx, version i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMongoDatabases", reflect.TypeOf((*MockDeploymentInterface)(nil).ListMongoDatabases), ctx, version)
 }
 
+// ListSecrets mocks base method.
+func (m *MockDeploymentInterface) ListSecrets(ctx context.Context) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListSecrets", ctx)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListSecrets indicates an expected call of ListSecrets.
+func (mr *MockDeploymentInterfaceMockRecorder) ListSecrets(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListSecrets", reflect.TypeOf((*MockDeploymentInterface)(nil).ListSecrets), ctx)
+}
+
 // ListVonageApplications mocks base method.
 func (m *MockDeploymentInterface) ListVonageApplications(ctx context.Context, filter string) (api.ListVonageApplicationsOutput, error) {
 	m.ctrl.T.Helper()
