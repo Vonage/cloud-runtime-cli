@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.5.0](https://github.com/Vonage/cloud-runtime-cli/compare/v2.4.0...v2.5.0) (2026-05-13)
+
+
+### 🚀 Features
+
+* add support instance list ([#71](https://github.com/Vonage/cloud-runtime-cli/issues/71)) ([d2b4da6](https://github.com/Vonage/cloud-runtime-cli/commit/d2b4da625037f5e735d8bbb1dae936aaff761e5c))
+* add support secret list ([#73](https://github.com/Vonage/cloud-runtime-cli/issues/73)) ([8350a42](https://github.com/Vonage/cloud-runtime-cli/commit/8350a42682607ebbb1f5f87142017aeb7065d529))
+
+
+### 🐛 Bug Fixes
+
+* APIAPEX-2747 add follow flag to instance logs ([#77](https://github.com/Vonage/cloud-runtime-cli/issues/77)) ([5945724](https://github.com/Vonage/cloud-runtime-cli/commit/59457248b4d0c1dad2d934fb93b998befbdd040b))
+
 ## [2.4.0](https://github.com/Vonage/cloud-runtime-cli/compare/v2.3.0...v2.4.0) (2026-04-15)
 
 
