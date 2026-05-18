@@ -17,3 +17,6 @@ lefthook-local.yml
 
 # Node modules (for commitlint)
 node_modules/
+
+# Agent working files
+docs/superpowers/
