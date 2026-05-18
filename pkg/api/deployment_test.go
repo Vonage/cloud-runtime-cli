@@ -239,6 +239,80 @@ func TestGenerateVonageApplicationKeys(t *testing.T) {
 	}
 }
 
+func TestDeleteVonageApplication(t *testing.T) {
+	client := resty.New()
+	httpmock.ActivateNonDefault(client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	type mock struct {
+		mockResponse string
+		status       int
+	}
+
+	type want struct {
+		err error
+	}
+
+	tests := []struct {
+		name string
+		mock mock
+		want want
+	}{
+		{
+			name: "204-happy-path",
+			mock: mock{
+				mockResponse: "",
+				status:       http.StatusNoContent,
+			},
+			want: want{
+				err: nil,
+			},
+		},
+		{
+			name: "404-not-found",
+			mock: mock{
+				mockResponse: "",
+				status:       http.StatusNotFound,
+			},
+			want: want{
+				err: ErrNotFound,
+			},
+		},
+		{
+			name: "500-error",
+			mock: mock{
+				mockResponse: `{"error": {"code": 1001, "message": "internal server error", "traceId": "n/a", "containerLogs": ""}}`,
+				status:       http.StatusInternalServerError,
+			},
+			want: want{
+				err: errors.New("API Error Encountered: ( HTTP status: 500 Error code: 1001 Detailed message: internal server error Trace ID: n/a )"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			httpmock.RegisterResponder("DELETE", "https://example.com/v0.3/applications/application-id",
+				func(_ *http.Request) (*http.Response, error) {
+					resp := httpmock.NewStringResponse(tt.mock.status, tt.mock.mockResponse)
+					resp.Header.Set("Content-Type", "application/json")
+					return resp, nil
+				})
+
+			deploymentClient := NewDeploymentClient("https://example.com", "v0.3", client, nil)
+
+			err := deploymentClient.DeleteVonageApplication(t.Context(), "application-id")
+			if tt.want.err != nil {
+				require.EqualError(t, err, tt.want.err.Error())
+				httpmock.Reset()
+				return
+			}
+			require.NoError(t, err)
+			httpmock.Reset()
+		})
+	}
+}
+
 func TestDeployDebugService(t *testing.T) {
 	client := resty.New()
 	httpmock.ActivateNonDefault(client.GetClient())

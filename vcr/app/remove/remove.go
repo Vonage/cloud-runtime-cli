@@ -2,11 +2,13 @@ package remove
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/spf13/cobra"
 
+	"vonage-cloud-runtime-cli/pkg/api"
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
 )
 
@@ -76,6 +78,9 @@ func runRemove(ctx context.Context, opts *Options) error {
 	err := opts.DeploymentClient().DeleteVonageApplication(ctx, opts.ApplicationID)
 	spinner.Stop()
 	if err != nil {
+		if errors.Is(err, api.ErrNotFound) {
+			return fmt.Errorf("application %q could not be found or may have already been deleted", opts.ApplicationID)
+		}
 		return fmt.Errorf("failed to remove application: %w", err)
 	}
 

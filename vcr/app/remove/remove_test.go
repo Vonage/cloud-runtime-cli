@@ -11,6 +11,7 @@ import (
 	"github.com/google/shlex"
 	"github.com/stretchr/testify/require"
 
+	"vonage-cloud-runtime-cli/pkg/api"
 	"vonage-cloud-runtime-cli/testutil"
 	"vonage-cloud-runtime-cli/testutil/mocks"
 )
@@ -85,6 +86,17 @@ func TestAppRemove(t *testing.T) {
 			},
 		},
 		{
+			name: "not-found",
+			cli:  appID + " --yes",
+			mock: mock{
+				DeleteTimes:     1,
+				DeleteReturnErr: api.ErrNotFound,
+			},
+			want: want{
+				errMsg: "application \"" + appID + "\" could not be found or may have already been deleted",
+			},
+		},
+		{
 			name: "api-error",
 			cli:  appID + " --yes",
 			mock: mock{
@@ -102,16 +114,20 @@ func TestAppRemove(t *testing.T) {
 			ctrl := gomock.NewController(t)
 
 			deploymentMock := mocks.NewMockDeploymentInterface(ctrl)
-			deploymentMock.EXPECT().
-				DeleteVonageApplication(gomock.Any(), appID).
-				Times(tt.mock.DeleteTimes).
-				Return(tt.mock.DeleteReturnErr)
+			if tt.mock.DeleteTimes > 0 {
+				deploymentMock.EXPECT().
+					DeleteVonageApplication(gomock.Any(), appID).
+					Times(tt.mock.DeleteTimes).
+					Return(tt.mock.DeleteReturnErr)
+			}
 
 			surveyMock := mocks.NewMockSurveyInterface(ctrl)
-			surveyMock.EXPECT().
-				AskYesNo(gomock.Any()).
-				Times(tt.mock.AskYesNoTimes).
-				Return(tt.mock.AskYesNoReturn)
+			if tt.mock.AskYesNoTimes > 0 {
+				surveyMock.EXPECT().
+					AskYesNo(gomock.Any()).
+					Times(tt.mock.AskYesNoTimes).
+					Return(tt.mock.AskYesNoReturn)
+			}
 
 			ios, _, stdout, stderr := iostreams.Test()
 			ios.SetStdinTTY(true)
@@ -130,9 +146,10 @@ func TestAppRemove(t *testing.T) {
 			cmd.SetOut(io.Discard)
 			cmd.SetErr(io.Discard)
 
-			if _, err := cmd.ExecuteC(); err != nil && tt.want.errMsg != "" {
-				require.Error(t, err, "should throw error")
-				require.Equal(t, tt.want.errMsg, err.Error())
+			_, cmdErr := cmd.ExecuteC()
+			if cmdErr != nil && tt.want.errMsg != "" {
+				require.Error(t, cmdErr, "should throw error")
+				require.Equal(t, tt.want.errMsg, cmdErr.Error())
 				return
 			}
 
@@ -145,7 +162,7 @@ func TestAppRemove(t *testing.T) {
 				require.Equal(t, tt.want.stderr, cmdOut.Stderr())
 				return
 			}
-			require.NoError(t, err, "should not throw error")
+			require.NoError(t, cmdErr, "should not throw error")
 			require.Equal(t, tt.want.stdout, cmdOut.String())
 		})
 	}
