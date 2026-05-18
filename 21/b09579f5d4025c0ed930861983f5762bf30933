@@ -1,0 +1,31 @@
+pkg/api/deployment.go
+  s_280295d2aaf900::t_e31c6c5e0ca203 112,117
+vcr/app/app.go
+  s_7f4e1dc4b43c81::t_1a8430d1aaf398 30-33
+vcr/app/delete/delete.go
+  s_7f4e1dc4b43c81::t_1044eeef32d540 65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "21b09579f5d4025c0ed930861983f5762bf30933",
+  "prompts": {},
+  "sessions": {
+    "s_280295d2aaf900": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1c6000ceaffe6xXLsVvmwWxGbz",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Gorka Revilla <gorka.revillafernandez@vonage.com>"
+    },
+    "s_7f4e1dc4b43c81": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1c5f6cf59ffexphUJabP8XRlH2",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Gorka Revilla <gorka.revillafernandez@vonage.com>"
+    }
+  }
+}
