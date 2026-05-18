@@ -41,8 +41,8 @@ func NewCmdApp(f cmdutil.Factory) *cobra.Command {
 			# Create a new application with Voice and Messages capabilities
 			$ vcr app create --name my-app --voice --messages
 
-		# Remove an application
-		$ vcr app remove 12345678-1234-1234-1234-123456789abc
+			# Remove an application
+			$ vcr app remove 12345678-1234-1234-1234-123456789abc
 
 			# Generate new keys for an existing application
 			$ vcr app generate-keys --app-id 12345678-1234-1234-1234-123456789abc
