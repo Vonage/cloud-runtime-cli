@@ -109,12 +109,12 @@ func (c *DeploymentClient) GenerateVonageApplicationKeys(ctx context.Context, ap
 func (c *DeploymentClient) DeleteVonageApplication(ctx context.Context, appID string) error {
 	resp, err := c.httpClient.R().
 		SetContext(ctx).
-		Delete(fmt.Sprintf("%s/applications/%s", c.baseURL, appID))
+		Delete(c.baseURL + "/applications/" + appID)
 	if err != nil {
 		return fmt.Errorf("%w: trace_id = %s", err, traceIDFromHTTPResponse(resp))
 	}
 	if resp.StatusCode() == http.StatusNotFound {
-		return ErrNotFound
+		return nil
 	}
 	if resp.IsError() {
 		return NewErrorFromHTTPResponse(resp)

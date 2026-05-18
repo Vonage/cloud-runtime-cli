@@ -27,10 +27,10 @@ func NewCmdApp(f cmdutil.Factory) *cobra.Command {
 			  • Webhook URLs for receiving events
 
 			AVAILABLE COMMANDS
-		  create         Create a new Vonage application
-		  delete         Delete a Vonage application
-		  list (ls)      List all Vonage applications in your account
-		  generate-keys  Generate new key pairs for an existing application
+			  create         Create a new Vonage application
+			  delete         Delete a Vonage application
+			  list (ls)      List all Vonage applications in your account
+			  generate-keys  Generate new key pairs for an existing application
 
 			WORKFLOW
 			  1. Create an application: vcr app create --name my-app

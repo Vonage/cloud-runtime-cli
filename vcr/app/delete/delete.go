@@ -62,7 +62,7 @@ func runDelete(ctx context.Context, opts *Options) error {
 	c := io.ColorScheme()
 
 	if io.CanPrompt() && !opts.SkipPrompts {
-		if !opts.Survey().AskYesNo(fmt.Sprintf("are you sure you want to delete application %q ?", opts.ApplicationID)) {
+		if !opts.Survey().AskYesNo(fmt.Sprintf("Are you sure you want to delete application %q?", opts.ApplicationID)) {
 			fmt.Fprintf(io.ErrOut, "%s Application removal aborted\n", c.WarningIcon())
 			return nil
 		}
