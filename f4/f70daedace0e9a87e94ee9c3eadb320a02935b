@@ -1,0 +1,19 @@
+pkg/api/deployment.go
+  s_85ceac78ce8e86::t_4577079fc94544 109-124
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "f4f70daedace0e9a87e94ee9c3eadb320a02935b",
+  "prompts": {},
+  "sessions": {
+    "s_85ceac78ce8e86": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1c601f094ffe0hx4Sspnq7moYv",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Gorka Revilla <gorka.revillafernandez@vonage.com>"
+    }
+  }
+}
