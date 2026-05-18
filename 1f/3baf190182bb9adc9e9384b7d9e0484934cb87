@@ -1,0 +1,28 @@
+pkg/api/deployment.go
+  s_280295d2aaf900::t_e31c6c5e0ca203 112,117
+  s_85ceac78ce8e86::t_4577079fc94544 109-111,113-116,118-124
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "1f3baf190182bb9adc9e9384b7d9e0484934cb87",
+  "prompts": {},
+  "sessions": {
+    "s_280295d2aaf900": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1c6000ceaffe6xXLsVvmwWxGbz",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": null
+    },
+    "s_85ceac78ce8e86": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1c601f094ffe0hx4Sspnq7moYv",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Gorka Revilla <gorka.revillafernandez@vonage.com>"
+    }
+  }
+}
