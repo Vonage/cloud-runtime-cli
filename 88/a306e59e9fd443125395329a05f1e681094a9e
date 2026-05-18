@@ -1,0 +1,21 @@
+vcr/app/delete/delete.go
+  s_7f4e1dc4b43c81::t_1044eeef32d540 65
+vcr/app/app.go
+  s_7f4e1dc4b43c81::t_1a8430d1aaf398 30-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "88a306e59e9fd443125395329a05f1e681094a9e",
+  "prompts": {},
+  "sessions": {
+    "s_7f4e1dc4b43c81": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1c5f6cf59ffexphUJabP8XRlH2",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Gorka Revilla <gorka.revillafernandez@vonage.com>"
+    }
+  }
+}
