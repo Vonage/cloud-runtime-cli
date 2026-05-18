@@ -6,9 +6,9 @@ import (
 
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
 	createCmd "vonage-cloud-runtime-cli/vcr/app/create"
-	deleteCmd "vonage-cloud-runtime-cli/vcr/app/delete"
 	generatekeysCmd "vonage-cloud-runtime-cli/vcr/app/generatekeys"
 	listCmd "vonage-cloud-runtime-cli/vcr/app/list"
+	removeCmd "vonage-cloud-runtime-cli/vcr/app/remove"
 )
 
 func NewCmdApp(f cmdutil.Factory) *cobra.Command {
@@ -28,7 +28,7 @@ func NewCmdApp(f cmdutil.Factory) *cobra.Command {
 
 			AVAILABLE COMMANDS
 			  create         Create a new Vonage application
-			  delete         Delete a Vonage application
+			  remove (rm)    Remove a Vonage application
 			  list (ls)      List all Vonage applications in your account
 			  generate-keys  Generate new key pairs for an existing application
 
@@ -41,8 +41,8 @@ func NewCmdApp(f cmdutil.Factory) *cobra.Command {
 			# Create a new application with Voice and Messages capabilities
 			$ vcr app create --name my-app --voice --messages
 
-			# Delete an application
-			$ vcr app delete 12345678-1234-1234-1234-123456789abc
+		# Remove an application
+		$ vcr app remove 12345678-1234-1234-1234-123456789abc
 
 			# Generate new keys for an existing application
 			$ vcr app generate-keys --app-id 12345678-1234-1234-1234-123456789abc
@@ -56,8 +56,8 @@ func NewCmdApp(f cmdutil.Factory) *cobra.Command {
 	}
 
 	cmd.AddCommand(createCmd.NewCmdAppCreate(f))
-	cmd.AddCommand(deleteCmd.NewCmdAppDelete(f))
 	cmd.AddCommand(generatekeysCmd.NewCmdAppGenerateKeys(f))
 	cmd.AddCommand(listCmd.NewCmdAppList(f))
+	cmd.AddCommand(removeCmd.NewCmdAppRemove(f))
 	return cmd
 }

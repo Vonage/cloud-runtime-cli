@@ -1,4 +1,4 @@
-package delete
+package remove
 
 import (
 	"bytes"
@@ -15,7 +15,7 @@ import (
 	"vonage-cloud-runtime-cli/testutil/mocks"
 )
 
-func TestAppDelete(t *testing.T) {
+func TestAppRemove(t *testing.T) {
 	const appID = "12345678-1234-1234-1234-123456789abc"
 
 	type mock struct {
@@ -45,7 +45,7 @@ func TestAppDelete(t *testing.T) {
 				AskYesNoTimes:   0,
 			},
 			want: want{
-				stdout: "✓ Application \"" + appID + "\" successfully deleted\n",
+				stdout: "✓ Application \"" + appID + "\" successfully removed\n",
 			},
 		},
 		{
@@ -58,7 +58,7 @@ func TestAppDelete(t *testing.T) {
 				AskYesNoReturn:  true,
 			},
 			want: want{
-				stdout: "✓ Application \"" + appID + "\" successfully deleted\n",
+				stdout: "✓ Application \"" + appID + "\" successfully removed\n",
 			},
 		},
 		{
@@ -92,7 +92,7 @@ func TestAppDelete(t *testing.T) {
 				DeleteReturnErr: errors.New("internal server error"),
 			},
 			want: want{
-				errMsg: "failed to delete application: internal server error",
+				errMsg: "failed to remove application: internal server error",
 			},
 		},
 	}
@@ -124,7 +124,7 @@ func TestAppDelete(t *testing.T) {
 
 			f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, deploymentMock, surveyMock, nil)
 
-			cmd := NewCmdAppDelete(f)
+			cmd := NewCmdAppRemove(f)
 			cmd.SetArgs(argv)
 			cmd.SetIn(&bytes.Buffer{})
 			cmd.SetOut(io.Discard)
