@@ -1,0 +1,19 @@
+.gitignore
+  s_167a5f91c35092::t_f56d3fc5ea15ae 20-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "63ff24bec31bf6206e4b9452bd67addf7b6bd2cf",
+  "prompts": {},
+  "sessions": {
+    "s_167a5f91c35092": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1c61bcc33ffev4qEAc4eTXR5ch",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Gorka Revilla <gorka.revillafernandez@vonage.com>"
+    }
+  }
+}
