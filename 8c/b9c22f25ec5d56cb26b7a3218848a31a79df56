@@ -1,0 +1,21 @@
+pkg/cmdutil/factory.go
+  s_75b1cb4d2e8247::t_c03be2d52879ed 43
+testutil/mocks/factory.go
+  s_75b1cb4d2e8247::t_1f69d93ca8ddd1 370-383,702-703,705-706,711-712,714,717-718,720-721,726-727,729
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "8cb9c22f25ec5d56cb26b7a3218848a31a79df56",
+  "prompts": {},
+  "sessions": {
+    "s_75b1cb4d2e8247": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1c5ff09feffeZP0fPLkv3VMlXW",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Gorka Revilla <gorka.revillafernandez@vonage.com>"
+    }
+  }
+}
