@@ -1,0 +1,19 @@
+docs/superpowers/specs/2026-05-18-vcr-app-delete-design.md
+  s_167a5f91c35092::t_f779265fed6e49 1-71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "ef9a45a45e29c15d5f83109a2e7142d4881604a6",
+  "prompts": {},
+  "sessions": {
+    "s_167a5f91c35092": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1c61bcc33ffev4qEAc4eTXR5ch",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Gorka Revilla <gorka.revillafernandez@vonage.com>"
+    }
+  }
+}
