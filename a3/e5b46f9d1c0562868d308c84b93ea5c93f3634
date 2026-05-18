@@ -1,0 +1,22 @@
+vcr/app/app.go
+  s_167a5f91c35092::t_5871e1230f5a38 61
+  s_167a5f91c35092::t_1afff37d040d90 44-45
+  s_167a5f91c35092::t_dd8d0680955fc0 11
+  s_167a5f91c35092::t_32ec7485d8f1b0 31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "a3e5b46f9d1c0562868d308c84b93ea5c93f3634",
+  "prompts": {},
+  "sessions": {
+    "s_167a5f91c35092": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1c61bcc33ffev4qEAc4eTXR5ch",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Gorka Revilla <gorka.revillafernandez@vonage.com>"
+    }
+  }
+}
