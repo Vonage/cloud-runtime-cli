@@ -1,0 +1,21 @@
+docs/superpowers/specs/2026-05-18-vcr-app-delete-design.md
+  s_167a5f91c35092::t_3ecb9a88bd4a14 1,7,12,17,20,29-31,34,43,46,52-56,60,62-63,65-66,70,72-74
+docs/superpowers/plans/2026-05-18-vcr-app-delete.md
+  s_167a5f91c35092::t_d61928783c59b7 1,5,7,9,20-22,31,37,42,51,53,59,73,79,85,91,99,102,104,107,126-127,130-133,139,147,152,158,162,165,170,173,176,179,184,187,189,191-197,199,201,204,207,209,212,217,222,225,229,232,234,240,243,246,249
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "b38fcc4e0b823c0c43f6473c1d1a9be3a02eb27e",
+  "prompts": {},
+  "sessions": {
+    "s_167a5f91c35092": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1c61bcc33ffev4qEAc4eTXR5ch",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Gorka Revilla <gorka.revillafernandez@vonage.com>"
+    }
+  }
+}
