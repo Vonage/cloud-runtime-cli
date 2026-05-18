@@ -1,0 +1,27 @@
+vcr/app/remove/remove_test.go
+  s_167a5f91c35092::t_968a8793883369 14,88-98,117-122,125-130,149-152,165
+pkg/api/deployment.go
+  s_167a5f91c35092::t_86e934711e8c8f 8
+  s_167a5f91c35092::t_499c933e6ca8b4 113,118
+pkg/api/deployment_test.go
+  s_167a5f91c35092::t_8ecf8ac273b467 242-304
+vcr/app/remove/remove.go
+  s_167a5f91c35092::t_3691ecd4f7bf15 81-83
+  s_167a5f91c35092::t_27b67db4db60c0 5,11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "516f208d4e1d2d9cf535d114d3d72a0a3dd51f34",
+  "prompts": {},
+  "sessions": {
+    "s_167a5f91c35092": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1c61bcc33ffev4qEAc4eTXR5ch",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Gorka Revilla <gorka.revillafernandez@vonage.com>"
+    }
+  }
+}
