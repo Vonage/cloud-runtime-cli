@@ -1,22 +1,23 @@
-# Design: `vcr app delete`
+# Design: `vcr app remove`
 
 **Date:** 2026-05-18
 
 ## Summary
 
-Add a `vcr app delete <applicationID>` command that deletes a Vonage application via the deployment API. Follows existing CLI conventions established by `vcr instance remove` and `vcr secret remove`.
+Add a `vcr app remove <applicationID>` command that removes a Vonage application via the deployment API. Follows existing CLI conventions established by `vcr instance remove` and `vcr secret remove`.
 
 ## Command Interface
 
 ```
-vcr app delete <applicationID> [--yes|-y]
+vcr app remove <applicationID> [--yes|-y]
 ```
 
 - `applicationID`: required positional argument (Vonage application UUID).
 - `--yes` / `-y`: skip the interactive confirmation prompt (e.g. for CI environments). Prompt is also skipped when `io.CanPrompt()` returns false.
+- `rm` alias available (consistent with `vcr instance rm`, `vcr secret rm`).
 - Without `--yes`, the CLI prints:
   ```
-  are you sure you want to delete application "<applicationID>"? [y/N]
+  Are you sure you want to remove application "<applicationID>"?
   ```
   and aborts on anything other than `y`/`yes`.
 
@@ -25,12 +26,12 @@ vcr app delete <applicationID> [--yes|-y]
 Follows the existing pattern under `vcr/app/`:
 
 ```
-vcr/app/delete/
-  delete.go        # NewCmdAppDelete, Options, runDelete
-  delete_test.go
+vcr/app/remove/
+  remove.go        # NewCmdAppRemove, Options, runRemove
+  remove_test.go
 ```
 
-`vcr/app/app.go` gets a new `AddCommand(delete.NewCmdAppDelete(f))` line.
+`vcr/app/app.go` gets a new `AddCommand(removeCmd.NewCmdAppRemove(f))` line.
 
 ## API Layer
 
@@ -39,33 +40,35 @@ Add `DeleteVonageApplication` to `pkg/api/deployment.go`:
 ```go
 func (c *DeploymentClient) DeleteVonageApplication(ctx context.Context, appID string) error
 // DELETE {baseURL}/applications/{appID}
-// Returns nil on 2xx, ErrNotFound on 404, error on other non-2xx.
+// Returns nil on 2xx and 404 (idempotent), error on other non-2xx.
 ```
 
-The `Factory` interface in `pkg/cmdutil/factory.go` already exposes `DeploymentClient()` — no interface changes needed.
+The `Factory` interface in `pkg/cmdutil/factory.go` exposes `DeploymentClient()` — `DeleteVonageApplication` is added to `DeploymentInterface` and mocks regenerated.
 
 ## Output
 
 | Scenario | Output | Exit code |
 |---|---|---|
-| Success | `Application "<id>" deleted.` to stdout | 0 |
-| User aborts prompt | `Application removal aborted` to stderr | 0 |
-| 404 | formatted error: `application not found` | 1 |
-| Other API error | standard error via `pkg/format` | 1 |
+| Success | `✓ Application "<id>" successfully removed` to stdout | 0 |
+| User aborts prompt | `! Application removal aborted` to stderr | 0 |
+| Other API error | `failed to remove application: <err>` to stderr | 1 |
+
+Note: 404 is treated as success (idempotent delete) — no error surfaced to the user.
 
 ## Tests
 
-Table-driven tests in `delete_test.go` using `httpmock` and `testutil.NewTestIOStreams()`:
+Table-driven tests in `remove_test.go` using `gomock` and `testutil.NewTestIOStreams()`:
 
-- Successful delete with `--yes` flag (no prompt).
-- Successful delete after user confirms at prompt.
+- Successful remove with `--yes` flag (no prompt).
+- Successful remove after user confirms at prompt.
 - User types `n` at prompt — aborts, no API call made.
-- 404 response — error message printed, non-zero exit.
-- 500 response — error message printed, non-zero exit.
+- Missing application ID argument — cobra returns error.
+- API returns error — command returns wrapped error.
 
 ## Consistency Notes
 
+- Command name `remove` / alias `rm` matches `vcr instance remove` and `vcr secret remove`.
 - Flag name `--yes` / `-y` matches `vcr instance remove` and `vcr secret remove`.
-- Prompt text style matches `vcr instance remove`: lowercase, uses `opts.Survey().AskYesNo(...)`.
-- Prompt is gated on `io.CanPrompt()` matching existing pattern.
-- Error formatting uses `pkg/format` matching all other commands.
+- Prompt text capitalised: `"Are you sure you want to remove application %q?"`.
+- Prompt gated on `io.CanPrompt()` matching existing pattern.
+- API method named `DeleteVonageApplication` (HTTP verb) while CLI command is `remove` (user-facing verb).
