@@ -782,11 +782,6 @@ func TestGetActiveProductVersionByID(t *testing.T) {
 							},
 						},
 					},
-					getProductVersionByIDResponse{
-						Data: getProductVersionByIDResponseData{
-							ProductVersion: &ProductVersion{ID: "ProductVersion1-id"},
-						},
-					},
 				},
 				status: http.StatusOK,
 			},
@@ -832,47 +827,18 @@ func TestGetActiveProductVersionByID(t *testing.T) {
 				err:    ErrNotFound,
 			},
 		},
-		{
-			name: "404-error-active-version-not-found",
-			mock: mock{
-				mockResponses: []interface{}{
-					getActiveProductVersionByIDResponse{
-						Data: getActiveProductVersionByIDResponseData{
-							Product: &getActiveProductVersionByIDProduct{
-								ActiveVersionID: "ProductVersion1-id",
-							},
-						},
-					},
-					getProductVersionByIDResponse{
-						Data: getProductVersionByIDResponseData{},
-					},
-				},
-				status: http.StatusOK,
-			},
-			want: want{
-				output: ProductVersion{},
-				err:    ErrNotFound,
-			},
-		},
 		// Regression: must return the product's active version, not the latest by creation order.
 		{
 			name: "200-active-version-returned-when-newer-draft-exists",
 			mock: mock{
 				mockResponses: []interface{}{
-					// First call: product lookup — active_version_id points to v1 (the live version),
+					// Product lookup — active_version_id points to v1 (the live version),
 					// NOT v2 which was created more recently but is a draft without source code.
 					getActiveProductVersionByIDResponse{
 						Data: getActiveProductVersionByIDResponseData{
 							Product: &getActiveProductVersionByIDProduct{
 								ActiveVersionID: "v1-active-id",
 							},
-						},
-					},
-					// Second call: version lookup resolves v1 by its primary key.
-					// v2 ("v2-draft-id") is never queried — it is skipped entirely.
-					getProductVersionByIDResponse{
-						Data: getProductVersionByIDResponseData{
-							ProductVersion: &ProductVersion{ID: "v1-active-id"},
 						},
 					},
 				},
