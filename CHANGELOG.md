@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.0](https://github.com/Vonage/cloud-runtime-cli/compare/v2.5.0...v2.6.0) (2026-05-19)
+
+
+### 🚀 Features
+
+* **app:** add vcr app remove command [APIAPEX-2823] ([#82](https://github.com/Vonage/cloud-runtime-cli/issues/82)) ([4f861f4](https://github.com/Vonage/cloud-runtime-cli/commit/4f861f4ff497acac9213f6cf6ca5d68dd3f2b83a))
+
 ## [2.5.0](https://github.com/Vonage/cloud-runtime-cli/compare/v2.4.0...v2.5.0) (2026-05-13)
 
 
