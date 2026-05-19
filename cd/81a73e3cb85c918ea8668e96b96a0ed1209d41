@@ -1,0 +1,21 @@
+pkg/api/datastore_test.go
+  s_a856b9a1a3deab::t_b58c4f89f58cdb 835
+pkg/api/datastore.go
+  s_a856b9a1a3deab::t_2edb46aeca384f 371
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.9",
+  "base_commit_sha": "cd81a73e3cb85c918ea8668e96b96a0ed1209d41",
+  "prompts": {},
+  "sessions": {
+    "s_a856b9a1a3deab": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1c0de2caaffeuTxZXrlxh0HcrX",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Daniel Kaluzny <Daniel.Kaluzny@vonage.com>"
+    }
+  }
+}
