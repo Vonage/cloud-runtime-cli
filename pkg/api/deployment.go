@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 
@@ -99,6 +100,22 @@ func (c *DeploymentClient) GenerateVonageApplicationKeys(ctx context.Context, ap
 		Patch(c.baseURL + "/applications/" + appID + "/keys")
 	if err != nil {
 		return fmt.Errorf("%w: trace_id = %s", err, traceIDFromHTTPResponse(resp))
+	}
+	if resp.IsError() {
+		return NewErrorFromHTTPResponse(resp)
+	}
+	return nil
+}
+
+func (c *DeploymentClient) DeleteVonageApplication(ctx context.Context, appID string) error {
+	resp, err := c.httpClient.R().
+		SetContext(ctx).
+		Delete(c.baseURL + "/applications/" + url.PathEscape(appID))
+	if err != nil {
+		return fmt.Errorf("%w: trace_id = %s", err, traceIDFromHTTPResponse(resp))
+	}
+	if resp.StatusCode() == http.StatusNotFound {
+		return ErrNotFound
 	}
 	if resp.IsError() {
 		return NewErrorFromHTTPResponse(resp)

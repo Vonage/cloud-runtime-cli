@@ -40,6 +40,7 @@ type DeploymentInterface interface {
 	CreateVonageApplication(ctx context.Context, name string, enableRTC, enableVoice, enableMessages bool) (api.CreateVonageApplicationOutput, error)
 	ListVonageApplications(ctx context.Context, filter string) (api.ListVonageApplicationsOutput, error)
 	GenerateVonageApplicationKeys(ctx context.Context, appID string) error
+	DeleteVonageApplication(ctx context.Context, appID string) error
 	DeployDebugService(ctx context.Context, region, applicationID, name string, caps api.Capabilities) (api.DeployResponse, error)
 	GetServiceReadyStatus(ctx context.Context, serviceName string) (bool, error)
 	DeleteDebugService(ctx context.Context, serviceName string, preserveData bool) error

@@ -367,6 +367,20 @@ func (mr *MockDeploymentInterfaceMockRecorder) DeleteMongoDatabase(ctx, version,
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMongoDatabase", reflect.TypeOf((*MockDeploymentInterface)(nil).DeleteMongoDatabase), ctx, version, database)
 }
 
+// DeleteVonageApplication mocks base method.
+func (m *MockDeploymentInterface) DeleteVonageApplication(ctx context.Context, appID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteVonageApplication", ctx, appID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteVonageApplication indicates an expected call of DeleteVonageApplication.
+func (mr *MockDeploymentInterfaceMockRecorder) DeleteVonageApplication(ctx, appID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteVonageApplication", reflect.TypeOf((*MockDeploymentInterface)(nil).DeleteVonageApplication), ctx, appID)
+}
+
 // DeployDebugService mocks base method.
 func (m *MockDeploymentInterface) DeployDebugService(ctx context.Context, region, applicationID, name string, caps api.Capabilities) (api.DeployResponse, error) {
 	m.ctrl.T.Helper()
@@ -685,21 +699,6 @@ func (mr *MockDatastoreInterfaceMockRecorder) GetRuntimeByName(ctx, name interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRuntimeByName", reflect.TypeOf((*MockDatastoreInterface)(nil).GetRuntimeByName), ctx, name)
 }
 
-// ListLogsByInstanceID mocks base method.
-func (m *MockDatastoreInterface) ListLogsByInstanceID(ctx context.Context, instanceID string, limit int, timestamp time.Time) ([]api.Log, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListLogsByInstanceID", ctx, instanceID, limit, timestamp)
-	ret0, _ := ret[0].([]api.Log)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListLogsByInstanceID indicates an expected call of ListLogsByInstanceID.
-func (mr *MockDatastoreInterfaceMockRecorder) ListLogsByInstanceID(ctx, instanceID, limit, timestamp interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListLogsByInstanceID", reflect.TypeOf((*MockDatastoreInterface)(nil).ListLogsByInstanceID), ctx, instanceID, limit, timestamp)
-}
-
 // ListInstances mocks base method.
 func (m *MockDatastoreInterface) ListInstances(ctx context.Context, filter string) ([]api.InstanceListItem, error) {
 	m.ctrl.T.Helper()
@@ -713,6 +712,21 @@ func (m *MockDatastoreInterface) ListInstances(ctx context.Context, filter strin
 func (mr *MockDatastoreInterfaceMockRecorder) ListInstances(ctx, filter interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListInstances", reflect.TypeOf((*MockDatastoreInterface)(nil).ListInstances), ctx, filter)
+}
+
+// ListLogsByInstanceID mocks base method.
+func (m *MockDatastoreInterface) ListLogsByInstanceID(ctx context.Context, instanceID string, limit int, timestamp time.Time) ([]api.Log, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListLogsByInstanceID", ctx, instanceID, limit, timestamp)
+	ret0, _ := ret[0].([]api.Log)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListLogsByInstanceID indicates an expected call of ListLogsByInstanceID.
+func (mr *MockDatastoreInterfaceMockRecorder) ListLogsByInstanceID(ctx, instanceID, limit, timestamp interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListLogsByInstanceID", reflect.TypeOf((*MockDatastoreInterface)(nil).ListLogsByInstanceID), ctx, instanceID, limit, timestamp)
 }
 
 // ListProducts mocks base method.
