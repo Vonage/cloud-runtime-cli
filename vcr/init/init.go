@@ -326,11 +326,11 @@ func askTemplate(ctx context.Context, opts *Options) error {
 
 	selectedProductID := templateOptions.IDLookup[templateLabel]
 
-	spinner = cmdutil.DisplaySpinnerMessageWithHandle(" Retrieve the latest product template version... ")
-	selectedProductVersion, err := opts.Datastore().GetLatestProductVersionByID(ctx, selectedProductID)
+	spinner = cmdutil.DisplaySpinnerMessageWithHandle(" Retrieving active product template version... ")
+	selectedProductVersion, err := opts.Datastore().GetActiveProductVersionByID(ctx, selectedProductID)
 	spinner.Stop()
 	if err != nil {
-		return fmt.Errorf("failed to get the latest product template version: %w", err)
+		return fmt.Errorf("failed to get the active product template version: %w", err)
 	}
 	selectedProductVersionID := selectedProductVersion.ID
 
