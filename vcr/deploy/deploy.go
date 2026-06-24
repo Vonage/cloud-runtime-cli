@@ -523,7 +523,10 @@ func createPackage(ctx context.Context, opts *Options, uploadResp api.UploadResp
 		return api.CreatePackageResponse{}, fmt.Errorf("failed to get runtime: %w", err)
 	}
 
+	packageName := format.SanitizeDockerImageName(opts.ProjectName + "-" + opts.InstanceName)
+
 	createPackageArgs := api.CreatePackageArgs{
+		Name:            packageName,
 		SourceCodeKey:   uploadResp.SourceCodeKey,
 		Entrypoint:      opts.manifest.Instance.Entrypoint,
 		BuildScriptPath: opts.manifest.Instance.BuildScript,
@@ -537,7 +540,7 @@ func createPackage(ctx context.Context, opts *Options, uploadResp api.UploadResp
 		return api.CreatePackageResponse{}, fmt.Errorf("failed to create package: %w", err)
 	}
 
-	fmt.Fprintf(io.Out, "%s Package created: package_id=%q\n", c.SuccessIcon(), createPkgResp.PackageID)
+	fmt.Fprintf(io.Out, "%s Package created: package_id=%q name=%q version=%d\n", c.SuccessIcon(), createPkgResp.PackageID, createPkgResp.Name, createPkgResp.Version)
 
 	fmt.Fprintf(io.Out, "%s Waiting for build to start...\n", c.Blue(cmdutil.InfoIcon))
 	err = opts.DeploymentClient().WatchDeployment(ctx, opts.IOStreams(), createPkgResp.PackageID)

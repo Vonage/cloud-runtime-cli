@@ -10,11 +10,11 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/v0.4/packages/source", uploadTgzHandler)
-	http.HandleFunc("/v0.4/packages", createPackageHandler)
-	http.HandleFunc("/v0.4/packages/test-package-id/build/watch", watchDeploymentHandler)
-	http.HandleFunc("/v0.4/deployments/validate", validateDeploymentHandler)
-	http.HandleFunc("/v0.4/deployments", deployInstanceHandler)
+	http.HandleFunc("/v0.5/packages/source", uploadTgzHandler)
+	http.HandleFunc("/v0.5/packages", createPackageHandler)
+	http.HandleFunc("/v0.5/packages/test-package-id/build/watch", watchDeploymentHandler)
+	http.HandleFunc("/v0.5/deployments/validate", validateDeploymentHandler)
+	http.HandleFunc("/v0.5/deployments", deployInstanceHandler)
 	http.HandleFunc("/releases/latest", getLatestReleaseHandler)
 
 	fmt.Println("Server started on port 80")
@@ -42,10 +42,12 @@ func uploadTgzHandler(w http.ResponseWriter, _ *http.Request) {
 
 type CreatePackageResponse struct {
 	PackageID string `json:"packageId"`
+	Name      string `json:"name"`
+	Version   int    `json:"version"`
 }
 
 func createPackageHandler(w http.ResponseWriter, _ *http.Request) {
-	mockResponse := CreatePackageResponse{PackageID: "test-package-id"}
+	mockResponse := CreatePackageResponse{PackageID: "test-package-id", Name: "test-dev", Version: 1}
 	w.Header().Set("Content-Type", "application/json")
 	jsonResponse, err := json.Marshal(mockResponse)
 	if err != nil {
