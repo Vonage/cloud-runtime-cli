@@ -6,8 +6,11 @@ import "sync"
 // does not override --buffer.
 const DefaultBufferSize = 5000
 
-// Buffer is a bounded, drop-oldest ring buffer of entries. It is safe for
-// concurrent use: a source goroutine appends while the render loop snapshots.
+// Buffer retains at most a fixed number of entries in a bounded slice. Once
+// full, adding an entry drops the oldest by shifting the remaining entries down
+// one position, so Add is O(n) in the capacity once the buffer is saturated.
+// It is safe for concurrent use: a source goroutine appends while the render
+// loop snapshots.
 type Buffer struct {
 	mu       sync.Mutex
 	entries  []Entry
@@ -51,5 +54,7 @@ func (b *Buffer) Len() int {
 	return len(b.entries)
 }
 
-// Cap returns the configured capacity.
+// Cap returns the configured capacity. It is deliberately lock-free because
+// capacity is immutable after construction; if the buffer ever gains a resize
+// operation, this must start taking b.mu like Len does.
 func (b *Buffer) Cap() int { return b.capacity }
