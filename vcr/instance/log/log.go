@@ -57,15 +57,18 @@ type Options struct {
 }
 
 func NewCmdInstanceLog(f cmdutil.Factory) *cobra.Command {
-	return newLogCmd(f, "log", []string{"logs"})
+	return newLogCmd(f, "log", []string{"logs"}, "vcr instance log")
 }
 
 // NewCmdLogs returns the same command registered at the top level as "vcr logs".
 func NewCmdLogs(f cmdutil.Factory) *cobra.Command {
-	return newLogCmd(f, "logs", nil)
+	return newLogCmd(f, "logs", nil, "vcr logs")
 }
 
-func newLogCmd(f cmdutil.Factory, use string, aliases []string) *cobra.Command {
+// newLogCmd builds the log command. invocation is the fully-qualified way a user
+// types this command ("vcr logs" or "vcr instance log"); it is substituted into the
+// examples so each registration shows examples that actually work as written.
+func newLogCmd(f cmdutil.Factory, use string, aliases []string, invocation string) *cobra.Command {
 	opts := Options{Factory: f}
 
 	cmd := &cobra.Command{
@@ -100,22 +103,22 @@ func newLogCmd(f cmdutil.Factory, use string, aliases []string) *cobra.Command {
 			  --json prints one JSON object per line for scripting.
 		`),
 		Args: cobra.MaximumNArgs(0),
-		Example: heredoc.Doc(`
+		Example: fmt.Sprintf(heredoc.Doc(`
 			# Print recent logs and exit
-			$ vcr logs --project-name my-app --instance-name dev
+			$ %[1]s --project-name my-app --instance-name dev
 
 			# Follow new logs (Ctrl+C to stop)
-			$ vcr logs -p my-app -n dev --follow
+			$ %[1]s -p my-app -n dev --follow
 
 			# The last 15 minutes, errors only
-			$ vcr logs -p my-app -n dev --since 15m --log-level error
+			$ %[1]s -p my-app -n dev --since 15m --log-level error
 
 			# An explicit window
-			$ vcr logs -i 12345678-1234-1234-1234-123456789abc --from 2026-08-02T10:00:00Z --to 2026-08-02T11:00:00Z
+			$ %[1]s -i 12345678-1234-1234-1234-123456789abc --from 2026-08-02T10:00:00Z --to 2026-08-02T11:00:00Z
 
 			# Only payment failures, excluding health checks, as JSON
-			$ vcr logs -p my-app -n dev --grep 'pay.*502' --exclude '/health' --json
-		`),
+			$ %[1]s -p my-app -n dev --grep 'pay.*502' --exclude '/health' --json
+		`), invocation),
 		RunE: func(_ *cobra.Command, _ []string) error {
 			return runLog(&opts)
 		},

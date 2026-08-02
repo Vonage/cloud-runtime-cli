@@ -873,3 +873,24 @@ func TestNewCmdLogs_TopLevelAlias(t *testing.T) {
 	require.NotNil(t, cmd.Flags().Lookup("since"))
 	require.NotNil(t, cmd.Flags().Lookup("grep"))
 }
+
+// Both registrations share one help text, so the examples must be rewritten per
+// registration. Otherwise `vcr instance log --help` tells the user to type
+// `vcr logs ...`, which is a different command.
+func TestLogCmd_ExamplesMatchTheirOwnInvocation(t *testing.T) {
+	ios, _, _, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+
+	topLevel := NewCmdLogs(f)
+	require.Contains(t, topLevel.Example, "$ vcr logs ")
+	require.NotContains(t, topLevel.Example, "vcr instance log")
+
+	nested := NewCmdInstanceLog(f)
+	require.Contains(t, nested.Example, "$ vcr instance log ")
+	require.NotContains(t, nested.Example, "$ vcr logs ",
+		"vcr instance log examples must not tell the user to run vcr logs")
+
+	// No unsubstituted verbs leaked into either help text.
+	require.NotContains(t, topLevel.Example, "%!")
+	require.NotContains(t, nested.Example, "%!")
+}
