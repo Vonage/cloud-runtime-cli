@@ -36,9 +36,8 @@ func NewRenderer(cs *iostreams.ColorScheme, opts RenderOptions) *Renderer {
 	return &Renderer{cs: cs, opts: opts}
 }
 
-// Line renders one entry in the human format, without a trailing newline.
-// Line always renders the human format: it does not consult
-// RenderOptions.JSON, so a caller wanting JSON must call JSONLine.
+// Line renders one entry in the human format, without a trailing newline. It
+// does not consult RenderOptions.JSON; a caller wanting JSON calls JSONLine.
 func (r *Renderer) Line(e Entry) string {
 	ts := e.Timestamp.In(time.Local)
 	if r.opts.UTC {
@@ -78,7 +77,7 @@ func (r *Renderer) colorLevel(level string) string {
 	case "warn":
 		return r.cs.Yellow(padded)
 	case "debug", "trace":
-		return r.cs.Gray(padded)
+		return r.cs.Muted(padded)
 	default:
 		return padded
 	}
