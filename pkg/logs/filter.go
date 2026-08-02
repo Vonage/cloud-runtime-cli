@@ -147,5 +147,11 @@ func NextLevel(l Level) Level {
 	return l + 1
 }
 
-// LevelNames returns the ladder in order, for help text.
-func LevelNames() []string { return levelOrder }
+// LevelNames returns a copy of the ladder in order, for help text. It copies so
+// a caller cannot reorder or overwrite the shared package slice for everyone
+// else in the process.
+func LevelNames() []string {
+	names := make([]string, len(levelOrder))
+	copy(names, levelOrder)
+	return names
+}

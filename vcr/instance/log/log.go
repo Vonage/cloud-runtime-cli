@@ -99,8 +99,10 @@ func newLogCmd(f cmdutil.Factory, use string, aliases []string, invocation strin
 			  Use (?i) inside a pattern for case-insensitive matching.
 
 			OUTPUT
-			  Each line is: HH:MM:SS.mmm  level  message
-			  --json prints one JSON object per line for scripting.
+			  Each line is: HH:MM:SS.mmm  level  message, preceded by a
+			  "==> YYYY-MM-DD" marker whenever the calendar date changes.
+			  --json prints one JSON object per line for scripting, always with
+			  UTC timestamps so output does not vary by host timezone.
 		`),
 		Args: cobra.MaximumNArgs(0),
 		Example: fmt.Sprintf(heredoc.Doc(`
@@ -146,6 +148,30 @@ func newLogCmd(f cmdutil.Factory, use string, aliases []string, invocation strin
 	return cmd
 }
 
+// validateFlags rejects numeric flag values that cannot mean what the user
+// typed. Both were silently rewritten to a default deep inside pkg/logs, so
+// --history 0 fetched 200 entries and --buffer 0 retained 5000.
+func validateFlags(opts *Options) error {
+	if opts.Limit <= 0 {
+		return fmt.Errorf("--history must be a positive number, got %d", opts.Limit)
+	}
+	if opts.BufferSize <= 0 {
+		return fmt.Errorf("--buffer must be a positive number, got %d", opts.BufferSize)
+	}
+	return nil
+}
+
+// flagPatternError re-frames a logs.Filter pattern error so it names the flag
+// the user actually typed. Filter reports "invalid include pattern", which
+// describes its own field and reads like a typo to someone who typed --grep.
+func flagPatternError(flag, pattern string, err error) error {
+	cause := errors.Unwrap(err)
+	if cause == nil {
+		cause = err
+	}
+	return fmt.Errorf("invalid %s %q: %w", flag, pattern, cause)
+}
+
 // buildQueryAndFilter converts flags into a source query and a filter, failing
 // fast on contradictory or malformed input.
 func buildQueryAndFilter(opts *Options) (logs.Query, *logs.Filter, error) {
@@ -185,19 +211,27 @@ func buildQueryAndFilter(opts *Options) (logs.Query, *logs.Filter, error) {
 		f.MinLevel = lvl
 	}
 	if err := f.SetInclude(opts.Grep); err != nil {
-		return logs.Query{}, nil, err
+		return logs.Query{}, nil, flagPatternError("--grep", opts.Grep, err)
 	}
 	if err := f.SetExclude(opts.Exclude); err != nil {
-		return logs.Query{}, nil, err
+		return logs.Query{}, nil, flagPatternError("--exclude", opts.Exclude, err)
 	}
 	return q, f, nil
 }
 
 // newSource picks the log source. Phase 3 adds the SSE-backed "stream" source.
+//
+// The source is given a handler for retried fetch failures so a transient error
+// while following prints a warning to ErrOut and the stream carries on, rather
+// than ending a long-running tail with a non-zero exit.
 func newSource(opts *Options) (logs.Source, error) {
 	switch opts.SourceName {
 	case "", "auto", "graphql":
-		return logs.NewGraphQLSource(opts.Datastore(), TickerInterval), nil
+		return logs.NewGraphQLSource(opts.Datastore(), TickerInterval,
+			logs.WithFollowErrorHandler(func(err error) {
+				io := opts.IOStreams()
+				fmt.Fprintf(io.ErrOut, "%s Error fetching logs: %v\n", io.ColorScheme().WarningIcon(), err)
+			})), nil
 	default:
 		return nil, fmt.Errorf("unknown --source %q: want auto or graphql", opts.SourceName)
 	}
@@ -206,6 +240,9 @@ func newSource(opts *Options) (logs.Source, error) {
 func runLog(opts *Options) error {
 	io := opts.IOStreams()
 	if err := cmdutil.ValidateFlags(opts.InstanceID, opts.InstanceName, opts.ProjectName); err != nil {
+		return fmt.Errorf("failed to validate flags: %w", err)
+	}
+	if err := validateFlags(opts); err != nil {
 		return fmt.Errorf("failed to validate flags: %w", err)
 	}
 
@@ -277,8 +314,18 @@ func runHistory(src logs.Source, opts *Options, q logs.Query, filter *logs.Filte
 		emit(opts, renderer, e)
 		shown++
 	}
-	if shown == 0 {
-		c := io.ColorScheme()
+	c := io.ColorScheme()
+	switch {
+	case page.WindowTruncated:
+		// The source filled the page from the newest end and --to rejected all of
+		// it, so the window was never reached. Saying "no matching log entries"
+		// here would be a confidently wrong answer. Paging older than the page
+		// needs a timestamp: {_lt: ...} bound, which lands in a later phase.
+		fmt.Fprintf(io.ErrOut,
+			"%s --history %d was filled entirely with entries newer than --to, so the requested window may contain older entries that were not fetched.\n"+
+				"  Retry with a larger --history or a later --from.\n",
+			c.WarningIcon(), q.Limit)
+	case shown == 0:
 		fmt.Fprintf(io.ErrOut, "%s no matching log entries in range\n", c.WarningIcon())
 	}
 	return nil
@@ -330,6 +377,10 @@ func runFollow(src logs.Source, opts *Options, q logs.Query, filter *logs.Filter
 	for {
 		select {
 		case <-interrupt:
+			// Cancel first: draining a channel a live producer is still filling
+			// can never finish, and the longer this branch runs the longer a
+			// second Ctrl+C is swallowed by the handler still installed below.
+			cancel()
 			drain()
 			fmt.Fprintf(io.ErrOut, "\n%s stopped\n", c.SuccessIcon())
 			return nil
@@ -356,6 +407,9 @@ func emit(opts *Options, renderer *logs.Renderer, e logs.Entry) {
 		}
 		fmt.Fprintln(io.Out, line)
 		return
+	}
+	if marker := renderer.DateMarker(e); marker != "" {
+		fmt.Fprintln(io.Out, marker)
 	}
 	fmt.Fprintln(io.Out, renderer.Line(e))
 }

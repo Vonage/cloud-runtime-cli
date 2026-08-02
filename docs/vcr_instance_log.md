@@ -28,8 +28,10 @@ FILTERING
   Use (?i) inside a pattern for case-insensitive matching.
 
 OUTPUT
-  Each line is: HH:MM:SS.mmm  level  message
-  --json prints one JSON object per line for scripting.
+  Each line is: HH:MM:SS.mmm  level  message, preceded by a
+  "==> YYYY-MM-DD" marker whenever the calendar date changes.
+  --json prints one JSON object per line for scripting, always with
+  UTC timestamps so output does not vary by host timezone.
 
 
 ```

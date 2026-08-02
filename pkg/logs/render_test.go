@@ -167,20 +167,74 @@ func TestRenderer_LineDefaultsToLocalTime(t *testing.T) {
 	require.Equal(t, want, r.Line(e))
 }
 
-// TestRenderer_JSONLineDefaultsToLocalTime is the JSON counterpart: with
-// UTC:false the timestamp is converted to time.Local, not left in the entry's
-// own zone.
-func TestRenderer_JSONLineDefaultsToLocalTime(t *testing.T) {
-	r := testRenderer(t, RenderOptions{JSON: true})
+// TestRenderer_JSONLineIsAlwaysUTC pins review finding 5: --json is sold as the
+// scripting format, so its timestamps must not vary with the operator's TZ.
+// Both the UTC:false and UTC:true paths must emit the same instant in UTC.
+func TestRenderer_JSONLineIsAlwaysUTC(t *testing.T) {
+	// A local zone with a non-zero offset, otherwise a UTC CI machine would make
+	// the assertion vacuous. Not parallel-safe.
+	origLocal := time.Local
+	time.Local = time.FixedZone("TEST+09", 9*60*60)
+	t.Cleanup(func() { time.Local = origLocal })
+
 	ts := time.Date(2026, 8, 2, 16, 23, 1, 0, time.FixedZone("UTC+2", 2*60*60))
+	for name, opts := range map[string]RenderOptions{
+		"utc flag off": {JSON: true},
+		"utc flag on":  {JSON: true, UTC: true},
+	} {
+		t.Run(name, func(t *testing.T) {
+			got, err := testRenderer(t, opts).JSONLine(Entry{Timestamp: ts, Level: "info", Message: "hello"})
+			require.NoError(t, err)
+			require.Contains(t, got, `"timestamp":"2026-08-02T14:23:01Z"`,
+				"machine-readable output must be UTC RFC3339 regardless of the host timezone")
+		})
+	}
+}
 
-	got, err := r.JSONLine(Entry{Timestamp: ts, Level: "info", Message: "hello"})
-	require.NoError(t, err)
+// TestRenderer_DateMarker pins review finding 3: the line format carries only
+// HH:MM:SS.mmm, so a date banner is the only thing that keeps multi-day history
+// and explicit --from/--to windows unambiguous.
+func TestRenderer_DateMarker(t *testing.T) {
+	r := testRenderer(t, RenderOptions{UTC: true})
+	day1 := time.Date(2026, 8, 2, 23, 59, 0, 0, time.UTC)
+	day2 := time.Date(2026, 8, 3, 0, 0, 1, 0, time.UTC)
 
-	wantTS, err := json.Marshal(ts.In(time.Local))
-	require.NoError(t, err)
-	require.Contains(t, got, `"timestamp":`+string(wantTS),
-		"UTC:false must render the timestamp in time.Local")
+	require.Equal(t, "==> 2026-08-02", r.DateMarker(Entry{Timestamp: day1}),
+		"the first entry always gets a marker")
+	require.Equal(t, "", r.DateMarker(Entry{Timestamp: day1.Add(30 * time.Second)}),
+		"the same calendar date must not be repeated")
+	require.Equal(t, "==> 2026-08-03", r.DateMarker(Entry{Timestamp: day2}),
+		"a date change must emit a new marker")
+	require.Equal(t, "", r.DateMarker(Entry{Timestamp: day2.Add(time.Hour)}))
+	require.Equal(t, "==> 2026-08-02", r.DateMarker(Entry{Timestamp: day1}),
+		"going back a day is still a change")
+}
+
+// TestRenderer_DateMarkerHonoursUTC pins that the banner reports the same
+// calendar day the line's clock time belongs to, in whichever zone Line uses.
+func TestRenderer_DateMarkerHonoursUTC(t *testing.T) {
+	origLocal := time.Local
+	time.Local = time.FixedZone("TEST+09", 9*60*60)
+	t.Cleanup(func() { time.Local = origLocal })
+
+	// 2026-08-02T23:30Z is already 2026-08-03 in TEST+09.
+	ts := time.Date(2026, 8, 2, 23, 30, 0, 0, time.UTC)
+
+	require.Equal(t, "==> 2026-08-02", testRenderer(t, RenderOptions{UTC: true}).DateMarker(Entry{Timestamp: ts}),
+		"--utc must date the entry in UTC")
+	require.Equal(t, "==> 2026-08-03", testRenderer(t, RenderOptions{}).DateMarker(Entry{Timestamp: ts}),
+		"without --utc the marker must follow the local date Line prints")
+}
+
+// TestRenderer_DateMarkerIsMuted pins that the banner is styled with the muted
+// colour so it reads as a separator rather than as a log line.
+func TestRenderer_DateMarkerIsMuted(t *testing.T) {
+	cs := &iostreams.ColorScheme{Enabled: true}
+	r := NewRenderer(cs, RenderOptions{UTC: true})
+	marker := r.DateMarker(Entry{Timestamp: time.Date(2026, 8, 2, 10, 0, 0, 0, time.UTC)})
+
+	require.Contains(t, marker, ansiPrefix, "a colour-enabled scheme must style the marker")
+	require.Equal(t, ansiCodes(cs.Muted("x")), ansiCodes(marker), "the marker uses the muted colour")
 }
 
 func TestRenderer_LineLevels(t *testing.T) {

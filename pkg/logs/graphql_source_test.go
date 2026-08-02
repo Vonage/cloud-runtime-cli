@@ -44,6 +44,29 @@ func (f *fakeLister) ListLogsByInstanceID(_ context.Context, id string, limit in
 	return page, nil
 }
 
+// listerStep is one scripted result for scriptedLister.
+type listerStep struct {
+	page []api.Log
+	err  error
+}
+
+// scriptedLister serves a scripted sequence of results, repeating the last step
+// forever once the script runs out. It lets a Follow test interleave transient
+// failures with successful polls.
+type scriptedLister struct {
+	steps []listerStep
+	calls int
+}
+
+func (l *scriptedLister) ListLogsByInstanceID(_ context.Context, _ string, _ int, _ time.Time) ([]api.Log, error) {
+	i := l.calls
+	l.calls++
+	if i >= len(l.steps) {
+		i = len(l.steps) - 1
+	}
+	return l.steps[i].page, l.steps[i].err
+}
+
 // startFollow runs Follow on a goroutine and returns its error channel.
 func startFollow(ctx context.Context, s *GraphQLSource, q Query, out chan Entry) <-chan error {
 	done := make(chan error, 1)
@@ -115,14 +138,79 @@ func TestGraphQLSource_HistoryRejectsCursor(t *testing.T) {
 	require.ErrorIs(t, err, ErrPagingUnsupported)
 }
 
-func TestGraphQLSource_HistoryWrapsListerError(t *testing.T) {
+// TestGraphQLSource_HistoryFlagsAWindowTruncatedByTheLimit is the source half of
+// blocker 2. The backing query can only say "newer than From" with a limit,
+// ordered newest-first, so To is enforced by discarding rows here. When the
+// server fills the page from the newest end, every row can be newer than To and
+// the whole page is dropped — indistinguishable from an empty window unless the
+// source says so.
+func TestGraphQLSource_HistoryFlagsAWindowTruncatedByTheLimit(t *testing.T) {
+	t0 := time.Date(2026, 8, 2, 10, 0, 0, 0, time.UTC)
+	to := t0.Add(time.Minute)
+	// A full page (len == Limit) in which every row is newer than To.
+	saturated := []api.Log{
+		{LogLevel: "info", Message: "n3", Timestamp: to.Add(3 * time.Minute)},
+		{LogLevel: "info", Message: "n2", Timestamp: to.Add(2 * time.Minute)},
+		{LogLevel: "info", Message: "n1", Timestamp: to.Add(1 * time.Minute)},
+	}
+
+	t.Run("full page entirely newer than To is flagged", func(t *testing.T) {
+		s := NewGraphQLSource(&fakeLister{pages: [][]api.Log{saturated}}, time.Second)
+		page, err := s.History(context.Background(), Query{InstanceID: "i", From: t0, To: to, Limit: 3})
+		require.NoError(t, err)
+		require.Empty(t, page.Entries)
+		require.True(t, page.WindowTruncated,
+			"a full page discarded in its entirety means in-window entries may exist below it")
+	})
+
+	t.Run("short page is not flagged", func(t *testing.T) {
+		s := NewGraphQLSource(&fakeLister{pages: [][]api.Log{saturated}}, time.Second)
+		page, err := s.History(context.Background(), Query{InstanceID: "i", From: t0, To: to, Limit: 10})
+		require.NoError(t, err)
+		require.Empty(t, page.Entries)
+		require.False(t, page.WindowTruncated,
+			"the server had room to spare, so the window really is empty")
+	})
+
+	t.Run("full page with survivors is not flagged", func(t *testing.T) {
+		rows := []api.Log{
+			{LogLevel: "info", Message: "newer", Timestamp: to.Add(time.Minute)},
+			{LogLevel: "info", Message: "kept", Timestamp: t0.Add(30 * time.Second)},
+		}
+		s := NewGraphQLSource(&fakeLister{pages: [][]api.Log{rows}}, time.Second)
+		page, err := s.History(context.Background(), Query{InstanceID: "i", From: t0, To: to, Limit: 2})
+		require.NoError(t, err)
+		require.Len(t, page.Entries, 1)
+		require.False(t, page.WindowTruncated, "the page reached back inside the window")
+	})
+
+	t.Run("no To means no upper bound to truncate against", func(t *testing.T) {
+		s := NewGraphQLSource(&fakeLister{pages: [][]api.Log{saturated}}, time.Second)
+		page, err := s.History(context.Background(), Query{InstanceID: "i", From: t0, Limit: 3})
+		require.NoError(t, err)
+		require.Len(t, page.Entries, 3)
+		require.False(t, page.WindowTruncated)
+	})
+
+	t.Run("empty page is not flagged", func(t *testing.T) {
+		s := NewGraphQLSource(&fakeLister{}, time.Second)
+		page, err := s.History(context.Background(), Query{InstanceID: "i", From: t0, To: to, Limit: 0})
+		require.NoError(t, err)
+		require.Empty(t, page.Entries)
+		require.False(t, page.WindowTruncated)
+	})
+}
+
+// TestGraphQLSource_HistoryReturnsTheListerErrorUnprefixed pins review finding 7:
+// the command layer already says "failed to fetch log history", so a
+// "failed to list logs" prefix here produced a doubled message.
+func TestGraphQLSource_HistoryReturnsTheListerErrorUnprefixed(t *testing.T) {
 	sentinel := errors.New("boom")
 	s := NewGraphQLSource(&fakeLister{err: sentinel}, time.Second)
 	_, err := s.History(context.Background(), Query{InstanceID: "i"})
-	require.ErrorIs(t, err, sentinel, "lister error must be wrapped with %w")
-	// ErrorIs alone also passes for a bare `return err`; the prefix proves the
-	// error is actually wrapped with context.
-	require.Contains(t, err.Error(), "failed to list logs", "wrapper message must be preserved")
+	require.ErrorIs(t, err, sentinel, "the lister error must reach the caller")
+	require.Equal(t, sentinel.Error(), err.Error(),
+		"the source must not add a prefix; its caller names the step that failed")
 }
 
 func TestGraphQLSource_HistoryMapsAllEntryFields(t *testing.T) {
@@ -204,7 +292,7 @@ func TestGraphQLSource_FollowEmitsOldestFirstAndAdvancesToNewest(t *testing.T) {
 	require.Equal(t, t0.Add(3*time.Second), lister.calls[1], "cursor advances to newest timestamp seen")
 }
 
-func TestGraphQLSource_FollowWrapsListerErrorWhenContextLive(t *testing.T) {
+func TestGraphQLSource_FollowSurfacesAPersistentListerError(t *testing.T) {
 	sentinel := errors.New("boom")
 	lister := &fakeLister{err: sentinel}
 	s := NewGraphQLSource(lister, time.Millisecond)
@@ -216,11 +304,113 @@ func TestGraphQLSource_FollowWrapsListerErrorWhenContextLive(t *testing.T) {
 	done := startFollow(ctx, s, Query{InstanceID: "inst-err"}, out)
 
 	err := waitFollow(t, done)
-	require.Error(t, err, "a lister error on a live context must surface")
+	require.Error(t, err, "a lister error that never recovers must surface")
 	require.ErrorIs(t, err, sentinel)
-	require.Contains(t, err.Error(), "failed to list logs", "wrapper message must be preserved")
+	require.Contains(t, err.Error(), "consecutive", "the give-up message must say the retries were exhausted")
 	require.NoError(t, ctx.Err(), "context must still be live for this to be meaningful")
-	require.Equal(t, []string{"inst-err"}, lister.ids, "Query.InstanceID is passed through")
+	require.Equal(t, "inst-err", lister.ids[0], "Query.InstanceID is passed through")
+}
+
+// TestGraphQLSource_FollowSurvivesATransientListerError is the source half of
+// blocker 1: a single failed poll must be reported and retried, not returned.
+// One Hasura 502 used to end a tail that had been open for hours.
+func TestGraphQLSource_FollowSurvivesATransientListerError(t *testing.T) {
+	t0 := time.Date(2026, 8, 2, 10, 0, 0, 0, time.UTC)
+	blip := errors.New("hasura 502")
+	lister := &scriptedLister{steps: []listerStep{
+		{err: blip},
+		{page: []api.Log{{LogLevel: "info", Message: "after-the-blip", Timestamp: t0}}},
+		{},
+	}}
+	var reported []error
+	s := NewGraphQLSource(lister, time.Millisecond,
+		WithFollowErrorHandler(func(err error) { reported = append(reported, err) }))
+
+	ctx, cancel := context.WithTimeout(context.Background(), followTimeout)
+	defer cancel()
+	out := make(chan Entry, 4)
+	done := startFollow(ctx, s, Query{InstanceID: "i"}, out)
+
+	require.Equal(t, "after-the-blip", recvEntry(t, out).Message,
+		"Follow must keep polling after a transient fetch error")
+	cancel()
+	require.NoError(t, waitFollow(t, done), "a transient error must not end the stream")
+	require.Len(t, reported, 1, "the retried failure must be reported exactly once")
+	require.ErrorIs(t, reported[0], blip)
+}
+
+// TestGraphQLSource_FollowGivesUpAfterConsecutiveFailures pins the other half:
+// resilience is bounded, so a genuinely dead backend still exits non-zero.
+func TestGraphQLSource_FollowGivesUpAfterConsecutiveFailures(t *testing.T) {
+	dead := errors.New("hasura unreachable")
+	lister := &scriptedLister{steps: []listerStep{{err: dead}}}
+	reported := 0
+	s := NewGraphQLSource(lister, time.Millisecond,
+		WithFollowErrorHandler(func(error) { reported++ }))
+
+	ctx, cancel := context.WithTimeout(context.Background(), followTimeout)
+	defer cancel()
+	done := startFollow(ctx, s, Query{InstanceID: "i"}, make(chan Entry, 1))
+
+	err := waitFollow(t, done)
+	require.Error(t, err)
+	require.ErrorIs(t, err, dead)
+	require.NoError(t, ctx.Err(), "the give-up must not be caused by cancellation")
+	require.Equal(t, MaxFollowPollFailures, lister.calls,
+		"Follow retries a bounded number of times before giving up")
+	require.Equal(t, MaxFollowPollFailures-1, reported,
+		"every retried failure is reported; the final one is returned instead")
+}
+
+// TestGraphQLSource_FollowResetsTheFailureCountOnSuccess proves the ladder is
+// consecutive, not cumulative: an instance that blips once a minute for a day
+// must never exhaust it.
+func TestGraphQLSource_FollowResetsTheFailureCountOnSuccess(t *testing.T) {
+	t0 := time.Date(2026, 8, 2, 10, 0, 0, 0, time.UTC)
+	blip := errors.New("blip")
+	var steps []listerStep
+	// Alternate failure/success far more times than the ladder allows.
+	for i := 0; i < MaxFollowPollFailures*3; i++ {
+		steps = append(steps,
+			listerStep{err: blip},
+			listerStep{page: []api.Log{{LogLevel: "info", Message: "alive", Timestamp: t0.Add(time.Duration(i) * time.Second)}}},
+		)
+	}
+	steps = append(steps, listerStep{})
+	lister := &scriptedLister{steps: steps}
+	s := NewGraphQLSource(lister, time.Microsecond, WithFollowErrorHandler(func(error) {}))
+
+	ctx, cancel := context.WithTimeout(context.Background(), followTimeout)
+	defer cancel()
+	out := make(chan Entry, 128)
+	done := startFollow(ctx, s, Query{InstanceID: "i"}, out)
+
+	for i := 0; i < MaxFollowPollFailures*3; i++ {
+		require.Equal(t, "alive", recvEntry(t, out).Message)
+	}
+	cancel()
+	require.NoError(t, waitFollow(t, done), "interleaved failures must never exhaust the ladder")
+}
+
+// TestGraphQLSource_FollowErrorHandlerIsOptional pins that a source built
+// without a handler still retries rather than panicking on a nil callback.
+func TestGraphQLSource_FollowErrorHandlerIsOptional(t *testing.T) {
+	t0 := time.Date(2026, 8, 2, 10, 0, 0, 0, time.UTC)
+	lister := &scriptedLister{steps: []listerStep{
+		{err: errors.New("blip")},
+		{page: []api.Log{{LogLevel: "info", Message: "recovered", Timestamp: t0}}},
+		{},
+	}}
+	s := NewGraphQLSource(lister, time.Millisecond)
+
+	ctx, cancel := context.WithTimeout(context.Background(), followTimeout)
+	defer cancel()
+	out := make(chan Entry, 4)
+	done := startFollow(ctx, s, Query{InstanceID: "i"}, out)
+
+	require.Equal(t, "recovered", recvEntry(t, out).Message)
+	cancel()
+	require.NoError(t, waitFollow(t, done))
 }
 
 func TestGraphQLSource_FollowReturnsNilWhenContextCancelledBeforeError(t *testing.T) {

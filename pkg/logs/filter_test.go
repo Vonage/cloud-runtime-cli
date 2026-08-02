@@ -60,3 +60,17 @@ func TestFilterSummary(t *testing.T) {
 	require.Contains(t, f.Summary(), "level>=error")
 	require.Contains(t, f.Summary(), "/boom/")
 }
+
+// TestLevelNames_ReturnsACopy pins review finding 17: LevelNames used to hand
+// out the package-level slice, so any caller could reorder the ladder for every
+// other caller in the process.
+func TestLevelNames_ReturnsACopy(t *testing.T) {
+	want := []string{"trace", "debug", "info", "warn", "error", "fatal"}
+	got := LevelNames()
+	require.Equal(t, want, got)
+
+	got[0] = "mutated"
+	require.Equal(t, want, LevelNames(), "mutating the result must not corrupt the package ladder")
+
+	require.NotSame(t, &got[0], &LevelNames()[0], "each call must return a distinct backing array")
+}

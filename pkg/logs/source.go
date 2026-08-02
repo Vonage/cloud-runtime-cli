@@ -47,6 +47,11 @@ type Page struct {
 	// Cursor is passed back as Query.Cursor to fetch the next older page.
 	Cursor  string
 	HasMore bool
+	// WindowTruncated reports that the source filled this page from the newest
+	// end and Query.To then discarded all of it, so entries inside the requested
+	// window may exist older than anything the page could reach. Sources that can
+	// express an upper bound server-side never set it.
+	WindowTruncated bool
 }
 
 // Caps describes what a Source can do, so callers can enable or hide features
