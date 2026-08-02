@@ -861,3 +861,14 @@ func Test_runLog_utcReachesRenderer(t *testing.T) {
 	require.Contains(t, out, wantUTC, "--utc must reach the renderer")
 	require.NotContains(t, out, wantLocal, "--utc must not render local time")
 }
+
+func TestNewCmdLogs_TopLevelAlias(t *testing.T) {
+	ios, _, _, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+
+	cmd := NewCmdLogs(f)
+	require.Equal(t, "logs", cmd.Use)
+	require.Empty(t, cmd.Aliases)
+	require.NotNil(t, cmd.Flags().Lookup("follow"))
+	require.NotNil(t, cmd.Flags().Lookup("since"))
+}
