@@ -55,6 +55,27 @@ func TestRegistry_ResolveByShortIDOrHostnameSubstring(t *testing.T) {
 	require.False(t, ok)
 }
 
+func TestRegistry_ResolveExactHostnameBeatsEarlierSubstringMatch(t *testing.T) {
+	r := NewRegistry()
+	// xabcx is registered FIRST and contains "abc" as a substring, so a
+	// substring-first Resolve would return it. The exact-hostname tier must win.
+	r.Ensure("xabcx")
+	r.Ensure("abc")
+
+	got, ok := r.Resolve("abc")
+	require.True(t, ok)
+	require.Equal(t, "abc", got.Hostname, "exact hostname match must beat an earlier-registered substring match")
+	require.Equal(t, "r2", got.ShortID)
+}
+
+func TestRegistry_ResolveEmptyTokenIsNotFound(t *testing.T) {
+	r := NewRegistry()
+	r.Ensure("vcr-app-abc-12345")
+
+	_, ok := r.Resolve("")
+	require.False(t, ok, "an empty token must never resolve")
+}
+
 func TestRegistry_ConcurrentEnsureAndList(t *testing.T) {
 	r := NewRegistry()
 
@@ -64,12 +85,12 @@ func TestRegistry_ConcurrentEnsureAndList(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(writers * 2)
 	for w := 0; w < writers; w++ {
-		go func(w int) {
+		go func() {
 			defer wg.Done()
 			for i := 0; i < perWriter; i++ {
 				r.Ensure(fmt.Sprintf("host-%d", i%4))
 			}
-		}(w)
+		}()
 		go func() {
 			defer wg.Done()
 			for i := 0; i < perWriter; i++ {
@@ -87,4 +108,15 @@ func TestRegistry_ConcurrentEnsureAndList(t *testing.T) {
 		total += rep.Count
 	}
 	require.Equal(t, writers*perWriter, total, "every Ensure is counted exactly once")
+
+	// A racy len(r.order) read while assigning ShortID would hand the same short
+	// id to two replicas; assert every id is distinct and accounted for.
+	list := r.List()
+	seen := map[string]bool{}
+	for _, rep := range list {
+		require.False(t, seen[rep.ShortID], "duplicate ShortID %q assigned", rep.ShortID)
+		seen[rep.ShortID] = true
+	}
+	require.Len(t, seen, r.Len(), "one unique ShortID per registered replica")
+	require.Len(t, list, r.Len())
 }

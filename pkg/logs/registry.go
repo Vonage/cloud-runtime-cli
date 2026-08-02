@@ -10,9 +10,12 @@ import (
 type Replica struct {
 	ShortID  string // r1, r2, ...
 	Hostname string
-	// ColorIndex is a stable index the renderer maps to a terminal colour.
+	// ColorIndex is a stable index the renderer maps to a terminal colour. It is
+	// unbounded (it is len(order) at the time the replica was first seen), so a
+	// renderer must take it modulo its palette size.
 	ColorIndex int
-	Count      int
+	// Count is the number of log entries seen from this replica.
+	Count int
 }
 
 // Registry assigns stable short ids to replica hostnames as they are first seen,
@@ -65,7 +68,8 @@ func (r *Registry) List() []Replica {
 }
 
 // Resolve looks a replica up by exact short id, exact hostname, or hostname
-// substring (in that order).
+// substring (in that order). The substring tier returns the FIRST first-seen
+// match, not the most specific one.
 func (r *Registry) Resolve(token string) (Replica, bool) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
