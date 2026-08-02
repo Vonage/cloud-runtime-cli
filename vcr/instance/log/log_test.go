@@ -871,4 +871,5 @@ func TestNewCmdLogs_TopLevelAlias(t *testing.T) {
 	require.Empty(t, cmd.Aliases)
 	require.NotNil(t, cmd.Flags().Lookup("follow"))
 	require.NotNil(t, cmd.Flags().Lookup("since"))
+	require.NotNil(t, cmd.Flags().Lookup("grep"))
 }

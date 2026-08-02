@@ -166,6 +166,11 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 	})
 	cmd.SetFlagErrorFunc(rootFlagErrorFunc)
 
+	// Keep --version a LOCAL flag. The top-level `vcr logs` command uses -v as the
+	// shorthand for --exclude, and cobra merges only a parent's persistent flags
+	// into a child's flagset. Promoting this to PersistentFlags would make pflag's
+	// AddFlag find shorthand "v" already taken and panic on every `vcr logs` run
+	// (the name-based Lookup guard does not help: the flag names differ).
 	cmd.Flags().BoolP("version", "v", false, "Show VCR CLI version")
 	cmd.PersistentFlags().Bool("help", false, "Show help for command")
 	cmd.PersistentFlags().StringVarP(&opts.ConfigFilePath, "config-file", "", config.DefaultCLIConfigPath[0], "Path to config file (default is $HOME/.vcr-cli)")

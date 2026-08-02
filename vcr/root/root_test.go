@@ -84,3 +84,24 @@ func TestCheckForUpdate(t *testing.T) {
 		})
 	}
 }
+
+// TestNewCmdRoot_registersTopLevelLogs pins the `vcr logs` shortcut to the root
+// command's wiring. Asserting on Use (not just "a command was added") means
+// registering NewCmdInstanceLog, whose Use is "log", fails here too.
+func TestNewCmdRoot_registersTopLevelLogs(t *testing.T) {
+	ios, _, _, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+
+	updateStream := make(chan string, 1)
+	cmd := NewCmdRoot(f, "0.0.1", "2026-08-02", "abcdef0", updateStream)
+
+	var uses []string
+	found := false
+	for _, sub := range cmd.Commands() {
+		uses = append(uses, sub.Use)
+		if sub.Use == "logs" {
+			found = true
+		}
+	}
+	require.True(t, found, `root must register a top-level command with Use == "logs"; got %v`, uses)
+}
