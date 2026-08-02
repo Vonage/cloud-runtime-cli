@@ -3,6 +3,7 @@ package logs
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
@@ -17,6 +18,8 @@ type RenderOptions struct {
 	// Source.Caps().Replicas.
 	ShowReplica bool
 	// JSON emits one JSON object per line instead of the human format.
+	// The Renderer itself does not branch on this flag: callers decide the
+	// format by calling either Line or JSONLine.
 	JSON bool
 	// UTC prints timestamps in UTC instead of local time.
 	UTC bool
@@ -34,6 +37,8 @@ func NewRenderer(cs *iostreams.ColorScheme, opts RenderOptions) *Renderer {
 }
 
 // Line renders one entry in the human format, without a trailing newline.
+// Line always renders the human format: it does not consult
+// RenderOptions.JSON, so a caller wanting JSON must call JSONLine.
 func (r *Renderer) Line(e Entry) string {
 	ts := e.Timestamp.In(time.Local)
 	if r.opts.UTC {
@@ -47,19 +52,27 @@ func (r *Renderer) Line(e Entry) string {
 	return out
 }
 
-// JSONLine renders one entry as a single-line JSON object.
+// JSONLine renders one entry as a single-line JSON object. The timestamp is
+// normalized to the same location Line would use, so RenderOptions.UTC applies
+// to both formats. The caller's entry is not mutated.
 func (r *Renderer) JSONLine(e Entry) (string, error) {
-	b, err := json.Marshal(e)
+	out := e
+	out.Timestamp = e.Timestamp.In(time.Local)
+	if r.opts.UTC {
+		out.Timestamp = e.Timestamp.UTC()
+	}
+	b, err := json.Marshal(out)
 	if err != nil {
 		return "", fmt.Errorf("failed to encode log entry: %w", err)
 	}
 	return string(b), nil
 }
 
-// colorLevel pads the level to a fixed width and colours it by severity.
+// colorLevel pads the level to a fixed width and colours it by severity. The
+// severity match is case-insensitive, but the level is rendered as supplied.
 func (r *Renderer) colorLevel(level string) string {
 	padded := fmt.Sprintf("%-5s", level)
-	switch level {
+	switch strings.ToLower(level) {
 	case "error", "fatal":
 		return r.cs.Red(padded)
 	case "warn":
@@ -72,7 +85,7 @@ func (r *Renderer) colorLevel(level string) string {
 }
 
 // colorReplica colours the replica short id so lines from one replica are easy
-// to follow. The colour is derived from the id's trailing digits so it is stable
+// to follow. The colour is derived from the digits in the id so it is stable
 // without the renderer holding registry state.
 func (r *Renderer) colorReplica(shortID string) string {
 	if shortID == "" {
@@ -90,7 +103,9 @@ func (r *Renderer) colorReplica(shortID string) string {
 	}
 }
 
-// replicaColorIndex extracts the numeric part of a short id (r3 -> 3).
+// replicaColorIndex folds every digit found anywhere in the short id into a
+// single number, ignoring all non-digit runes (r3 -> 3, r1a2 -> 12). Ids with no
+// digits yield 0.
 func replicaColorIndex(shortID string) int {
 	n := 0
 	for _, c := range shortID {
