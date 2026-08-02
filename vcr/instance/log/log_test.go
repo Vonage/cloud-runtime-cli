@@ -2,9 +2,11 @@ package log
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"io"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -14,9 +16,63 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"vonage-cloud-runtime-cli/pkg/api"
+	"vonage-cloud-runtime-cli/pkg/logs"
 	"vonage-cloud-runtime-cli/testutil"
 	"vonage-cloud-runtime-cli/testutil/mocks"
 )
+
+func Test_buildQueryAndFilter(t *testing.T) {
+	t.Run("since sets From", func(t *testing.T) {
+		opts := &Options{Since: 15 * time.Minute, Limit: 300}
+		q, _, err := buildQueryAndFilter(opts)
+		require.NoError(t, err)
+		require.WithinDuration(t, time.Now().Add(-15*time.Minute), q.From, 5*time.Second)
+		require.Equal(t, 300, q.Limit)
+	})
+
+	t.Run("since and from are mutually exclusive", func(t *testing.T) {
+		opts := &Options{Since: time.Minute, From: "2026-08-02T10:00:00Z"}
+		_, _, err := buildQueryAndFilter(opts)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "mutually exclusive")
+	})
+
+	t.Run("invalid from is rejected", func(t *testing.T) {
+		opts := &Options{From: "not-a-time"}
+		_, _, err := buildQueryAndFilter(opts)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "--from")
+	})
+
+	t.Run("invalid grep is rejected", func(t *testing.T) {
+		opts := &Options{Grep: "("}
+		_, _, err := buildQueryAndFilter(opts)
+		require.Error(t, err)
+	})
+
+	t.Run("filters are populated", func(t *testing.T) {
+		opts := &Options{LogLevel: "warn", SourceType: "application", Grep: "boom", Exclude: "health"}
+		_, f, err := buildQueryAndFilter(opts)
+		require.NoError(t, err)
+		require.Equal(t, logs.LevelWarn, f.MinLevel)
+		require.Equal(t, "application", f.SourceType)
+		require.True(t, f.Match(logs.Entry{Level: "error", Message: "boom", SourceType: "application"}))
+		require.False(t, f.Match(logs.Entry{Level: "error", Message: "boom health", SourceType: "application"}))
+	})
+
+	t.Run("unknown log level is rejected", func(t *testing.T) {
+		opts := &Options{LogLevel: "loud"}
+		_, _, err := buildQueryAndFilter(opts)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "--log-level")
+	})
+
+	t.Run("replica flag needs a replica-capable source", func(t *testing.T) {
+		opts := &Options{Replicas: "r1"}
+		_, _, err := buildQueryAndFilter(opts)
+		require.NoError(t, err, "parsing succeeds; capability is checked against the source")
+	})
+}
 
 func TestLog(t *testing.T) {
 	type mock struct {
@@ -87,7 +143,57 @@ func TestLog(t *testing.T) {
 				LogGetInstanceByIDReturnErr:          nil,
 			},
 			want: want{
-				stdout: "[application] hello",
+				stdout: "hello",
+			},
+		},
+		{
+			name: "json-output-emits-one-object-per-line",
+			cli:  "--id=abc-123 --json",
+			mock: mock{
+				LogListLogsByInstanceIDTimes: 1,
+				LogGetInstanceByIDTimes:      1,
+				LogReturnInstance:            api.Instance{ID: "abc-123"},
+				LogInstanceID:                "abc-123",
+				LogReturnLogs:                []api.Log{{Timestamp: time.Now(), SourceType: "application", LogLevel: "info", Message: "hello"}},
+			},
+			want: want{
+				stdout: `"message":"hello"`,
+			},
+		},
+		{
+			name: "unknown-log-level-fails-closed",
+			cli:  "--id=abc-123 --log-level=loud",
+			mock: mock{
+				LogListLogsByInstanceIDTimes: 0,
+				LogGetInstanceByIDTimes:      0,
+			},
+			want: want{
+				errMsg: `failed to validate flags: invalid --log-level "loud": want one of trace, debug, info, warn, error, fatal`,
+			},
+		},
+		{
+			name: "replica-flag-rejected-for-graphql-source",
+			cli:  "--id=abc-123 --replica=r1",
+			mock: mock{
+				LogListLogsByInstanceIDTimes: 0,
+				LogGetInstanceByIDTimes:      0,
+			},
+			want: want{
+				errMsg: `--replica needs a replica-capable log source; the "graphql" source does not provide replica information`,
+			},
+		},
+		{
+			name: "log-level-filters-out-lower-severity",
+			cli:  "--id=abc-123 --log-level=error",
+			mock: mock{
+				LogListLogsByInstanceIDTimes: 1,
+				LogGetInstanceByIDTimes:      1,
+				LogReturnInstance:            api.Instance{ID: "abc-123"},
+				LogInstanceID:                "abc-123",
+				LogReturnLogs:                []api.Log{{Timestamp: time.Now(), SourceType: "application", LogLevel: "info", Message: "quiet"}},
+			},
+			want: want{
+				stderr: "! no matching log entries in range\n",
 			},
 		},
 		{
@@ -167,135 +273,6 @@ func TestLog(t *testing.T) {
 	}
 }
 
-func Test_fetchLogs(t *testing.T) {
-	type mock struct {
-		LogListLogsByInstanceIDTimes     int
-		LogListLogsByInstanceIDReturnErr error
-		LogReturnLogs                    []api.Log
-	}
-	type want struct {
-		stdout string
-		stderr string
-	}
-	tests := []struct {
-		name string
-		mock mock
-		want want
-	}{
-		{
-			name: "Test with error",
-			mock: mock{LogListLogsByInstanceIDTimes: 1, LogListLogsByInstanceIDReturnErr: errors.New("failed to list logs"), LogReturnLogs: nil},
-			want: want{stderr: "! Error fetching logs: failed to list logs\n"},
-		},
-		{
-			name: "Test without error",
-			mock: mock{LogListLogsByInstanceIDTimes: 1, LogListLogsByInstanceIDReturnErr: nil, LogReturnLogs: []api.Log{{Timestamp: time.Now(), SourceType: "application", Message: "test"}}},
-			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-
-			ctrl := gomock.NewController(t)
-
-			datastoreMock := mocks.NewMockDatastoreInterface(ctrl)
-			datastoreMock.EXPECT().ListLogsByInstanceID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-				Times(tt.mock.LogListLogsByInstanceIDTimes).
-				Return(tt.mock.LogReturnLogs, tt.mock.LogListLogsByInstanceIDReturnErr)
-
-			ios, _, stdout, stderr := iostreams.Test()
-			lastTimestamp := time.Now()
-
-			f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, nil, nil, nil)
-
-			opts := &Options{
-				Factory: f,
-			}
-
-			fetchLogs(ios, opts, lastTimestamp)
-
-			cmdOut := &testutil.CmdOut{
-				OutBuf: stdout,
-				ErrBuf: stderr,
-			}
-			if tt.want.stderr != "" {
-				require.Equal(t, tt.want.stderr, cmdOut.Stderr())
-				return
-			}
-			require.Equal(t, tt.want.stdout, cmdOut.String())
-		})
-	}
-}
-
-func Test_printLogs(t *testing.T) {
-
-	type mock struct {
-		LogSourceType string
-		LogLogLevel   string
-	}
-	type want struct {
-		stdout string
-	}
-	tests := []struct {
-		name string
-		mock mock
-		want want
-	}{
-		{
-			name: "Test with source type",
-			mock: mock{LogSourceType: "application", LogLogLevel: ""},
-			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
-		},
-		{
-			name: "Test with info log level",
-			mock: mock{LogSourceType: "", LogLogLevel: "info"},
-			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
-		},
-		{
-			name: "Test with warn log level",
-			mock: mock{LogSourceType: "", LogLogLevel: "warn"},
-			want: want{stdout: ""},
-		},
-		{
-			name: "Test with source type and log level",
-			mock: mock{LogSourceType: "application", LogLogLevel: "info"},
-			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
-		},
-		{
-			name: "Test without source type and log level",
-			mock: mock{LogSourceType: "", LogLogLevel: ""},
-			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
-		},
-		{
-			name: "Test with log level not exist",
-			mock: mock{LogSourceType: "", LogLogLevel: "log-level-not-exist"},
-			want: want{stdout: ""},
-		},
-		{
-			name: "Test with source type not exist",
-			mock: mock{LogSourceType: "provider", LogLogLevel: "info"},
-			want: want{stdout: ""},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-
-			ios, _, stdout, _ := iostreams.Test()
-
-			opts := &Options{
-				SourceType: tt.mock.LogSourceType,
-				LogLevel:   tt.mock.LogLogLevel,
-			}
-
-			printLogs(ios, opts, api.Log{Timestamp: time.Now(), SourceType: "application", Message: "test", LogLevel: "info"})
-
-			require.Equal(t, tt.want.stdout, stdout.String())
-		})
-	}
-}
-
 func TestLog_Follow(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
@@ -340,5 +317,90 @@ func TestLog_Follow(t *testing.T) {
 	_, err = cmd.ExecuteC()
 	require.NoError(t, err, "follow should exit cleanly on interrupt")
 	require.GreaterOrEqual(t, callCount, 2, "logs should have been fetched at least twice")
-	require.Contains(t, stdout.String(), "[application] streaming")
+	require.Contains(t, stdout.String(), "streaming")
+}
+
+// fakeFollowSource records the context handed to Follow so a test can assert the
+// follow loop is not bounded by the global --timeout deadline. It also serves a
+// canned History page.
+type fakeFollowSource struct {
+	hadDeadline bool
+	followErr   error
+	historyPage logs.Page
+}
+
+func (s *fakeFollowSource) Name() string    { return "fake" }
+func (s *fakeFollowSource) Caps() logs.Caps { return logs.Caps{} }
+
+func (s *fakeFollowSource) History(_ context.Context, _ logs.Query) (logs.Page, error) {
+	return s.historyPage, nil
+}
+
+func (s *fakeFollowSource) Follow(ctx context.Context, _ logs.Query, _ chan<- logs.Entry) error {
+	_, s.hadDeadline = ctx.Deadline()
+	return s.followErr
+}
+
+// Test_runFollow_isNotBoundedByGlobalTimeout pins defect fix 1: deriving the
+// follow context from opts.Deadline() used to kill --follow after --timeout.
+func Test_runFollow_isNotBoundedByGlobalTimeout(t *testing.T) {
+	ios, _, _, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+	opts := &Options{Factory: f, Follow: true, BufferSize: 10}
+
+	src := &fakeFollowSource{}
+	err := runFollow(src, opts, logs.Query{}, &logs.Filter{},
+		logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}), logs.NewBuffer(10), logs.NewRegistry())
+
+	require.NoError(t, err)
+	require.False(t, src.hadDeadline, "follow context must not carry the global --timeout deadline")
+}
+
+func Test_runFollow_wrapsSourceError(t *testing.T) {
+	ios, _, _, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+	opts := &Options{Factory: f, Follow: true, BufferSize: 10}
+
+	src := &fakeFollowSource{followErr: errors.New("transport died")}
+	err := runFollow(src, opts, logs.Query{}, &logs.Filter{},
+		logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}), logs.NewBuffer(10), logs.NewRegistry())
+
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "failed to stream logs: transport died")
+}
+
+// Test_runHistory_ordering pins that a history page (newest-first from the
+// source) is printed chronologically by default and newest-first with --reverse.
+func Test_runHistory_ordering(t *testing.T) {
+	base := time.Date(2026, 8, 2, 10, 0, 0, 0, time.UTC)
+	newestFirst := logs.Page{Entries: []logs.Entry{
+		{Timestamp: base.Add(2 * time.Minute), Level: "info", Message: "third"},
+		{Timestamp: base.Add(1 * time.Minute), Level: "info", Message: "second"},
+		{Timestamp: base, Level: "info", Message: "first"},
+	}}
+
+	run := func(t *testing.T, reverse bool) string {
+		t.Helper()
+		ios, _, stdout, _ := iostreams.Test()
+		f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+		opts := &Options{Factory: f, BufferSize: 10, Reverse: reverse}
+		src := &fakeFollowSource{historyPage: newestFirst}
+
+		err := runHistory(src, opts, logs.Query{}, &logs.Filter{},
+			logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}), logs.NewBuffer(10), logs.NewRegistry())
+		require.NoError(t, err)
+		return stdout.String()
+	}
+
+	t.Run("default is chronological", func(t *testing.T) {
+		out := run(t, false)
+		require.Less(t, strings.Index(out, "first"), strings.Index(out, "second"))
+		require.Less(t, strings.Index(out, "second"), strings.Index(out, "third"))
+	})
+
+	t.Run("reverse keeps the source order", func(t *testing.T) {
+		out := run(t, true)
+		require.Less(t, strings.Index(out, "third"), strings.Index(out, "second"))
+		require.Less(t, strings.Index(out, "second"), strings.Index(out, "first"))
+	})
 }
