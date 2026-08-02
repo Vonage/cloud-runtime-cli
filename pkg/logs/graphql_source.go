@@ -21,6 +21,10 @@ type LogLister interface {
 // GraphQLSource reads logs from Hasura. Rows carry no hostname, so replica
 // features are unavailable (Caps().Replicas == false), and the backing query can
 // only express "newer than", so paging older than a cursor is unsupported.
+//
+// Query.SourceType and Query.Substring are silently ignored by this source: the
+// backing GraphQL query exposes no equivalent parameters, so callers that need
+// those filters must apply them client-side to the returned entries.
 type GraphQLSource struct {
 	lister       LogLister
 	pollInterval time.Duration
