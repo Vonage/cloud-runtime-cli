@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/signal"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -436,8 +438,8 @@ func Test_runFollow_isNotBoundedByGlobalTimeout(t *testing.T) {
 	opts := &Options{Factory: f, Follow: true, BufferSize: 10}
 
 	src := &fakeFollowSource{}
-	err := runFollow(src, opts, logs.Query{}, &logs.Filter{},
-		logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}), logs.NewBuffer(10), logs.NewRegistry())
+	err := runFollowWithTimeout(t, src, opts, &logs.Filter{},
+		logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}))
 
 	require.NoError(t, err)
 	require.False(t, src.hadDeadline, "follow context must not carry the global --timeout deadline")
@@ -449,8 +451,8 @@ func Test_runFollow_wrapsSourceError(t *testing.T) {
 	opts := &Options{Factory: f, Follow: true, BufferSize: 10}
 
 	src := &fakeFollowSource{followErr: errors.New("transport died")}
-	err := runFollow(src, opts, logs.Query{}, &logs.Filter{},
-		logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}), logs.NewBuffer(10), logs.NewRegistry())
+	err := runFollowWithTimeout(t, src, opts, &logs.Filter{},
+		logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}))
 
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "failed to stream logs: transport died")
@@ -558,6 +560,148 @@ func Test_runFollow_rendersBufferedEntriesOnCleanStop(t *testing.T) {
 		require.Contains(t, out, fmt.Sprintf("last-gasp-%03d", i),
 			"entries already delivered by the source must be drained on a clean stop too")
 	}
+}
+
+// gateWriter holds the render loop still until release is closed, then writes
+// straight through. It lets the interrupt-drain test guarantee that the source
+// has finished delivering and that the interrupt is already pending before the
+// loop renders anything else, so the assertion does not depend on how fast the
+// render loop happens to run. Only runFollow writes through it, so no locking
+// is needed; runFollowWithTimeout's channel receive synchronises the read.
+type gateWriter struct {
+	release <-chan struct{}
+	opened  sync.Once
+	w       io.Writer
+}
+
+// Fd satisfies the unexported writer interface iostreams.IOStreams.Out requires.
+func (g *gateWriter) Fd() uintptr { return 1 }
+
+func (g *gateWriter) Write(p []byte) (int, error) {
+	g.opened.Do(func() { <-g.release })
+	return g.w.Write(p)
+}
+
+// interruptingSource delivers a burst of entries and then interrupts the
+// process, which is how a real --follow session almost always ends. It closes
+// release only once the interrupt has been observed by a second handler, which
+// proves the follow loop's own interrupt channel has been served too, and then
+// parks on ctx so it never races the loop to errCh.
+type interruptingSource struct {
+	emit    []logs.Entry
+	release chan struct{}
+	pending <-chan os.Signal
+}
+
+func (s *interruptingSource) Name() string    { return "interrupting" }
+func (s *interruptingSource) Caps() logs.Caps { return logs.Caps{} }
+
+func (s *interruptingSource) History(_ context.Context, _ logs.Query) (logs.Page, error) {
+	return logs.Page{}, nil
+}
+
+func (s *interruptingSource) Follow(ctx context.Context, _ logs.Query, out chan<- logs.Entry) error {
+	for _, e := range s.emit {
+		select {
+		case out <- e:
+		case <-ctx.Done():
+			return nil
+		}
+	}
+	p, err := os.FindProcess(os.Getpid())
+	if err != nil {
+		return err
+	}
+	if err := p.Signal(os.Interrupt); err != nil {
+		return err
+	}
+	<-s.pending
+	close(s.release)
+	<-ctx.Done()
+	return nil
+}
+
+// Test_runFollow_rendersBufferedEntriesOnInterrupt pins the drain on the
+// interrupt branch: Ctrl+C ends nearly every real --follow session, and the
+// branch used to return without draining, discarding up to 256 entries the
+// source had already delivered.
+//
+// The source fills the channel buffer and holds the render loop on its first
+// write until the interrupt is pending, so when the loop resumes both the
+// interrupt and the remaining entries are ready. Without the drain the
+// interrupt branch wins the select after a handful of entries and the rest are
+// lost; with it, every entry is rendered.
+func Test_runFollow_rendersBufferedEntriesOnInterrupt(t *testing.T) {
+	ios, _, stdout, _ := iostreams.Test()
+
+	release := make(chan struct{})
+	ios.Out = &gateWriter{release: release, w: stdout}
+
+	pending := make(chan os.Signal, 1)
+	signal.Notify(pending, os.Interrupt)
+	t.Cleanup(func() { signal.Stop(pending) })
+
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+	opts := &Options{Factory: f, Follow: true, BufferSize: 10}
+
+	const burst = 128
+	base := time.Date(2026, 8, 2, 10, 0, 0, 0, time.UTC)
+	emit := make([]logs.Entry, 0, burst)
+	for i := 0; i < burst; i++ {
+		emit = append(emit, logs.Entry{
+			Timestamp: base.Add(time.Duration(i) * time.Millisecond),
+			Level:     "info",
+			Message:   fmt.Sprintf("interrupted-%03d", i),
+		})
+	}
+
+	src := &interruptingSource{emit: emit, release: release, pending: pending}
+	err := runFollowWithTimeout(t, src, opts, &logs.Filter{},
+		logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}))
+
+	require.NoError(t, err, "an interrupt is a clean stop")
+	out := stdout.String()
+	for i := 0; i < burst; i++ {
+		require.Contains(t, out, fmt.Sprintf("interrupted-%03d", i),
+			"entries already delivered by the source must be drained and rendered before Ctrl+C returns")
+	}
+}
+
+// Test_runLog_historyErrorIsReportedOnce pins the runHistory error branch: a
+// backend failure must surface as a non-zero exit rather than an empty run that
+// looks successful. It also pins that the command layer names the failing step
+// without repeating the source layer's own "failed to list logs" phrasing.
+func Test_runLog_historyErrorIsReportedOnce(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	datastoreMock := mocks.NewMockDatastoreInterface(ctrl)
+
+	datastoreMock.EXPECT().
+		GetInstanceByID(gomock.Any(), "abc-123").
+		Times(1).
+		Return(api.Instance{ID: "abc-123"}, nil)
+	datastoreMock.EXPECT().
+		ListLogsByInstanceID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		Times(1).
+		Return(nil, errors.New("datastore unreachable"))
+
+	ios, _, stdout, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, nil, nil, nil)
+
+	cmd := NewCmdInstanceLog(f)
+	cmd.SetArgs([]string{"--id=abc-123"})
+	cmd.SetIn(&bytes.Buffer{})
+	cmd.SetOut(io.Discard)
+	cmd.SetErr(io.Discard)
+
+	_, err := cmd.ExecuteC()
+	require.Error(t, err, "a backend failure must not exit 0 with empty output")
+	require.Contains(t, err.Error(), "failed to fetch log history:",
+		"the command layer must name the step that failed")
+	require.Contains(t, err.Error(), "datastore unreachable",
+		"the underlying cause must survive wrapping")
+	require.Equal(t, 1, strings.Count(err.Error(), "failed to list logs"),
+		"the command wrapper must not repeat the source layer's phrasing")
+	require.Empty(t, stdout.String(), "nothing should be printed when the fetch fails")
 }
 
 // Test_runFollow_appliesFilter pins review finding 2: follow mode must apply the

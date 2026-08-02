@@ -251,7 +251,7 @@ func runHistory(src logs.Source, opts *Options, q logs.Query, filter *logs.Filte
 
 	page, err := src.History(ctx, q)
 	if err != nil {
-		return fmt.Errorf("log history unavailable: %w", err)
+		return fmt.Errorf("failed to fetch log history: %w", err)
 	}
 
 	// History returns newest-first; print chronologically unless --reverse.
@@ -309,27 +309,33 @@ func runFollow(src logs.Source, opts *Options, q logs.Query, filter *logs.Filter
 		emit(opts, renderer, e)
 	}
 
+	// drain renders entries the source already delivered that are still sitting
+	// in the channel buffer. Every exit path calls it so a stop — whether from
+	// Ctrl+C or from a source failure — never silently discards successful
+	// polls. It is non-blocking: an empty channel returns immediately.
+	drain := func() {
+		for {
+			select {
+			case e := <-entries:
+				show(e)
+			default:
+				return
+			}
+		}
+	}
+
 	for {
 		select {
 		case <-interrupt:
+			drain()
 			fmt.Fprintf(io.ErrOut, "\n%s stopped\n", c.SuccessIcon())
 			return nil
 		case err := <-errCh:
-			// The source has stopped, but entries it already delivered may still
-			// be sitting in the channel buffer. Render those before returning so
-			// a late failure does not silently discard successful polls. The
-			// drain is non-blocking, so an empty channel returns immediately.
+			drain()
 			if err != nil {
-				err = fmt.Errorf("failed to stream logs: %w", err)
+				return fmt.Errorf("failed to stream logs: %w", err)
 			}
-			for {
-				select {
-				case e := <-entries:
-					show(e)
-				default:
-					return err
-				}
-			}
+			return nil
 		case e := <-entries:
 			show(e)
 		}
