@@ -243,12 +243,12 @@ func runLog(opts *Options) error {
 		return fmt.Errorf("failed to validate flags: %w", err)
 	}
 	if err := validateFlags(opts); err != nil {
-		return fmt.Errorf("failed to validate flags: %w", err)
+		return err
 	}
 
 	q, filter, err := buildQueryAndFilter(opts)
 	if err != nil {
-		return fmt.Errorf("failed to validate flags: %w", err)
+		return err
 	}
 
 	src, err := newSource(opts)
@@ -256,7 +256,7 @@ func runLog(opts *Options) error {
 		return fmt.Errorf("failed to select log source: %w", err)
 	}
 	if opts.Replicas != "" && !src.Caps().Replicas {
-		return fmt.Errorf("failed to validate flags: --replica needs a replica-capable log source; the %q source does not provide replica information", src.Name())
+		return fmt.Errorf("--replica needs a replica-capable log source; the %q source does not provide replica information", src.Name())
 	}
 
 	// Instance resolution is bounded by the global deadline.

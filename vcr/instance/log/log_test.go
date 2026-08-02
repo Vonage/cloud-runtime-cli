@@ -207,7 +207,7 @@ func TestLog(t *testing.T) {
 				LogGetInstanceByIDTimes:      0,
 			},
 			want: want{
-				errMsg: `failed to validate flags: invalid --log-level "loud": want one of trace, debug, info, warn, error, fatal`,
+				errMsg: `invalid --log-level "loud": want one of trace, debug, info, warn, error, fatal`,
 			},
 		},
 		{
@@ -243,7 +243,7 @@ func TestLog(t *testing.T) {
 				LogGetInstanceByIDTimes:      0,
 			},
 			want: want{
-				errMsg: `failed to validate flags: invalid --to value "not-a-time": expected RFC3339`,
+				errMsg: `invalid --to value "not-a-time": expected RFC3339`,
 			},
 		},
 		{
@@ -1000,7 +1000,8 @@ func Test_runLog_rejectsNonPositiveSizes(t *testing.T) {
 
 			_, err := cmd.ExecuteC()
 			require.Error(t, err)
-			require.Contains(t, err.Error(), "failed to validate flags: ")
+			require.NotContains(t, err.Error(), "failed to validate flags: ",
+				"self-describing flag errors must not be wrapped in a generic prefix")
 			require.Contains(t, err.Error(), tt.want)
 		})
 	}
