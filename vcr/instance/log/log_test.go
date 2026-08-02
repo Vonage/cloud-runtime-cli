@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -44,6 +45,20 @@ func Test_buildQueryAndFilter(t *testing.T) {
 		require.Contains(t, err.Error(), "--from")
 	})
 
+	t.Run("to sets To", func(t *testing.T) {
+		opts := &Options{To: "2026-08-02T11:00:00Z"}
+		q, _, err := buildQueryAndFilter(opts)
+		require.NoError(t, err)
+		require.Equal(t, time.Date(2026, 8, 2, 11, 0, 0, 0, time.UTC), q.To.UTC())
+	})
+
+	t.Run("invalid to is rejected", func(t *testing.T) {
+		opts := &Options{To: "not-a-time"}
+		_, _, err := buildQueryAndFilter(opts)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "--to")
+	})
+
 	t.Run("invalid grep is rejected", func(t *testing.T) {
 		opts := &Options{Grep: "("}
 		_, _, err := buildQueryAndFilter(opts)
@@ -71,6 +86,28 @@ func Test_buildQueryAndFilter(t *testing.T) {
 		opts := &Options{Replicas: "r1"}
 		_, _, err := buildQueryAndFilter(opts)
 		require.NoError(t, err, "parsing succeeds; capability is checked against the source")
+	})
+}
+
+func Test_newSource(t *testing.T) {
+	ios, _, _, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+
+	for _, name := range []string{"", "auto", "graphql"} {
+		t.Run("accepts "+name, func(t *testing.T) {
+			src, err := newSource(&Options{Factory: f, SourceName: name})
+			require.NoError(t, err)
+			require.Equal(t, "graphql", src.Name())
+		})
+	}
+
+	t.Run("rejects an unknown source and names the accepted values", func(t *testing.T) {
+		src, err := newSource(&Options{Factory: f, SourceName: "stream"})
+		require.Error(t, err)
+		require.Nil(t, src)
+		require.Contains(t, err.Error(), `unknown --source "stream"`)
+		require.Contains(t, err.Error(), "auto")
+		require.Contains(t, err.Error(), "graphql")
 	})
 }
 
@@ -194,6 +231,28 @@ func TestLog(t *testing.T) {
 			},
 			want: want{
 				stderr: "! no matching log entries in range\n",
+			},
+		},
+		{
+			name: "malformed-to-fails-closed",
+			cli:  "--id=abc-123 --to=not-a-time",
+			mock: mock{
+				LogListLogsByInstanceIDTimes: 0,
+				LogGetInstanceByIDTimes:      0,
+			},
+			want: want{
+				errMsg: `failed to validate flags: invalid --to value "not-a-time": expected RFC3339`,
+			},
+		},
+		{
+			name: "unknown-source-is-rejected-and-names-accepted-values",
+			cli:  "--id=abc-123 --source=stream",
+			mock: mock{
+				LogListLogsByInstanceIDTimes: 0,
+				LogGetInstanceByIDTimes:      0,
+			},
+			want: want{
+				errMsg: `failed to select log source: unknown --source "stream": want auto or graphql`,
 			},
 		},
 		{
@@ -322,11 +381,13 @@ func TestLog_Follow(t *testing.T) {
 
 // fakeFollowSource records the context handed to Follow so a test can assert the
 // follow loop is not bounded by the global --timeout deadline. It also serves a
-// canned History page.
+// canned History page and can emit a canned stream of entries.
 type fakeFollowSource struct {
 	hadDeadline bool
 	followErr   error
 	historyPage logs.Page
+	// emit is delivered on the Follow channel before followErr is returned.
+	emit []logs.Entry
 }
 
 func (s *fakeFollowSource) Name() string    { return "fake" }
@@ -336,9 +397,35 @@ func (s *fakeFollowSource) History(_ context.Context, _ logs.Query) (logs.Page, 
 	return s.historyPage, nil
 }
 
-func (s *fakeFollowSource) Follow(ctx context.Context, _ logs.Query, _ chan<- logs.Entry) error {
+func (s *fakeFollowSource) Follow(ctx context.Context, _ logs.Query, out chan<- logs.Entry) error {
 	_, s.hadDeadline = ctx.Deadline()
+	for _, e := range s.emit {
+		select {
+		case out <- e:
+		case <-ctx.Done():
+			return nil
+		}
+	}
 	return s.followErr
+}
+
+// runFollowWithTimeout runs runFollow on a goroutine with a hard backstop so a
+// regression that stops the loop from returning fails the test instead of
+// hanging CI. Reading the output buffer after this returns is safe: the channel
+// receive synchronises with every write runFollow made.
+func runFollowWithTimeout(t *testing.T, src logs.Source, opts *Options, filter *logs.Filter, renderer *logs.Renderer) error {
+	t.Helper()
+	done := make(chan error, 1)
+	go func() {
+		done <- runFollow(src, opts, logs.Query{}, filter, renderer, logs.NewBuffer(opts.BufferSize), logs.NewRegistry())
+	}()
+	select {
+	case err := <-done:
+		return err
+	case <-time.After(10 * time.Second):
+		t.Fatal("runFollow did not return within 10s")
+		return nil
+	}
 }
 
 // Test_runFollow_isNotBoundedByGlobalTimeout pins defect fix 1: deriving the
@@ -403,4 +490,230 @@ func Test_runHistory_ordering(t *testing.T) {
 		require.Less(t, strings.Index(out, "third"), strings.Index(out, "second"))
 		require.Less(t, strings.Index(out, "second"), strings.Index(out, "first"))
 	})
+}
+
+// Test_runFollow_rendersBufferedEntriesOnSourceError pins the drain added for
+// review finding 1: when the source fails after successful polls, entries it
+// already delivered are still in the channel buffer and must be printed rather
+// than discarded by the error branch winning the select.
+//
+// The source emits a burst large enough that it outpaces the render loop, so by
+// the time the error lands on errCh the entries channel still holds many
+// entries. Without the drain the error branch discards them and the assertion
+// below fails.
+func Test_runFollow_rendersBufferedEntriesOnSourceError(t *testing.T) {
+	ios, _, stdout, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+	opts := &Options{Factory: f, Follow: true, BufferSize: 10}
+
+	const burst = 128
+	base := time.Date(2026, 8, 2, 10, 0, 0, 0, time.UTC)
+	emit := make([]logs.Entry, 0, burst)
+	for i := 0; i < burst; i++ {
+		emit = append(emit, logs.Entry{
+			Timestamp: base.Add(time.Duration(i) * time.Millisecond),
+			Level:     "info",
+			Message:   fmt.Sprintf("delivered-%03d", i),
+		})
+	}
+	src := &fakeFollowSource{followErr: errors.New("transport died"), emit: emit}
+
+	err := runFollowWithTimeout(t, src, opts, &logs.Filter{},
+		logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}))
+
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "failed to stream logs: transport died")
+
+	out := stdout.String()
+	for i := 0; i < burst; i++ {
+		require.Contains(t, out, fmt.Sprintf("delivered-%03d", i),
+			"entries already delivered by the source must be drained and rendered before returning the error")
+	}
+}
+
+// Test_runFollow_rendersBufferedEntriesOnCleanStop is the same drain guarantee on
+// the clean (nil error) exit path.
+func Test_runFollow_rendersBufferedEntriesOnCleanStop(t *testing.T) {
+	ios, _, stdout, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+	opts := &Options{Factory: f, Follow: true, BufferSize: 10}
+
+	const burst = 128
+	base := time.Date(2026, 8, 2, 10, 0, 0, 0, time.UTC)
+	emit := make([]logs.Entry, 0, burst)
+	for i := 0; i < burst; i++ {
+		emit = append(emit, logs.Entry{
+			Timestamp: base.Add(time.Duration(i) * time.Millisecond),
+			Level:     "info",
+			Message:   fmt.Sprintf("last-gasp-%03d", i),
+		})
+	}
+
+	err := runFollowWithTimeout(t, &fakeFollowSource{emit: emit}, opts, &logs.Filter{},
+		logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}))
+
+	require.NoError(t, err)
+	out := stdout.String()
+	for i := 0; i < burst; i++ {
+		require.Contains(t, out, fmt.Sprintf("last-gasp-%03d", i),
+			"entries already delivered by the source must be drained on a clean stop too")
+	}
+}
+
+// Test_runFollow_appliesFilter pins review finding 2: follow mode must apply the
+// same filter as history mode, so entries below --log-level never reach stdout.
+func Test_runFollow_appliesFilter(t *testing.T) {
+	base := time.Date(2026, 8, 2, 10, 0, 0, 0, time.UTC)
+	entries := []logs.Entry{
+		{Timestamp: base, Level: "info", Message: "chatty-info-line"},
+		{Timestamp: base.Add(time.Second), Level: "error", Message: "important-error-line"},
+	}
+
+	t.Run("log-level threshold", func(t *testing.T) {
+		ios, _, stdout, _ := iostreams.Test()
+		f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+		opts := &Options{Factory: f, Follow: true, BufferSize: 10, LogLevel: "error"}
+
+		_, filter, err := buildQueryAndFilter(opts)
+		require.NoError(t, err)
+
+		err = runFollowWithTimeout(t, &fakeFollowSource{emit: entries}, opts, filter,
+			logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}))
+		require.NoError(t, err)
+
+		out := stdout.String()
+		require.Contains(t, out, "important-error-line")
+		require.NotContains(t, out, "chatty-info-line", "--log-level must filter follow-mode entries")
+	})
+
+	t.Run("grep pattern", func(t *testing.T) {
+		ios, _, stdout, _ := iostreams.Test()
+		f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+		opts := &Options{Factory: f, Follow: true, BufferSize: 10, Grep: "important"}
+
+		_, filter, err := buildQueryAndFilter(opts)
+		require.NoError(t, err)
+
+		err = runFollowWithTimeout(t, &fakeFollowSource{emit: entries}, opts, filter,
+			logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}))
+		require.NoError(t, err)
+
+		out := stdout.String()
+		require.Contains(t, out, "important-error-line")
+		require.NotContains(t, out, "chatty-info-line", "--grep must filter follow-mode entries")
+	})
+}
+
+// Test_runLog_queriesResolvedInstanceID pins review finding 3: the id handed to
+// the datastore's log query must be the resolved instance's ID, not whatever the
+// user typed (and not the empty string on the project/instance-name path).
+func Test_runLog_queriesResolvedInstanceID(t *testing.T) {
+	t.Run("id flag uses the resolved id", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		datastoreMock := mocks.NewMockDatastoreInterface(ctrl)
+
+		// The lookup canonicalises the id, so the queried id differs from --id.
+		datastoreMock.EXPECT().
+			GetInstanceByID(gomock.Any(), "alias-id").
+			Times(1).
+			Return(api.Instance{ID: "resolved-abc-999"}, nil)
+
+		var gotID string
+		datastoreMock.EXPECT().
+			ListLogsByInstanceID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context, id string, _ int, _ time.Time) ([]api.Log, error) {
+				gotID = id
+				return []api.Log{{Timestamp: time.Now(), SourceType: "application", Message: "hello"}}, nil
+			})
+
+		ios, _, stdout, _ := iostreams.Test()
+		f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, nil, nil, nil)
+
+		cmd := NewCmdInstanceLog(f)
+		cmd.SetArgs([]string{"--id=alias-id"})
+		cmd.SetIn(&bytes.Buffer{})
+		cmd.SetOut(io.Discard)
+		cmd.SetErr(io.Discard)
+
+		_, err := cmd.ExecuteC()
+		require.NoError(t, err)
+		require.Equal(t, "resolved-abc-999", gotID, "the log query must use the resolved instance id")
+		require.Contains(t, stdout.String(), "hello")
+	})
+
+	t.Run("project-name and instance-name resolve to an id", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		datastoreMock := mocks.NewMockDatastoreInterface(ctrl)
+
+		datastoreMock.EXPECT().
+			GetInstanceByProjectAndInstanceName(gomock.Any(), "my-app", "dev").
+			Times(1).
+			Return(api.Instance{ID: "resolved-from-names"}, nil)
+
+		var gotID string
+		datastoreMock.EXPECT().
+			ListLogsByInstanceID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context, id string, _ int, _ time.Time) ([]api.Log, error) {
+				gotID = id
+				return []api.Log{{Timestamp: time.Now(), SourceType: "application", Message: "named-instance-line"}}, nil
+			})
+
+		ios, _, stdout, _ := iostreams.Test()
+		f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, nil, nil, nil)
+
+		cmd := NewCmdInstanceLog(f)
+		cmd.SetArgs([]string{"--project-name=my-app", "--instance-name=dev"})
+		cmd.SetIn(&bytes.Buffer{})
+		cmd.SetOut(io.Discard)
+		cmd.SetErr(io.Discard)
+
+		_, err := cmd.ExecuteC()
+		require.NoError(t, err)
+		require.Equal(t, "resolved-from-names", gotID, "the log query must use the id resolved from the names")
+		require.Contains(t, stdout.String(), "named-instance-line")
+	})
+}
+
+// Test_runLog_utcReachesRenderer pins review finding 4b: --utc must be handed to
+// the renderer so timestamps print in UTC rather than local time.
+func Test_runLog_utcReachesRenderer(t *testing.T) {
+	// Pin a non-UTC local zone, otherwise the local and UTC renderings of the
+	// same instant would be identical on a UTC CI machine and the assertion
+	// below would be vacuous. Not parallel-safe, so this test is not parallel.
+	origLocal := time.Local
+	time.Local = time.FixedZone("TEST+09", 9*60*60)
+	t.Cleanup(func() { time.Local = origLocal })
+
+	ts := time.Date(2026, 8, 2, 23, 30, 15, 500*int(time.Millisecond), time.UTC)
+	const wantUTC = "23:30:15.500"   // ts rendered in UTC
+	const wantLocal = "08:30:15.500" // ts rendered in TEST+09
+
+	ctrl := gomock.NewController(t)
+	datastoreMock := mocks.NewMockDatastoreInterface(ctrl)
+	datastoreMock.EXPECT().
+		GetInstanceByID(gomock.Any(), "abc-123").
+		Times(1).
+		Return(api.Instance{ID: "abc-123"}, nil)
+	datastoreMock.EXPECT().
+		ListLogsByInstanceID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		Times(1).
+		Return([]api.Log{{Timestamp: ts, SourceType: "application", LogLevel: "info", Message: "utc-line"}}, nil)
+
+	ios, _, stdout, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, nil, nil, nil)
+
+	cmd := NewCmdInstanceLog(f)
+	cmd.SetArgs([]string{"--id=abc-123", "--utc"})
+	cmd.SetIn(&bytes.Buffer{})
+	cmd.SetOut(io.Discard)
+	cmd.SetErr(io.Discard)
+
+	_, err := cmd.ExecuteC()
+	require.NoError(t, err)
+
+	out := stdout.String()
+	require.Contains(t, out, wantUTC, "--utc must reach the renderer")
+	require.NotContains(t, out, wantLocal, "--utc must not render local time")
 }

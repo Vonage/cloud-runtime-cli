@@ -251,7 +251,7 @@ func runHistory(src logs.Source, opts *Options, q logs.Query, filter *logs.Filte
 
 	page, err := src.History(ctx, q)
 	if err != nil {
-		return fmt.Errorf("failed to fetch logs: %w", err)
+		return fmt.Errorf("log history unavailable: %w", err)
 	}
 
 	// History returns newest-first; print chronologically unless --reverse.
@@ -298,23 +298,40 @@ func runFollow(src logs.Source, opts *Options, q logs.Query, filter *logs.Filter
 	errCh := make(chan error, 1)
 	go func() { errCh <- src.Follow(ctx, q, entries) }()
 
+	// show applies the shared per-entry handling: assign a replica short id,
+	// retain the entry in the ring buffer, then print it if it passes the filter.
+	show := func(e logs.Entry) {
+		e.ReplicaID = registry.Ensure(e.Hostname).ShortID
+		buf.Add(e)
+		if !filter.Match(e) {
+			return
+		}
+		emit(opts, renderer, e)
+	}
+
 	for {
 		select {
 		case <-interrupt:
 			fmt.Fprintf(io.ErrOut, "\n%s stopped\n", c.SuccessIcon())
 			return nil
 		case err := <-errCh:
+			// The source has stopped, but entries it already delivered may still
+			// be sitting in the channel buffer. Render those before returning so
+			// a late failure does not silently discard successful polls. The
+			// drain is non-blocking, so an empty channel returns immediately.
 			if err != nil {
-				return fmt.Errorf("failed to stream logs: %w", err)
+				err = fmt.Errorf("failed to stream logs: %w", err)
 			}
-			return nil
+			for {
+				select {
+				case e := <-entries:
+					show(e)
+				default:
+					return err
+				}
+			}
 		case e := <-entries:
-			e.ReplicaID = registry.Ensure(e.Hostname).ShortID
-			buf.Add(e)
-			if !filter.Match(e) {
-				continue
-			}
-			emit(opts, renderer, e)
+			show(e)
 		}
 	}
 }
