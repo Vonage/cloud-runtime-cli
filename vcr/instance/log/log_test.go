@@ -2,9 +2,14 @@ package log
 
 import (
 	"bytes"
+	"context"
 	"errors"
+	"fmt"
 	"io"
 	"os"
+	"os/signal"
+	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -14,9 +19,99 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"vonage-cloud-runtime-cli/pkg/api"
+	"vonage-cloud-runtime-cli/pkg/logs"
 	"vonage-cloud-runtime-cli/testutil"
 	"vonage-cloud-runtime-cli/testutil/mocks"
 )
+
+func Test_buildQueryAndFilter(t *testing.T) {
+	t.Run("since sets From", func(t *testing.T) {
+		opts := &Options{Since: 15 * time.Minute, Limit: 300}
+		q, _, err := buildQueryAndFilter(opts)
+		require.NoError(t, err)
+		require.WithinDuration(t, time.Now().Add(-15*time.Minute), q.From, 5*time.Second)
+		require.Equal(t, 300, q.Limit)
+	})
+
+	t.Run("since and from are mutually exclusive", func(t *testing.T) {
+		opts := &Options{Since: time.Minute, From: "2026-08-02T10:00:00Z"}
+		_, _, err := buildQueryAndFilter(opts)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "mutually exclusive")
+	})
+
+	t.Run("invalid from is rejected", func(t *testing.T) {
+		opts := &Options{From: "not-a-time"}
+		_, _, err := buildQueryAndFilter(opts)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "--from")
+	})
+
+	t.Run("to sets To", func(t *testing.T) {
+		opts := &Options{To: "2026-08-02T11:00:00Z"}
+		q, _, err := buildQueryAndFilter(opts)
+		require.NoError(t, err)
+		require.Equal(t, time.Date(2026, 8, 2, 11, 0, 0, 0, time.UTC), q.To.UTC())
+	})
+
+	t.Run("invalid to is rejected", func(t *testing.T) {
+		opts := &Options{To: "not-a-time"}
+		_, _, err := buildQueryAndFilter(opts)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "--to")
+	})
+
+	t.Run("invalid grep is rejected", func(t *testing.T) {
+		opts := &Options{Grep: "("}
+		_, _, err := buildQueryAndFilter(opts)
+		require.Error(t, err)
+	})
+
+	t.Run("filters are populated", func(t *testing.T) {
+		opts := &Options{LogLevel: "warn", SourceType: "application", Grep: "boom", Exclude: "health"}
+		_, f, err := buildQueryAndFilter(opts)
+		require.NoError(t, err)
+		require.Equal(t, logs.LevelWarn, f.MinLevel)
+		require.Equal(t, "application", f.SourceType)
+		require.True(t, f.Match(logs.Entry{Level: "error", Message: "boom", SourceType: "application"}))
+		require.False(t, f.Match(logs.Entry{Level: "error", Message: "boom health", SourceType: "application"}))
+	})
+
+	t.Run("unknown log level is rejected", func(t *testing.T) {
+		opts := &Options{LogLevel: "loud"}
+		_, _, err := buildQueryAndFilter(opts)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "--log-level")
+	})
+
+	t.Run("replica flag needs a replica-capable source", func(t *testing.T) {
+		opts := &Options{Replicas: "r1"}
+		_, _, err := buildQueryAndFilter(opts)
+		require.NoError(t, err, "parsing succeeds; capability is checked against the source")
+	})
+}
+
+func Test_newSource(t *testing.T) {
+	ios, _, _, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+
+	for _, name := range []string{"", "auto", "graphql"} {
+		t.Run("accepts "+name, func(t *testing.T) {
+			src, err := newSource(&Options{Factory: f, SourceName: name})
+			require.NoError(t, err)
+			require.Equal(t, "graphql", src.Name())
+		})
+	}
+
+	t.Run("rejects an unknown source and names the accepted values", func(t *testing.T) {
+		src, err := newSource(&Options{Factory: f, SourceName: "stream"})
+		require.Error(t, err)
+		require.Nil(t, src)
+		require.Contains(t, err.Error(), `unknown --source "stream"`)
+		require.Contains(t, err.Error(), "auto")
+		require.Contains(t, err.Error(), "graphql")
+	})
+}
 
 func TestLog(t *testing.T) {
 	type mock struct {
@@ -87,7 +182,79 @@ func TestLog(t *testing.T) {
 				LogGetInstanceByIDReturnErr:          nil,
 			},
 			want: want{
-				stdout: "[application] hello",
+				stdout: "hello",
+			},
+		},
+		{
+			name: "json-output-emits-one-object-per-line",
+			cli:  "--id=abc-123 --json",
+			mock: mock{
+				LogListLogsByInstanceIDTimes: 1,
+				LogGetInstanceByIDTimes:      1,
+				LogReturnInstance:            api.Instance{ID: "abc-123"},
+				LogInstanceID:                "abc-123",
+				LogReturnLogs:                []api.Log{{Timestamp: time.Now(), SourceType: "application", LogLevel: "info", Message: "hello"}},
+			},
+			want: want{
+				stdout: `"message":"hello"`,
+			},
+		},
+		{
+			name: "unknown-log-level-fails-closed",
+			cli:  "--id=abc-123 --log-level=loud",
+			mock: mock{
+				LogListLogsByInstanceIDTimes: 0,
+				LogGetInstanceByIDTimes:      0,
+			},
+			want: want{
+				errMsg: `invalid --log-level "loud": want one of trace, debug, info, warn, error, fatal`,
+			},
+		},
+		{
+			name: "replica-flag-rejected-for-graphql-source",
+			cli:  "--id=abc-123 --replica=r1",
+			mock: mock{
+				LogListLogsByInstanceIDTimes: 0,
+				LogGetInstanceByIDTimes:      0,
+			},
+			want: want{
+				errMsg: `--replica needs a replica-capable log source; the "graphql" source does not provide replica information`,
+			},
+		},
+		{
+			name: "log-level-filters-out-lower-severity",
+			cli:  "--id=abc-123 --log-level=error",
+			mock: mock{
+				LogListLogsByInstanceIDTimes: 1,
+				LogGetInstanceByIDTimes:      1,
+				LogReturnInstance:            api.Instance{ID: "abc-123"},
+				LogInstanceID:                "abc-123",
+				LogReturnLogs:                []api.Log{{Timestamp: time.Now(), SourceType: "application", LogLevel: "info", Message: "quiet"}},
+			},
+			want: want{
+				stderr: "! no matching log entries in range\n",
+			},
+		},
+		{
+			name: "malformed-to-fails-closed",
+			cli:  "--id=abc-123 --to=not-a-time",
+			mock: mock{
+				LogListLogsByInstanceIDTimes: 0,
+				LogGetInstanceByIDTimes:      0,
+			},
+			want: want{
+				errMsg: `invalid --to value "not-a-time": expected RFC3339`,
+			},
+		},
+		{
+			name: "unknown-source-is-rejected-and-names-accepted-values",
+			cli:  "--id=abc-123 --source=stream",
+			mock: mock{
+				LogListLogsByInstanceIDTimes: 0,
+				LogGetInstanceByIDTimes:      0,
+			},
+			want: want{
+				errMsg: `failed to select log source: unknown --source "stream": want auto or graphql`,
 			},
 		},
 		{
@@ -167,135 +334,6 @@ func TestLog(t *testing.T) {
 	}
 }
 
-func Test_fetchLogs(t *testing.T) {
-	type mock struct {
-		LogListLogsByInstanceIDTimes     int
-		LogListLogsByInstanceIDReturnErr error
-		LogReturnLogs                    []api.Log
-	}
-	type want struct {
-		stdout string
-		stderr string
-	}
-	tests := []struct {
-		name string
-		mock mock
-		want want
-	}{
-		{
-			name: "Test with error",
-			mock: mock{LogListLogsByInstanceIDTimes: 1, LogListLogsByInstanceIDReturnErr: errors.New("failed to list logs"), LogReturnLogs: nil},
-			want: want{stderr: "! Error fetching logs: failed to list logs\n"},
-		},
-		{
-			name: "Test without error",
-			mock: mock{LogListLogsByInstanceIDTimes: 1, LogListLogsByInstanceIDReturnErr: nil, LogReturnLogs: []api.Log{{Timestamp: time.Now(), SourceType: "application", Message: "test"}}},
-			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-
-			ctrl := gomock.NewController(t)
-
-			datastoreMock := mocks.NewMockDatastoreInterface(ctrl)
-			datastoreMock.EXPECT().ListLogsByInstanceID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-				Times(tt.mock.LogListLogsByInstanceIDTimes).
-				Return(tt.mock.LogReturnLogs, tt.mock.LogListLogsByInstanceIDReturnErr)
-
-			ios, _, stdout, stderr := iostreams.Test()
-			lastTimestamp := time.Now()
-
-			f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, nil, nil, nil)
-
-			opts := &Options{
-				Factory: f,
-			}
-
-			fetchLogs(ios, opts, lastTimestamp)
-
-			cmdOut := &testutil.CmdOut{
-				OutBuf: stdout,
-				ErrBuf: stderr,
-			}
-			if tt.want.stderr != "" {
-				require.Equal(t, tt.want.stderr, cmdOut.Stderr())
-				return
-			}
-			require.Equal(t, tt.want.stdout, cmdOut.String())
-		})
-	}
-}
-
-func Test_printLogs(t *testing.T) {
-
-	type mock struct {
-		LogSourceType string
-		LogLogLevel   string
-	}
-	type want struct {
-		stdout string
-	}
-	tests := []struct {
-		name string
-		mock mock
-		want want
-	}{
-		{
-			name: "Test with source type",
-			mock: mock{LogSourceType: "application", LogLogLevel: ""},
-			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
-		},
-		{
-			name: "Test with info log level",
-			mock: mock{LogSourceType: "", LogLogLevel: "info"},
-			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
-		},
-		{
-			name: "Test with warn log level",
-			mock: mock{LogSourceType: "", LogLogLevel: "warn"},
-			want: want{stdout: ""},
-		},
-		{
-			name: "Test with source type and log level",
-			mock: mock{LogSourceType: "application", LogLogLevel: "info"},
-			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
-		},
-		{
-			name: "Test without source type and log level",
-			mock: mock{LogSourceType: "", LogLogLevel: ""},
-			want: want{stdout: time.Now().In(time.Local).Format(time.RFC3339) + " [application] test\n"},
-		},
-		{
-			name: "Test with log level not exist",
-			mock: mock{LogSourceType: "", LogLogLevel: "log-level-not-exist"},
-			want: want{stdout: ""},
-		},
-		{
-			name: "Test with source type not exist",
-			mock: mock{LogSourceType: "provider", LogLogLevel: "info"},
-			want: want{stdout: ""},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-
-			ios, _, stdout, _ := iostreams.Test()
-
-			opts := &Options{
-				SourceType: tt.mock.LogSourceType,
-				LogLevel:   tt.mock.LogLogLevel,
-			}
-
-			printLogs(ios, opts, api.Log{Timestamp: time.Now(), SourceType: "application", Message: "test", LogLevel: "info"})
-
-			require.Equal(t, tt.want.stdout, stdout.String())
-		})
-	}
-}
-
 func TestLog_Follow(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
@@ -340,5 +378,933 @@ func TestLog_Follow(t *testing.T) {
 	_, err = cmd.ExecuteC()
 	require.NoError(t, err, "follow should exit cleanly on interrupt")
 	require.GreaterOrEqual(t, callCount, 2, "logs should have been fetched at least twice")
-	require.Contains(t, stdout.String(), "[application] streaming")
+	require.Contains(t, stdout.String(), "streaming")
+}
+
+// fakeFollowSource records the context handed to Follow so a test can assert the
+// follow loop is not bounded by the global --timeout deadline. It also serves a
+// canned History page and can emit a canned stream of entries.
+type fakeFollowSource struct {
+	hadDeadline bool
+	followErr   error
+	historyPage logs.Page
+	// emit is delivered on the Follow channel before followErr is returned.
+	emit []logs.Entry
+}
+
+func (s *fakeFollowSource) Name() string    { return "fake" }
+func (s *fakeFollowSource) Caps() logs.Caps { return logs.Caps{} }
+
+func (s *fakeFollowSource) History(_ context.Context, _ logs.Query) (logs.Page, error) {
+	return s.historyPage, nil
+}
+
+func (s *fakeFollowSource) Follow(ctx context.Context, _ logs.Query, out chan<- logs.Entry) error {
+	_, s.hadDeadline = ctx.Deadline()
+	for _, e := range s.emit {
+		select {
+		case out <- e:
+		case <-ctx.Done():
+			return nil
+		}
+	}
+	return s.followErr
+}
+
+// runFollowWithTimeout runs runFollow on a goroutine with a hard backstop so a
+// regression that stops the loop from returning fails the test instead of
+// hanging CI. Reading the output buffer after this returns is safe: the channel
+// receive synchronises with every write runFollow made.
+func runFollowWithTimeout(t *testing.T, src logs.Source, opts *Options, filter *logs.Filter, renderer *logs.Renderer) error {
+	t.Helper()
+	done := make(chan error, 1)
+	go func() {
+		done <- runFollow(src, opts, logs.Query{}, filter, renderer, logs.NewBuffer(opts.BufferSize), logs.NewRegistry())
+	}()
+	select {
+	case err := <-done:
+		return err
+	case <-time.After(10 * time.Second):
+		t.Fatal("runFollow did not return within 10s")
+		return nil
+	}
+}
+
+// Test_runFollow_isNotBoundedByGlobalTimeout pins defect fix 1: deriving the
+// follow context from opts.Deadline() used to kill --follow after --timeout.
+func Test_runFollow_isNotBoundedByGlobalTimeout(t *testing.T) {
+	ios, _, _, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+	opts := &Options{Factory: f, Follow: true, BufferSize: 10}
+
+	src := &fakeFollowSource{}
+	err := runFollowWithTimeout(t, src, opts, &logs.Filter{},
+		logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}))
+
+	require.NoError(t, err)
+	require.False(t, src.hadDeadline, "follow context must not carry the global --timeout deadline")
+}
+
+// Test_runFollow_surfacesPersistentSourceError pins the command half of blocker
+// 1. Transient poll failures are absorbed and retried inside the source (see
+// TestGraphQLSource_FollowSurvivesATransientListerError), so by the time Follow
+// returns an error it has given up — which is genuinely fatal and must exit
+// non-zero rather than look like a clean stop.
+func Test_runFollow_surfacesPersistentSourceError(t *testing.T) {
+	ios, _, _, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+	opts := &Options{Factory: f, Follow: true, BufferSize: 10}
+
+	src := &fakeFollowSource{followErr: errors.New("transport died")}
+	err := runFollowWithTimeout(t, src, opts, &logs.Filter{},
+		logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}))
+
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "failed to stream logs: transport died")
+}
+
+// Test_runLog_followSurvivesATransientFetchError is blocker 1 end-to-end through
+// the real GraphQL source: one failed poll must warn on ErrOut and keep the tail
+// alive. Before the fix a single Hasura 502 ended a long-running `vcr logs -f`
+// with exit 1, contradicting both the old command and the design spec
+// ("printed to ErrOut with the warning icon; the loop continues").
+func Test_runLog_followSurvivesATransientFetchError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	datastoreMock := mocks.NewMockDatastoreInterface(ctrl)
+	datastoreMock.EXPECT().
+		GetInstanceByID(gomock.Any(), "abc-123").
+		Times(1).
+		Return(api.Instance{ID: "abc-123"}, nil)
+
+	call := 0
+	datastoreMock.EXPECT().
+		ListLogsByInstanceID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		MinTimes(3).
+		DoAndReturn(func(_ context.Context, _ string, _ int, _ time.Time) ([]api.Log, error) {
+			call++
+			switch call {
+			case 1:
+				return nil, errors.New("hasura 502")
+			case 2:
+				return []api.Log{{Timestamp: time.Now(), SourceType: "application", LogLevel: "info", Message: "survived-the-blip"}}, nil
+			default:
+				// The entry above is already on the channel; stop the session.
+				p, _ := os.FindProcess(os.Getpid())
+				_ = p.Signal(os.Interrupt)
+				return nil, nil
+			}
+		})
+
+	ios, _, stdout, stderr := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, nil, nil, nil)
+
+	cmd := NewCmdInstanceLog(f)
+	cmd.SetArgs([]string{"--id=abc-123", "--follow"})
+	cmd.SetIn(&bytes.Buffer{})
+	cmd.SetOut(io.Discard)
+	cmd.SetErr(io.Discard)
+
+	_, err := cmd.ExecuteC()
+	require.NoError(t, err, "a transient fetch error must not end --follow with a non-zero exit")
+	require.Contains(t, stdout.String(), "survived-the-blip", "polling must continue past the failure")
+	require.Contains(t, stderr.String(), "hasura 502", "the failure must still be reported")
+	require.Contains(t, stderr.String(), "!", "the report uses the warning icon")
+	require.NotContains(t, stdout.String(), "hasura 502", "warnings belong on ErrOut")
+}
+
+// Test_runHistory_ordering pins that a history page (newest-first from the
+// source) is printed chronologically by default and newest-first with --reverse.
+func Test_runHistory_ordering(t *testing.T) {
+	base := time.Date(2026, 8, 2, 10, 0, 0, 0, time.UTC)
+	newestFirst := logs.Page{Entries: []logs.Entry{
+		{Timestamp: base.Add(2 * time.Minute), Level: "info", Message: "third"},
+		{Timestamp: base.Add(1 * time.Minute), Level: "info", Message: "second"},
+		{Timestamp: base, Level: "info", Message: "first"},
+	}}
+
+	run := func(t *testing.T, reverse bool) string {
+		t.Helper()
+		ios, _, stdout, _ := iostreams.Test()
+		f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+		opts := &Options{Factory: f, BufferSize: 10, Reverse: reverse}
+		src := &fakeFollowSource{historyPage: newestFirst}
+
+		err := runHistory(src, opts, logs.Query{}, &logs.Filter{},
+			logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}), logs.NewBuffer(10), logs.NewRegistry())
+		require.NoError(t, err)
+		return stdout.String()
+	}
+
+	t.Run("default is chronological", func(t *testing.T) {
+		out := run(t, false)
+		require.Less(t, strings.Index(out, "first"), strings.Index(out, "second"))
+		require.Less(t, strings.Index(out, "second"), strings.Index(out, "third"))
+	})
+
+	t.Run("reverse keeps the source order", func(t *testing.T) {
+		out := run(t, true)
+		require.Less(t, strings.Index(out, "third"), strings.Index(out, "second"))
+		require.Less(t, strings.Index(out, "second"), strings.Index(out, "first"))
+	})
+}
+
+// Test_runFollow_rendersBufferedEntriesOnSourceError pins the drain added for
+// review finding 1: when the source fails after successful polls, entries it
+// already delivered are still in the channel buffer and must be printed rather
+// than discarded by the error branch winning the select.
+//
+// The source emits a burst large enough that it outpaces the render loop, so by
+// the time the error lands on errCh the entries channel still holds many
+// entries. Without the drain the error branch discards them and the assertion
+// below fails.
+func Test_runFollow_rendersBufferedEntriesOnSourceError(t *testing.T) {
+	ios, _, stdout, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+	opts := &Options{Factory: f, Follow: true, BufferSize: 10}
+
+	const burst = 128
+	base := time.Date(2026, 8, 2, 10, 0, 0, 0, time.UTC)
+	emit := make([]logs.Entry, 0, burst)
+	for i := 0; i < burst; i++ {
+		emit = append(emit, logs.Entry{
+			Timestamp: base.Add(time.Duration(i) * time.Millisecond),
+			Level:     "info",
+			Message:   fmt.Sprintf("delivered-%03d", i),
+		})
+	}
+	src := &fakeFollowSource{followErr: errors.New("transport died"), emit: emit}
+
+	err := runFollowWithTimeout(t, src, opts, &logs.Filter{},
+		logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}))
+
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "failed to stream logs: transport died")
+
+	out := stdout.String()
+	for i := 0; i < burst; i++ {
+		require.Contains(t, out, fmt.Sprintf("delivered-%03d", i),
+			"entries already delivered by the source must be drained and rendered before returning the error")
+	}
+}
+
+// Test_runFollow_rendersBufferedEntriesOnCleanStop is the same drain guarantee on
+// the clean (nil error) exit path.
+func Test_runFollow_rendersBufferedEntriesOnCleanStop(t *testing.T) {
+	ios, _, stdout, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+	opts := &Options{Factory: f, Follow: true, BufferSize: 10}
+
+	const burst = 128
+	base := time.Date(2026, 8, 2, 10, 0, 0, 0, time.UTC)
+	emit := make([]logs.Entry, 0, burst)
+	for i := 0; i < burst; i++ {
+		emit = append(emit, logs.Entry{
+			Timestamp: base.Add(time.Duration(i) * time.Millisecond),
+			Level:     "info",
+			Message:   fmt.Sprintf("last-gasp-%03d", i),
+		})
+	}
+
+	err := runFollowWithTimeout(t, &fakeFollowSource{emit: emit}, opts, &logs.Filter{},
+		logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}))
+
+	require.NoError(t, err)
+	out := stdout.String()
+	for i := 0; i < burst; i++ {
+		require.Contains(t, out, fmt.Sprintf("last-gasp-%03d", i),
+			"entries already delivered by the source must be drained on a clean stop too")
+	}
+}
+
+// gateWriter holds the render loop still until release is closed, then writes
+// straight through. It lets the interrupt-drain test guarantee that the source
+// has finished delivering and that the interrupt is already pending before the
+// loop renders anything else, so the assertion does not depend on how fast the
+// render loop happens to run. Only runFollow writes through it, so no locking
+// is needed; runFollowWithTimeout's channel receive synchronises the read.
+type gateWriter struct {
+	release <-chan struct{}
+	opened  sync.Once
+	w       io.Writer
+}
+
+// Fd satisfies the unexported writer interface iostreams.IOStreams.Out requires.
+func (g *gateWriter) Fd() uintptr { return 1 }
+
+func (g *gateWriter) Write(p []byte) (int, error) {
+	g.opened.Do(func() { <-g.release })
+	return g.w.Write(p)
+}
+
+// interruptingSource delivers a burst of entries and then interrupts the
+// process, which is how a real --follow session almost always ends. It closes
+// release only once the interrupt has been observed by a second handler, which
+// proves the follow loop's own interrupt channel has been served too, and then
+// parks on ctx so it never races the loop to errCh.
+type interruptingSource struct {
+	emit    []logs.Entry
+	release chan struct{}
+	pending <-chan os.Signal
+}
+
+func (s *interruptingSource) Name() string    { return "interrupting" }
+func (s *interruptingSource) Caps() logs.Caps { return logs.Caps{} }
+
+func (s *interruptingSource) History(_ context.Context, _ logs.Query) (logs.Page, error) {
+	return logs.Page{}, nil
+}
+
+func (s *interruptingSource) Follow(ctx context.Context, _ logs.Query, out chan<- logs.Entry) error {
+	for _, e := range s.emit {
+		select {
+		case out <- e:
+		case <-ctx.Done():
+			return nil
+		}
+	}
+	p, err := os.FindProcess(os.Getpid())
+	if err != nil {
+		return err
+	}
+	if err := p.Signal(os.Interrupt); err != nil {
+		return err
+	}
+	<-s.pending
+	close(s.release)
+	<-ctx.Done()
+	return nil
+}
+
+// Test_runFollow_rendersBufferedEntriesOnInterrupt pins the drain on the
+// interrupt branch: Ctrl+C ends nearly every real --follow session, and the
+// branch used to return without draining, discarding up to 256 entries the
+// source had already delivered.
+//
+// The source fills the channel buffer and holds the render loop on its first
+// write until the interrupt is pending, so when the loop resumes both the
+// interrupt and the remaining entries are ready. Without the drain the
+// interrupt branch wins the select after a handful of entries and the rest are
+// lost; with it, every entry is rendered.
+func Test_runFollow_rendersBufferedEntriesOnInterrupt(t *testing.T) {
+	ios, _, stdout, _ := iostreams.Test()
+
+	release := make(chan struct{})
+	ios.Out = &gateWriter{release: release, w: stdout}
+
+	pending := make(chan os.Signal, 1)
+	signal.Notify(pending, os.Interrupt)
+	t.Cleanup(func() { signal.Stop(pending) })
+
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+	opts := &Options{Factory: f, Follow: true, BufferSize: 10}
+
+	const burst = 128
+	base := time.Date(2026, 8, 2, 10, 0, 0, 0, time.UTC)
+	emit := make([]logs.Entry, 0, burst)
+	for i := 0; i < burst; i++ {
+		emit = append(emit, logs.Entry{
+			Timestamp: base.Add(time.Duration(i) * time.Millisecond),
+			Level:     "info",
+			Message:   fmt.Sprintf("interrupted-%03d", i),
+		})
+	}
+
+	src := &interruptingSource{emit: emit, release: release, pending: pending}
+	err := runFollowWithTimeout(t, src, opts, &logs.Filter{},
+		logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}))
+
+	require.NoError(t, err, "an interrupt is a clean stop")
+	out := stdout.String()
+	for i := 0; i < burst; i++ {
+		require.Contains(t, out, fmt.Sprintf("interrupted-%03d", i),
+			"entries already delivered by the source must be drained and rendered before Ctrl+C returns")
+	}
+}
+
+// Test_runLog_historyErrorIsReportedOnce pins the runHistory error branch: a
+// backend failure must surface as a non-zero exit rather than an empty run that
+// looks successful. It also pins that the command layer names the failing step
+// without repeating the source layer's own "failed to list logs" phrasing.
+func Test_runLog_historyErrorIsReportedOnce(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	datastoreMock := mocks.NewMockDatastoreInterface(ctrl)
+
+	datastoreMock.EXPECT().
+		GetInstanceByID(gomock.Any(), "abc-123").
+		Times(1).
+		Return(api.Instance{ID: "abc-123"}, nil)
+	datastoreMock.EXPECT().
+		ListLogsByInstanceID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		Times(1).
+		Return(nil, errors.New("datastore unreachable"))
+
+	ios, _, stdout, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, nil, nil, nil)
+
+	cmd := NewCmdInstanceLog(f)
+	cmd.SetArgs([]string{"--id=abc-123"})
+	cmd.SetIn(&bytes.Buffer{})
+	cmd.SetOut(io.Discard)
+	cmd.SetErr(io.Discard)
+
+	_, err := cmd.ExecuteC()
+	require.Error(t, err, "a backend failure must not exit 0 with empty output")
+	require.Contains(t, err.Error(), "failed to fetch log history:",
+		"the command layer must name the step that failed")
+	require.Contains(t, err.Error(), "datastore unreachable",
+		"the underlying cause must survive wrapping")
+	require.NotContains(t, err.Error(), "failed to list logs",
+		"the source must not add a prefix the command already supplies")
+	require.Equal(t, 1, strings.Count(err.Error(), "failed to "),
+		"the user must see one failure prefix, not two")
+	require.Empty(t, stdout.String(), "nothing should be printed when the fetch fails")
+}
+
+// Test_runFollow_appliesFilter pins review finding 2: follow mode must apply the
+// same filter as history mode, so entries below --log-level never reach stdout.
+func Test_runFollow_appliesFilter(t *testing.T) {
+	base := time.Date(2026, 8, 2, 10, 0, 0, 0, time.UTC)
+	entries := []logs.Entry{
+		{Timestamp: base, Level: "info", Message: "chatty-info-line"},
+		{Timestamp: base.Add(time.Second), Level: "error", Message: "important-error-line"},
+	}
+
+	t.Run("log-level threshold", func(t *testing.T) {
+		ios, _, stdout, _ := iostreams.Test()
+		f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+		opts := &Options{Factory: f, Follow: true, BufferSize: 10, LogLevel: "error"}
+
+		_, filter, err := buildQueryAndFilter(opts)
+		require.NoError(t, err)
+
+		err = runFollowWithTimeout(t, &fakeFollowSource{emit: entries}, opts, filter,
+			logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}))
+		require.NoError(t, err)
+
+		out := stdout.String()
+		require.Contains(t, out, "important-error-line")
+		require.NotContains(t, out, "chatty-info-line", "--log-level must filter follow-mode entries")
+	})
+
+	t.Run("grep pattern", func(t *testing.T) {
+		ios, _, stdout, _ := iostreams.Test()
+		f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+		opts := &Options{Factory: f, Follow: true, BufferSize: 10, Grep: "important"}
+
+		_, filter, err := buildQueryAndFilter(opts)
+		require.NoError(t, err)
+
+		err = runFollowWithTimeout(t, &fakeFollowSource{emit: entries}, opts, filter,
+			logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}))
+		require.NoError(t, err)
+
+		out := stdout.String()
+		require.Contains(t, out, "important-error-line")
+		require.NotContains(t, out, "chatty-info-line", "--grep must filter follow-mode entries")
+	})
+}
+
+// Test_runLog_queriesResolvedInstanceID pins review finding 3: the id handed to
+// the datastore's log query must be the resolved instance's ID, not whatever the
+// user typed (and not the empty string on the project/instance-name path).
+func Test_runLog_queriesResolvedInstanceID(t *testing.T) {
+	t.Run("id flag uses the resolved id", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		datastoreMock := mocks.NewMockDatastoreInterface(ctrl)
+
+		// The lookup canonicalises the id, so the queried id differs from --id.
+		datastoreMock.EXPECT().
+			GetInstanceByID(gomock.Any(), "alias-id").
+			Times(1).
+			Return(api.Instance{ID: "resolved-abc-999"}, nil)
+
+		var gotID string
+		datastoreMock.EXPECT().
+			ListLogsByInstanceID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context, id string, _ int, _ time.Time) ([]api.Log, error) {
+				gotID = id
+				return []api.Log{{Timestamp: time.Now(), SourceType: "application", Message: "hello"}}, nil
+			})
+
+		ios, _, stdout, _ := iostreams.Test()
+		f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, nil, nil, nil)
+
+		cmd := NewCmdInstanceLog(f)
+		cmd.SetArgs([]string{"--id=alias-id"})
+		cmd.SetIn(&bytes.Buffer{})
+		cmd.SetOut(io.Discard)
+		cmd.SetErr(io.Discard)
+
+		_, err := cmd.ExecuteC()
+		require.NoError(t, err)
+		require.Equal(t, "resolved-abc-999", gotID, "the log query must use the resolved instance id")
+		require.Contains(t, stdout.String(), "hello")
+	})
+
+	t.Run("project-name and instance-name resolve to an id", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		datastoreMock := mocks.NewMockDatastoreInterface(ctrl)
+
+		datastoreMock.EXPECT().
+			GetInstanceByProjectAndInstanceName(gomock.Any(), "my-app", "dev").
+			Times(1).
+			Return(api.Instance{ID: "resolved-from-names"}, nil)
+
+		var gotID string
+		datastoreMock.EXPECT().
+			ListLogsByInstanceID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context, id string, _ int, _ time.Time) ([]api.Log, error) {
+				gotID = id
+				return []api.Log{{Timestamp: time.Now(), SourceType: "application", Message: "named-instance-line"}}, nil
+			})
+
+		ios, _, stdout, _ := iostreams.Test()
+		f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, nil, nil, nil)
+
+		cmd := NewCmdInstanceLog(f)
+		cmd.SetArgs([]string{"--project-name=my-app", "--instance-name=dev"})
+		cmd.SetIn(&bytes.Buffer{})
+		cmd.SetOut(io.Discard)
+		cmd.SetErr(io.Discard)
+
+		_, err := cmd.ExecuteC()
+		require.NoError(t, err)
+		require.Equal(t, "resolved-from-names", gotID, "the log query must use the id resolved from the names")
+		require.Contains(t, stdout.String(), "named-instance-line")
+	})
+}
+
+// Test_runLog_utcReachesRenderer pins review finding 4b: --utc must be handed to
+// the renderer so timestamps print in UTC rather than local time.
+func Test_runLog_utcReachesRenderer(t *testing.T) {
+	// Pin a non-UTC local zone, otherwise the local and UTC renderings of the
+	// same instant would be identical on a UTC CI machine and the assertion
+	// below would be vacuous. Not parallel-safe, so this test is not parallel.
+	origLocal := time.Local
+	time.Local = time.FixedZone("TEST+09", 9*60*60)
+	t.Cleanup(func() { time.Local = origLocal })
+
+	ts := time.Date(2026, 8, 2, 23, 30, 15, 500*int(time.Millisecond), time.UTC)
+	const wantUTC = "23:30:15.500"   // ts rendered in UTC
+	const wantLocal = "08:30:15.500" // ts rendered in TEST+09
+
+	ctrl := gomock.NewController(t)
+	datastoreMock := mocks.NewMockDatastoreInterface(ctrl)
+	datastoreMock.EXPECT().
+		GetInstanceByID(gomock.Any(), "abc-123").
+		Times(1).
+		Return(api.Instance{ID: "abc-123"}, nil)
+	datastoreMock.EXPECT().
+		ListLogsByInstanceID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		Times(1).
+		Return([]api.Log{{Timestamp: ts, SourceType: "application", LogLevel: "info", Message: "utc-line"}}, nil)
+
+	ios, _, stdout, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, nil, nil, nil)
+
+	cmd := NewCmdInstanceLog(f)
+	cmd.SetArgs([]string{"--id=abc-123", "--utc"})
+	cmd.SetIn(&bytes.Buffer{})
+	cmd.SetOut(io.Discard)
+	cmd.SetErr(io.Discard)
+
+	_, err := cmd.ExecuteC()
+	require.NoError(t, err)
+
+	out := stdout.String()
+	require.Contains(t, out, wantUTC, "--utc must reach the renderer")
+	require.NotContains(t, out, wantLocal, "--utc must not render local time")
+}
+
+func TestNewCmdLogs_TopLevelAlias(t *testing.T) {
+	ios, _, _, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+
+	cmd := NewCmdLogs(f)
+	require.Equal(t, "logs", cmd.Use)
+	require.Empty(t, cmd.Aliases)
+	require.NotNil(t, cmd.Flags().Lookup("follow"))
+	require.NotNil(t, cmd.Flags().Lookup("since"))
+	require.NotNil(t, cmd.Flags().Lookup("grep"))
+}
+
+// Both registrations share one help text, so the examples must be rewritten per
+// registration. Otherwise `vcr instance log --help` tells the user to type
+// `vcr logs ...`, which is a different command.
+func TestLogCmd_ExamplesMatchTheirOwnInvocation(t *testing.T) {
+	ios, _, _, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+
+	topLevel := NewCmdLogs(f)
+	require.Contains(t, topLevel.Example, "$ vcr logs ")
+	require.NotContains(t, topLevel.Example, "vcr instance log")
+
+	nested := NewCmdInstanceLog(f)
+	require.Contains(t, nested.Example, "$ vcr instance log ")
+	require.NotContains(t, nested.Example, "$ vcr logs ",
+		"vcr instance log examples must not tell the user to run vcr logs")
+
+	// No unsubstituted verbs leaked into either help text.
+	require.NotContains(t, topLevel.Example, "%!")
+	require.NotContains(t, nested.Example, "%!")
+}
+
+// Test_validateFlags pins review finding 10: --history 0 used to become 200 and
+// --buffer 0 used to become 5000, deep inside pkg/logs. Silently substituting a
+// default for a value the user typed is worse than refusing it.
+func Test_validateFlags(t *testing.T) {
+	t.Run("accepts the defaults", func(t *testing.T) {
+		require.NoError(t, validateFlags(&Options{Limit: DefaultHistoryLimit, BufferSize: logs.DefaultBufferSize}))
+	})
+
+	for name, limit := range map[string]int{"zero": 0, "negative": -1} {
+		t.Run("rejects "+name+" history", func(t *testing.T) {
+			err := validateFlags(&Options{Limit: limit, BufferSize: logs.DefaultBufferSize})
+			require.Error(t, err)
+			require.Contains(t, err.Error(), "--history")
+			require.Contains(t, err.Error(), "positive")
+		})
+		t.Run("rejects "+name+" buffer", func(t *testing.T) {
+			err := validateFlags(&Options{Limit: DefaultHistoryLimit, BufferSize: limit})
+			require.Error(t, err)
+			require.Contains(t, err.Error(), "--buffer")
+			require.Contains(t, err.Error(), "positive")
+		})
+	}
+}
+
+// Test_runLog_rejectsNonPositiveSizes drives the same rejection through the real
+// command so the error reaches the user with a non-zero exit.
+func Test_runLog_rejectsNonPositiveSizes(t *testing.T) {
+	for _, tt := range []struct{ args, want string }{
+		{"--history=0", "--history"},
+		{"--buffer=0", "--buffer"},
+	} {
+		t.Run(tt.args, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			datastoreMock := mocks.NewMockDatastoreInterface(ctrl)
+			// Nothing may be fetched: the flags are rejected before any request.
+			datastoreMock.EXPECT().GetInstanceByID(gomock.Any(), gomock.Any()).Times(0)
+			datastoreMock.EXPECT().ListLogsByInstanceID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+
+			ios, _, _, _ := iostreams.Test()
+			f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, nil, nil, nil)
+
+			cmd := NewCmdInstanceLog(f)
+			cmd.SetArgs([]string{"--id=abc-123", tt.args})
+			cmd.SetIn(&bytes.Buffer{})
+			cmd.SetOut(io.Discard)
+			cmd.SetErr(io.Discard)
+
+			_, err := cmd.ExecuteC()
+			require.Error(t, err)
+			require.NotContains(t, err.Error(), "failed to validate flags: ",
+				"self-describing flag errors must not be wrapped in a generic prefix")
+			require.Contains(t, err.Error(), tt.want)
+		})
+	}
+}
+
+// Test_buildQueryAndFilter_patternErrorsNameTheFlag pins review finding 6: an
+// invalid --grep reported "invalid include pattern", naming Filter's internal
+// term rather than the flag the user typed.
+func Test_buildQueryAndFilter_patternErrorsNameTheFlag(t *testing.T) {
+	t.Run("grep", func(t *testing.T) {
+		_, _, err := buildQueryAndFilter(&Options{Grep: "("})
+		require.Error(t, err)
+		require.Contains(t, err.Error(), `invalid --grep "("`)
+		require.NotContains(t, err.Error(), "include pattern",
+			"the user never typed the word include")
+		require.Contains(t, err.Error(), "missing closing )",
+			"the regexp cause must survive re-framing")
+	})
+
+	t.Run("exclude", func(t *testing.T) {
+		_, _, err := buildQueryAndFilter(&Options{Exclude: "["})
+		require.Error(t, err)
+		require.Contains(t, err.Error(), `invalid --exclude "["`)
+		require.NotContains(t, err.Error(), "exclude pattern",
+			"the flag name, not Filter's internal wording")
+	})
+}
+
+// Test_runHistory_warnsWhenTheWindowWasTruncated is blocker 2 at the command
+// boundary: a page the server filled entirely from the newest end, all of which
+// --to discarded, must not be reported as an empty window.
+func Test_runHistory_warnsWhenTheWindowWasTruncated(t *testing.T) {
+	ios, _, stdout, stderr := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+	opts := &Options{Factory: f, BufferSize: 10, Limit: 3, To: "2026-08-02T10:01:00Z"}
+	src := &fakeFollowSource{historyPage: logs.Page{WindowTruncated: true}}
+
+	err := runHistory(src, opts, logs.Query{Limit: 3}, &logs.Filter{},
+		logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{UTC: true}), logs.NewBuffer(10), logs.NewRegistry())
+	require.NoError(t, err)
+
+	require.Empty(t, stdout.String(), "stdout stays clean for pipes")
+	warn := stderr.String()
+	require.NotContains(t, warn, "no matching log entries in range",
+		"claiming the window is empty is exactly the wrong answer here")
+	require.Contains(t, warn, "--to", "the warning must name the bound that discarded the page")
+	require.Contains(t, warn, "--history", "and suggest raising the fetch size")
+	require.Contains(t, warn, "--from", "and suggest a later window start")
+	require.Contains(t, warn, "3", "the current --history value helps the user pick a bigger one")
+}
+
+// Test_runLog_toWindowSaturatedByHistoryWarns is blocker 2 end-to-end through the
+// real GraphQL source: --from/--to over a busy instance, where more entries exist
+// since --from than --history allows, so every row the server returns is newer
+// than --to. Before the fix the user got "no matching log entries in range" and
+// exit 0, and reasonably concluded the hour they asked about was quiet.
+func Test_runLog_toWindowSaturatedByHistoryWarns(t *testing.T) {
+	from := time.Date(2026, 8, 2, 10, 0, 0, 0, time.UTC)
+	to := from.Add(time.Hour)
+
+	ctrl := gomock.NewController(t)
+	datastoreMock := mocks.NewMockDatastoreInterface(ctrl)
+	datastoreMock.EXPECT().
+		GetInstanceByID(gomock.Any(), "abc-123").
+		Times(1).
+		Return(api.Instance{ID: "abc-123"}, nil)
+	// The server honours only `timestamp > from` with a limit, newest-first, so
+	// it fills the page from the newest end — hours past --to.
+	datastoreMock.EXPECT().
+		ListLogsByInstanceID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		Times(1).
+		Return([]api.Log{
+			{Timestamp: to.Add(3 * time.Hour), SourceType: "application", LogLevel: "info", Message: "way-newer-3"},
+			{Timestamp: to.Add(2 * time.Hour), SourceType: "application", LogLevel: "info", Message: "way-newer-2"},
+		}, nil)
+
+	ios, _, stdout, stderr := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, datastoreMock, nil, nil, nil)
+
+	cmd := NewCmdInstanceLog(f)
+	cmd.SetArgs([]string{
+		"--id=abc-123",
+		"--from=" + from.Format(time.RFC3339),
+		"--to=" + to.Format(time.RFC3339),
+		"--history=2",
+	})
+	cmd.SetIn(&bytes.Buffer{})
+	cmd.SetOut(io.Discard)
+	cmd.SetErr(io.Discard)
+
+	_, err := cmd.ExecuteC()
+	require.NoError(t, err)
+	require.Empty(t, stdout.String(), "entries outside the window must not be printed")
+
+	warn := stderr.String()
+	require.NotContains(t, warn, "no matching log entries in range",
+		"the window is not known to be empty; the page never reached it")
+	require.Contains(t, warn, "--history", "the warning must be actionable")
+}
+
+// Test_dateMarkerAppearsInBothModes pins review finding 3. The line format is
+// HH:MM:SS.mmm, so without a date banner the default mode's 300 entries and any
+// --from/--to window spanning days are ambiguous.
+func Test_dateMarkerAppearsInBothModes(t *testing.T) {
+	day1 := time.Date(2026, 8, 2, 23, 58, 0, 0, time.UTC)
+	// newest-first, as a source returns it
+	page := logs.Page{Entries: []logs.Entry{
+		{Timestamp: day1.Add(4 * time.Minute), Level: "info", Message: "next-day-late"},
+		{Timestamp: day1.Add(3 * time.Minute), Level: "info", Message: "next-day-early"},
+		{Timestamp: day1.Add(time.Minute), Level: "info", Message: "same-day-late"},
+		{Timestamp: day1, Level: "info", Message: "same-day-early"},
+	}}
+
+	assertMarkers := func(t *testing.T, out string) {
+		t.Helper()
+		require.Equal(t, 1, strings.Count(out, "==> 2026-08-02"),
+			"exactly one marker for the first date, not one per entry")
+		require.Equal(t, 1, strings.Count(out, "==> 2026-08-03"),
+			"exactly one marker on the date change")
+		require.Less(t, strings.Index(out, "==> 2026-08-02"), strings.Index(out, "same-day-early"),
+			"the marker precedes the first entry of its date")
+		require.Less(t, strings.Index(out, "same-day-late"), strings.Index(out, "==> 2026-08-03"),
+			"the second marker appears only when the date rolls over")
+		require.Less(t, strings.Index(out, "==> 2026-08-03"), strings.Index(out, "next-day-early"))
+	}
+
+	t.Run("history mode", func(t *testing.T) {
+		ios, _, stdout, _ := iostreams.Test()
+		f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+		opts := &Options{Factory: f, BufferSize: 10, Limit: 10}
+
+		err := runHistory(&fakeFollowSource{historyPage: page}, opts, logs.Query{}, &logs.Filter{},
+			logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{UTC: true}), logs.NewBuffer(10), logs.NewRegistry())
+		require.NoError(t, err)
+		assertMarkers(t, stdout.String())
+	})
+
+	t.Run("follow mode", func(t *testing.T) {
+		ios, _, stdout, _ := iostreams.Test()
+		f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+		opts := &Options{Factory: f, Follow: true, BufferSize: 10, Limit: 10}
+
+		// Follow delivers oldest-first, which is what history prints too.
+		chronological := make([]logs.Entry, 0, len(page.Entries))
+		for i := len(page.Entries) - 1; i >= 0; i-- {
+			chronological = append(chronological, page.Entries[i])
+		}
+
+		err := runFollowWithTimeout(t, &fakeFollowSource{emit: chronological}, opts, &logs.Filter{},
+			logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{UTC: true}))
+		require.NoError(t, err)
+		assertMarkers(t, stdout.String())
+	})
+
+	t.Run("json mode has no markers", func(t *testing.T) {
+		ios, _, stdout, _ := iostreams.Test()
+		f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+		opts := &Options{Factory: f, BufferSize: 10, Limit: 10, JSONOut: true}
+
+		err := runHistory(&fakeFollowSource{historyPage: page}, opts, logs.Query{}, &logs.Filter{},
+			logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{UTC: true, JSON: true}), logs.NewBuffer(10), logs.NewRegistry())
+		require.NoError(t, err)
+
+		out := stdout.String()
+		require.NotContains(t, out, "==>", "machine-readable output must stay one JSON object per line")
+		for _, line := range strings.Split(strings.TrimSpace(out), "\n") {
+			require.True(t, strings.HasPrefix(line, "{"), "every line must be a JSON object, got %q", line)
+		}
+	})
+
+	t.Run("respects --utc", func(t *testing.T) {
+		origLocal := time.Local
+		time.Local = time.FixedZone("TEST+09", 9*60*60)
+		t.Cleanup(func() { time.Local = origLocal })
+
+		// 2026-08-02T23:58Z is already 2026-08-03 in TEST+09.
+		ios, _, stdout, _ := iostreams.Test()
+		f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+		opts := &Options{Factory: f, BufferSize: 10, Limit: 10}
+
+		single := logs.Page{Entries: []logs.Entry{{Timestamp: day1, Level: "info", Message: "one"}}}
+		err := runHistory(&fakeFollowSource{historyPage: single}, opts, logs.Query{}, &logs.Filter{},
+			logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}), logs.NewBuffer(10), logs.NewRegistry())
+		require.NoError(t, err)
+		require.Contains(t, stdout.String(), "==> 2026-08-03", "the marker follows the rendered zone")
+	})
+}
+
+// floodingSource fills runFollow's entry channel until a send is left blocked,
+// then interrupts the process and keeps sending until its context is cancelled.
+// It exists to pin review finding 11: while a sender is blocked on a full
+// channel, every receive hands that sender's value straight back into the
+// buffer, so the channel is never observed empty and a drain that runs before
+// cancel() can never terminate.
+type floodingSource struct {
+	pending <-chan os.Signal
+	// gate is closed once the interrupt is pending, releasing the render loop.
+	gate chan struct{}
+}
+
+func (s *floodingSource) Name() string    { return "flooding" }
+func (s *floodingSource) Caps() logs.Caps { return logs.Caps{} }
+
+func (s *floodingSource) History(_ context.Context, _ logs.Query) (logs.Page, error) {
+	return logs.Page{}, nil
+}
+
+func (s *floodingSource) Follow(ctx context.Context, _ logs.Query, out chan<- logs.Entry) error {
+	entry := func() logs.Entry {
+		return logs.Entry{Timestamp: time.Now(), Level: "info", Message: "flood"}
+	}
+
+	// One entry for the render loop to take, so it parks inside the gated Write
+	// and cannot reach the interrupt branch while the buffer is being filled.
+	select {
+	case out <- entry():
+	case <-ctx.Done():
+		return nil
+	}
+
+	// Fill the channel buffer completely, detected by the first send that would
+	// block. Nothing is consuming, so this terminates.
+	for full := false; !full; {
+		select {
+		case out <- entry():
+		default:
+			full = true
+		}
+	}
+
+	// Leave a sender blocked on the now-full channel before the loop is released.
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for {
+			select {
+			case out <- entry():
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+
+	p, err := os.FindProcess(os.Getpid())
+	if err != nil {
+		return err
+	}
+	if err := p.Signal(os.Interrupt); err != nil {
+		return err
+	}
+	<-s.pending // the interrupt has reached every registered handler
+	close(s.gate)
+
+	<-done
+	return nil
+}
+
+// countingGateWriter holds the render loop still until release is closed, then
+// counts every line written. It satisfies the unexported fileWriter interface
+// iostreams.IOStreams.Out requires. Only runFollow writes through it, so no
+// locking is needed; runFollowWithTimeout's channel receive synchronises the
+// read.
+type countingGateWriter struct {
+	release <-chan struct{}
+	opened  sync.Once
+	lines   int
+}
+
+func (w *countingGateWriter) Fd() uintptr { return 1 }
+
+func (w *countingGateWriter) Write(p []byte) (int, error) {
+	w.opened.Do(func() { <-w.release })
+	w.lines++
+	return len(p), nil
+}
+
+// Test_runFollow_interruptCancelsBeforeDraining pins that the interrupt path
+// cancels the source before draining. Draining a channel a live producer is
+// still filling only ends when the consumer happens to outrun the producer, so
+// Ctrl+C keeps rendering entries the user never asked to see — tens of thousands
+// of them here — and runFollow's signal handler stays installed for all of it,
+// swallowing a second Ctrl+C. Cancelling first bounds the drain to whatever the
+// channel already held.
+func Test_runFollow_interruptCancelsBeforeDraining(t *testing.T) {
+	ios, _, _, _ := iostreams.Test()
+	gate := make(chan struct{})
+	out := &countingGateWriter{release: gate}
+	ios.Out = out
+
+	pending := make(chan os.Signal, 1)
+	signal.Notify(pending, os.Interrupt)
+	t.Cleanup(func() { signal.Stop(pending) })
+
+	f := testutil.DefaultFactoryMock(t, ios, nil, nil, nil, nil, nil, nil)
+	opts := &Options{Factory: f, Follow: true, BufferSize: 10}
+
+	err := runFollowWithTimeout(t, &floodingSource{pending: pending, gate: gate}, opts, &logs.Filter{},
+		logs.NewRenderer(ios.ColorScheme(), logs.RenderOptions{}))
+	require.NoError(t, err)
+
+	// The channel holds followChanCap entries plus the date marker and the few a
+	// cancelled producer may still hand over; an order of magnitude of headroom
+	// keeps this insensitive to scheduling without admitting a runaway drain.
+	require.Less(t, out.lines, 1000,
+		"the drain must be bounded by what the channel already held when Ctrl+C arrived")
 }

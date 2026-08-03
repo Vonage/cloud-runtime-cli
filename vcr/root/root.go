@@ -19,6 +19,7 @@ import (
 	deployCmd "vonage-cloud-runtime-cli/vcr/deploy"
 	initCmd "vonage-cloud-runtime-cli/vcr/init"
 	instanceCmd "vonage-cloud-runtime-cli/vcr/instance"
+	logCmd "vonage-cloud-runtime-cli/vcr/instance/log"
 	secretCmd "vonage-cloud-runtime-cli/vcr/secret"
 	upgradeCmd "vonage-cloud-runtime-cli/vcr/upgrade"
 )
@@ -59,6 +60,7 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 			  • vcr init       - Initialize a project from a template
 			  • vcr deploy     - Deploy your application to VCR
 			  • vcr debug      - Run your application locally in debug mode
+			  • vcr logs       - Tail or search logs from a deployed instance
 			  • vcr instance   - Manage deployed instances (logs, removal)
 			  • vcr secret     - Manage secrets for your applications
 			  • vcr upgrade    - Update the VCR CLI to the latest version
@@ -86,7 +88,10 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 			$ vcr debug
 
 			# View logs for a deployed instance
-			$ vcr instance log --project-name my-project --instance-name dev
+			$ vcr logs --project-name my-project --instance-name dev
+
+			# Follow logs live (also available as: vcr instance log)
+			$ vcr logs -p my-project -n dev --follow
 
 			# Create a secret for your application
 			$ vcr secret create --name MY_API_KEY --value "secret-value"
@@ -165,6 +170,11 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 	})
 	cmd.SetFlagErrorFunc(rootFlagErrorFunc)
 
+	// Keep --version a LOCAL flag. The top-level `vcr logs` command uses -v as the
+	// shorthand for --exclude, and cobra merges only a parent's persistent flags
+	// into a child's flagset. Promoting this to PersistentFlags would make pflag's
+	// AddFlag find shorthand "v" already taken and panic on every `vcr logs` run
+	// (the name-based Lookup guard does not help: the flag names differ).
 	cmd.Flags().BoolP("version", "v", false, "Show VCR CLI version")
 	cmd.PersistentFlags().Bool("help", false, "Show help for command")
 	cmd.PersistentFlags().StringVarP(&opts.ConfigFilePath, "config-file", "", config.DefaultCLIConfigPath[0], "Path to config file (default is $HOME/.vcr-cli)")
@@ -180,6 +190,7 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 	cmd.AddCommand(debugCmd.NewCmdDebug(f))
 	cmd.AddCommand(deployCmd.NewCmdDeploy(f))
 	cmd.AddCommand(instanceCmd.NewCmdInstance(f))
+	cmd.AddCommand(logCmd.NewCmdLogs(f))
 	cmd.AddCommand(secretCmd.NewCmdSecret(f))
 	cmd.AddCommand(upgradeCmd.NewCmdUpgrade(f, version))
 	return cmd
