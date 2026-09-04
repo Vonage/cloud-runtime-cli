@@ -1,0 +1,14 @@
+.gitignore
+  h_21cec820b22239 23-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "7fb393879d137660dab1ad3f266beffb5232ffeb",
+  "prompts": {},
+  "humans": {
+    "h_21cec820b22239": {
+      "author": "Eduardo Alonso <eduardo.alonsogarcia@vonage.com>"
+    }
+  }
+}
