@@ -1,0 +1,22 @@
+pkg/api/deployment_test.go
+  s_c49b3ebc223d8e::t_7e66221c053025 1949-1965
+  s_c49b3ebc223d8e::t_9d2f6236d18492 4,11
+  s_c49b3ebc223d8e::t_638db0bfd7eff3 1896-1899
+  s_c49b3ebc223d8e::t_3f1fbbf554ab62 1890-1895,1900-1948,1966-1986
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "d7f76041f759f17bdfaac1baf4b9d1044e4186c2",
+  "prompts": {},
+  "sessions": {
+    "s_c49b3ebc223d8e": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_82ffa0ce-4b3c-4a1b-acd4-54ef19fb8a11",
+        "model": "auto"
+      },
+      "human_author": "Eduardo Alonso <eduardo.alonsogarcia@vonage.com>"
+    }
+  }
+}
