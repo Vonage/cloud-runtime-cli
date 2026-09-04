@@ -1,12 +1,14 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
 	"github.com/go-resty/resty/v2"
@@ -1882,6 +1884,103 @@ func TestDeploymentClient_WatchDeployment(t *testing.T) {
 			}
 
 			require.Equal(t, tt.want.stdout, stdout.String())
+		})
+	}
+}
+
+// TestDeploymentClient_WatchDeployment_ContextDone exercises the ctx.Done()
+// branch of WatchDeployment, which is user-visible behaviour (the build wait
+// timing out or being cancelled) but is not covered by the happy/failed/close
+// cases above.
+//
+// The WS server streams non-terminal progress messages so the client's read
+// loop stays live (ReadMessage does not observe ctx); once the context's
+// deadline expires or it is cancelled, the next loop iteration hits the
+// ctx.Done() branch.
+func TestDeploymentClient_WatchDeployment_ContextDone(t *testing.T) {
+	tests := []struct {
+		name       string
+		ctxFunc    func() (context.Context, context.CancelFunc)
+		wantErrMsg string
+		wantErrIs  error
+	}{
+		{
+			name: "deadline-exceeded",
+			ctxFunc: func() (context.Context, context.CancelFunc) {
+				return context.WithTimeout(context.Background(), 50*time.Millisecond)
+			},
+			wantErrMsg: "timed out waiting for the build to finish for package package-id; " +
+				"the build may still be running server-side. Re-run with a longer --timeout " +
+				"(e.g. -t 20m) or check the build logs: context deadline exceeded",
+			wantErrIs: context.DeadlineExceeded,
+		},
+		{
+			name: "cancelled",
+			ctxFunc: func() (context.Context, context.CancelFunc) {
+				ctx, cancel := context.WithCancel(context.Background())
+				// Cancel shortly after the watch starts so the first progress
+				// message is delivered, then the next loop iteration sees the
+				// cancellation.
+				go func() {
+					time.Sleep(50 * time.Millisecond)
+					cancel()
+				}()
+				return ctx, func() {}
+			},
+			wantErrMsg: "timed out waiting for the build to finish for package package-id; " +
+				"the build may still be running server-side. Re-run with a longer --timeout " +
+				"(e.g. -t 20m) or check the build logs: context canceled",
+			wantErrIs: context.Canceled,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			serverDone := make(chan struct{})
+			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				upgrader := websocket.Upgrader{}
+				conn, err := upgrader.Upgrade(w, r, nil)
+				if err != nil {
+					t.Errorf("Failed to upgrade ws connection: %v", err)
+					return
+				}
+				defer conn.Close()
+
+				// Stream non-terminal progress messages on a ticker. Each
+				// ReadMessage() on the client returns one of these, the client
+				// prints it and loops back around to re-check ctx.Done(). This
+				// keeps the read loop live (ReadMessage does not observe ctx)
+				// so the ctx.Done() branch is reached deterministically once the
+				// deadline expires or the context is cancelled.
+				ticker := time.NewTicker(5 * time.Millisecond)
+				defer ticker.Stop()
+				for {
+					select {
+					case <-serverDone:
+						return
+					case <-ticker.C:
+						if err := conn.WriteMessage(websocket.TextMessage, []byte(`{"status": "building"}`)); err != nil {
+							return
+						}
+					}
+				}
+			})
+			ts := httptest.NewServer(handler)
+			defer ts.Close()
+
+			websocketClient := NewWebsocketConnectionClient("api-key", "api-secret")
+			deploymentClient := NewDeploymentClient(ts.URL, "v0.3", nil, websocketClient)
+			ios, _, _, _ := iostreams.Test()
+
+			ctx, cancel := tt.ctxFunc()
+			defer cancel()
+
+			err := deploymentClient.WatchDeployment(ctx, ios, "package-id")
+			close(serverDone)
+
+			require.Error(t, err)
+			require.EqualError(t, err, tt.wantErrMsg)
+			require.ErrorIs(t, err, tt.wantErrIs)
 		})
 	}
 }

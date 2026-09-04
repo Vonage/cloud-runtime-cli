@@ -351,7 +351,9 @@ func (c *DeploymentClient) WatchDeployment(ctx context.Context, out *iostreams.I
 	for {
 		select {
 		case <-ctx.Done():
-			return fmt.Errorf("context exceeds deadline")
+			return fmt.Errorf("timed out waiting for the build to finish for package %s; "+
+				"the build may still be running server-side. Re-run with a longer --timeout "+
+				"(e.g. -t 20m) or check the build logs: %w", packageID, ctx.Err())
 		default:
 			_, message, err := c.websocketConnectionClient.conn.ReadMessage()
 			if err == nil {
