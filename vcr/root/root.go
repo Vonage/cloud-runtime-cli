@@ -26,8 +26,8 @@ import (
 // defaultTimeout is the wall-clock deadline applied to a whole CLI command
 // (upload + package create + build watch + deploy). It must stay above the
 // build job's server-side limit, otherwise a slow-but-healthy build trips this
-// deadline client-side and surfaces as "failed to watch deployment ... context
-// exceeds deadline" even though the build is still progressing.
+// deadline client-side and surfaces as a generic client timeout even though the
+// build is still progressing.
 //
 // deployment-api caps builds via BUILDER_ACTIVE_DEADLINE_SECONDS (default 900s
 // / 15m). We add a margin on top so the server-side build deadline is always
