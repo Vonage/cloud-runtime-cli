@@ -1,0 +1,25 @@
+pkg/api/deployment_test.go
+  s_7936a4f53669f4::t_18eef91fb0da54 1930-1931
+  s_7936a4f53669f4::t_3a95f52f0ef5cd 1913
+vcr/root/root.go
+  s_7936a4f53669f4::t_53ecf00c704241 27-30
+pkg/api/deployment.go
+  s_7936a4f53669f4::t_2f08a6e784ca05 6
+  s_7936a4f53669f4::t_c5204bf5cc42fd 355-357,359
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1b1d294421ff5695d1fd05e01fea565aeffedb23",
+  "prompts": {},
+  "sessions": {
+    "s_7936a4f53669f4": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_fdbc880b-a417-40bb-bbf0-5a8432d4ab15",
+        "model": "auto"
+      },
+      "human_author": "Eduardo Alonso <eduardo.alonsogarcia@vonage.com>"
+    }
+  }
+}
