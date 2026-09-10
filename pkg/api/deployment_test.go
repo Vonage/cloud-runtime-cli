@@ -1910,7 +1910,7 @@ func TestDeploymentClient_WatchDeployment_ContextDone(t *testing.T) {
 				return context.WithTimeout(context.Background(), 50*time.Millisecond)
 			},
 			wantErrMsg: "timed out waiting for the build to finish for package package-id; " +
-				"the build may still be running server-side. Re-run with a longer --timeout " +
+				"the build may still be in progress. Re-run with a longer --timeout " +
 				"(e.g. -t 20m) or check the build logs: context deadline exceeded",
 			wantErrIs: context.DeadlineExceeded,
 		},
@@ -1927,10 +1927,8 @@ func TestDeploymentClient_WatchDeployment_ContextDone(t *testing.T) {
 				}()
 				return ctx, func() {}
 			},
-			wantErrMsg: "timed out waiting for the build to finish for package package-id; " +
-				"the build may still be running server-side. Re-run with a longer --timeout " +
-				"(e.g. -t 20m) or check the build logs: context canceled",
-			wantErrIs: context.Canceled,
+			wantErrMsg: "build watch for package package-id was canceled: context canceled",
+			wantErrIs:  context.Canceled,
 		},
 	}
 
