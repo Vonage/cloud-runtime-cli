@@ -23,7 +23,10 @@ import (
 	upgradeCmd "vonage-cloud-runtime-cli/vcr/upgrade"
 )
 
-// Define a constant for the default timeout
+// defaultTimeout is the wall-clock deadline applied to a whole CLI command
+// (upload + package create + build watch + deploy). This suits most commands;
+// if a longer-running build needs more time, users can raise it with --timeout
+// (e.g. -t 20m).
 const defaultTimeout = 10 * time.Minute
 
 func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStream chan string) *cobra.Command {
@@ -172,7 +175,7 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 	cmd.PersistentFlags().StringVarP(&opts.Region, "region", "", "", "Vonage platform region")
 	cmd.PersistentFlags().StringVarP(&opts.APIKey, "api-key", "", "", "Vonage API key")
 	cmd.PersistentFlags().StringVarP(&opts.APISecret, "api-secret", "", "", "Vonage API secret")
-	cmd.PersistentFlags().DurationVarP(&opts.Timeout, "timeout", "t", defaultTimeout, "Timeout for requests to Vonage platform")
+	cmd.PersistentFlags().DurationVarP(&opts.Timeout, "timeout", "t", defaultTimeout, "Overall deadline for the command, including waiting for a build to finish (e.g. 20m)")
 
 	cmd.AddCommand(configureCmd.NewCmdConfigure(f))
 	cmd.AddCommand(appCmd.NewCmdApp(f))

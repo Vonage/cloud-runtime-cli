@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -351,7 +352,12 @@ func (c *DeploymentClient) WatchDeployment(ctx context.Context, out *iostreams.I
 	for {
 		select {
 		case <-ctx.Done():
-			return fmt.Errorf("context exceeds deadline")
+			if errors.Is(ctx.Err(), context.Canceled) {
+				return fmt.Errorf("build watch for package %s was canceled: %w", packageID, ctx.Err())
+			}
+			return fmt.Errorf("timed out waiting for the build to finish for package %s; "+
+				"the build may still be in progress. Re-run with a longer --timeout "+
+				"(e.g. -t 20m) or check the build logs: %w", packageID, ctx.Err())
 		default:
 			_, message, err := c.websocketConnectionClient.conn.ReadMessage()
 			if err == nil {
