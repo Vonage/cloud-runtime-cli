@@ -3,18 +3,19 @@
 package clierr
 
 import (
-	"vonage-cloud-runtime-cli/internal/term"
+	"fmt"
+	"strings"
 )
 
 // UsageError is a flag or argument problem: Render prints the message and then the command's usage block
 // on stderr, and no update notice (v2.6.1's FlagError).
 type UsageError struct{ Err error }
 
-func (e *UsageError) Error() string { panic("not implemented: clierr.UsageError.Error") }
-func (e *UsageError) Unwrap() error { panic("not implemented: clierr.UsageError.Unwrap") }
+func (e *UsageError) Error() string { return e.Err.Error() }
+func (e *UsageError) Unwrap() error { return e.Err }
 
 // Usagef returns a *UsageError wrapping fmt.Errorf(format, a...).
-func Usagef(format string, a ...any) error { panic("not implemented: clierr.Usagef") }
+func Usagef(format string, a ...any) error { return &UsageError{Err: fmt.Errorf(format, a...)} }
 
 // APIError is a non-2xx answer from the platform.
 type APIError struct {
@@ -28,17 +29,24 @@ type APIError struct {
 // Error reproduces v2.6.1's api.Error text:
 // "API Error Encountered: ( HTTP status: <n> Error code: <n> Detailed message: <m> Trace ID: <t> Container logs: <l> )",
 // each part present only when non-zero or non-empty.
-func (e *APIError) Error() string { panic("not implemented: clierr.APIError.Error") }
-
-// Render writes err the way v2.6.1's main.printError does and reports whether the update notice should follow:
-//   - a *UsageError, or a message starting "unknown command ": "<err>\n" then usage, on stderr; notice=false.
-//   - an error wrapping *APIError: a red 56-character "─" line on stdout, then on stderr the failure icon and
-//     the API error block ("Error Encountered: <text before the first ':'>", "<red ℹ> Details:", the
-//     "- HTTP Status : ", "- Message     : ", "- Trace ID    : " lines, container logs, the support line),
-//     then the red line again on stdout; notice=true.
-//   - anything else: "<failure icon> <err>" on stderr; notice=true.
-//
-// Remote text inside the block (message, container logs) is printed through term.SanitizeStream.
-func Render(t *term.IO, err error, usage string) (notice bool) {
-	panic("not implemented: clierr.Render")
+func (e *APIError) Error() string {
+	var b strings.Builder
+	b.WriteString("API Error Encountered: ( ")
+	if e.HTTPStatus != 0 {
+		fmt.Fprintf(&b, "HTTP status: %d ", e.HTTPStatus)
+	}
+	if e.ServerCode != 0 {
+		fmt.Fprintf(&b, "Error code: %d ", e.ServerCode)
+	}
+	if e.Message != "" {
+		fmt.Fprintf(&b, "Detailed message: %s ", e.Message)
+	}
+	if e.TraceID != "" {
+		fmt.Fprintf(&b, "Trace ID: %s ", e.TraceID)
+	}
+	if e.ContainerLogs != "" {
+		fmt.Fprintf(&b, "Container logs: %s ", e.ContainerLogs)
+	}
+	b.WriteString(")")
+	return b.String()
 }
