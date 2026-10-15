@@ -11,8 +11,8 @@ import (
 
 const (
 	errSharingViolation syscall.Errno = 32
-	renameAttempts                      = 3
-	renameRetryDelay                    = 50 * time.Millisecond
+	renameAttempts                    = 3
+	renameRetryDelay                  = 50 * time.Millisecond
 )
 
 // renameFile retries a few times when another process briefly holds the target open.
