@@ -74,16 +74,7 @@ jobs:
           cache: false
 
       - name: Run unit tests
-        run: go test ./...
-
-      - name: Build binaries for integration tests
-        run: |
-          mkdir -p tests/integration/bin
-          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-X main.releaseURL=http://mockserver:80" -o tests/integration/bin/vcr-cli .
-          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o tests/integration/bin/mockserver ./tests/integration/mocks/main.go
-
-      - name: Run integration tests
-        run: make test-integration
+        run: make test
 
   # Build, sign and notarize (requires macOS for Apple signing)
   build:

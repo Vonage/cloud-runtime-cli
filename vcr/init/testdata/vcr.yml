@@ -1,9 +1,0 @@
-project:
-    name: project-name
-instance:
-    name: instance-name
-    runtime: nodejs16
-    region: aws.euw1
-    application-id: app-id
-debug:
-    application-id: app-id

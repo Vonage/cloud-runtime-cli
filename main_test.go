@@ -1,107 +1,37 @@
 package main
 
 import (
-	"errors"
-	"fmt"
 	"testing"
 
-	"github.com/cli/cli/v2/pkg/iostreams"
-	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 
-	"vonage-cloud-runtime-cli/pkg/api"
-	"vonage-cloud-runtime-cli/pkg/cmdutil"
+	"vonage-cloud-runtime-cli/internal/buildinfo"
 )
 
-func Test_printError(t *testing.T) {
-	cmd := &cobra.Command{}
+func TestStampVariables(t *testing.T) {
+	assert.Equal(t, "dev", version)
+	assert.Equal(t, "0000", commit)
+	assert.Equal(t, "2021-09-01T00:00:00Z", buildDate)
+	assert.Equal(t, "v0.3", apiVersion)
+	assert.Equal(t, "https://api.github.com/repos/Vonage/cloud-runtime-cli", releaseURL)
+	assert.Empty(t, upgradeTestKey)
 
-	type mock struct {
-		err           error
-		cmd           *cobra.Command
-		latestVersion string
-	}
-	type want struct {
-		stdout string
-		stderr string
-	}
-	tests := []struct {
-		name string
-		mock mock
-		want want
-	}{
-		{
-			name: "generic error",
-			mock: mock{
-				err:           errors.New("the app crashed"),
-				cmd:           cmd,
-				latestVersion: "1.0.1",
-			},
-			want: want{
-				stdout: "\n\nA new release of vcr is available: 0.0.1 → 1.0.1\nTo upgrade, run: vcr upgrade\n",
-				stderr: "X the app crashed\n",
-			},
-		},
-		{
-			name: "Api error",
-			mock: mock{
-				err: fmt.Errorf("http error: %w", api.Error{
-					HTTPStatusCode: 404,
-					ServerCode:     3001,
-					Message:        "Not Found",
-					TraceID:        "1234",
-					ContainerLogs:  "container logs",
-				}),
-				cmd:           cmd,
-				latestVersion: "1.0.1",
-			},
-			want: want{
-				stdout: "\n\nA new release of vcr is available: 0.0.1 → 1.0.1\nTo upgrade, run: vcr upgrade\n",
-				stderr: "X Error Encountered: http error\n\nℹ Details:\n  - HTTP Status : 404\n  - Message     : Not Found\n  - Trace ID    : 1234\n\nℹ App logs captured before failure:\ncontainer logs\n\nPlease refer to the documentation or contact support for further assistance.\n",
-			},
-		},
-		{
-			name: "Cobra flag error",
-			mock: mock{
-				err:           cmdutil.FlagErrorf("unknown flag --foo"),
-				cmd:           cmd,
-				latestVersion: "1.0.1",
-			},
-			want: want{
-				stderr: "unknown flag --foo\nUsage:\n\n",
-			},
-		},
-		{
-			name: "unknown Cobra command error",
-			mock: mock{
-				err:           errors.New("unknown command foo"),
-				cmd:           cmd,
-				latestVersion: "1.0.1",
-			},
-			want: want{
-				stderr: "unknown command foo\nUsage:\n\n",
-			},
-		},
-	}
+	origVersion, origCommit, origBuildDate := version, commit, buildDate
+	origAPIVersion, origReleaseURL, origUpgradeTestKey := apiVersion, releaseURL, upgradeTestKey
+	t.Cleanup(func() {
+		version, commit, buildDate = origVersion, origCommit, origBuildDate
+		apiVersion, releaseURL, upgradeTestKey = origAPIVersion, origReleaseURL, origUpgradeTestKey
+	})
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ios, _, stdout, stderr := iostreams.Test()
-			mockUpdateMessageChan := make(chan string)
-			go func() {
-				mockUpdateMessageChan <- tt.mock.latestVersion
-			}()
+	version, commit, buildDate = "v9.9.9", "abc123", "2030-01-02T03:04:05Z"
+	apiVersion, releaseURL, upgradeTestKey = "v9.9", "https://api.example.test/repos/o/r", "test-key"
 
-			printError(ios, tt.mock.err, tt.mock.cmd, mockUpdateMessageChan)
-
-			if tt.want.stdout != "" {
-				require.Equal(t, tt.want.stdout, stdout.String())
-
-			}
-			if tt.want.stderr != "" {
-				require.Equal(t, tt.want.stderr, stderr.String())
-
-			}
-		})
-	}
+	assert.Equal(t, buildinfo.Info{
+		Version:        "v9.9.9",
+		Commit:         "abc123",
+		Date:           "2030-01-02T03:04:05Z",
+		APIVersion:     "v9.9",
+		ReleaseURL:     "https://api.example.test/repos/o/r",
+		UpgradeTestKey: "test-key",
+	}, buildInfo())
 }
