@@ -1,0 +1,44 @@
+# Strings that other tools read from the output of vcr. Every pattern applies
+# to every scenario: the lines it matches in the recorded output must equal, in
+# order, the lines it matches in the output under test (an allowed diff never
+# excuses this). A scenario whose point is sanitised text lists the names it is
+# exempt from under scrape-except.
+#
+# name:    how scenarios refer to the entry
+# stream:  stdout (the default), stderr or any (stdout lines, then stderr lines)
+# pattern: a Go regular expression, matched against each line
+
+- name: version-line
+  pattern: '^vcr-cli version \S+ \(commit:\S+, date:\S+\)$'
+- name: deployed-banner
+  pattern: '^Instance has been deployed!$'
+- name: deployed-instance-id
+  pattern: '^Instance id: \S+$'
+- name: deployed-service-name
+  pattern: '^Instance service name: \S+$'
+- name: deployed-host-address
+  pattern: '^Instance host address: \S+$'
+- name: table-lines
+  pattern: '^[┌├└│┬┴┼─].*$'
+- name: secrets-found
+  pattern: '^\S+ Found \d+ secret\(s\):$'
+- name: secret-name
+  pattern: '^  ℹ \S+$'
+- name: secrets-none
+  pattern: '^\S+ No secrets found$'
+- name: log-line
+  stream: any
+  pattern: '^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\S* \[[^\]]*\] .*$'
+- name: interrupt-notice
+  pattern: '^Interrupt received, stopping\.\.\.$'
+- name: update-notice
+  pattern: '^A new release of vcr is available: \S+ → \S+$'
+- name: update-hint
+  pattern: '^To upgrade, run: vcr upgrade$'
+- name: config-not-found-notice
+  pattern: '^! Config file not found at .*$'
+- name: debug-access-log
+  stream: any
+  pattern: '^\[VCR-debug\] .*$'
+- name: upgrade-success
+  pattern: '^\S+ Successfully updated to version \S+$'
