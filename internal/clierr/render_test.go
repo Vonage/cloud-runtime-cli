@@ -180,8 +180,6 @@ func TestRenderPlain(t *testing.T) {
 }
 
 func TestRenderSanitisesMessage(t *testing.T) {
-	t.Skip("needs the sanitiser")
-
 	err := fmt.Errorf("failed to list applications: %w", &clierr.APIError{
 		HTTPStatus: 500, Message: "bo\x1b]0;t\aom", TraceID: "t-1", ContainerLogs: "boot\x1b[2J failed",
 	})
@@ -195,8 +193,6 @@ func TestRenderSanitisesMessage(t *testing.T) {
 }
 
 func TestRenderSanitisesRemoteText(t *testing.T) {
-	t.Skip("needs the sanitiser")
-
 	apiBlock := "ℹ Details:\n  - HTTP Status : 500\n  - Message     : boom\n  - Trace ID    : t-1\n\n" + supportLine + "\n"
 	tests := []struct {
 		name       string

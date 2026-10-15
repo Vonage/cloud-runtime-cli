@@ -6,7 +6,6 @@ package term
 import (
 	"bufio"
 	"bytes"
-	"context"
 	"io"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
@@ -57,12 +56,3 @@ func (t *IO) IsStdoutTTY() bool { return t.ios.IsStdoutTTY() }
 
 // CanPrompt reports whether confirmations and pickers may be shown (stdin and stdout are terminals), as in v2.6.1.
 func (t *IO) CanPrompt() bool { return t.ios.CanPrompt() }
-
-// ReadMaskedLines reads a value typed on a terminal stdin with echo off, in raw mode with its own line assembler
-// (golang.org/x/term.ReadPassword cannot end on Ctrl-D after the last line). Ctrl-D ends input (Ctrl-Z on a Windows
-// console); Ctrl-C returns the error "input interrupted"; lines are joined with "\n" and the final line ending is
-// dropped. It prints nothing (the caller writes the newline after it), restores the terminal on every path, honours
-// ctx, and returns an error, never panics, when stdin cannot be read.
-func (t *IO) ReadMaskedLines(ctx context.Context) (string, error) {
-	panic("not implemented: term.IO.ReadMaskedLines")
-}
