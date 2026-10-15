@@ -1,0 +1,18 @@
+defaults: &defaults
+  name: dev
+  runtime: nodejs18
+  region: aws.euw1
+shared-environment: &shared
+  - name: FROM_ANCHOR
+    value: anchored
+project:
+  name: anchors-project
+instance:
+  <<: *defaults
+  application-id: 00000000-0000-4000-8000-000000000601
+  entrypoint: [node, index.js]
+  environment: *shared
+debug:
+  application-id: 00000000-0000-4000-8000-000000000602
+  entrypoint: ["${TESTAPP}"]
+  environment: *shared

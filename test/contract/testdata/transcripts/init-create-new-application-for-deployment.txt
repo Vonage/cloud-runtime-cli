@@ -1,0 +1,83 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 0
+@@ stdout 428
+? Enter your project name: project
+? Enter your Instance name: dev
+? Select a runtime: nodejs18
+? Select a region: AWS - Europe (Ireland) - (aws.euw1)
+? Select your Vonage application ID for deployment: CREATE NEW APP
+? Enter your new Vonage application name for deployment: fresh-app
+? Select your Vonage application ID for debug: SKIP
+? Select a product template for runtime nodejs18:  SKIP
+✓ <WORK>/project/vcr.yml created
+
+@@ stderr 0
+
+@@ files 518
++ work/project/vcr.yml mode=0644 size=352 sha256=a817b4ff2bc8416e7102dd4b2ee8aa351a827c6373c32bddc6c2fda4bd5b2fb6
+  | project:
+  |     name: project
+  | instance:
+  |     name: dev
+  |     runtime: nodejs18
+  |     region: aws.euw1
+  |     application-id: <uuid>
+  |     entrypoint:
+  |         - <please include the entrypoint for your script>
+  | debug:
+  |     application-id: <please create an application on VONAGE APIs dashboard>
+  |     entrypoint:
+  |         - <please include the entrypoint for your script>
+
+@@ requests 1812
+euw1 POST graphql:Region
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($alias: String!) {\\n  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {\\n    name\\n    alias\\n\\tdeployment_api_url\\n\\tmarketplace_api_url\\n\\tassets_api_url\\n\\tendpoint_url_scheme\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":{"alias":"aws.euw1"}}
+
+euw1 POST graphql:Runtimes
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery {\\n  Runtimes(where: {enabled: {_eq: true}}, order_by: {name: asc}) {\\n    id\\n    name\\n    language\\n\\tcomments\\n  }\\n}","variables":null}
+
+euw1 POST graphql:Regions
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery {\\n  Regions(where: {enabled: {_eq: true}}) {\\n \\tname    \\n\\talias\\n\\tdeployment_api_url\\n\\tassets_api_url\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":null}
+
+euw1 GET /applications?pattern=
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+
+euw1 POST /applications
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"enableMessages":false,"enableRtc":false,"enableVoice":false,"name":"fresh-app"}
+
+euw1 GET /applications?pattern=
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+
+euw1 POST graphql:Products
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery {\\n  Products(where: {ProductVersions: {code_template_enabled: {_eq: true}}, type: {_eq: public}}, order_by: {name: asc}) {\\n    id\\n    name\\n    programming_language\\n  }\\n}","variables":null}
+
+gh GET /releases/latest
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+

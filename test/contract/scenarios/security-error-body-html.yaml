@@ -1,0 +1,8 @@
+description: "an HTML error page from a gateway is summarised instead of printed"
+group: app
+args: [app, list]
+fixtures:
+  overrides:
+    - {match: "GET /applications", status: 502, contentType: text/html, body: "<html><head><title>502 Bad Gateway</title></head><body><h1>502 Bad Gateway</h1><p>upstream unavailable</p></body></html>"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

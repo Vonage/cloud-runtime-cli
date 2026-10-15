@@ -15,6 +15,9 @@ import (
 	"vonage-cloud-runtime-cli/test/fakeplatform"
 )
 
+// maxShownOutput is how much of a stream a failed wait quotes.
+const maxShownOutput = 2000
+
 // driver runs the steps of a scenario against a running process and the fake.
 type driver struct {
 	sc       Scenario
@@ -84,6 +87,9 @@ func (d *driver) step(s Step) error {
 	case "public-call":
 		return d.publicCall(*s.PublicCall)
 	case "send":
+		if d.p.drained != nil {
+			d.settle(limit)
+		}
 		return d.send(unescapeSend(*s.Send))
 	case "close-stdin":
 		d.p.closeStdin()
@@ -106,6 +112,7 @@ func (d *driver) waitUntil(limit time.Duration, what string, cond func() bool) e
 			return nil
 		}
 		if d.p.exited() {
+			d.p.awaitOutput()
 			if cond() {
 				return nil
 			}
@@ -118,8 +125,30 @@ func (d *driver) waitUntil(limit time.Duration, what string, cond func() bool) e
 	}
 }
 
+// waitText waits for text in a stream. When it does not come, the error shows
+// the end of what both streams held, which is what a scenario author needs to see.
 func (d *driver) waitText(limit time.Duration, stream string, buf *lockedBuffer, text string) error {
-	return d.waitUntil(limit, fmt.Sprintf("%s to contain %q", stream, text), func() bool { return strings.Contains(buf.String(), text) })
+	err := d.waitUntil(limit, fmt.Sprintf("%s to contain %q", stream, text), func() bool { return strings.Contains(buf.String(), text) })
+	if err == nil {
+		return nil
+	}
+	other := &d.p.err
+	if buf == &d.p.err {
+		other = &d.p.out
+	}
+	return fmt.Errorf("%w%s%s", err, tailOf(stream, buf.String()), tailOf("the other stream", other.String()))
+}
+
+// tailOf is the end of a stream as a block for an error message, or nothing
+// when the stream is empty.
+func tailOf(name, text string) string {
+	if text == "" {
+		return ""
+	}
+	if len(text) > maxShownOutput {
+		text = "…" + text[len(text)-maxShownOutput:]
+	}
+	return fmt.Sprintf("\n--- %s so far ---\n%s", name, text)
 }
 
 func (d *driver) requestSeen(prefix string) bool {
@@ -206,6 +235,10 @@ func (d *driver) call(c Call, target string) (CallRecord, error) {
 		return CallRecord{}, err
 	}
 	for k, v := range c.Headers {
+		if strings.EqualFold(k, "Host") {
+			req.Host = v // the client sends req.Host, not a Host entry of the header map
+			continue
+		}
 		req.Header.Set(k, v)
 	}
 	rec := CallRecord{Method: c.Method, Target: req.URL.RequestURI()}

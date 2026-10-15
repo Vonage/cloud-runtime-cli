@@ -1,0 +1,7 @@
+description: "a manifest that is not valid YAML is reported"
+args: [deploy]
+cwd: work/project
+files:
+  - {path: work/project/vcr.yml, from: testdata/corpora/manifests/bad-yaml-syntax.yaml, mode: 0644}
+  - {path: work/project/index.js, content: "console.log('hello');\n"}
+expect-reads: []

@@ -63,7 +63,7 @@ func (s *Server) classify(listener string, r *http.Request, body []byte) target 
 	switch rel, isMarket := marketPath(path); {
 	case path == githubPrefix || strings.HasPrefix(path, githubPrefix+"/"):
 		classifyIn(githubRoutes, kindGitHub, spaceGitHub, r.Method, strings.TrimPrefix(path, githubPrefix), &t)
-	case strings.HasSuffix(path, "graphql"):
+	case strings.HasSuffix(strings.TrimSuffix(path, "/"), "graphql"): // one trailing slash is allowed
 		classifyGraphQL(r.Method, body, &t)
 	case isMarket:
 		classifyIn([]route{marketRoute}, kindMarket, spaceMarket, r.Method, rel, &t)

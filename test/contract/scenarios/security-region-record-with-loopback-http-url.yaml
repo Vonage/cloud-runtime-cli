@@ -1,0 +1,8 @@
+description: "a region record with a loopback http address keeps working"
+group: app
+args: [app, list]
+fixtures:
+  regions:
+    - {alias: aws.euw1, name: "AWS - Europe (Ireland)", default: true, enabled: true, deploymentApiUrl: "${FAKE}/v1/vcr/euw1/api/deployment", assetsApiUrl: "${FAKE}/v1/vcr/euw1/api/assets", marketplaceApiUrl: "${FAKE}/v1/vcr/euw1/api/marketplace", endpointUrlScheme: http, debuggerUrlScheme: ws, hostTemplate: "http://${OTHER_HOST}"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

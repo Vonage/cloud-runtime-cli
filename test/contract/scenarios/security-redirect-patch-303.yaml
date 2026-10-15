@@ -1,0 +1,9 @@
+description: "a 303 answer to a PATCH request is not followed to another host"
+group: secret
+args: [secret, update, --name, DB_URL]
+stdin: "redirect-test-value\n"
+fixtures:
+  overrides:
+    - {match: "PATCH /secrets", status: 303, headers: {Location: "${OTHER}/captured"}}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

@@ -1,0 +1,9 @@
+description: "answering n at the confirmation aborts without creating anything and exits 0"
+args: [app, create, --name, test-app]
+tty: true
+steps:
+  - {expect: "Are you sure you want to create an application? [y/n]:"}
+  - {send: "n\r"}
+  - {expect: "Application creation aborted"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

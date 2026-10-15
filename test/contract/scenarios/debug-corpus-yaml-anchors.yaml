@@ -1,0 +1,12 @@
+# the debug entrypoint of the manifest is ${TESTAPP}, a small program that stands in for the application
+description: "a debug session starts from the manifest with the debug block and runs the local app"
+args: [debug, --yes, --app-port, "${PORT:app}", --debugger-port, "${PORT:debugger}"]
+cwd: work/project
+files:
+  - {path: work/project/vcr.yml, from: testdata/corpora/manifests/yaml-anchors.yaml, mode: 0644}
+steps:
+  - {wait-peer: connected}
+  - {wait-stdout: testapp env XDG_CONFIG_HOME}
+  - {signal: SIGINT}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

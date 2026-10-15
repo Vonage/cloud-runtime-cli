@@ -1,0 +1,7 @@
+description: "app list reads quotes around the values of a configuration file"
+args: [app, list]
+config: none
+files:
+  - {path: home/.vcr-cli, from: testdata/corpora/config/quoted-values.ini, mode: 0600}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

@@ -1,0 +1,8 @@
+description: "a 308 answer to a DELETE request is not followed to another host"
+group: secret
+args: [secret, remove, --name, DB_URL]
+fixtures:
+  overrides:
+    - {match: "DELETE /secrets/*", status: 308, headers: {Location: "${OTHER}/captured"}}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

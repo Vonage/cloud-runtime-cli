@@ -1,0 +1,7 @@
+description: "a debug session starts from the manifest with the debug block, which names no entrypoint, and is refused"
+args: [debug, --yes, --app-port, "${PORT:app}", --debugger-port, "${PORT:debugger}"]
+cwd: work/project
+files:
+  - {path: work/project/vcr.yml, from: testdata/corpora/manifests/vcr-with-authenticated-security.yaml, mode: 0644}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

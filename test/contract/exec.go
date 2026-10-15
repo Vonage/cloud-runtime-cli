@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"syscall"
 	"time"
 )
@@ -47,14 +48,26 @@ func (l *lockedBuffer) String() string {
 	return l.b.String()
 }
 
-// proc is a running process in a group of its own.
+// set replaces the whole content, which is how a terminal's screen is kept.
+func (l *lockedBuffer) set(s string) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.b.Reset()
+	l.b.WriteString(s)
+}
+
+// proc is a running process in a group of its own. On a terminal, stdin is
+// the keyboard, out holds the screen, and drained closes once everything the
+// process printed has been read.
 type proc struct {
-	cmd       *exec.Cmd
-	stdin     io.WriteCloser
-	stdinOnce sync.Once
-	devnull   *os.File
-	out, err  lockedBuffer
-	done      chan struct{}
+	cmd        *exec.Cmd
+	stdin      io.WriteCloser
+	stdinOnce  sync.Once
+	devnull    *os.File
+	out, err   lockedBuffer
+	done       chan struct{}
+	drained    chan struct{}
+	lastOutput atomic.Int64 // when the terminal last printed, in Unix nanoseconds
 }
 
 // keepsStdinOpen reports whether the scenario writes to stdin while it runs.
@@ -65,6 +78,14 @@ func keepsStdinOpen(sc Scenario) bool {
 		}
 	}
 	return false
+}
+
+// startChild starts the scenario's process: on a terminal when it asks for one.
+func startChild(exe string, sc Scenario, l Layout, env []string) (*proc, error) {
+	if sc.TTY {
+		return startPTY(exe, sc, l, env)
+	}
+	return startProc(exe, sc, l, env)
 }
 
 // startProc starts exe with the scenario's args in its working directory, on
@@ -134,14 +155,28 @@ func (p *proc) exited() bool {
 	}
 }
 
-// stop kills the whole group, what is left of it, and waits for the process.
+// stop kills the whole group, what is left of it, and waits for the process
+// and, on a terminal, for the rest of its output.
 func (p *proc) stop() {
 	_ = p.signalGroup(syscall.SIGKILL)
 	select {
 	case <-p.done:
 	case <-time.After(exitGrace):
 	}
+	p.awaitOutput()
 	p.closeStdin()
+}
+
+// awaitOutput waits, on a terminal, until everything the process printed has
+// been read; a process that ended a moment ago may still have output in flight.
+func (p *proc) awaitOutput() {
+	if p.drained == nil {
+		return
+	}
+	select {
+	case <-p.drained:
+	case <-time.After(drainGrace):
+	}
 }
 
 var signalNames = map[syscall.Signal]string{

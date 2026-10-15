@@ -1,0 +1,10 @@
+description: "the capability video-v1 in a manifest is sent as the version the CLI derives from it"
+args: [deploy]
+cwd: work/project
+files:
+  - {path: work/project/vcr.yml, from: testdata/corpora/manifests/each-capability-video-v1.yaml, mode: 0644}
+  - {path: work/project/index.js, content: "console.log('hello');\n"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /projects/capability-project"
+scrape: [deployed-banner, deployed-instance-id, deployed-service-name, deployed-host-address]

@@ -1,0 +1,101 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 0
+@@ stdout 372
+? Enter your project name: project
+? Enter your Instance name: dev
+? Select a runtime: nodejs18
+? Select a region: AWS - Europe (Ireland) - (aws.euw1)
+? Select your Vonage application ID for deployment: SKIP
+? Select your Vonage application ID for debug: SKIP
+? Select a product template for runtime nodejs18:  Starter Project - Node.js
+✓ <WORK>/project/vcr.yml created
+
+@@ stderr 0
+
+@@ files 1462
++ work/project/.env.example mode=0644 size=10 sha256=c283007d8774ef7af9ef9242045d49e726f834624768abf670d1e9a6634ee651
+  | KEY=value
++ work/project/empty/ mode=0755
++ work/project/index.js mode=0644 size=22 sha256=5e39b3fff9234c7b1b3a8cb5caf35cceaa66e71abd210edfb0d5bbf51cf3874d
+  | console.log('hello');
++ work/project/scripts/ mode=0755
++ work/project/scripts/open.txt mode=0644 size=36 sha256=d286e3999ddd72ad579d51b03fffc278f6b2771cee44b37e13ee291c53351ef8
+  | writable by everyone in the archive
++ work/project/scripts/start.sh mode=0755 size=24 sha256=d4b7bd7ad123a59c3f9a653405e5460fcbbda733b0304603c090413a5f478dbe
+  | #!/bin/sh
+  | node index.js
++ work/project/src/ mode=0755
++ work/project/src/app/ mode=0755
++ work/project/src/app/handler.js mode=0644 size=21 sha256=8222b8169ee86f25cdccd84d340340060ae3f0cff55e2ea9d344d7c332733b71
+  | module.exports = {};
++ work/project/src/app/lib/ mode=0755
++ work/project/src/app/lib/util.js mode=0600 size=25 sha256=15229ff57b48e1cf67378627903ccd148f7ce7df0f8ea309e4e6718516ddf3a1
+  | exports.noop = () => {};
++ work/project/vcr.yml mode=0644 size=253 sha256=dac92e626737981d466fcc55a0d069306b73f7fe6612bb6e82bbaf0e8dd6f0e9
+  | project:
+  |     name: project
+  | instance:
+  |     name: dev
+  |     runtime: nodejs18
+  |     region: aws.euw1
+  |     application-id: <please create an application on VONAGE APIs dashboard>
+  | debug:
+  |     application-id: <please create an application on VONAGE APIs dashboard>
+
+@@ requests 2083
+euw1 POST graphql:Region
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($alias: String!) {\\n  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {\\n    name\\n    alias\\n\\tdeployment_api_url\\n\\tmarketplace_api_url\\n\\tassets_api_url\\n\\tendpoint_url_scheme\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":{"alias":"aws.euw1"}}
+
+euw1 POST graphql:Runtimes
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery {\\n  Runtimes(where: {enabled: {_eq: true}}, order_by: {name: asc}) {\\n    id\\n    name\\n    language\\n\\tcomments\\n  }\\n}","variables":null}
+
+euw1 POST graphql:Regions
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery {\\n  Regions(where: {enabled: {_eq: true}}) {\\n \\tname    \\n\\talias\\n\\tdeployment_api_url\\n\\tassets_api_url\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":null}
+
+euw1 GET /applications?pattern=
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+
+euw1 GET /applications?pattern=
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+
+euw1 POST graphql:Products
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery {\\n  Products(where: {ProductVersions: {code_template_enabled: {_eq: true}}, type: {_eq: public}}, order_by: {name: asc}) {\\n    id\\n    name\\n    programming_language\\n  }\\n}","variables":null}
+
+euw1 POST graphql:ProductVersion
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($id: uuid!) {\\n  Products_by_pk(id: $id) {\\n    active_version_id\\n  }\\n}\\n","variables":{"id":"00000000-0000-4000-8000-000000000201"}}
+
+euw1 GET market:/products/00000000-0000-4000-8000-000000000201/versions/00000000-0000-4000-8000-000000000301/download/source
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+
+gh GET /releases/latest
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+

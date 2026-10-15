@@ -177,9 +177,11 @@ func TestGraphQLLogsFailureIsEmptyNotError(t *testing.T) {
 func TestGraphQLServesAnyPathEndingInGraphql(t *testing.T) {
 	s := Start(t, Defaults())
 	for path, region := range map[string]string{
-		"/v1/graphql":                         "",
-		"/graphql":                            "",
-		"/v1/vcr/use1/api/graphql/v1/graphql": "use1",
+		"/v1/graphql":                          "",
+		"/graphql":                             "",
+		"/graphql/":                            "",
+		"/v1/vcr/use1/api/graphql/v1/graphql":  "use1",
+		"/v1/vcr/euw1/api/graphql/v1/graphql/": "euw1",
 	} {
 		s.Reset()
 		r := gql(t, s.URL()+path, baselineQuery(t, "Regions"), nil, asAccount)
@@ -190,6 +192,7 @@ func TestGraphQLServesAnyPathEndingInGraphql(t *testing.T) {
 		assert.Equal(t, region, reqs[0].Region, path)
 	}
 	assert.Equal(t, http.StatusNotFound, gql(t, s.URL()+"/graphql/x", baselineQuery(t, "Regions"), nil, asAccount).status)
+	assert.Equal(t, http.StatusNotFound, gql(t, s.URL()+"/v1/graphql//", baselineQuery(t, "Regions"), nil, asAccount).status, "only one trailing slash is allowed")
 }
 
 func TestGraphQLRequiresAuth(t *testing.T) {

@@ -1,0 +1,13 @@
+description: "answering y at the confirmation replaces the running binary with the new release"
+args: [upgrade]
+tty: true
+requires-hotfix: true
+exe: copy
+fixtures:
+  release: {tag: v9.9.9}
+steps:
+  - {expect: "Are you sure you want to update to 9.9.9 ? [y/n]:"}
+  - {send: "y\r"}
+  - {expect: "Successfully updated"}
+expect-reads: []
+scrape: [version-line, upgrade-success]

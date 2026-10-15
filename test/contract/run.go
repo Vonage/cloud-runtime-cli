@@ -77,9 +77,6 @@ type run struct {
 // Result with its exit.
 func RunScenario(t testing.TB, bin string, sc Scenario, c Config) (Result, error) {
 	t.Helper()
-	if sc.TTY {
-		t.Skip("terminal scenarios are driven by the terminal runner")
-	}
 	for _, req := range sc.Requires {
 		if why := RequirementUnmet(req); why != "" {
 			t.Skipf("%s: %s", sc.ID, why)
@@ -197,7 +194,7 @@ func (r *run) execute(bin string, c Config) (Result, error) {
 	if err != nil {
 		return Result{}, err
 	}
-	p, err := startProc(exe, r.sc, r.l, ChildEnv(r.l, r.sc, c.ExtraEnv))
+	p, err := startChild(exe, r.sc, r.l, ChildEnv(r.l, r.sc, c.ExtraEnv))
 	if err != nil {
 		return Result{}, err
 	}
@@ -222,7 +219,7 @@ func (r *run) result(p *proc, d *driver, before, after Snapshot) Result {
 	obs := Observed{Requests: log, PeerEvents: r.srv.Peer().Events(), Local: d.local, Public: d.public}
 	return Result{
 		Exit:     p.exitLine(),
-		Stdout:   Escape(n.Stream(p.out.String(), false)),
+		Stdout:   Escape(n.Stream(p.out.String(), r.sc.TTY)), // a terminal shows both streams, so its screen gets the rules of stderr too
 		Stderr:   Escape(n.Stream(p.err.String(), true)),
 		Files:    Escape(RenderFiles(DiffSnapshots(before, after, n))),
 		Requests: Escape(RenderRequests(obs, n)),

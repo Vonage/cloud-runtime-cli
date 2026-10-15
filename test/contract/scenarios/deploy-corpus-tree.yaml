@@ -1,0 +1,23 @@
+description: "a tree with nested directories, dotfiles, a binary file, an empty file, unusual names, a long path, an executable and a read-only file is packaged"
+args: [deploy]
+cwd: work/project
+files:
+  - {path: work/project/vcr.yml, from: testdata/corpora/manifests/minimal.yaml, mode: 0644}
+  - {path: work/project/index.js, content: "console.log('hello');\n"}
+  - {path: work/project/src/a/b/c/deep.js, content: "module.exports = 1;\n"}
+  - {path: work/project/.hidden, content: "hidden file\n"}
+  - {path: work/project/.config/settings.json, content: "{\"debug\": true}\n"}
+  - {path: work/project/.dotdir/.nested, content: "nested dotfile\n"}
+  - {path: work/project/empty.txt, content: ""}
+  - {path: "work/project/docs/file with spaces.txt", content: "spaces in the name\n"}
+  - {path: "work/project/docs/résumé.txt", content: "accented name\n"}
+  - {path: "work/project/docs/日本語.txt", content: "cjk name\n"}
+  - {path: "work/project/ünïcödé dir/ñandú.js", content: "unicode directory\n"}
+  - {path: work/project/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/ccccccccccccccccccccccccccccccccccccccccccccccccc/ffffffffffffffffffffffffffffffffffffffffffffffffff, content: "a path of 200 characters\n"}
+  - {path: work/project/scripts/run.sh, content: "#!/bin/sh\necho run\n", mode: 0755}
+  - {path: work/project/readonly.txt, content: "read only\n", mode: 0444}
+  - {path: work/project/assets/binary.dat, from: testdata/corpora/tree/binary.dat}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /projects/minimal-project"
+scrape: [deployed-banner, deployed-instance-id, deployed-service-name, deployed-host-address]

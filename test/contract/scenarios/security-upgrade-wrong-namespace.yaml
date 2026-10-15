@@ -1,0 +1,9 @@
+description: "a signature made for another purpose is not accepted"
+group: upgrade
+args: [upgrade, --force]
+requires-hotfix: true
+exe: copy
+fixtures:
+  release: {tag: v9.9.9, tamper: wrong-namespace}
+expect-reads: []
+scrape: [version-line]

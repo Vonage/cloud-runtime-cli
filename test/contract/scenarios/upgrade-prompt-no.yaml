@@ -1,0 +1,12 @@
+description: "answering n at the confirmation leaves the binary alone and exits 0"
+args: [upgrade]
+tty: true
+exe: copy
+fixtures:
+  release: {tag: v9.9.9}
+steps:
+  - {expect: "Are you sure you want to update to 9.9.9 ? [y/n]:"}
+  - {send: "n\r"}
+  - {expect: "Update aborted"}
+expect-reads: []
+scrape: [version-line]

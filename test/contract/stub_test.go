@@ -3,6 +3,7 @@
 package contract
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -19,6 +20,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/AlecAivazis/survey/v2/terminal"
+	"github.com/creack/pty"
 	"github.com/gorilla/websocket"
 )
 
@@ -45,6 +48,10 @@ var stubModes = map[string]func(args []string) int{
 	"spawn":       stubSpawn,
 	"serve":       stubServe,
 	"tunnel":      stubTunnel,
+	"prompt":      stubPrompt,
+	"survey-like": stubSurveyLike,
+	"spinner":     stubSpinner,
+	"terminal":    stubTerminal,
 }
 
 func runStub(args []string) int {
@@ -250,4 +257,61 @@ func stubTunnel(args []string) int {
 			return 1
 		}
 	}
+}
+
+// stubPrompt asks for a name on the terminal and greets it.
+func stubPrompt([]string) int {
+	fmt.Print("Name: ")
+	line, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+	fmt.Printf("hello %s\n", strings.TrimSpace(line))
+	return 0
+}
+
+// stubSurveyLike behaves as the prompt library does: it takes the terminal out
+// of line mode, asks where the cursor is and waits for the answer. With
+// "corner" it asks from the far corner, which gives the window size.
+func stubSurveyLike(args []string) int {
+	stdio := terminal.Stdio{In: os.Stdin, Out: os.Stdout, Err: os.Stderr}
+	rr := terminal.NewRuneReader(stdio)
+	if err := rr.SetTermMode(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	defer func() { _ = rr.RestoreTermMode() }()
+	fmt.Print("at: ")
+	if len(args) > 0 && args[0] == "corner" {
+		fmt.Print("\x1b7\x1b[999;999f")
+	}
+	cur := &terminal.Cursor{In: os.Stdin, Out: os.Stdout}
+	loc, err := cur.Location(rr.Buffer())
+	if len(args) > 0 && args[0] == "corner" {
+		fmt.Print("\x1b8")
+	}
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	fmt.Printf("cursor %d;%d\r\n", loc.Y, loc.X)
+	return 0
+}
+
+// stubSpinner draws a spinner the way the CLI does, then prints a line.
+func stubSpinner([]string) int {
+	fmt.Print("\x1b[?25l")
+	for _, frame := range []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴"} {
+		fmt.Printf("\r\x1b[K\r%s Retrieving region list... ", frame)
+		time.Sleep(5 * time.Millisecond)
+	}
+	fmt.Print("\r\x1b[K\x1b[?25h")
+	fmt.Println("done")
+	return 0
+}
+
+// stubTerminal reports what the process sees of its terminal.
+func stubTerminal([]string) int {
+	rows, cols, err := pty.Getsize(os.Stdout)
+	fmt.Printf("tty %t\n", err == nil)
+	fmt.Printf("size %dx%d\n", cols, rows)
+	fmt.Printf("TERM %s\n", os.Getenv("TERM"))
+	return 0
 }

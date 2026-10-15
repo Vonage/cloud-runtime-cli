@@ -1,0 +1,22 @@
+description: "init reports the error when the region list cannot be fetched"
+args: [init]
+tty: true
+cwd: work/project
+files:
+  - {path: work/project, type: dir}
+fixtures:
+  overrides:
+    - {match: "* graphql:Regions", status: 500}
+    - {match: "GET /regions", status: 500}
+steps:
+  - {expect: "Enter your project name:"}
+  - {send: "\r"}
+  - {expect: "Enter your Instance name:"}
+  - {send: "\r"}
+  - {expect: "Select a runtime:"}
+  - {send: "\r"}
+  - {expect: "failed to ask region"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /runtimes"
+  - "euw1 GET /regions"

@@ -1,0 +1,20 @@
+description: "control sequences in the route of a relayed request are not passed on by the access log"
+group: debug
+args: [debug, --app-port, "${PORT:app}", --debugger-port, "${PORT:debugger}"]
+cwd: work/project
+files:
+  - path: work/project/vcr.yml
+    content: |
+      project: {name: my-project}
+      instance: {name: dev, runtime: nodejs18, region: aws.euw1, application-id: 00000000-0000-4000-8000-000000000601}
+      debug: {application-id: 00000000-0000-4000-8000-000000000602, entrypoint: ["${TESTAPP}"]}
+steps:
+  - {wait-peer: connected}
+  - {wait-stdout: testapp env XDG_CONFIG_HOME}
+  - {peer-send: {id: r1, operation: execute, method: GET, route: "/hello%1b%5d0;pwned%07%1b%5b2Jx", headers: {Accept: [text/plain]}, payload: ""}}
+  - {wait-peer-response: r1}
+  - {signal: SIGINT}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+scrape: [debug-access-log]
+scrape-except: [debug-access-log]

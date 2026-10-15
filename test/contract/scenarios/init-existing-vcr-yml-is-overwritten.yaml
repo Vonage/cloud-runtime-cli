@@ -1,0 +1,38 @@
+description: "init replaces a vcr.yml that is already in the directory, also through a template that brings a manifest of its own"
+args: [init]
+tty: true
+cwd: work/project
+files:
+  - {path: work/project, type: dir}
+  - {path: work/project/vcr.yml, from: testdata/corpora/init/vcr.yml, mode: 0644}
+fixtures:
+  products:
+    - id: 00000000-0000-4000-8000-000000000201
+      name: Starter Project - Node.js
+      programmingLanguage: nodejs
+      activeVersionId: 00000000-0000-4000-8000-000000000301
+      template:
+        archiveFrom: testdata/corpora/init/test.tar.gz
+steps:
+  - {expect: "Enter your project name:"}
+  - {send: "\r"}
+  - {expect: "Enter your Instance name:"}
+  - {send: "prod\r"}
+  - {expect: "Select a runtime:"}
+  - {send: "\r"}
+  - {expect: "Select a region:"}
+  - {send: "\r"}
+  - {expect: "Select your Vonage application ID for deployment:"}
+  - {send: "\r"}
+  - {expect: "Select your Vonage application ID for debug:"}
+  - {send: "\r"}
+  - {expect: "Select a product template for runtime"}
+  - {send: "\x1b[B"}
+  - {expect: "> Starter Project - Node.js"}
+  - {send: "\r"}
+  - {expect: "created"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /runtimes"
+  - "euw1 GET /regions"
+  - "euw1 GET /products/templates"

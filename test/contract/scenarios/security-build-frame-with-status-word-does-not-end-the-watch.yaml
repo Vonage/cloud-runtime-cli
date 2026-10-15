@@ -1,0 +1,29 @@
+description: "a build line that merely contains a status word does not end the watch"
+group: deploy
+args: [deploy]
+cwd: work/project
+files:
+  - path: work/project/vcr.yml
+    content: |
+      project:
+        name: my-project
+      instance:
+        name: dev
+        runtime: nodejs18
+        region: aws.euw1
+        application-id: 00000000-0000-4000-8000-000000000601
+        entrypoint: [node, index.js]
+  - path: work/project/index.js
+    content: |
+      console.log('hello');
+  - path: work/project/package.json
+    content: |
+      {"name": "my-project", "version": "1.0.0"}
+fixtures:
+  build:
+    connections:
+      - [{send: "unit test status: completed"}, {send: "Starting build"}, {send: "Step 1/2 : install dependencies"}, {send: "\x1b[35mℹ\x1b[0m Status - completed"}]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /projects/my-project"
+scrape: [deployed-banner, deployed-instance-id, deployed-service-name, deployed-host-address]

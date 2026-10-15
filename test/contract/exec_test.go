@@ -229,17 +229,6 @@ func TestLocalCallIsRecorded(t *testing.T) {
 	assert.Equal(t, "[local]\nPOST /echo?x=1 -> 201 \"ping\"\nGET /hello -> 200 \"hello from app\"\n", res.Requests)
 }
 
-func TestTerminalScenariosAreLeftToTheTerminalRunner(t *testing.T) {
-	c := stubConfig(t)
-	sc := stubScenario(t, "version-tty", "args: [echo]\ntty: true\n")
-	skipped := false
-	t.Run("tty", func(t *testing.T) {
-		defer func() { skipped = t.Skipped() }()
-		_, _ = RunScenario(t, c.Bin, sc, c)
-	})
-	assert.True(t, skipped)
-}
-
 func TestRequirementsAreChecked(t *testing.T) {
 	if os.Geteuid() != 0 {
 		assert.Empty(t, RequirementUnmet("non-root"))

@@ -1,0 +1,9 @@
+description: "a 308 answer to a POST request is not followed to another host"
+group: secret
+args: [secret, create, --name, REDIRECTED]
+stdin: "redirect-test-value\n"
+fixtures:
+  overrides:
+    - {match: "POST /secrets", status: 308, headers: {Location: "${OTHER}/captured"}}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

@@ -1,0 +1,7 @@
+description: "app list reads a configuration file with Windows line endings"
+args: [app, list]
+config: none
+files:
+  - {path: home/.vcr-cli, from: testdata/corpora/config/crlf.ini, mode: 0600}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

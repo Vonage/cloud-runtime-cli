@@ -1,0 +1,39 @@
+description: init asks every question in order and writes vcr.yml from the chosen template
+args: [init]
+tty: true
+cwd: work/project
+files:
+  - {path: work/project, type: dir}
+steps:
+  - {expect: "Enter your project name:"}
+  - {send: "my-project\r"}
+  - {expect: "Enter your Instance name:"}
+  - {send: "staging\r"}
+  - {expect: "Select a runtime:"}
+  - {send: "\r"}
+  - {expect: "Select a region:"}
+  - {send: "\r"}
+  - {expect: "Select your Vonage application ID for deployment:"}
+  - {send: "\x1b[B"}
+  - {expect: "> CREATE NEW APP"}
+  - {send: "\x1b[B"}
+  - {expect: "> my-app"}
+  - {send: "\r"}
+  - {expect: "Select your Vonage application ID for debug:"}
+  - {send: "\x1b[B"}
+  - {expect: "> CREATE NEW APP"}
+  - {send: "\x1b[B"}
+  - {expect: "> my-app"}
+  - {send: "\x1b[B"}
+  - {expect: "> second-app"}
+  - {send: "\r"}
+  - {expect: "Select a product template for runtime"}
+  - {send: "\x1b[B"}
+  - {expect: "> Starter Project - Node.js"}
+  - {send: "\r"}
+  - {expect: "created"}
+expect-reads:
+  - "euw1 GET /products/templates"
+  - "euw1 GET /regions"
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /runtimes"

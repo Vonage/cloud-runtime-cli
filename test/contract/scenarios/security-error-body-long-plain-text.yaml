@@ -1,0 +1,8 @@
+description: "a long plain-text error body is cut short"
+group: app
+args: [app, list]
+fixtures:
+  overrides:
+    - {match: "GET /applications", status: 500, bodyRepeat: {text: "the gateway could not reach the service and says so at length. ", count: 70}}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

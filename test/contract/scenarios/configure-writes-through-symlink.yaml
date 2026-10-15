@@ -1,0 +1,28 @@
+description: configure writes the new settings into the file a symlinked configuration path points to
+args: [configure]
+tty: true
+requires-hotfix: true
+config: none
+files:
+  - path: home/real.ini
+    content: |
+      graphql_endpoint = ${FAKE}/v1/vcr/euw1/api/graphql/v1/graphql
+      default_region   = aws.euw1
+
+      [credentials]
+      api_key    = abc123
+      api_secret = s3cret-for-tests
+    mode: 0600
+  - path: home/.vcr-cli
+    link: real.ini
+steps:
+  - {expect: "Enter your Vonage api key:"}
+  - {send: "\r"}
+  - {expect: "Enter your Vonage api secret"}
+  - {send: "\r"}
+  - {expect: "Select your Vonage region:"}
+  - {send: "\x1b[B"}
+  - {expect: "> AWS - US East"}
+  - {send: "\r"}
+  - {expect: "New configuration file written to"}
+expect-reads: [euw1 GET /regions]

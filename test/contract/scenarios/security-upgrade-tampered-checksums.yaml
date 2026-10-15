@@ -1,0 +1,9 @@
+description: "a checksum list that differs from its signature by one bit is not trusted"
+group: upgrade
+args: [upgrade, --force]
+requires-hotfix: true
+exe: copy
+fixtures:
+  release: {tag: v9.9.9, tamper: list-bitflip}
+expect-reads: []
+scrape: [version-line]

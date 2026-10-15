@@ -1,0 +1,9 @@
+description: "a release without a signature is not installed"
+group: upgrade
+args: [upgrade, --force]
+requires-hotfix: true
+exe: copy
+fixtures:
+  release: {tag: v9.9.9, tamper: missing-signature}
+expect-reads: []
+scrape: [version-line]

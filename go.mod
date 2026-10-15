@@ -11,6 +11,7 @@ require (
 	github.com/briandowns/spinner v1.23.2
 	github.com/cli/cli/v2 v2.98.0
 	github.com/cli/go-gh/v2 v2.13.0
+	github.com/creack/pty v1.1.24
 	github.com/go-resty/resty/v2 v2.17.1
 	github.com/golang/mock v1.6.0
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510

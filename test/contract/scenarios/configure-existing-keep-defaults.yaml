@@ -1,0 +1,13 @@
+description: configure with an existing file keeps every current value when Enter is pressed at each prompt
+args: [configure]
+tty: true
+requires-hotfix: true
+steps:
+  - {expect: "Enter your Vonage api key:"}
+  - {send: "\r"}
+  - {expect: "Enter your Vonage api secret"}
+  - {send: "\r"}
+  - {expect: "Select your Vonage region:"}
+  - {send: "\r"}
+  - {expect: "New configuration file written to"}
+expect-reads: [euw1 GET /regions]

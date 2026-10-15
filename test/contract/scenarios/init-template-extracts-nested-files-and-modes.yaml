@@ -1,0 +1,47 @@
+description: "template files are written with their directories and the owner permission bits of the archive"
+args: [init]
+tty: true
+requires-hotfix: true
+cwd: work/project
+files:
+  - {path: work/project, type: dir}
+fixtures:
+  products:
+    - id: 00000000-0000-4000-8000-000000000201
+      name: Starter Project - Node.js
+      programmingLanguage: nodejs
+      activeVersionId: 00000000-0000-4000-8000-000000000301
+      template:
+        files:
+          - {path: vcr.yml, content: "project:\n  name: starter\ninstance:\n  name: dev\n  runtime: nodejs18\n  region: aws.euw1\n", mode: 0644}
+          - {path: index.js, content: "console.log('hello');\n", mode: 0644}
+          - {path: src/app/handler.js, content: "module.exports = {};\n", mode: 0644}
+          - {path: src/app/lib/util.js, content: "exports.noop = () => {};\n", mode: 0600}
+          - {path: scripts/start.sh, content: "#!/bin/sh\nnode index.js\n", mode: 0755}
+          - {path: scripts/open.txt, content: "writable by everyone in the archive\n", mode: 0666}
+          - {path: .env.example, content: "KEY=value\n", mode: 0644}
+        entries:
+          - {name: empty/, type: dir, mode: 0755}
+steps:
+  - {expect: "Enter your project name:"}
+  - {send: "\r"}
+  - {expect: "Enter your Instance name:"}
+  - {send: "\r"}
+  - {expect: "Select a runtime:"}
+  - {send: "\r"}
+  - {expect: "Select a region:"}
+  - {send: "\r"}
+  - {expect: "Select your Vonage application ID for deployment:"}
+  - {send: "\r"}
+  - {expect: "Select your Vonage application ID for debug:"}
+  - {send: "\r"}
+  - {expect: "Select a product template for runtime"}
+  - {send: "\x1b[B"}
+  - {expect: "> Starter Project - Node.js"}
+  - {send: "\r"}
+  - {expect: "created"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /runtimes"
+  - "euw1 GET /regions"
+  - "euw1 GET /products/templates"

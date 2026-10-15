@@ -1,0 +1,15 @@
+description: configure with an existing file moves the region choice down one entry and saves it
+args: [configure]
+tty: true
+requires-hotfix: true
+steps:
+  - {expect: "Enter your Vonage api key:"}
+  - {send: "\r"}
+  - {expect: "Enter your Vonage api secret"}
+  - {send: "\r"}
+  - {expect: "Select your Vonage region:"}
+  - {send: "\x1b[B"}
+  - {expect: "> AWS - US East"}
+  - {send: "\r"}
+  - {expect: "New configuration file written to"}
+expect-reads: [euw1 GET /regions]

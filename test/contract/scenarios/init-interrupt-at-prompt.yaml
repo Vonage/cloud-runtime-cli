@@ -1,0 +1,11 @@
+description: "Ctrl-C at the first question of init ends the command with an error"
+args: [init]
+tty: true
+cwd: work/project
+files:
+  - {path: work/project, type: dir}
+steps:
+  - {expect: "Enter your project name:"}
+  - {send: "\x03"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

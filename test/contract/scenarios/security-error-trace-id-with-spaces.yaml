@@ -1,0 +1,8 @@
+description: "a trace id header with spaces is not shown as it is"
+group: app
+args: [app, list]
+fixtures:
+  overrides:
+    - {match: "GET /applications", status: 500, headers: {X-Neru-TraceId: "trace id with spaces"}, body: '{"error":{"code":1001,"message":"internal error"}}'}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

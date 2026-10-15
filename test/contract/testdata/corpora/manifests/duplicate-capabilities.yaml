@@ -1,0 +1,13 @@
+project:
+  name: duplicate-capabilities-project
+instance:
+  name: dev
+  runtime: nodejs18
+  region: aws.euw1
+  application-id: 00000000-0000-4000-8000-000000000601
+  capabilities:
+    - voice
+    - messages-v1
+    - voice
+    - messages-v1
+    - rtc

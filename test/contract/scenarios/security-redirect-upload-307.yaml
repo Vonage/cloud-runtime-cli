@@ -1,0 +1,27 @@
+description: "a 307 answer to the source upload is not followed to another host"
+group: deploy
+args: [deploy]
+cwd: work/project
+files:
+  - path: work/project/vcr.yml
+    content: |
+      project:
+        name: my-project
+      instance:
+        name: dev
+        runtime: nodejs18
+        region: aws.euw1
+        application-id: 00000000-0000-4000-8000-000000000601
+        entrypoint: [node, index.js]
+  - path: work/project/index.js
+    content: |
+      console.log('hello');
+  - path: work/project/package.json
+    content: |
+      {"name": "my-project", "version": "1.0.0"}
+fixtures:
+  overrides:
+    - {match: "POST /packages/source", status: 307, headers: {Location: "${OTHER}/captured"}}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /projects/my-project"

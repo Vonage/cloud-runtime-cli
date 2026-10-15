@@ -1,0 +1,17 @@
+project:
+    name: test
+instance:
+    name: dev
+    runtime: nodejs16
+    region: aws.euw1
+    application-id: 0f39f387-579b-4259-9f76-2715ff73b8b7
+    environment:
+        - name: test-env-name
+          value: test-env-value
+    capabilities:
+        - messages-v1
+    entrypoint:
+        - node
+        - index.js
+debug:
+    application-id: id

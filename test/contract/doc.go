@@ -26,13 +26,26 @@
 //   - testdata/golden-misc.txt: reference recordings of version, help and
 //     error output from an earlier release; the version line is compared by
 //     format only.
-//   - testdata/corpora/: input files (archives, manifests, config files) that
-//     scenarios copy into their sandbox.
+//   - testdata/corpora/: input files (archives, manifests, config files,
+//     ignore files) that scenarios copy into their sandbox.
+//   - coverage.txt: the areas of the CLI contract and the scenarios that cover
+//     each, one "<area>: <glob> <glob> ..." line per area; a test fails when a
+//     glob matches no scenario or a scenario is in no row.
 //   - allowed-diffs.txt: the deliberate differences from the baseline, one
 //     "<scenario-glob> <field> <reason>" line each.
 //   - scraped.yaml: the output lines that other tools parse, checked by name.
 //   - testapp/: a small program that stands in for the application that
 //     vcr debug runs.
+//
+// # Terminal scenarios
+//
+// A scenario with tty: true runs on a pseudo-terminal of 100 columns by 40
+// rows, with stdin, stdout and stderr all on it. Its steps are expect (wait
+// until the screen text holds some text) and send (type some keys); a send
+// follows an expect, except Ctrl-C. vt.go keeps the screen a person would see,
+// so spinner frames, redraws and colours leave no trace, and answers the
+// cursor position queries of the prompt library. The transcript's stdout is
+// the final screen text.
 //
 // The binaries the harness builds go to .cache/contract/ at the repository
 // root, which git ignores.

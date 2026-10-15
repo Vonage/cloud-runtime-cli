@@ -1,0 +1,9 @@
+description: "a signed list made for another release is not trusted"
+group: upgrade
+args: [upgrade, --force]
+requires-hotfix: true
+exe: copy
+fixtures:
+  release: {tag: v9.9.9, tamper: tag-mismatch}
+expect-reads: []
+scrape: [version-line]

@@ -1,0 +1,35 @@
+# What the scenarios cover, in the areas of the CLI contract: one "<area>: <glob> <glob> ..." line per area.
+# TestCoverageTableHasNoGaps checks that every glob matches a scenario and every scenario is in a row.
+# TestScenariosCoverCommandTree checks that every command, alias and flag appears in a scenario.
+command tree: help-* completion-complete-command
+flags: root-* config-* bootstrap-* app-* secret-* instance-* deploy-* debug-* upgrade-* completion-*-no-descriptions
+precedence: root-credentials-from-flags root-flags-override-config-credentials config-graphql-endpoint-flag-overrides-config config-region-flag-overrides-configured-endpoint config-default-region-used deploy-flags-override-manifest deploy-config-default-region-fills-missing-region debug-manifest-app-id-precedence
+config file: config-* config-corpus-* configure-*
+exit codes: app-create-confirm-no help-unknown-nested-subcommand help-unknown-command
+remote text: security-escape-*
+streams: config-missing-everywhere-uses-flags root-update-notice-shown help-unknown-command
+help and usage: help-* completion-*
+version: version-*
+errors: app-list-server-error bootstrap-* security-error-* deploy-validation-errors instance-remove-server-refuses
+update notice: root-update-*
+timeout: root-timeout-* deploy-build-timeout deploy-build-interrupted
+names and ids in paths: security-id-* security-instance-names-with-slash security-server-service-name-malformed
+deploy: deploy-* deploy-corpus-*
+instance list: instance-list-*
+instance log: instance-log-*
+app list: app-list-*
+secret list: secret-list-*
+secret create, update, remove: secret-* secret-create-typed-value* secret-update-typed-value
+confirmations: app-create-confirm-* app-remove-confirm-* instance-remove-confirm-* upgrade-prompt-*
+configure: configure-* security-escape-region-picker
+init: init-*
+debug: debug-* debug-corpus-* security-debug-*
+upgrade: upgrade-* security-upgrade-*
+manifest: deploy-manifest-* deploy-corpus-* debug-corpus-*
+packaging: deploy-package-* deploy-corpus-tree deploy-corpus-vcrignore-* security-upload-*
+init output: init-full-flow init-template-* security-init-template-*
+rest calls: app-* secret-* deploy-* instance-remove-* debug-*
+authentication: security-redirect-* security-github-requests-carry-no-credentials security-region-record-* bootstrap-wrong-secret
+build watch: deploy-build-* security-build-*
+debug-proxy protocol: debug-execute-roundtrip debug-remote-call-through-local-debugger debug-unknown-inbound-operation-ends-the-session debug-public-request-is-relayed debug-takeover-close-1008 security-escape-debug-access-log
+release and install: upgrade-* security-upgrade-*

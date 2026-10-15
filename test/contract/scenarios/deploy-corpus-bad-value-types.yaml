@@ -1,0 +1,7 @@
+description: "a manifest with a list where a text belongs is reported"
+args: [deploy]
+cwd: work/project
+files:
+  - {path: work/project/vcr.yml, from: testdata/corpora/manifests/bad-value-types.yaml, mode: 0644}
+  - {path: work/project/index.js, content: "console.log('hello');\n"}
+expect-reads: []

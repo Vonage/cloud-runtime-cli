@@ -1,0 +1,9 @@
+description: "answering y at the confirmation creates the application"
+args: [app, create, --name, test-app]
+tty: true
+steps:
+  - {expect: "Are you sure you want to create an application? [y/n]:"}
+  - {send: "y\r"}
+  - {expect: "Application created"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

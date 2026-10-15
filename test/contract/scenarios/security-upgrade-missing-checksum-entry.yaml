@@ -1,0 +1,9 @@
+description: "a signed list that has no entry for this platform is not trusted"
+group: upgrade
+args: [upgrade, --force]
+requires-hotfix: true
+exe: copy
+fixtures:
+  release: {tag: v9.9.9, tamper: missing-entry}
+expect-reads: []
+scrape: [version-line]

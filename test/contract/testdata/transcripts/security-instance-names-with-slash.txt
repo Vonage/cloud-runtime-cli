@@ -1,0 +1,30 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 1
+@@ stdout 0
+
+@@ stderr 125
+X failed to get instance: instance with project_name="a/b" and instance_name="c" could not be found or may have been deleted
+
+@@ files 0
+
+@@ requests 924
+euw1 POST graphql:Region
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($alias: String!) {\\n  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {\\n    name\\n    alias\\n\\tdeployment_api_url\\n\\tmarketplace_api_url\\n\\tassets_api_url\\n\\tendpoint_url_scheme\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":{"alias":"aws.euw1"}}
+
+euw1 POST graphql:InstanceByNames
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($project_name: String!, $instance_name: String!) {\\n  Instances(where: {Project: {name: {_eq: $project_name}}, _and: {name: {_eq: $instance_name}}, deleted: {_eq: false}}) {\\n    id\\n    service_name\\n  }\\n}","variables":{"instance_name":"c","project_name":"a/b"}}
+
+gh GET /releases/latest
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+

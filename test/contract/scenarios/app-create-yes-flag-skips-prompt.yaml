@@ -1,0 +1,7 @@
+description: "--yes creates the application without asking, even on a terminal"
+args: [app, create, --name, test-app, --yes]
+tty: true
+steps:
+  - {expect: "Application created"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

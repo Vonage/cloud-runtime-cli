@@ -1,0 +1,4 @@
+*.log
+!keep.log
+docs/*
+!docs/readme.md

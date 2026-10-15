@@ -1,0 +1,24 @@
+# keys the CLI does not know are ignored, at the top and nested
+extra-top-level: true
+notes:
+  - first
+  - second
+project:
+  name: unknown-keys-project
+  description: not a known key
+instance:
+  name: dev
+  runtime: nodejs18
+  region: aws.euw1
+  application-id: 00000000-0000-4000-8000-000000000601
+  entrypoint: [node, index.js]
+  unknown-nested:
+    deeper: [1, 2, 3]
+  environment:
+    - name: KNOWN
+      value: kept
+      comment: not a known key
+debug:
+  application-id: 00000000-0000-4000-8000-000000000602
+  entrypoint: ["${TESTAPP}"]
+  unknown-debug-key: true

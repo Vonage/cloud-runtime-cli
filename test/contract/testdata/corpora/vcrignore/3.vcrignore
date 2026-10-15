@@ -1,0 +1,3 @@
+**/generated/**
+logs/**/*.txt
+**/*.map

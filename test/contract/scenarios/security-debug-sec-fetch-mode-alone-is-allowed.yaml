@@ -1,0 +1,22 @@
+description: "a call with only a Sec-Fetch-Mode header, as a Node.js client sends, is allowed"
+group: debug
+args: [debug, --app-port, "${PORT:app}", --debugger-port, "${PORT:debugger}"]
+requires-hotfix: true
+cwd: work/project
+files:
+  - path: work/project/vcr.yml
+    content: |
+      project: {name: my-project}
+      instance: {name: dev, runtime: nodejs18, region: aws.euw1, application-id: 00000000-0000-4000-8000-000000000601}
+      debug: {application-id: 00000000-0000-4000-8000-000000000602, entrypoint: ["${TESTAPP}"]}
+fixtures:
+  debug:
+    remote:
+      provider-a: {status: 202, headers: {X-Provider: a}, body: accepted}
+steps:
+  - {wait-peer: connected}
+  - {wait-stdout: testapp env XDG_CONFIG_HOME}
+  - {local-call: {method: GET, url: "http://127.0.0.1:${PORT:debugger}/hook?func=provider-a", headers: {Sec-Fetch-Mode: "cors"}}}
+  - {signal: SIGINT}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
