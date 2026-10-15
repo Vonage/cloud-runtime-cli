@@ -1,0 +1,155 @@
+$ vcr --version
+[exit=0]
+--- stdout ---
+vcr-cli version v2.6.0 (commit:91034cc, date:2026-05-26T08:59:00Z)
+--- stderr ---
+
+
+$ vcr -v
+[exit=0]
+--- stdout ---
+vcr-cli version v2.6.0 (commit:91034cc, date:2026-05-26T08:59:00Z)
+--- stderr ---
+
+
+$ vcr -h
+[exit=0]
+--- stdout ---
+VCR CLI is a powerful command-line interface designed to streamline
+and simplify the development and management of applications on
+the Vonage Cloud Runtime platform.
+
+Vonage Cloud Runtime (VCR) enables you to build, deploy, and run serverless
+applications that integrate with Vonage communication APIs including Voice,
+Messages, and RTC (Real-Time Communication).
+
+GETTING STARTED
+  1. Configure the CLI with your Vonage API credentials:
+     $ vcr configure
+
+  2. Initialize a new project from a template:
+     $ vcr init my-project
+
+  3. Deploy your application:
+     $ vcr deploy
+
+CORE WORKFLOW
+  • vcr configure  - Set up your Vonage API credentials and region
+  • vcr app        - Create and manage Vonage applications
+  • vcr init       - Initialize a project from a template
+  • vcr deploy     - Deploy your application to VCR
+  • vcr debug      - Run your application locally in debug mode
+  • vcr instance   - Manage deployed instances (logs, removal)
+  • vcr secret     - Manage secrets for your applications
+  • vcr upgrade    - Update the VCR CLI to the latest version
+
+
+USAGE
+  vcr <command> <subcommand> [flags]
+
+AVAILABLE COMMANDS
+  app:         Manage Vonage applications for VCR deployments
+  completion:  Generate the autocompletion script for the specified shell
+  configure:   Configure VCR CLI with your Vonage API credentials
+  debug:       Run your application locally in debug mode with live VCR integration
+  deploy:      Deploy your application to Vonage Cloud Runtime
+  ini--- stderr ---
+
+
+$ vcr nosuchcmd
+[exit=1]
+--- stdout ---
+--- stderr ---
+unknown command "nosuchcmd" for "vcr"
+Usage:  vcr <command> <subcommand> [flags]
+
+Available commands:
+  app
+  completion
+  configure
+  debug
+  deploy
+  init
+  instance
+  secret
+  upgrade
+
+
+
+$ vcr app
+[exit=0]
+--- stdout ---
+Manage Vonage applications for VCR deployments.
+
+Vonage applications are containers that hold your communication settings and
+capabilities. Each VCR deployment must be linked to a Vonage application.
+
+WHAT IS A VONAGE APPLICATION?
+  A Vonage application provides:
+  • Authentication credentials (API keys and private keys)
+  • Enabled capabilities (Voice, Messages, RTC)
+  • Webhook URLs for receiving events
+
+AVAILABLE COMMANDS
+  create         Create a new Vonage application
+  remove (rm)    Remove a Vonage application
+  list (ls)      List all Vonage applications in your account
+  generate-keys  Generate new key pairs for an existing application
+
+WORKFLOW
+  1. Create an application: vcr app create --name my-app
+  2. Use the application ID in your vcr.yml manifest
+  3. Deploy your VCR application with: vcr deploy
+
+
+USAGE
+  vcr app <command> [flags]
+
+AVAILABLE COMMANDS
+  create:      Create a new Vonage application
+  generate-keys: Generate new key pairs for a Vonage application
+  list:        List all Vonage applications in your account
+  remove:      Remove a Vonage application
+
+INHERITED FLAGS
+      --api-key string            Vonage API key
+      --api-secret string         Vonage API secret
+      --config-file string        Path to config file (default is $HOME/.vcr-cli) (default "~/.vcr-cli")
+      --graphql-endpoint string   Graphql endpoint used to fetch metadata
+      --help                      Show help for command
+      --region string             Vonage platform reg--- stderr ---
+
+
+$ vcr app create
+[exit=1]
+--- stdout ---
+! Config file not found at "~/.vcr-cli", please use 'vcr configure' to create one. Trying to use flags...
+--- stderr ---
+2026/10/14 16:22:44.569607 WARN RESTY Using Basic Auth in HTTP mode is not secure, use HTTPS
+X failed to initialize cli: Post "": unsupported protocol scheme ""
+
+
+$ vcr instance log
+[exit=1]
+--- stdout ---
+! Config file not found at "~/.vcr-cli", please use 'vcr configure' to create one. Trying to use flags...
+--- stderr ---
+2026/10/14 16:22:44.679331 WARN RESTY Using Basic Auth in HTTP mode is not secure, use HTTPS
+X failed to initialize cli: Post "": unsupported protocol scheme ""
+
+
+$ vcr secret list --region aws.euw1
+[exit=1]
+--- stdout ---
+! Config file not found at "~/.vcr-cli", please use 'vcr configure' to create one. Trying to use flags...
+────────────────────────────────────────────────────────
+────────────────────────────────────────────────────────
+--- stderr ---
+X Error Encountered: failed to initialize cli
+
+ℹ Details:
+  - HTTP Status : 403
+  - Trace ID    : e502834d-10d4-4baa-91c5-92c941a33dda
+
+Please refer to the documentation or contact support for further assistance.
+

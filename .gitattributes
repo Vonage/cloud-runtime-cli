@@ -1,0 +1,8 @@
+# Transcripts and golden files are compared byte for byte: never convert their line endings.
+test/contract/testdata/** -text
+test/fakeplatform/testdata/** -text
+
+# Files the contract harness parses as text always use LF.
+test/contract/scenarios/** text eol=lf
+test/contract/allowed-diffs.txt text eol=lf
+test/contract/scraped.yaml text eol=lf

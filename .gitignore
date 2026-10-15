@@ -12,6 +12,9 @@ vcr_macos_arm64
 tests/integration/bin/vcr-cli
 tests/integration/bin/mockserver
 
+# Binaries built by the contract harness
+/.cache/
+
 # Lefthook local overrides
 lefthook-local.yml
 
