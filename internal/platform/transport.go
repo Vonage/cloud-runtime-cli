@@ -121,14 +121,15 @@ func newLoopbackDialer() *net.Dialer {
 }
 
 // refuseNonLoopback is a net.Dialer Control hook. It sees the address that is about to be connected to, so a
-// name that resolves to a remote address is refused too.
+// name that resolves to a remote address is refused too. The refusal is a *policyError, like every other
+// request the credential rule turns down.
 func refuseNonLoopback(_, address string, _ syscall.RawConn) error {
 	peer, err := netip.ParseAddrPort(address)
 	if err != nil {
-		return fmt.Errorf("refusing to dial non-loopback address %s over plain http", address)
+		return policyErrorf("refusing to dial non-loopback address %s over plain http", address)
 	}
 	if ip := peer.Addr().Unmap(); !ip.IsLoopback() {
-		return fmt.Errorf("refusing to dial non-loopback address %s over plain http", ip)
+		return policyErrorf("refusing to dial non-loopback address %s over plain http", ip)
 	}
 	return nil
 }
