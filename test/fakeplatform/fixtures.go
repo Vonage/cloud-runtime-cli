@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"slices"
 	"strings"
 	"time"
 
@@ -25,6 +26,9 @@ type Fixtures struct {
 	Applications []Application `yaml:"applications"`
 	Secrets      []string      `yaml:"secrets"`
 	Deploy       Deploy        `yaml:"deploy"`
+	Build        Build         `yaml:"build"`
+	Debug        Debug         `yaml:"debug"`
+	Release      Release       `yaml:"release"`
 	Overrides    []Override    `yaml:"overrides"`
 }
 
@@ -59,13 +63,15 @@ type Runtime struct {
 
 // Product is a marketplace product. A product whose Public is unset is
 // public; one that is not public, or is deleted, is not listed as a template.
+// The marketplace serves Template as the archive of its active version.
 type Product struct {
-	ID                  string `yaml:"id"`
-	Name                string `yaml:"name"`
-	ProgrammingLanguage string `yaml:"programmingLanguage"`
-	ActiveVersionID     string `yaml:"activeVersionId"`
-	Public              *bool  `yaml:"public,omitempty"`
-	Deleted             bool   `yaml:"deleted"`
+	ID                  string   `yaml:"id"`
+	Name                string   `yaml:"name"`
+	ProgrammingLanguage string   `yaml:"programmingLanguage"`
+	ActiveVersionID     string   `yaml:"activeVersionId"`
+	Public              *bool    `yaml:"public,omitempty"`
+	Deleted             bool     `yaml:"deleted"`
+	Template            Template `yaml:"template,omitempty"`
 }
 
 // Project is a project of Account, which is the fixture account when empty.
@@ -145,7 +151,8 @@ func boolPtr(v bool) *bool { return &v }
 
 // Defaults returns the default world: one account, two regions, two runtimes,
 // a template product, two projects, four instances (one deleted), five log
-// lines, two applications, two secrets and the answers of a deploy.
+// lines, two applications, two secrets, the answers of a deploy, a build
+// watch that completes, a debug service and a signed release v2.6.1.
 func Defaults() Fixtures {
 	return Fixtures{
 		Account: Account{Key: "abc123", Secret: "s3cret-for-tests"},
@@ -175,6 +182,9 @@ func Defaults() Fixtures {
 			HostURLs: []string{"https://my-project-dev.euw1.runtime.example.test"},
 			Validate: Validation{Valid: true},
 		},
+		Build:   Build{Connections: [][]WatchAction{defaultWatchScript()}},
+		Debug:   defaultDebug(),
+		Release: Release{Tag: "v2.6.1", Platforms: slices.Clone(releasePlatforms)},
 	}
 }
 
@@ -276,13 +286,28 @@ func (f *Fixtures) validate() error {
 			errs = append(errs, fmt.Errorf("logs[%d].timestamp: %w", i, err))
 		}
 	}
+	for i := range f.Products {
+		if err := f.Products[i].Template.validate(); err != nil {
+			errs = append(errs, fmt.Errorf("products[%d].template: %w", i, err))
+		}
+	}
 	for i := range f.Overrides {
 		if err := f.Overrides[i].validate(); err != nil {
 			errs = append(errs, fmt.Errorf("overrides[%d]: %w", i, err))
 		}
 	}
+	errs = appendPrefixed(errs, "build", f.Build.validate())
+	errs = appendPrefixed(errs, "debug", f.Debug.validate())
+	errs = appendPrefixed(errs, "release", f.Release.validate())
 	if len(errs) > 0 {
 		return fmt.Errorf("invalid fixtures: %w", errors.Join(errs...))
 	}
 	return nil
+}
+
+func appendPrefixed(errs []error, name string, err error) []error {
+	if err == nil {
+		return errs
+	}
+	return append(errs, fmt.Errorf("%s: %w", name, err))
 }

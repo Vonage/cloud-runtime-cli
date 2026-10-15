@@ -36,7 +36,7 @@ func TestStartOnAddress(t *testing.T) {
 }
 
 func TestStartOnRefusesNonLoopbackAddresses(t *testing.T) {
-	_, err := start("0.0.0.0:0", Defaults())
+	_, err := start(t, "0.0.0.0:0", Defaults())
 	assert.Error(t, err)
 }
 
@@ -165,9 +165,9 @@ func TestOtherListenerAnswersCapturedOnly(t *testing.T) {
 	}
 	for _, path := range []string{"/elsewhere", "/v1/vcr/euw1/api/deployment/v0.3/secrets"} {
 		r := send(t, http.MethodGet, s.OtherURL()+path, nil, asAccount)
-		require.Equal(t, http.StatusNotFound, r.status, path)
-		_, msg := r.apiError(t)
-		assert.Equal(t, "not found in fake: GET "+path, msg)
+		require.Equal(t, http.StatusBadGateway, r.status, "%s is relayed to the tunnel client, and none is connected", path)
+		code, _ := r.apiError(t)
+		assert.Equal(t, http.StatusBadGateway, code)
 	}
 
 	reqs := s.Requests()
@@ -177,6 +177,10 @@ func TestOtherListenerAnswersCapturedOnly(t *testing.T) {
 		assert.Empty(t, req.Region, "the other listener serves no region")
 	}
 	assert.Equal(t, "x=1", reqs[1].RawQuery)
+	assert.Equal(t, []string{"other", "other", "debug", "debug"}, []string{reqs[0].Kind, reqs[1].Kind, reqs[2].Kind, reqs[3].Kind})
+	assert.Equal(t, "GET /captured", reqs[1].Route)
+	assert.Equal(t, "GET debug:/elsewhere", reqs[2].Route)
+	assert.Equal(t, "/v1/vcr/euw1/api/deployment/v0.3/secrets", reqs[3].Rel)
 }
 
 func TestDefaultRegionsPointTheDebugHostAtTheOtherListener(t *testing.T) {

@@ -14,10 +14,13 @@ import (
 // Override changes the answer to the requests it matches.
 //
 // Match is "<METHOD|*> <route>", where route is a REST path below the API
-// base, in which * stands for one segment and a trailing /** for any number
-// of them (/instances/*/logs, /applications/**), or graphql:<Op>. Skip lets
-// the first matching requests through and Times is how many requests the
-// entry then applies to (0 is all); the first entry that applies wins.
+// base (/instances/*/logs, /applications/**), graphql:<Op>, gh:<path> for
+// the path after /gh (gh:/releases/latest, gh:/download/*/checksums.txt) or
+// market:<path> for a marketplace path from /products/ on, whatever comes
+// before it (market:/products/*/versions/*/download/source). In a path, *
+// stands for one segment and a trailing /** for any number of them. Skip
+// lets the first matching requests through and Times is how many requests
+// the entry then applies to (0 is all); the first entry that applies wins.
 //
 // An entry with a Status, Body, BodyRepeat or ContainerLogs answers the
 // request itself, after Delay; an entry without them only adds its Headers
@@ -66,11 +69,18 @@ func (d *Duration) UnmarshalYAML(n *yaml.Node) error {
 const (
 	spaceREST     = "rest"
 	spaceGraphQL  = "graphql"
+	spaceGitHub   = "github"
+	spaceMarket   = "market"
 	graphQLPrefix = "graphql:"
+	ghPrefix      = "gh:"
+	marketPrefix  = "market:"
 	anyMethod     = "*"
 	anySegment    = "*"
 	anyBelow      = "**"
 )
+
+// pathSpaces are the match prefixes whose routes are paths, and their spaces.
+var pathSpaces = []struct{ prefix, space string }{{ghPrefix, spaceGitHub}, {marketPrefix, spaceMarket}, {"", spaceREST}}
 
 var errNotEnvelope = errors.New("containerLogs needs a body that is an error envelope")
 
@@ -79,7 +89,7 @@ var errNotEnvelope = errors.New("containerLogs needs a body that is an error env
 type matcher struct {
 	method string
 	space  string
-	segs   []string // spaceREST: the path pattern
+	segs   []string // the path pattern, in every space but spaceGraphQL
 	op     string   // spaceGraphQL: the operation
 }
 
@@ -90,20 +100,24 @@ func parseMatch(s string) (matcher, error) {
 		return matcher{}, fmt.Errorf("match %q is not \"<METHOD|*> <route>\"", s)
 	}
 	m := matcher{method: strings.ToUpper(method)}
-	switch {
-	case strings.HasPrefix(route, graphQLPrefix):
-		m.space, m.op = spaceGraphQL, strings.TrimPrefix(route, graphQLPrefix)
-	case strings.HasPrefix(route, "/"):
-		m.space, m.segs = spaceREST, splitPath(route)
+	if op, ok := strings.CutPrefix(route, graphQLPrefix); ok {
+		m.space, m.op = spaceGraphQL, op
+		return m, nil
+	}
+	for _, ps := range pathSpaces {
+		path, ok := strings.CutPrefix(route, ps.prefix)
+		if !ok || !strings.HasPrefix(path, "/") {
+			continue
+		}
+		m.space, m.segs = ps.space, splitPath(path)
 		for i, seg := range m.segs {
 			if seg == anyBelow && i != len(m.segs)-1 {
 				return matcher{}, fmt.Errorf("match %q: ** must be the last segment", s)
 			}
 		}
-	default:
-		return matcher{}, fmt.Errorf("match %q: the route is neither a /path nor graphql:<Op>", s)
+		return m, nil
 	}
-	return m, nil
+	return matcher{}, fmt.Errorf("match %q: the route is none of /path, graphql:<Op>, gh:/path and market:/path", s)
 }
 
 func (m *matcher) matches(method string, t *target) bool {

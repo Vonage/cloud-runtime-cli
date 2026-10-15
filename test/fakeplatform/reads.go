@@ -252,27 +252,25 @@ func answerInstance(c *call, in *instanceItem) {
 	writeJSON(c.rw, http.StatusOK, in)
 }
 
-// listLogs answers the logs of a visible instance, newest first. Logs are
-// regional: a region other than the instance's has none.
+// listLogs answers the logs of a visible instance, newest first. Ownership
+// comes first: an instance the caller cannot see is 404 whatever the query.
+// Logs are regional: a region other than the instance's has none.
 func (s *Server) listLogs(c *call) {
 	id, ok := c.param(paramID)
 	if !ok || !isUUID(id) {
 		writeError(c.rw, http.StatusNotFound, codeInstanceNotFound, msgInstanceNotFound)
 		return
 	}
-	limit, after, ok := logsQuery(c.r.URL.Query())
-	if !ok {
-		writeError(c.rw, http.StatusBadRequest, codeInvalidQuery, msgInvalidQuery)
-		return
-	}
+	limit, after, validQuery := logsQuery(c.r.URL.Query())
 	out := logList{Logs: []logItem{}}
 	found, failed := false, false
 	s.locked(func(w *world) {
 		in := w.instanceByID(id, w.visible)
-		if in == nil {
+		found = in != nil
+		if !found || !validQuery {
 			return
 		}
-		found, failed = true, w.f.LogsFailure
+		failed = w.f.LogsFailure
 		poll := w.poll(id)
 		if failed || shortAlias(in.Region) != c.region {
 			return
@@ -286,6 +284,8 @@ func (s *Server) listLogs(c *call) {
 	switch {
 	case !found:
 		writeError(c.rw, http.StatusNotFound, codeInstanceNotFound, msgInstanceNotFound)
+	case !validQuery:
+		writeError(c.rw, http.StatusBadRequest, codeInvalidQuery, msgInvalidQuery)
 	case failed:
 		writeError(c.rw, http.StatusServiceUnavailable, codeUpstream, msgUpstream)
 	default:

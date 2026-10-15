@@ -8,18 +8,21 @@ import (
 )
 
 // world is the state of a running server: the expanded fixtures as requests
-// changed them, and the counters of overrides and log polls. It is only used
-// with Server.mu held.
+// changed them, and the counters of overrides, polls and build watches. It
+// is only used with Server.mu held.
 type world struct {
-	f        Fixtures
-	matchers []matcher
-	hits     []int          // matches counted per override
-	polls    map[string]int // log polls per instance id
-	created  int            // applications created so far
+	f             Fixtures
+	matchers      []matcher
+	hits          []int          // matches counted per override
+	polls         map[string]int // log polls per instance id
+	statusPolls   map[string]int // debug-service status polls per service name
+	created       int            // applications created so far
+	watchAttempts int            // build-watch upgrade attempts so far
+	watchConns    int            // build-watch connections accepted so far
 }
 
 func newWorld(f Fixtures) (world, error) {
-	w := world{f: f, hits: make([]int, len(f.Overrides)), polls: map[string]int{}}
+	w := world{f: f, hits: make([]int, len(f.Overrides)), polls: map[string]int{}, statusPolls: map[string]int{}}
 	for i, o := range f.Overrides {
 		m, err := parseMatch(o.Match)
 		if err != nil {

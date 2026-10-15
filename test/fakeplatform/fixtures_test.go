@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -54,6 +55,7 @@ func TestDefaultsAreSelfConsistent(t *testing.T) {
 	claim("deployed package", "07", f.Deploy.PackageID)
 	claim("deployed instance", "07", f.Deploy.InstanceID)
 	claim("deployment", "07", f.Deploy.DeploymentID)
+	claim("debug instance", "07", f.Debug.InstanceID)
 
 	assert.NoError(t, f.validate())
 }
@@ -114,6 +116,10 @@ func TestDecodeRejectsUnknownKeys(t *testing.T) {
 		"regions: [{alias: aws.x, colour: red}]\n",
 		"deploy: {validate: {valid: true, why: x}}\n",
 		"overrides: [{match: GET /secrets, statuss: 500}]\n",
+		"build: {connections: [[{shout: x}]]}\n",
+		"release: {tag: v1.0.0, colour: red}\n",
+		"debug: {remote: {f: {code: 1}}}\n",
+		"products: [{id: x, template: {files: [{path: a, perm: 1}]}}]\n",
 	} {
 		_, err := Decode([]byte(y))
 		assert.Error(t, err, y)
@@ -122,19 +128,69 @@ func TestDecodeRejectsUnknownKeys(t *testing.T) {
 
 func TestDecodeRejectsInvalidValues(t *testing.T) {
 	for name, y := range map[string]string{
-		"empty account key":       "account: {key: ''}\n",
-		"log timestamp":           "logs: [{instance: x, timestamp: yesterday}]\n",
-		"instance updatedAt":      "instances: [{id: x, updatedAt: soon}]\n",
-		"match without a route":   "overrides: [{match: GET}]\n",
-		"unknown match kind":      "overrides: [{match: 'GET ftp:/x'}]\n",
-		"double star not last":    "overrides: [{match: 'GET /a/**/b'}]\n",
-		"negative skip":           "overrides: [{match: 'GET /a', skip: -1}]\n",
-		"bad delay":               "overrides: [{match: 'GET /a', delay: soon}]\n",
-		"logs on a text body":     "overrides: [{match: 'GET /a', status: 500, body: oops, containerLogs: x}]\n",
-		"status out of range":     "overrides: [{match: 'GET /a', status: 1000}]\n",
-		"hang and close together": "overrides: [{match: 'GET /a', hang: true, close: true}]\n",
+		"empty account key":           "account: {key: ''}\n",
+		"log timestamp":               "logs: [{instance: x, timestamp: yesterday}]\n",
+		"instance updatedAt":          "instances: [{id: x, updatedAt: soon}]\n",
+		"match without a route":       "overrides: [{match: GET}]\n",
+		"unknown match kind":          "overrides: [{match: 'GET ftp:/x'}]\n",
+		"double star not last":        "overrides: [{match: 'GET /a/**/b'}]\n",
+		"negative skip":               "overrides: [{match: 'GET /a', skip: -1}]\n",
+		"bad delay":                   "overrides: [{match: 'GET /a', delay: soon}]\n",
+		"logs on a text body":         "overrides: [{match: 'GET /a', status: 500, body: oops, containerLogs: x}]\n",
+		"status out of range":         "overrides: [{match: 'GET /a', status: 1000}]\n",
+		"hang and close together":     "overrides: [{match: 'GET /a', hang: true, close: true}]\n",
+		"gh match without a path":     "overrides: [{match: 'GET gh:releases'}]\n",
+		"market match without a path": "overrides: [{match: 'GET market:products'}]\n",
+		"unknown tamper mode":         "release: {tamper: nope}\n",
+		"empty release tag":           "release: {tag: ''}\n",
+		"platform without arch":       "release: {platforms: [linux]}\n",
+		"watch action without a key":  "build: {connections: [[{}]]}\n",
+		"watch action with two keys":  "build: {connections: [[{send: x, drop: true}]]}\n",
+		"close code out of range":     "build: {connections: [[{close: 999}]]}\n",
+		"negative sleep":              "build: {connections: [[{sleep: -1s}]]}\n",
+		"negative rejectFirst":        "build: {rejectFirst: -1}\n",
+		"unknown entry type":          "products: [{id: x, template: {entries: [{name: a, type: socket}]}}]\n",
+		"file without a path":         "products: [{id: x, template: {files: [{content: a}]}}]\n",
+		"archiveFrom with files":      "products: [{id: x, template: {archiveFrom: a.tgz, files: [{path: a}]}}]\n",
+		"generate without a verb":     "products: [{id: x, template: {generate: {pattern: bulk, count: 2}}}]\n",
+		"negative generate count":     "products: [{id: x, template: {generate: {pattern: 'f%d', count: -1}}}]\n",
+		"negative readyAfterPolls":    "debug: {readyAfterPolls: -1}\n",
+		"remote status out of range":  "debug: {remote: {f: {status: 42}}}\n",
 	} {
 		_, err := Decode([]byte(y))
 		assert.Error(t, err, name)
 	}
+}
+
+func TestDecodeAcceptsTheDocumentedShapes(t *testing.T) {
+	f, err := Decode([]byte(`products:
+  - id: p1
+    activeVersionId: v1
+    template:
+      files: [{path: vcr.yml, content: "project: {}", mode: 0644}]
+      entries: [{name: ../evil, type: file, content: x, mode: 0644}, {name: link, type: symlink, link: /etc}]
+      generate: {pattern: "bulk/f%05d.txt", count: 10001}
+build:
+  rejectFirst: 1
+  connections:
+    - [{send: a}, {sleep: 10ms}, {close: 1011}]
+    - [{drop: true}]
+    - [{hang: true}]
+release: {tag: v9.9.9, platforms: [linux_amd64], tamper: missing-entry, failOnCredentials: true}
+debug: {serviceName: s, readyAfterPolls: 2, remote: {voice: {status: 201, headers: {X-A: b}, body: ok}}}
+`))
+	require.NoError(t, err)
+	tmpl := f.Products[0].Template
+	assert.Equal(t, int64(0o644), tmpl.Files[0].Mode, "modes are octal")
+	assert.Equal(t, "symlink", tmpl.Entries[1].Type)
+	assert.Equal(t, 10001, tmpl.Generate.Count)
+	assert.Equal(t, 1, f.Build.RejectFirst)
+	require.Len(t, f.Build.Connections, 3)
+	assert.Equal(t, Duration(10*time.Millisecond), f.Build.Connections[0][1].Sleep)
+	assert.Equal(t, 1011, f.Build.Connections[0][2].Close)
+	assert.Equal(t, Release{Tag: "v9.9.9", Platforms: []string{"linux_amd64"}, Tamper: "missing-entry", FailOnCredentials: true}, f.Release)
+	assert.Equal(t, "dbg-service-1", Defaults().Debug.ServiceName)
+	assert.Equal(t, "s", f.Debug.ServiceName)
+	assert.Equal(t, Defaults().Debug.WebsocketPath, f.Debug.WebsocketPath, "a mapping merges into the default")
+	assert.Equal(t, RemoteAnswer{Status: 201, Headers: map[string]string{"X-A": "b"}, Body: "ok"}, f.Debug.Remote["voice"])
 }

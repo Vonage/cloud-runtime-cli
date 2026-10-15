@@ -36,7 +36,7 @@ func TestAuthRequired(t *testing.T) {
 
 	for _, family := range deploymentAPI {
 		for _, rt := range family {
-			rel := strings.NewReplacer("{id}", devID, "{name}", "x", "{alias}", "x", "{p}", "x", "{n}", "x").Replace(rt.pattern)
+			rel := strings.NewReplacer("{id}", devID, "{name}", "x", "{alias}", "x", "{p}", "x", "{n}", "x", "{svc}", "x").Replace(rt.pattern)
 			r := send(t, rt.method, s.DeploymentAPIURL("euw1")+"/v0.3"+rel, nil)
 			assert.Equal(t, http.StatusUnauthorized, r.status, rt.key)
 		}

@@ -1,6 +1,8 @@
 // Package fakeplatform is an in-process fake of the platform that vcr talks
 // to: the regional deployment API over REST and, for recording older releases
-// only, over GraphQL, with a log of every request and fault injection.
+// only, over GraphQL; the marketplace; GitHub releases; the build-watch
+// websocket; and the debug host with its debug proxy. It logs every request
+// and injects faults.
 //
 // Unit tests start it with Start(t, Defaults()); the contract harness starts
 // it on a fixed address with StartOn and fixtures read by Decode.
@@ -32,9 +34,11 @@ const (
 )
 
 // Server is a running fake platform. It listens on two loopback ports: the
-// primary one serves the platform; the other one stands for a host that is
-// not a platform host and serves no platform route. Both write to one log.
+// primary one serves the platform and the release host; the other one stands
+// for a host that is not a platform host, the debug host, and serves no
+// platform route. Both write to one log.
 type Server struct {
+	tb       testing.TB
 	account  Account
 	url      string
 	otherURL string
@@ -44,9 +48,21 @@ type Server struct {
 	stop     sync.Once
 	inflight atomic.Int64
 	log      requestLog
+	built    built
+	peer     *Peer
 
 	mu    sync.Mutex // guards world
 	world world
+}
+
+// built is what load derives from the fixtures once; it does not change
+// while the server runs.
+type built struct {
+	templates         map[string]builtTemplate
+	release           release
+	tunnelPath        string
+	proxyPath         string
+	failOnCredentials bool
 }
 
 // Start starts a server on 127.0.0.1 with free ports, serving f with its
@@ -61,7 +77,7 @@ func Start(t testing.TB, f Fixtures) *Server {
 // free port.
 func StartOn(t testing.TB, addr string, f Fixtures) *Server {
 	t.Helper()
-	s, err := start(addr, f)
+	s, err := start(t, addr, f)
 	if err != nil {
 		t.Fatalf("fakeplatform: %v", err)
 	}
@@ -69,7 +85,7 @@ func StartOn(t testing.TB, addr string, f Fixtures) *Server {
 	return s
 }
 
-func start(addr string, f Fixtures) (*Server, error) {
+func start(tb testing.TB, addr string, f Fixtures) (*Server, error) {
 	host, _, err := net.SplitHostPort(addr)
 	if err != nil {
 		return nil, fmt.Errorf("address %q: %w", addr, err)
@@ -87,6 +103,7 @@ func start(addr string, f Fixtures) (*Server, error) {
 		return nil, err
 	}
 	s := newServer(portOfListener(primary), portOfListener(other), f.Account)
+	s.tb = tb
 	if err := s.load(f); err != nil {
 		_ = primary.Close()
 		_ = other.Close()
@@ -126,7 +143,20 @@ func (s *Server) load(f Fixtures) error {
 	if err != nil {
 		return err
 	}
-	s.account, s.world = expanded.Account, w
+	templates, err := buildTemplates(expanded.Products)
+	if err != nil {
+		return err
+	}
+	rel, err := buildRelease(&expanded.Release)
+	if err != nil {
+		return err
+	}
+	tunnel, proxy := debugPaths(expanded.Debug.WebsocketPath)
+	s.built = built{
+		templates: templates, release: rel, tunnelPath: tunnel, proxyPath: proxy,
+		failOnCredentials: expanded.Release.FailOnCredentials,
+	}
+	s.account, s.world, s.peer = expanded.Account, w, newPeer(expanded.Debug.Remote)
 	return nil
 }
 
@@ -162,8 +192,8 @@ func (s *Server) serve(ln net.Listener, name string) {
 	}()
 }
 
-// close stops both listeners, releases the handlers that hang and gives the
-// handlers still running a moment to return.
+// close stops both listeners, releases the handlers that hang, closes the
+// websockets and gives the handlers still running a moment to return.
 func (s *Server) close() {
 	s.stop.Do(func() {
 		close(s.done)
@@ -226,21 +256,25 @@ func replaceStrings(n *yaml.Node, r *strings.Replacer) {
 	}
 }
 
-// handle serves both listeners: it logs the request, applies the overrides,
-// checks the credentials and routes, in that order.
+// handle serves both listeners: it logs the request, refuses credentials
+// sent to the release host when the fixtures ask for it, applies the
+// overrides, checks the credentials and routes, in that order.
 func (s *Server) handle(listener string, rw http.ResponseWriter, r *http.Request) {
 	s.inflight.Add(1)
 	defer s.inflight.Add(-1)
 	rw.Header().Set(headerTraceID, traceID)
 
 	body, err := io.ReadAll(r.Body)
-	t := classify(listener, r, body)
+	t := s.classify(listener, r, body)
 	s.log.add(newRequest(listener, r, body, &t))
 	if err != nil {
 		return // the client went away while sending; the log keeps what arrived
 	}
 	r.Body = io.NopCloser(bytes.NewReader(body))
 
+	if t.kind == kindGitHub && s.built.failOnCredentials && s.refuseCredentials(rw, r) {
+		return
+	}
 	if t.space != "" {
 		if o, ok := s.pickOverride(r.Method, &t); ok && s.applyOverride(rw, r, &o) {
 			return

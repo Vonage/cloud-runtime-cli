@@ -19,7 +19,7 @@ type Request struct {
 	Region   string // the <region> of a /v1/vcr/<region>/ path, else ""
 	Kind     string // "rest", "graphql", "market", "github", "debug", "websocket" or "other"
 	Route    string // the canonical route, such as "GET /instances/{id}/logs" or "POST graphql:Regions"; "" if none matched
-	Rel      string // the REST path below the API base without the version segment, such as "/instances/<id>/logs"
+	Rel      string // the path below the base: for REST without the version segment ("/instances/<id>/logs"), for GitHub after /gh, for the marketplace from /products/ on; else the raw path
 }
 
 func (r Request) clone() Request {

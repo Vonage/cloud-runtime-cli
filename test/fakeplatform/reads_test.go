@@ -272,6 +272,18 @@ func TestLogsLimitAndAfterValidation(t *testing.T) {
 	assert.Len(t, logsOf(t, s, "euw1", devID, "limit=5&after="), 5, "an empty after is no cursor")
 }
 
+func TestLogsOwnershipIsCheckedBeforeTheQuery(t *testing.T) {
+	s := started(t, visibilityFixtures+"logs: [{instance: "+devID+", message: late, timestamp: '2026-10-14T10:00:00Z', visibleAfterPolls: 1}]\n")
+	for _, id := range []string{goneID, fixtureID(506), fixtureID(599)} {
+		for _, q := range []string{"limit=0", "limit=abc", "limit=5&after=yesterday", ""} {
+			notFound(t, rest(t, s, http.MethodGet, "/instances/"+id+"/logs?"+q, nil), 2003)
+		}
+	}
+	badQuery(t, rest(t, s, http.MethodGet, "/instances/"+devID+"/logs?limit=0", nil))
+	assert.Empty(t, logsOf(t, s, "euw1", devID, "limit=10"), "a refused query is not counted as a poll")
+	assert.Len(t, logsOf(t, s, "euw1", devID, "limit=10"), 1)
+}
+
 func TestLogsVisibleAfterPolls(t *testing.T) {
 	s := started(t, "logs:\n"+
 		"  - {instance: "+devID+", message: early, timestamp: '2026-10-14T10:00:01Z'}\n"+
