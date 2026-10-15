@@ -1,0 +1,45 @@
+project:
+    name: booking-app
+instance:
+    name: dev
+    runtime: nodejs22
+    region: aws.euw1
+    application-id: 11111111-2222-3333-4444-555555555555
+    environment:
+        - name: VONAGE_NUMBER
+          value: "12012010601"
+        - name: API_KEY
+          secret: MY_SECRET
+    capabilities:
+        - messages-v1
+        - voice
+    entrypoint:
+        - node
+        - index.js
+    domains:
+        - api.example.com
+    build-script: ./build.sh
+    scaling:
+        min-scale: 1
+        max-scale: 3
+    security:
+        access: private
+        auth-method: vonage_basic
+        override:
+            - path: /api/public
+              access: public
+            - path: /api/secure
+              access: authenticated
+              auth-method: vonage_basic
+    health-check-path: /custom/health
+debug:
+    name: debug
+    application-id: 22222222-2222-3333-4444-555555555555
+    environment:
+        - name: A
+          value: b
+    entrypoint:
+        - node
+        - --inspect
+        - index.js
+    preserve-data: true

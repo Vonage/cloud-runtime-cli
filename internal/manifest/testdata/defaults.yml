@@ -1,0 +1,13 @@
+project:
+    name: my-project
+instance:
+    name: dev
+    runtime: nodejs18
+    region: aws.euw1
+    application-id: <please create an application on VONAGE APIs dashboard>
+    entrypoint:
+        - <please include the entrypoint for your script>
+debug:
+    application-id: <please create an application on VONAGE APIs dashboard>
+    entrypoint:
+        - <please include the entrypoint for your script>
