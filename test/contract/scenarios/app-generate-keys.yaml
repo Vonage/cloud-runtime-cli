@@ -1,0 +1,4 @@
+description: "keys are generated for an application"
+args: [app, generate-keys, --app-id, 00000000-0000-4000-8000-000000000601]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

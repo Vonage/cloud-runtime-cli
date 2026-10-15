@@ -11,13 +11,13 @@
 - name: version-line
   pattern: '^vcr-cli version \S+ \(commit:\S+, date:\S+\)$'
 - name: deployed-banner
-  pattern: '^Instance has been deployed!$'
+  pattern: '^(\| )?Instance has been deployed!$'
 - name: deployed-instance-id
-  pattern: '^Instance id: \S+$'
+  pattern: '^(\| )?Instance id: \S+$'
 - name: deployed-service-name
-  pattern: '^Instance service name: \S+$'
+  pattern: '^(\| )?Instance service name: \S+$'
 - name: deployed-host-address
-  pattern: '^Instance host address: \S+$'
+  pattern: '^(\| )?Instance host address: \S+$'
 - name: table-lines
   pattern: '^[┌├└│┬┴┼─].*$'
 - name: secrets-found

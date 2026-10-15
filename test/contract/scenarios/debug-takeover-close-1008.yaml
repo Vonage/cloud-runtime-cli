@@ -1,0 +1,18 @@
+description: "a tunnel closed with code 1008 because another client took it over"
+args: [debug, --app-port, "${PORT:app}", --debugger-port, "${PORT:debugger}"]
+cwd: work/project
+files:
+  - path: work/project/vcr.yml
+    content: |
+      project: {name: my-project}
+      instance: {name: dev, runtime: nodejs18, region: aws.euw1, application-id: 00000000-0000-4000-8000-000000000601}
+      debug: {application-id: 00000000-0000-4000-8000-000000000602, entrypoint: ["${TESTAPP}"]}
+steps:
+  - {wait-peer: connected}
+  - {wait-stdout: testapp env XDG_CONFIG_HOME}
+  - {peer-close: {code: 1008, text: taken over}}
+  - {wait-peer: disconnected}
+  - {sleep: 1s}
+  - {signal: SIGINT}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

@@ -1,0 +1,4 @@
+description: "the help page of vcr app remove"
+group: app
+args: [app, remove, --help]
+expect-reads: []

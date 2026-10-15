@@ -1,0 +1,15 @@
+description: "--filename names the manifest file"
+args: [debug, --app-port, "${PORT:app}", --debugger-port, "${PORT:debugger}", --filename, custom.yml]
+cwd: work/project
+files:
+  - path: work/project/custom.yml
+    content: |
+      project: {name: my-project}
+      instance: {name: dev, runtime: nodejs18, region: aws.euw1, application-id: 00000000-0000-4000-8000-000000000601}
+      debug: {application-id: 00000000-0000-4000-8000-000000000602, entrypoint: ["${TESTAPP}"]}
+steps:
+  - {wait-peer: connected}
+  - {wait-stdout: testapp env XDG_CONFIG_HOME}
+  - {signal: SIGINT}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

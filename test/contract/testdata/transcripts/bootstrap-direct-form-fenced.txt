@@ -1,0 +1,12 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 1
+@@ stdout 0
+
+@@ stderr 157
+X failed to initialize cli: Post "https://graphql.euw1.runtime.vonage.cloud/v1/graphql": proxyconnect tcp: dial tcp 127.0.0.1:9: connect: connection refused
+
+@@ files 0
+
+@@ requests 0
+

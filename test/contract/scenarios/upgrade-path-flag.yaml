@@ -1,0 +1,8 @@
+description: "--path names the directory of the installation to replace"
+args: [upgrade, --force, --path, "${BIN}"]
+exe: copy
+requires-hotfix: true
+fixtures:
+  release: {tag: v9.9.9}
+expect-reads: []
+scrape: [version-line, upgrade-success]

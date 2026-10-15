@@ -1,0 +1,8 @@
+description: "a refusal by the platform is reported"
+args: [instance, remove, --id, 00000000-0000-4000-8000-000000000501, --yes]
+fixtures:
+  overrides:
+    - {match: "DELETE /instances/*", status: 403, body: '{"error":{"code":403,"message":"instance cannot be removed by this account","traceId":"trace-403"}}'}
+expect-reads:
+  - "euw1 GET /instances/00000000-0000-4000-8000-000000000501"
+  - "euw1 GET /regions/aws.euw1"

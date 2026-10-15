@@ -1,0 +1,4 @@
+description: "upgrade says so when the running version is the latest"
+args: [upgrade]
+expect-reads: []
+scrape: [version-line]

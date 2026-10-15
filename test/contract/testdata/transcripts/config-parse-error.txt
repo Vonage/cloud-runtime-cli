@@ -1,0 +1,13 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 1
+@@ stdout 0
+
+@@ stderr 76
+X failed to read config file "~/.vcr-cli" : unclosed section: [credentials
+
+
+@@ files 0
+
+@@ requests 0
+

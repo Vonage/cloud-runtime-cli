@@ -1,0 +1,4 @@
+description: "the help page of vcr deploy"
+group: deploy
+args: [deploy, --help]
+expect-reads: []

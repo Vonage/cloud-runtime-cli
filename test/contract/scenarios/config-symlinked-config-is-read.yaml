@@ -1,0 +1,17 @@
+description: "a configuration file that is a symlink is read through the link"
+args: [app, list]
+config: none
+files:
+  - path: home/real.ini
+    content: |
+      graphql_endpoint = ${FAKE}/v1/vcr/euw1/api/graphql/v1/graphql
+      default_region   = aws.euw1
+
+      [credentials]
+      api_key    = abc123
+      api_secret = s3cret-for-tests
+    mode: 0600
+  - path: home/.vcr-cli
+    link: real.ini
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

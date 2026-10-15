@@ -1,0 +1,6 @@
+description: "the filter treats _ as a wildcard"
+args: [instance, list, --filter, d_v]
+expect-reads:
+  - "euw1 GET /instances?filter=d_v"
+  - "euw1 GET /regions/aws.euw1"
+scrape: [table-lines]

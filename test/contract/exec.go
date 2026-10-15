@@ -5,7 +5,6 @@ package contract
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -260,5 +259,3 @@ func waitContext(limit time.Duration) (context.Context, context.CancelFunc) {
 func timedOut(limit time.Duration, what string) error {
 	return fmt.Errorf("timed out after %s waiting for %s", limit, what)
 }
-
-var errAlreadyExited = errors.New("the process has already exited")

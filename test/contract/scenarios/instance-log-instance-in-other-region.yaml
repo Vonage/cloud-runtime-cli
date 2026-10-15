@@ -1,0 +1,11 @@
+description: "the log of an instance of another region is printed"
+args: [instance, log, --id, 00000000-0000-4000-8000-000000000503]
+fixtures:
+  logs:
+    - {instance: 00000000-0000-4000-8000-000000000503, level: info, source: application, message: "booted in the other region", timestamp: "2026-10-14T11:00:01Z"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /instances/00000000-0000-4000-8000-000000000503"
+  - "euw1 GET /regions/aws.use1"
+  - "use1 GET /instances/00000000-0000-4000-8000-000000000503/logs?limit=300"
+scrape: [log-line]

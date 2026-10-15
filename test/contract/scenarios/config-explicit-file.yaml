@@ -1,0 +1,15 @@
+description: "an explicit --config-file is read instead of the default"
+args: [--config-file, "${HOME}/custom.ini", app, list]
+config: none
+files:
+  - path: home/custom.ini
+    content: |
+      graphql_endpoint = ${FAKE}/v1/vcr/euw1/api/graphql/v1/graphql
+      default_region   = aws.euw1
+
+      [credentials]
+      api_key    = abc123
+      api_secret = s3cret-for-tests
+    mode: 0600
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

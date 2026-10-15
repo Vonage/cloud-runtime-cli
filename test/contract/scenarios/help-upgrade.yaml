@@ -1,0 +1,3 @@
+description: "the help page of vcr upgrade"
+group: upgrade
+args: [upgrade, --help]

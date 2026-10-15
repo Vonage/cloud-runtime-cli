@@ -1,0 +1,41 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 1
+@@ stdout 420
+────────────────────────────────────────────────────────
+────────────────────────────────────────────────────────
+
+
+A new release of vcr is available: 2.6.1 → 9.9.9
+To upgrade, run: vcr upgrade
+
+@@ stderr 235
+X Error Encountered: failed to list Vonage applications
+
+ℹ Details:
+  - HTTP Status : 500
+  - Message     : internal error
+  - Trace ID    : fake-trace-id
+
+Please refer to the documentation or contact support for further assistance.
+
+@@ files 0
+
+@@ requests 591
+euw1 POST graphql:Region
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($alias: String!) {\\n  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {\\n    name\\n    alias\\n\\tdeployment_api_url\\n\\tmarketplace_api_url\\n\\tassets_api_url\\n\\tendpoint_url_scheme\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":{"alias":"aws.euw1"}}
+
+euw1 GET /applications?pattern=
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+
+gh GET /releases/latest
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+

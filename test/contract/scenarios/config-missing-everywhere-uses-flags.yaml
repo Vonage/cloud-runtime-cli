@@ -1,0 +1,6 @@
+description: "with no configuration file the flags are used, and with no region the lookup reports that the region does not exist"
+args: [--api-key, abc123, --api-secret, s3cret-for-tests, --graphql-endpoint, "${FAKE}/v1/vcr/euw1/api/graphql/v1/graphql", app, list]
+config: none
+expect-reads:
+  - "euw1 GET /regions"
+scrape: [config-not-found-notice]

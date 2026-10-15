@@ -1,0 +1,8 @@
+description: "an explicit configuration file that is a dangling symlink counts as missing"
+args: [--config-file, "${HOME}/broken.ini", app, list]
+files:
+  - path: home/broken.ini
+    link: nowhere.ini
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+scrape-except: [config-not-found-notice, table-lines]

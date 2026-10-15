@@ -1,0 +1,4 @@
+description: "the help command shows the help page of a nested command"
+group: app
+args: [help, app, create]
+expect-reads: []

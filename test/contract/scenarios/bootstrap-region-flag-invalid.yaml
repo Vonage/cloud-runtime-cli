@@ -1,0 +1,4 @@
+description: "a --region that is not aws.<name> is an error"
+args: [--region, not-a-region, app, list]
+requires-hotfix: true
+expect-reads: []

@@ -1,0 +1,9 @@
+description: "a default configuration file that is a dangling symlink counts as missing"
+args: [app, list]
+config: none
+files:
+  - path: home/.vcr-cli
+    link: nowhere.ini
+expect-reads: []
+scrape: [config-not-found-notice]
+scrape-except: [config-not-found-notice]

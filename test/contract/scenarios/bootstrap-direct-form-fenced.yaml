@@ -1,0 +1,5 @@
+description: "the production direct form of the endpoint is a production host that the network fence refuses"
+args: [--graphql-endpoint, "https://graphql.euw1.runtime.vonage.cloud/v1/graphql", app, list]
+expect-reads: []
+fenced-host: api-eu.vonage.com
+fenced-host-baseline: graphql.euw1.runtime.vonage.cloud

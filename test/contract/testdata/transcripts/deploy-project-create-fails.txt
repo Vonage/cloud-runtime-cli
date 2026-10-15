@@ -1,0 +1,53 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 1
+@@ stdout 338
+────────────────────────────────────────────────────────
+────────────────────────────────────────────────────────
+
+@@ stderr 238
+X Error Encountered: failed to create project "my-project"
+
+ℹ Details:
+  - HTTP Status : 500
+  - Message     : internal error
+  - Trace ID    : fake-trace-id
+
+Please refer to the documentation or contact support for further assistance.
+
+@@ files 0
+
+@@ requests 1538
+euw1 POST graphql:Region
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($alias: String!) {\\n  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {\\n    name\\n    alias\\n\\tdeployment_api_url\\n\\tmarketplace_api_url\\n\\tassets_api_url\\n\\tendpoint_url_scheme\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":{"alias":"aws.euw1"}}
+
+euw1 POST graphql:Region
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($alias: String!) {\\n  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {\\n    name\\n    alias\\n\\tdeployment_api_url\\n\\tmarketplace_api_url\\n\\tassets_api_url\\n\\tendpoint_url_scheme\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":{"alias":"aws.euw1"}}
+
+euw1 POST graphql:Project
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($api_account_id: String!, $name: String!) {\\n  Projects(where: {api_account_id: {_eq: $api_account_id}, _and: {name: {_eq: $name}, _and: {deleted: {_eq: false}}}}) {\\n    id\\n    name\\n    api_account_id\\n    created_at\\n    updated_at\\n  }\\n}","variables":{"api_account_id":"abc123","name":"my-project"}}
+
+euw1 POST /projects
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"name":"my-project","origin":"owner"}
+
+gh GET /releases/latest
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+

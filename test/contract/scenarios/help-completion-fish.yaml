@@ -1,0 +1,2 @@
+description: "the help page of vcr completion fish"
+args: [completion, fish, --help]

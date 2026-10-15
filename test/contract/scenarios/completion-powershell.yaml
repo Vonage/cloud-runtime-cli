@@ -1,0 +1,2 @@
+description: "the powershell completion script is printed"
+args: [completion, powershell]

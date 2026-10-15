@@ -1,0 +1,12 @@
+description: "instances are listed by update time, newest first"
+args: [instance, list]
+fixtures:
+  instances:
+    - {id: 00000000-0000-4000-8000-000000000511, name: a, serviceName: svc-oldest, apiApplicationId: 00000000-0000-4000-8000-000000000601, projectName: my-project, region: aws.euw1, updatedAt: "2026-10-10T10:00:00Z"}
+    - {id: 00000000-0000-4000-8000-000000000512, name: b, serviceName: svc-newest, apiApplicationId: 00000000-0000-4000-8000-000000000601, projectName: my-project, region: aws.euw1, updatedAt: "2026-10-14T10:00:00Z"}
+    - {id: 00000000-0000-4000-8000-000000000513, name: c, serviceName: svc-third, apiApplicationId: 00000000-0000-4000-8000-000000000601, projectName: my-project, region: aws.use1, updatedAt: "2026-10-11T10:00:00Z"}
+    - {id: 00000000-0000-4000-8000-000000000514, name: d, serviceName: svc-second, apiApplicationId: 00000000-0000-4000-8000-000000000601, projectName: my-project, region: aws.euw1, updatedAt: "2026-10-13T10:00:00Z"}
+expect-reads:
+  - "euw1 GET /instances"
+  - "euw1 GET /regions/aws.euw1"
+scrape: [table-lines]

@@ -1,0 +1,4 @@
+description: "--yes skips the confirmation of remove"
+args: [app, remove, 00000000-0000-4000-8000-000000000601, --yes]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

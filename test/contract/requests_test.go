@@ -150,7 +150,7 @@ func TestRenderMultipartListsSortedTarEntries(t *testing.T) {
 		"  part: name=file filename=source.tgz\n" +
 		"  tar: 4 entries\n" +
 		"    dir 0755 0 src/\n" +
-		"    symlink 0777 0 src/a.link -> b.txt\n" +
+		"    symlink ---- 0 src/a.link -> b.txt\n" +
 		"    file 0644 3 src/b.txt\n" +
 		"    hardlink 0644 0 src/hard -> src/b.txt\n" +
 		"  part: name=meta filename=\n" +

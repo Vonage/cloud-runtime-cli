@@ -1,0 +1,2 @@
+description: "the powershell completion script without descriptions"
+args: [completion, powershell, --no-descriptions]

@@ -26,8 +26,8 @@ func PortNames(raw string) []string {
 	return names
 }
 
-// PortSet is a free port per name. A held port stays bound on 127.0.0.1 until
-// Close, so the process under test finds it in use.
+// PortSet is a free port per name. A held port stays bound, on 127.0.0.1 and on
+// every interface, until Close, so the process under test finds it in use.
 type PortSet struct {
 	ports map[string]int
 	held  []net.Listener
@@ -41,13 +41,13 @@ func AllocatePorts(names, hold []string) (*PortSet, error) {
 		if _, ok := p.ports[name]; ok {
 			continue
 		}
-		ln, err := net.Listen("tcp", "127.0.0.1:0")
+		lns, port, err := listenEverywhere()
 		if err != nil {
 			p.Close()
 			return nil, fmt.Errorf("hold port %q: %w", name, err)
 		}
-		p.held = append(p.held, ln)
-		p.ports[name] = ln.Addr().(*net.TCPAddr).Port
+		p.held = append(p.held, lns...)
+		p.ports[name] = port
 	}
 	for _, name := range names {
 		if _, ok := p.ports[name]; ok {
@@ -61,6 +61,31 @@ func AllocatePorts(names, hold []string) (*PortSet, error) {
 		p.ports[name] = port
 	}
 	return p, nil
+}
+
+// holdAttempts is how many ports listenEverywhere tries before it gives up.
+const holdAttempts = 20
+
+// listenEverywhere binds one free port on the loopback address and on every
+// interface. A program that binds either of the two finds the port in use on
+// every Unix; BSD kernels would otherwise let a wildcard bind and a loopback
+// bind share a port.
+func listenEverywhere() ([]net.Listener, int, error) {
+	var lastErr error
+	for attempt := 0; attempt < holdAttempts; attempt++ {
+		loopback, err := net.Listen("tcp", "127.0.0.1:0")
+		if err != nil {
+			return nil, 0, err
+		}
+		port := loopback.Addr().(*net.TCPAddr).Port
+		wildcard, err := net.Listen("tcp", ":"+strconv.Itoa(port))
+		if err == nil {
+			return []net.Listener{loopback, wildcard}, port, nil
+		}
+		_ = loopback.Close()
+		lastErr = err
+	}
+	return nil, 0, lastErr
 }
 
 // Port is the port of a name, or 0 for an unknown name.

@@ -1,0 +1,4 @@
+description: "an application is created from a name"
+args: [app, create, --name, my-new-app]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

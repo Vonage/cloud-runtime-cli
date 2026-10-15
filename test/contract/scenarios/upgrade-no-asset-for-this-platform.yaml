@@ -1,0 +1,7 @@
+description: "a release without an archive for this platform is reported"
+args: [upgrade, --force]
+exe: copy
+fixtures:
+  release: {tag: v9.9.9, platforms: [plan9_386]}
+expect-reads: []
+scrape: [version-line]

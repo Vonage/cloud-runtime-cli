@@ -1,0 +1,17 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 1
+@@ stdout 86
+vcr-cli version v2.6.1 (commit:0123456789abcdef0123456789abcdef01234567, date:<time>)
+
+@@ stderr 54
+X failed to find executable CLI file at <OUTSIDE>/vcr
+
+@@ files 0
+
+@@ requests 65
+gh GET /releases/latest
+  auth: basic 
+  acct: none
+  trace: yes
+

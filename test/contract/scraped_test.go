@@ -13,10 +13,10 @@ import (
 func TestScrapedPatterns(t *testing.T) {
 	samples := map[string]struct{ match, miss string }{
 		"version-line":            {"vcr-cli version v2.6.1 (commit:0123456789abcdef, date:2026-01-01T00:00:00Z)", "vcr-cli version v2.6.1 (commit:0123456789abcdef)"},
-		"deployed-banner":         {"Instance has been deployed!", "Instance has been deployed"},
-		"deployed-instance-id":    {"Instance id: abc-123", "Instance id:"},
-		"deployed-service-name":   {"Instance service name: svc-1", "Instance service-name: svc-1"},
-		"deployed-host-address":   {"Instance host address: https://x.example/", "Instance host address:"},
+		"deployed-banner":         {"| Instance has been deployed!", "Instance has been deployed"},
+		"deployed-instance-id":    {"| Instance id: abc-123", "Instance id:"},
+		"deployed-service-name":   {"| Instance service name: svc-1", "Instance service-name: svc-1"},
+		"deployed-host-address":   {"| Instance host address: https://x.example/", "Instance host address:"},
 		"table-lines":             {"┌──────┬────┐", "Name  Id"},
 		"secrets-found":           {"✓ Found 2 secret(s):", "Found 2 secret(s):"},
 		"secret-name":             {"  ℹ DB_URL", "  DB_URL"},
@@ -48,6 +48,24 @@ func TestScrapedPatterns(t *testing.T) {
 			assert.True(t, s.Matches(samples[s.Name].match), "matching sample")
 			assert.False(t, s.Matches(samples[s.Name].miss), "non-matching sample")
 		})
+	}
+}
+
+func TestDeployBannerPrefixIsOptional(t *testing.T) {
+	scrapes, err := LoadScraped("scraped.yaml")
+	require.NoError(t, err)
+	byName := map[string]Scraped{}
+	for _, s := range scrapes {
+		byName[s.Name] = s
+	}
+	for _, c := range []struct{ name, line string }{
+		{"deployed-banner", "Instance has been deployed!"},
+		{"deployed-instance-id", "Instance id: abc-123"},
+		{"deployed-service-name", "Instance service name: svc-1"},
+		{"deployed-host-address", "Instance host address: https://x.example/"},
+	} {
+		assert.True(t, byName[c.name].Matches(c.line), "%s matches the line without the pipe", c.name)
+		assert.True(t, byName[c.name].Matches("| "+c.line), "%s matches the line with the pipe", c.name)
 	}
 }
 

@@ -1,0 +1,4 @@
+description: "the gateway form of graphql_endpoint in the configuration file reaches the platform"
+args: [app, list]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

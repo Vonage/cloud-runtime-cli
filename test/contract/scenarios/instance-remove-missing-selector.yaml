@@ -1,0 +1,4 @@
+description: "instance remove needs an id or a project and instance name"
+args: [instance, remove, --yes]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

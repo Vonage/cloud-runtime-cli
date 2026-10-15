@@ -251,3 +251,9 @@ func TestRequirementsAreChecked(t *testing.T) {
 	}
 	assert.NotEmpty(t, RequirementUnmet("teleport"), "an unknown requirement is never met")
 }
+
+func TestSignalStepOnAnExitedProcessIsANoOp(t *testing.T) {
+	res, err := runStubScenario(t, "version-exited", "args: [echo]\nsteps:\n  - {wait-exit: 5s}\n  - {signal: SIGINT}\n")
+	require.NoError(t, err, "a process that has ended has nothing left to interrupt, which is no error")
+	assert.Equal(t, "0", res.Exit)
+}

@@ -1,0 +1,26 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 0
+@@ stdout 138
+vcr-cli version v2.6.1 (commit:0123456789abcdef0123456789abcdef01234567, date:<time>)
+<BIN>/vcr
+✓ Successfully updated to version 9.9.9
+
+@@ stderr 0
+
+@@ files 153
+~ bin/vcr mode=0755 size=45 sha256=a7422556e869f6b0a37fbb6ecb7d161341c3c9875f77aefef25a91da666a74dd
+  | #!/bin/sh
+  | echo "fake vcr v9.9.9 <os>_<arch>"
+
+@@ requests 154
+gh GET /releases/latest
+  auth: basic 
+  acct: none
+  trace: yes
+
+gh GET /download/v9.9.9/vcr_<os>_<arch>.tar.gz
+  auth: basic 
+  acct: none
+  trace: yes
+

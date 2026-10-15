@@ -1,0 +1,6 @@
+description: "--region aws.use1 selects the production endpoint of that region"
+args: [--region, aws.use1, --api-key, abc123, --api-secret, s3cret-for-tests, app, list]
+config: none
+expect-reads: []
+fenced-host: api-eu.vonage.com
+fenced-host-baseline: graphql.use1.runtime.vonage.cloud

@@ -1,0 +1,4 @@
+description: "--help wins over the other flags of the command"
+group: instance
+args: [instance, log, --help, --id, x]
+expect-reads: []

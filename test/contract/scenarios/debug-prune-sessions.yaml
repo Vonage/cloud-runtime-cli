@@ -1,0 +1,4 @@
+description: "all debug sessions of the account are removed"
+args: [debug, prune-sessions]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

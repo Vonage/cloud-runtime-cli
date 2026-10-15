@@ -1,0 +1,4 @@
+description: "the help page of vcr configure"
+group: configure
+args: [configure, --help]
+expect-reads: []

@@ -1,0 +1,4 @@
+description: "init with a project path cannot ask its questions without a terminal"
+args: [init, project]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

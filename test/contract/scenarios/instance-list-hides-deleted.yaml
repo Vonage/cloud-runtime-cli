@@ -1,0 +1,10 @@
+description: "deleted instances are not listed"
+args: [instance, list]
+fixtures:
+  instances:
+    - {id: 00000000-0000-4000-8000-000000000501, name: dev, serviceName: my-project-dev, apiApplicationId: 00000000-0000-4000-8000-000000000601, projectName: my-project, region: aws.euw1, updatedAt: "2026-10-14T10:00:00Z"}
+    - {id: 00000000-0000-4000-8000-000000000504, name: gone, serviceName: my-project-gone, apiApplicationId: 00000000-0000-4000-8000-000000000601, projectName: my-project, region: aws.euw1, updatedAt: "2026-10-15T10:00:00Z", deleted: true}
+expect-reads:
+  - "euw1 GET /instances"
+  - "euw1 GET /regions/aws.euw1"
+scrape: [table-lines]

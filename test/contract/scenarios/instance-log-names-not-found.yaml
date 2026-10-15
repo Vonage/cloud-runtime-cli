@@ -1,0 +1,5 @@
+description: "an unknown project and instance name is reported"
+args: [instance, log, --project-name, my-project, --instance-name, nosuch]
+expect-reads:
+  - "euw1 GET /projects/my-project/instances/nosuch"
+  - "euw1 GET /regions/aws.euw1"

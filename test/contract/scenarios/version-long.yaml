@@ -1,0 +1,3 @@
+description: "the --version flag prints the version line"
+args: [--version]
+scrape: [version-line]

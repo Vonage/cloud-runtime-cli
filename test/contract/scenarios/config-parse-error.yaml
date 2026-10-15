@@ -1,0 +1,10 @@
+description: "a configuration file that cannot be parsed stops the command"
+args: [app, list]
+config: none
+files:
+  - path: home/.vcr-cli
+    content: |
+      [credentials
+      api_key = abc123
+    mode: 0600
+expect-reads: []

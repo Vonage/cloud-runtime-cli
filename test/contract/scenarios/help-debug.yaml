@@ -1,0 +1,4 @@
+description: "the help page of vcr debug"
+group: debug
+args: [debug, --help]
+expect-reads: []

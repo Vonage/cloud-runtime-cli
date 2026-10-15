@@ -1,0 +1,27 @@
+description: "every flag overrides the manifest at once"
+args: [deploy, --project-name, other, --runtime, python3, --app-id, 00000000-0000-4000-8000-000000000602, --instance-name, qa, --capabilities, "voice,rtc", --tgz, test.tar.gz, --filename, custom.yml]
+cwd: work/project
+files:
+  - path: work/project/index.js
+    content: |
+      console.log('hello');
+  - path: work/project/package.json
+    content: |
+      {"name": "my-project", "version": "1.0.0"}
+  - path: work/project/custom.yml
+    content: |
+      project:
+        name: my-project
+      instance:
+        name: dev
+        runtime: nodejs18
+        region: aws.euw1
+        application-id: 00000000-0000-4000-8000-000000000601
+        entrypoint: [node, index.js]
+        capabilities: [messages-v1]
+  - path: work/project/test.tar.gz
+    from: testdata/corpora/deploy/test.tar.gz
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /projects/other"
+scrape: [deployed-banner, deployed-instance-id, deployed-service-name, deployed-host-address]

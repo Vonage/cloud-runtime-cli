@@ -1,0 +1,4 @@
+description: "all capabilities can be enabled together"
+args: [app, create, --name, my-new-app, --messages, --rtc, --voice]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

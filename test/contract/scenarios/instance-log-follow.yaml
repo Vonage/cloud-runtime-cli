@@ -1,0 +1,17 @@
+description: "follow the log of an instance, see a row that appears later, stop on interrupt"
+args: [instance, log, --id, 00000000-0000-4000-8000-000000000501, --follow, --history, "2"]
+fixtures:
+  logs:
+    - {instance: 00000000-0000-4000-8000-000000000501, level: info, source: application, message: "first", timestamp: "2026-10-14T10:00:01Z"}
+    - {instance: 00000000-0000-4000-8000-000000000501, level: info, source: application, message: "second", timestamp: "2026-10-14T10:00:02Z"}
+    - {instance: 00000000-0000-4000-8000-000000000501, level: warn, source: provider, message: "third", timestamp: "2026-10-14T10:00:03Z", visibleAfterPolls: 2}
+steps:
+  - {wait-stdout: third}
+  - {signal: SIGINT}
+expect-reads:
+  - "euw1 GET /instances/00000000-0000-4000-8000-000000000501"
+  - "euw1 GET /instances/00000000-0000-4000-8000-000000000501/logs?after=2026-10-14T10:00:02Z&limit=2"
+  - "euw1 GET /instances/00000000-0000-4000-8000-000000000501/logs?after=2026-10-14T10:00:02Z&limit=2"
+  - "euw1 GET /instances/00000000-0000-4000-8000-000000000501/logs?limit=2"
+  - "euw1 GET /regions/aws.euw1"
+scrape: [log-line, interrupt-notice]

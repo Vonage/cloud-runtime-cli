@@ -1,0 +1,4 @@
+description: "global flags may follow the subcommand"
+args: [app, list, -t, 5s, --api-key, abc123, --api-secret, s3cret-for-tests]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

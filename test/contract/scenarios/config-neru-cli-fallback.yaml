@@ -1,0 +1,16 @@
+description: "the legacy ~/.neru-cli is used when ~/.vcr-cli does not exist"
+args: [app, list]
+config: none
+files:
+  - path: home/.neru-cli
+    content: |
+      graphql_endpoint = ${FAKE}/v1/vcr/euw1/api/graphql/v1/graphql
+      default_region   = aws.euw1
+
+      [credentials]
+      api_key    = abc123
+      api_secret = s3cret-for-tests
+    mode: 0600
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+scrape: [config-not-found-notice]

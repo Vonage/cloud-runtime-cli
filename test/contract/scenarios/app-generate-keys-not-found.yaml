@@ -1,0 +1,4 @@
+description: "generating keys for an unknown application is reported"
+args: [app, generate-keys, --app-id, 00000000-0000-4000-8000-000000000999]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

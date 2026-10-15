@@ -14,7 +14,11 @@ import (
 	"strings"
 )
 
-const maxUploadBytes = 256 << 20
+const (
+	maxUploadBytes = 256 << 20
+	kindSymlink    = "symlink"
+	kindHardlink   = "hardlink"
+)
 
 // renderMultipart renders the parts of a multipart body without their raw
 // bytes: tar and gzip bytes legitimately differ between implementations, so a
@@ -86,14 +90,18 @@ func tarEntryText(h *tar.Header) string {
 	case tar.TypeDir:
 		kind = kindDir
 	case tar.TypeSymlink:
-		kind = "symlink"
+		kind = kindSymlink
 	case tar.TypeLink:
-		kind = "hardlink"
+		kind = kindHardlink
 	case tar.TypeFifo:
 		kind = kindFifo
 	}
-	text := fmt.Sprintf("%s %04o %d %s", kind, h.Mode&0o7777, h.Size, h.Name)
-	if kind == "symlink" || kind == "hardlink" {
+	mode := fmt.Sprintf("%04o", h.Mode&0o7777)
+	if kind == kindSymlink {
+		mode = "----" // the mode of a link is 0755 on one system and 0777 on another
+	}
+	text := fmt.Sprintf("%s %s %d %s", kind, mode, h.Size, h.Name)
+	if kind == kindSymlink || kind == kindHardlink {
 		text += " -> " + h.Linkname
 	}
 	return text

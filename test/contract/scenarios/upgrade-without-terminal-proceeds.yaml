@@ -1,0 +1,8 @@
+description: "without a terminal upgrade does not ask and proceeds"
+args: [upgrade]
+exe: copy
+requires-hotfix: true
+fixtures:
+  release: {tag: v9.9.9}
+expect-reads: []
+scrape: [version-line, upgrade-success]

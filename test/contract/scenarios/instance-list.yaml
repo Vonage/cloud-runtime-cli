@@ -1,0 +1,6 @@
+description: "instances are listed as a table, newest first"
+args: [instance, list]
+expect-reads:
+  - "euw1 GET /instances"
+  - "euw1 GET /regions/aws.euw1"
+scrape: [table-lines]

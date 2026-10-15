@@ -1,0 +1,6 @@
+description: "a --path without a vcr binary in it is reported"
+args: [upgrade, --force, --path, "${OUTSIDE}"]
+fixtures:
+  release: {tag: v9.9.9}
+expect-reads: []
+scrape: [version-line]

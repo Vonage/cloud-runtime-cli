@@ -3,6 +3,7 @@
 package contract
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -157,15 +158,21 @@ func (d *driver) send(text string) error {
 	return err
 }
 
+// signal interrupts the process group. A process that has already ended on its
+// own has nothing left to interrupt, which is no error: two builds may end a
+// session differently, one by itself and one only when it is interrupted.
 func (d *driver) signal(name string) error {
 	if d.p.exited() {
-		return errAlreadyExited
+		return nil
 	}
 	sig := syscall.SIGINT
 	if name == "SIGTERM" {
 		sig = syscall.SIGTERM
 	}
-	return d.p.signalGroup(sig)
+	if err := d.p.signalGroup(sig); err != nil && !errors.Is(err, syscall.ESRCH) {
+		return err
+	}
+	return nil
 }
 
 func (d *driver) waitExit(limit time.Duration) error {

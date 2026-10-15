@@ -1,0 +1,4 @@
+description: "--yes skips the confirmation"
+args: [app, create, --name, my-new-app, --yes]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

@@ -1,0 +1,11 @@
+description: "a configured endpoint that is neither the gateway nor the production form"
+args: [app, list]
+config-file: |
+  graphql_endpoint = ${FAKE}/graphql
+  default_region   = aws.euw1
+
+  [credentials]
+  api_key    = abc123
+  api_secret = s3cret-for-tests
+expect-reads: []
+scrape-except: [table-lines]

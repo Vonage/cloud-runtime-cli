@@ -1,0 +1,27 @@
+description: "an upload answered with 502 twice and then accepted"
+args: [deploy]
+cwd: work/project
+files:
+  - path: work/project/vcr.yml
+    content: |
+      project:
+        name: my-project
+      instance:
+        name: dev
+        runtime: nodejs18
+        region: aws.euw1
+        application-id: 00000000-0000-4000-8000-000000000601
+        entrypoint: [node, index.js]
+  - path: work/project/index.js
+    content: |
+      console.log('hello');
+  - path: work/project/package.json
+    content: |
+      {"name": "my-project", "version": "1.0.0"}
+fixtures:
+  overrides:
+    - {match: "POST /packages/source", skip: 0, times: 2, status: 502, body: '{"error":{"code":9001,"message":"upstream unavailable","traceId":"trace-502"}}'}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /projects/my-project"
+scrape-except: [deployed-banner, deployed-instance-id, deployed-service-name, deployed-host-address]

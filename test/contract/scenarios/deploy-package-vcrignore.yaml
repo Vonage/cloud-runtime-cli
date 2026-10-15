@@ -1,0 +1,59 @@
+description: "a .vcrignore keeps matching files out of the upload"
+args: [deploy]
+cwd: work/project
+files:
+  - path: work/project/vcr.yml
+    content: |
+      project:
+        name: my-project
+      instance:
+        name: dev
+        runtime: nodejs18
+        region: aws.euw1
+        application-id: 00000000-0000-4000-8000-000000000601
+        entrypoint: [node, index.js]
+  - path: work/project/index.js
+    content: |
+      console.log('hello');
+  - path: work/project/package.json
+    content: |
+      {"name": "my-project", "version": "1.0.0"}
+  - path: work/project/keep.txt
+    content: |
+      x
+  - path: work/project/debug.log
+    content: |
+      x
+  - path: work/project/sub/nested.log
+    content: |
+      x
+  - path: work/project/root-only.txt
+    content: |
+      x
+  - path: work/project/sub/root-only.txt
+    content: |
+      x
+  - path: work/project/build/out.txt
+    content: |
+      x
+  - path: work/project/src/build/gen.txt
+    content: |
+      x
+  - path: "work/project/#literal"
+    content: |
+      x
+  - path: work/project/main.js
+    content: |
+      x
+  - path: work/project/.vcrignore
+    content: |
+      # a comment
+
+      *.log
+      /root-only.txt
+      build/
+      \#literal
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /projects/my-project"
+scrape: [deployed-banner, deployed-instance-id, deployed-service-name, deployed-host-address]

@@ -1,0 +1,6 @@
+description: "the filter ignores case"
+args: [instance, list, -f, DEV]
+expect-reads:
+  - "euw1 GET /instances?filter=DEV"
+  - "euw1 GET /regions/aws.euw1"
+scrape: [table-lines]

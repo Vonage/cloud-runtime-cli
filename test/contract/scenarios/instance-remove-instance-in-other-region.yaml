@@ -1,0 +1,6 @@
+description: "an instance of another region is removed through its own region"
+args: [instance, remove, --id, 00000000-0000-4000-8000-000000000503, --yes]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /instances/00000000-0000-4000-8000-000000000503"
+  - "euw1 GET /regions/aws.use1"

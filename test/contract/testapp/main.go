@@ -43,7 +43,7 @@ func run() int {
 		fmt.Fprintln(os.Stderr, "testapp:", err)
 		return 1
 	}
-	srv := &http.Server{Handler: routes(), ReadHeaderTimeout: 10 * time.Second}
+	srv := &http.Server{Handler: withoutDate(routes()), ReadHeaderTimeout: 10 * time.Second}
 	errs := make(chan error, 1)
 	go func() { errs <- srv.Serve(ln) }()
 
@@ -84,6 +84,15 @@ func envNames() []string {
 	}
 	sort.Strings(names)
 	return names
+}
+
+// withoutDate drops the Date header that net/http adds to every response, so
+// that the responses, and what vcr prints about them, are the same on every run.
+func withoutDate(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header()["Date"] = nil
+		next.ServeHTTP(w, r)
+	})
 }
 
 func routes() http.Handler {

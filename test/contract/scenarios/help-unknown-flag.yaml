@@ -1,0 +1,4 @@
+description: "an unknown flag is a usage error"
+group: app
+args: [app, list, --nope]
+expect-reads: []

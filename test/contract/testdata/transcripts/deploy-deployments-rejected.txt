@@ -1,0 +1,92 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 1
+@@ stdout 656
+✓ Project "my-project" retrieved: project_id="<uuid>"
+✓ Deployment parameters validated
+✓ Source code uploaded.
+✓ Package created: package_id="<uuid>"
+ℹ Waiting for build to start...
+Starting build
+Step 1/2 : install dependencies
+\x1b[35mℹ\x1b[0m Status - completed
+✓ Package "<uuid>" built successfully
+────────────────────────────────────────────────────────
+────────────────────────────────────────────────────────
+
+@@ stderr 237
+X Error Encountered: failed to deploy instance
+
+ℹ Details:
+  - HTTP Status : 422
+  - Message     : deployment is not allowed
+  - Trace ID    : fake-trace-id
+
+Please refer to the documentation or contact support for further assistance.
+
+@@ files 0
+
+@@ requests 2556
+euw1 POST graphql:Region
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($alias: String!) {\\n  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {\\n    name\\n    alias\\n\\tdeployment_api_url\\n\\tmarketplace_api_url\\n\\tassets_api_url\\n\\tendpoint_url_scheme\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":{"alias":"aws.euw1"}}
+
+euw1 POST graphql:Region
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($alias: String!) {\\n  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {\\n    name\\n    alias\\n\\tdeployment_api_url\\n\\tmarketplace_api_url\\n\\tassets_api_url\\n\\tendpoint_url_scheme\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":{"alias":"aws.euw1"}}
+
+euw1 POST graphql:Project
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($api_account_id: String!, $name: String!) {\\n  Projects(where: {api_account_id: {_eq: $api_account_id}, _and: {name: {_eq: $name}, _and: {deleted: {_eq: false}}}}) {\\n    id\\n    name\\n    api_account_id\\n    created_at\\n    updated_at\\n  }\\n}","variables":{"api_account_id":"abc123","name":"my-project"}}
+
+euw1 POST /deployments/validate
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"apiApplicationId":"00000000-0000-4000-8000-000000000601","environment":null,"instanceName":"dev","maxScale":0,"minScale":0,"projectId":"<uuid>","region":"aws.euw1"}
+
+euw1 POST /packages/source
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: multipart/form-data
+  part: name=tgz-code filename=tgz-code.tar.gz
+  tar: 3 entries
+    file 0644 22 index.js
+    file 0644 43 package.json
+    file 0644 175 vcr.yml
+
+euw1 POST /packages
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"buildScriptPath":"","capabilities":{},"entrypoint":["node","index.js"],"runtime":"nodejs18","sourceCodeKey":"source-key-0001"}
+
+euw1 WS /packages/<uuid>/build/watch
+  auth: basic abc123
+  acct: abc123
+  trace: no
+
+euw1 POST /deployments
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"apiApplicationId":"00000000-0000-4000-8000-000000000601","domains":null,"environment":null,"instanceName":"dev","maxScale":0,"minScale":0,"packageId":"<uuid>","projectId":"<uuid>","region":"aws.euw1"}
+
+gh GET /releases/latest
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+

@@ -1,0 +1,4 @@
+description: "the help page of vcr instance log"
+group: instance
+args: [instance, log, --help]
+expect-reads: []

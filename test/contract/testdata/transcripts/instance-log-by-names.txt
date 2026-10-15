@@ -1,0 +1,41 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 0
+@@ stdout 247
+2026-10-14T10:00:01Z [application] starting
+2026-10-14T10:00:02Z [application] listening on 3000
+2026-10-14T10:00:03Z [application] slow request
+2026-10-14T10:00:04Z [provider] provider call failed
+2026-10-14T10:00:05Z [application] shutting down
+
+@@ stderr 0
+
+@@ files 0
+
+@@ requests 1429
+euw1 POST graphql:Region
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($alias: String!) {\\n  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {\\n    name\\n    alias\\n\\tdeployment_api_url\\n\\tmarketplace_api_url\\n\\tassets_api_url\\n\\tendpoint_url_scheme\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":{"alias":"aws.euw1"}}
+
+euw1 POST graphql:InstanceByNames
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($project_name: String!, $instance_name: String!) {\\n  Instances(where: {Project: {name: {_eq: $project_name}}, _and: {name: {_eq: $instance_name}}, deleted: {_eq: false}}) {\\n    id\\n    service_name\\n  }\\n}","variables":{"instance_name":"dev","project_name":"my-project"}}
+
+euw1 POST graphql:Logs
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($instance_id: String!, $limit: Int!, $timestamp: Time!) {\\n  Logs(where: {instance_id: {_eq: $instance_id}, timestamp: {_gt: $timestamp}}, order_by: {timestamp: desc}, limit: $limit) {\\n    log_level\\n    source_type\\n    message\\n    timestamp\\n  }\\n}","variables":{"instance_id":"00000000-0000-4000-8000-000000000501","limit":300,"timestamp":"<time>"}}
+
+gh GET /releases/latest
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+

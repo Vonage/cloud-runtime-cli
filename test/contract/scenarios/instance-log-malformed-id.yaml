@@ -1,0 +1,5 @@
+description: "an id that is not a uuid is reported as not found"
+args: [instance, log, --id, not-a-uuid]
+expect-reads:
+  - "euw1 GET /instances/not-a-uuid"
+  - "euw1 GET /regions/aws.euw1"
