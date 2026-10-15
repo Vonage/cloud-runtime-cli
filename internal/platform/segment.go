@@ -68,13 +68,18 @@ func checkServiceName(v string) error {
 }
 
 func invalidServerValue(field, v string) error {
-	shown := strings.Map(func(r rune) rune {
+	return fmt.Errorf("the platform returned an invalid %s: %s", field, cutAtRune(dropControls(v), maxServerIDBytes))
+}
+
+// dropControls removes the control characters of a value the platform sent, so that an error never carries
+// an escape sequence to the terminal.
+func dropControls(v string) string {
+	return strings.Map(func(r rune) rune {
 		if unicode.IsControl(r) {
 			return -1
 		}
 		return r
 	}, v)
-	return fmt.Errorf("the platform returned an invalid %s: %s", field, cutAtRune(shown, maxServerIDBytes))
 }
 
 // cutAtRune returns s cut to at most n bytes without splitting a UTF-8 sequence.
