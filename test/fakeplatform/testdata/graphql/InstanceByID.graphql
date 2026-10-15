@@ -1,0 +1,7 @@
+
+query myQuery ($id: uuid!) {
+  Instances_by_pk(id: $id) {
+    id
+    service_name
+  }
+}

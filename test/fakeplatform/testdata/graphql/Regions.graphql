@@ -1,0 +1,11 @@
+
+query MyQuery {
+  Regions(where: {enabled: {_eq: true}}) {
+ 	name    
+	alias
+	deployment_api_url
+	assets_api_url
+	debugger_url_scheme
+	host_template
+  }
+}

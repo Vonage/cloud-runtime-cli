@@ -1,0 +1,9 @@
+
+query MyQuery {
+  Instances(order_by: {updated_at: desc}, where: {deleted: {_eq: false}}) {
+    id
+    api_application_id
+    name
+    service_name
+  }
+}

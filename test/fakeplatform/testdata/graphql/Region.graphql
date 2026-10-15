@@ -1,0 +1,13 @@
+
+query MyQuery ($alias: String!) {
+  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {
+    name
+    alias
+	deployment_api_url
+	marketplace_api_url
+	assets_api_url
+	endpoint_url_scheme
+	debugger_url_scheme
+	host_template
+  }
+}
