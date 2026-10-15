@@ -4,39 +4,13 @@ package platform
 
 import (
 	"context"
-	"errors"
-	"io"
 	"net/http"
 	"net/url"
 
 	"github.com/gorilla/websocket"
 
-	"vonage-cloud-runtime-cli/internal/clock"
 	"vonage-cloud-runtime-cli/internal/manifest"
 )
-
-// ErrNotFound is returned (wrapped) when a read route answers 404 with the error envelope.
-var ErrNotFound = errors.New("not found")
-
-// ErrAlreadyExists is returned (wrapped) when CreateSecret is answered 409.
-var ErrAlreadyExists = errors.New("already exists")
-
-// Credentials are sent as HTTP Basic api_key:api_secret plus X-Neru-ApiAccountId: <api_key>,
-// only to platform hosts over https (or loopback under the loopback rule).
-type Credentials struct {
-	APIKey    string
-	APISecret string
-}
-
-// Options configure a Resolver.
-type Options struct {
-	Bootstrap  string // from endpoint.Bootstrap, without the version segment
-	APIVersion string // "v0.3" in releases
-	Creds      Credentials
-	UserAgent  string      // buildinfo.Info.UserAgent()
-	Clock      clock.Clock // retry and reconnect delays
-	Notices    io.Writer   // stderr, for the upload-retry notice
-}
 
 // Resolver reaches the bootstrap deployment-api and builds per-region clients.
 type Resolver struct{}
@@ -61,25 +35,6 @@ func (r *Resolver) Region(ctx context.Context, alias string) (Region, error) {
 func (r *Resolver) Client(ctx context.Context, alias string) (*Client, error) {
 	panic("not implemented: platform.Resolver.Client")
 }
-
-// Region is the region record.
-type Region struct {
-	Name              string `json:"name"`
-	Alias             string `json:"alias"`
-	Default           bool   `json:"default"`
-	DeploymentAPIURL  string `json:"deploymentApiUrl"`
-	AssetsAPIURL      string `json:"assetsApiUrl"`
-	MarketplaceAPIURL string `json:"marketplaceApiUrl"`
-	EndpointURLScheme string `json:"endpointUrlScheme"`
-	DebuggerURLScheme string `json:"debuggerUrlScheme"`
-	HostTemplate      string `json:"hostTemplate"`
-}
-
-// Client calls one region's deployment-api.
-type Client struct{}
-
-// Region returns the record this client was built from.
-func (c *Client) Region() Region { panic("not implemented: platform.Client.Region") }
 
 // --- read routes that replace the GraphQL queries ---
 
