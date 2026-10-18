@@ -232,6 +232,41 @@ func RelaxGitHubCredentials(section string) string {
 	return strings.Join(blocks, "\n")
 }
 
+// RelaxWebsocketTrace removes the trace line from the websocket blocks of a requests section: the build watch and the
+// debug tunnel and proxy are dialled with a fresh trace id now, where the baseline sent none. Every other line of those
+// blocks, and every other block, stays as it is.
+func RelaxWebsocketTrace(section string) string {
+	blocks := splitBlocks(section)
+	for i, block := range blocks {
+		if !isWebsocketBlock(block) {
+			continue
+		}
+		var kept []string
+		for _, line := range strings.SplitAfter(block, "\n") {
+			if !isTraceMarker(line) {
+				kept = append(kept, line)
+			}
+		}
+		blocks[i] = strings.Join(kept, "")
+	}
+	return strings.Join(blocks, "\n")
+}
+
+// isWebsocketBlock reports whether the head of a request block, "<lane> WS <target>", is a websocket handshake.
+func isWebsocketBlock(block string) bool {
+	fields := strings.SplitN(firstLine(block), " ", 3)
+	return len(fields) == 3 && fields[1] == "WS"
+}
+
+// isTraceMarker reports whether a line is the trace line of a request block with one of its two values.
+func isTraceMarker(line string) bool {
+	switch strings.TrimSuffix(line, "\n") {
+	case "  trace: yes", "  trace: no":
+		return true
+	}
+	return false
+}
+
 // describeReads is a one-line form of a list of reads for messages.
 func describeReads(reads []string) string {
 	if len(reads) == 0 {

@@ -8,6 +8,7 @@ import (
 
 	"vonage-cloud-runtime-cli/internal/cli/app"
 	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
+	"vonage-cloud-runtime-cli/internal/cli/deploy"
 	"vonage-cloud-runtime-cli/internal/cli/instance"
 	"vonage-cloud-runtime-cli/internal/cli/secret"
 	"vonage-cloud-runtime-cli/internal/config"
@@ -32,6 +33,7 @@ func NewRoot(env *cmdenv.Env) *cobra.Command {
 func registeredGroups(env *cmdenv.Env) []*cobra.Command {
 	return []*cobra.Command{
 		app.NewCmd(env),
+		deploy.NewCmd(env),
 		instance.NewCmd(env),
 		secret.NewCmd(env),
 	}

@@ -114,7 +114,8 @@ func Check(t testing.TB, c Config, sc Scenario) []Failure {
 		return fail("run", err)
 	}
 	return Compare(sc, base, res, CompareOptions{
-		Allowed: allowed, Scrapes: scrapes, NoGraphQL: c.NoGraphQL, RelaxGitHub: c.NoGraphQL && !fromRelease,
+		Allowed: allowed, Scrapes: scrapes, NoGraphQL: c.NoGraphQL,
+		RelaxGitHub: c.NoGraphQL && !fromRelease, RelaxWebsocketTrace: c.NoGraphQL,
 	})
 }
 

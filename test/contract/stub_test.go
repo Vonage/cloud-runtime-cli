@@ -226,9 +226,17 @@ func stubServe(args []string) int {
 }
 
 // stubTunnel connects a websocket and answers every execute frame with an
-// execute-response; it ends when the tunnel closes.
+// execute-response; it ends when the tunnel closes. A second argument is sent
+// as the trace id of the handshake.
 func stubTunnel(args []string) int {
-	conn, _, err := websocket.DefaultDialer.Dial(args[0], nil)
+	header := http.Header{}
+	if len(args) > 1 {
+		header.Set("X-Neru-TraceId", args[1])
+	}
+	conn, resp, err := websocket.DefaultDialer.Dial(args[0], header)
+	if resp != nil {
+		_ = resp.Body.Close()
+	}
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1

@@ -1,6 +1,7 @@
 # <scenario-glob> <field> <reason>; fields: stdout stderr exit files requests
 completion-bash requests help and completion no longer read the config file or use the network
 completion-bash-no-descriptions requests help and completion no longer read the config file or use the network
+completion-complete-flags requests help and completion no longer read the config file or use the network
 completion-fish requests help and completion no longer read the config file or use the network
 completion-fish-no-descriptions requests help and completion no longer read the config file or use the network
 completion-no-config stdout help and completion no longer read the config file or use the network
@@ -106,3 +107,32 @@ secret-remove-name-with-dotdot stdout names with path separators, percent signs,
 secret-remove-name-with-dotdot stderr names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
 secret-remove-name-with-dotdot exit names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
 secret-remove-name-with-dotdot requests names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+deploy-bad-default-region-with-valid-manifest-region stdout a bad default region no longer blocks deploy when the manifest names a valid region
+deploy-bad-default-region-with-valid-manifest-region stderr a bad default region no longer blocks deploy when the manifest names a valid region
+deploy-bad-default-region-with-valid-manifest-region exit a bad default region no longer blocks deploy when the manifest names a valid region
+deploy-bad-default-region-with-valid-manifest-region requests a bad default region no longer blocks deploy when the manifest names a valid region
+deploy-build-interrupted stderr --timeout and Ctrl-C end a blocked build watch on time
+deploy-build-interrupted exit --timeout and Ctrl-C end a blocked build watch on time
+deploy-build-timeout stdout --timeout and Ctrl-C end a blocked build watch on time
+deploy-upload-fails-502 stderr uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-fails-502 requests uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-retry-then-succeeds stdout uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-retry-then-succeeds stderr uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-retry-then-succeeds exit uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-retry-then-succeeds requests uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-transport-error-once stdout uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-transport-error-once stderr uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-transport-error-once exit uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-transport-error-once requests uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+security-build-frame-with-status-word-does-not-end-the-watch stdout only the server's exact status frames end a build watch
+security-escape-build-frames stdout remote text is sanitised before it is printed
+security-redirect-upload-307 stdout credentials go only to platform hosts and redirects of POST requests are refused
+security-redirect-upload-307 stderr credentials go only to platform hosts and redirects of POST requests are refused
+security-redirect-upload-307 exit credentials go only to platform hosts and redirects of POST requests are refused
+security-redirect-upload-307 requests credentials go only to platform hosts and redirects of POST requests are refused
+security-upload-env-negation-brings-back-env stderr uploads leave out .git/ and local .env files, with one stderr notice
+security-upload-env-negation-brings-back-env requests uploads leave out .git/ and local .env files, with one stderr notice
+security-upload-git-negation-brings-back-git stderr uploads leave out .git/ and local .env files, with one stderr notice
+security-upload-git-negation-brings-back-git requests uploads leave out .git/ and local .env files, with one stderr notice
+security-upload-skips-git-and-env-files stderr uploads leave out .git/ and local .env files, with one stderr notice
+security-upload-skips-git-and-env-files requests uploads leave out .git/ and local .env files, with one stderr notice

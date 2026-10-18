@@ -23,6 +23,10 @@ type CompareOptions struct {
 	Scrapes     []Scraped
 	NoGraphQL   bool // the binary is the one under test
 	RelaxGitHub bool // the transcript was recorded from a commit: ignore the credential lines of gh blocks
+
+	// RelaxWebsocketTrace is set for the binary under test: ignore the trace marker of websocket blocks, which the
+	// baseline never sent.
+	RelaxWebsocketTrace bool
 }
 
 // errorCollector lets testify's assert.Equal produce the diff as text.
@@ -100,6 +104,9 @@ func (c *comparison) requests(base Transcript, got Result) {
 	want, have := base.Requests, got.Requests
 	if c.o.RelaxGitHub {
 		want, have = RelaxGitHubCredentials(want), RelaxGitHubCredentials(have)
+	}
+	if c.o.RelaxWebsocketTrace {
+		want, have = RelaxWebsocketTrace(want), RelaxWebsocketTrace(have)
 	}
 	wf, hf := FilterReads(want), FilterReads(have)
 	c.diff("requests", wf.Kept, hf.Kept)
