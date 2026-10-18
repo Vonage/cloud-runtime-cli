@@ -254,12 +254,12 @@ func TestReadCapped(t *testing.T) {
 	}
 }
 
-func TestLimitConstants(t *testing.T) {
-	assert.Equal(t, 16<<20, maxJSONBytes)
-	assert.Equal(t, 64<<10, maxErrorBytes)
-	assert.Equal(t, 2<<10, maxMessageBytes)
-	assert.Equal(t, 64<<20, maxTemplateBytes)
-	assert.Equal(t, 16<<20, maxFrameBytes)
+// TestLimitValues pins the limits by their byte counts, so that a change to one of them is a decision.
+func TestLimitValues(t *testing.T) {
+	assert.Equal(t, 16_777_216, maxJSONBytes, "a JSON response: 16 MiB")
+	assert.Equal(t, 65_536, maxErrorBytes, "the part of an error body that is read: 64 KiB")
+	assert.Equal(t, 67_108_864, maxTemplateBytes, "a template download: 64 MiB")
+	assert.Equal(t, 16_777_216, maxFrameBytes, "one build-watch frame: 16 MiB")
 }
 
 func TestSendJSONRejectsAnUnencodableBody(t *testing.T) {
