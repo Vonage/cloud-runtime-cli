@@ -3,6 +3,5 @@ args: [--config-file, "${HOME}/broken.ini", app, list]
 files:
   - path: home/broken.ini
     link: nowhere.ini
-expect-reads:
-  - "euw1 GET /regions/aws.euw1"
+expect-reads: []
 scrape-except: [config-not-found-notice, table-lines]

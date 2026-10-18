@@ -1,6 +1,5 @@
 description: "a missing explicit config file falls back to the default one with a notice"
 args: [--config-file, "${HOME}/missing.ini", app, list]
-expect-reads:
-  - "euw1 GET /regions/aws.euw1"
+expect-reads: []
 scrape: [config-not-found-notice]
 scrape-except: [config-not-found-notice, table-lines]

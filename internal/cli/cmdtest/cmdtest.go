@@ -1,0 +1,261 @@
+// Package cmdtest is the test support of the command packages. It builds the cmdenv.Env that cli.Run's pre-run
+// would leave for a full command, over the fake platform, and runs a command constructor the way cli.Run does.
+// Only _test.go files import it.
+package cmdtest
+
+import (
+	"bytes"
+	"context"
+	"testing"
+	"time"
+
+	"github.com/spf13/cobra"
+
+	"vonage-cloud-runtime-cli/internal/buildinfo"
+	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
+	"vonage-cloud-runtime-cli/internal/clock/clocktest"
+	"vonage-cloud-runtime-cli/internal/config"
+	"vonage-cloud-runtime-cli/internal/platform"
+	"vonage-cloud-runtime-cli/internal/term"
+	"vonage-cloud-runtime-cli/test/fakeplatform"
+)
+
+const (
+	defaultRegion  = "aws.euw1"
+	bootstrapSlug  = "euw1" // the region of the fake whose deployment API URL the resolver starts from
+	testVersion    = "v2.7.0-test"
+	testAPIVersion = "v0.3"
+	testUserAgent  = "vcr-cli/test"
+	defaultTimeout = 10 * time.Minute
+)
+
+// startTime is where the fake clock of every harness starts.
+var startTime = time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC)
+
+// Options shape the environment New builds. The zero value is a non-terminal run against the default region with
+// the account of the fake platform.
+type Options struct {
+	Stdin string // what the command can read from stdin
+	TTY   bool   // stdin, stdout and stderr are terminals
+	// Region is the region alias of Env.Settings and Env.Client; the default is aws.euw1.
+	Region string
+	// Prompt answers the questions a command asks. A *Script is handed the test; the default is a Script with no
+	// answers, so any question fails the test.
+	Prompt term.Prompter
+	// RealPrompter makes the prompter the one of Env.IO, which reads Stdin; for tests of the end-of-input case.
+	RealPrompter bool
+	// Flags are the global flags. A zero APIKey and APISecret become the account of the fake platform, a zero
+	// Timeout ten minutes.
+	Flags config.Flags
+	// NoPlatform leaves Env.Resolver and Env.Client nil and sets Flags.DeploymentAPIURL instead, for commands that
+	// build their own platform access.
+	NoPlatform bool
+	// NoCredentials leaves the flags and Env.Settings without credentials. It needs NoPlatform, because the fake
+	// rejects an unauthenticated region lookup.
+	NoCredentials bool
+}
+
+// Harness is the environment of one test run and the buffers and fake behind it.
+type Harness struct {
+	Env    *cmdenv.Env
+	Stdout *bytes.Buffer
+	Stderr *bytes.Buffer
+	Clock  *clocktest.Fake
+	Server *fakeplatform.Server
+}
+
+// New builds the environment of a command run over srv. Unless o.NoPlatform it resolves the region the way the
+// root's pre-run does for a full command, then clears the request log of srv, so Requests shows only what happens
+// after New. Setup that cannot work fails t.
+func New(t testing.TB, srv *fakeplatform.Server, o Options) *Harness {
+	t.Helper()
+	if o.NoCredentials && !o.NoPlatform {
+		t.Fatalf("cmdtest: NoCredentials needs NoPlatform, because the fake rejects an unauthenticated region lookup")
+		return nil
+	}
+	streams, stdout, stderr := term.Test(o.Stdin, o.TTY)
+	clk := clocktest.New(startTime)
+	flags := flagsFor(srv, o)
+	region := o.Region
+	if region == "" {
+		region = defaultRegion
+	}
+	h := &Harness{
+		Env: &cmdenv.Env{
+			IO:       streams,
+			Prompt:   prompterFor(t, streams, o),
+			Clock:    clk,
+			Build:    buildinfo.Info{Version: testVersion, APIVersion: testAPIVersion, ReleaseURL: srv.GitHubURL()},
+			Flags:    &flags,
+			Settings: settingsFor(flags, region, o.NoCredentials),
+		},
+		Stdout: stdout,
+		Stderr: stderr,
+		Clock:  clk,
+		Server: srv,
+	}
+	if !o.NoPlatform {
+		connect(t, h, region)
+	}
+	srv.Reset()
+	return h
+}
+
+func flagsFor(srv *fakeplatform.Server, o Options) config.Flags {
+	f := o.Flags
+	if !o.NoCredentials {
+		if f.APIKey == "" {
+			f.APIKey = srv.Expand("${ACCOUNT}")
+		}
+		if f.APISecret == "" {
+			f.APISecret = srv.Expand("${SECRET}")
+		}
+	}
+	if f.Timeout == 0 {
+		f.Timeout = defaultTimeout
+	}
+	if o.NoPlatform && f.DeploymentAPIURL == "" {
+		f.DeploymentAPIURL = srv.DeploymentAPIURL(bootstrapSlug)
+	}
+	return f
+}
+
+func settingsFor(f config.Flags, region string, noCredentials bool) config.Settings {
+	if noCredentials {
+		return config.Settings{Region: region}
+	}
+	return config.Settings{APIKey: f.APIKey, APISecret: f.APISecret, Region: region}
+}
+
+func prompterFor(t testing.TB, streams *term.IO, o Options) term.Prompter {
+	if o.RealPrompter {
+		return streams.Prompter()
+	}
+	if script, ok := o.Prompt.(*Script); ok {
+		script.bind(t)
+		return script
+	}
+	if o.Prompt != nil {
+		return o.Prompt
+	}
+	script := &Script{}
+	script.bind(t)
+	return script
+}
+
+// connect gives h.Env the resolver and the client of region, as the pre-run of a full command does.
+func connect(t testing.TB, h *Harness, region string) {
+	t.Helper()
+	env := h.Env
+	resolver, err := platform.NewResolver(platform.Options{
+		Bootstrap:  h.Server.DeploymentAPIURL(bootstrapSlug),
+		APIVersion: testAPIVersion,
+		Creds:      platform.Credentials{APIKey: env.Settings.APIKey, APISecret: env.Settings.APISecret},
+		UserAgent:  testUserAgent,
+		Clock:      h.Clock,
+		Notices:    h.Stderr,
+	})
+	if err != nil {
+		t.Fatalf("cmdtest: cannot build the resolver: %v", err)
+		return
+	}
+	env.Resolver = resolver
+	client, err := env.RegionClient(t.Context(), region)
+	if err != nil {
+		t.Fatalf("cmdtest: cannot resolve the region %q on the fake platform: %v", region, err)
+		return
+	}
+	env.Client = client
+}
+
+// Run builds the command with newCmd(h.Env), runs it with args under ctx and returns its error as the command
+// returned it, nothing rendered. Like cli.Run it keeps the signal context of ctx apart (or makes ctx the signal
+// context when it has none) and gives the command the --timeout deadline of Env.Flags.
+func (h *Harness) Run(ctx context.Context, newCmd func(*cmdenv.Env) *cobra.Command, args ...string) error {
+	if cmdenv.SignalContext(ctx) == ctx {
+		ctx = cmdenv.WithSignalContext(ctx, ctx)
+	}
+	ctx, cancel := context.WithTimeout(ctx, h.Env.Flags.Timeout)
+	defer cancel()
+
+	cmd := newCmd(h.Env)
+	if args == nil {
+		args = []string{} // cobra reads os.Args when it is given nil
+	}
+	cmd.SetArgs(args)
+	cmd.SetOut(h.Env.IO.Out)
+	cmd.SetErr(h.Env.IO.ErrOut)
+	cmd.SilenceErrors = true
+	cmd.SilenceUsage = true
+	return cmd.ExecuteContext(ctx)
+}
+
+// Requests are the requests the fake platform has received since New, or since the last call of AppID or
+// InstanceID.
+func (h *Harness) Requests() []fakeplatform.Request { return h.Server.Requests() }
+
+// Calls renders requests as "<Region> <Method> <Rel>[?<RawQuery>]", the notation of a scenario's expect-reads.
+func Calls(reqs []fakeplatform.Request) []string {
+	calls := make([]string, 0, len(reqs))
+	for _, r := range reqs {
+		call := r.Region + " " + r.Method + " " + r.Rel
+		if r.RawQuery != "" {
+			call += "?" + r.RawQuery
+		}
+		calls = append(calls, call)
+	}
+	return calls
+}
+
+// AppID is the id the fake platform lists for the application called name. Call it before Run: it asks the fake
+// through Env.Client and then clears the request log.
+func (h *Harness) AppID(t testing.TB, name string) string {
+	t.Helper()
+	if !h.hasClient(t) {
+		return ""
+	}
+	defer h.Server.Reset()
+	apps, err := h.Env.Client.ListApplications(t.Context(), "")
+	if err != nil {
+		t.Fatalf("cmdtest: cannot list the applications of the fake platform: %v", err)
+		return ""
+	}
+	for _, a := range apps {
+		if a.Name == name {
+			return a.ID
+		}
+	}
+	t.Fatalf("cmdtest: the fake platform has no application named %q", name)
+	return ""
+}
+
+// InstanceID is the id the fake platform lists for the instance called name. Call it before Run: it asks the fake
+// through Env.Client and then clears the request log.
+func (h *Harness) InstanceID(t testing.TB, name string) string {
+	t.Helper()
+	if !h.hasClient(t) {
+		return ""
+	}
+	defer h.Server.Reset()
+	instances, err := h.Env.Client.ListInstances(t.Context(), "")
+	if err != nil {
+		t.Fatalf("cmdtest: cannot list the instances of the fake platform: %v", err)
+		return ""
+	}
+	for _, in := range instances {
+		if in.Name == name {
+			return in.ID
+		}
+	}
+	t.Fatalf("cmdtest: the fake platform has no instance named %q", name)
+	return ""
+}
+
+func (h *Harness) hasClient(t testing.TB) bool {
+	t.Helper()
+	if h.Env.Client == nil {
+		t.Fatalf("cmdtest: the id helpers need a harness with a platform client")
+		return false
+	}
+	return true
+}

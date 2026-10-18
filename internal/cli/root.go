@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"vonage-cloud-runtime-cli/internal/cli/app"
 	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
 	"vonage-cloud-runtime-cli/internal/config"
 )
@@ -26,7 +27,11 @@ func NewRoot(env *cmdenv.Env) *cobra.Command {
 
 // registeredGroups returns the command groups that have a real implementation; each command group adds its
 // NewCmd(env) here. A top-level name that none of them claims gets a stand-in from pending.go.
-func registeredGroups(_ *cmdenv.Env) []*cobra.Command { return nil }
+func registeredGroups(env *cmdenv.Env) []*cobra.Command {
+	return []*cobra.Command{
+		app.NewCmd(env),
+	}
+}
 
 // buildRoot returns the root command with groups under it, a stand-in for every top-level group that groups lacks,
 // and cobra's help command. cobra adds the completion command itself when the tree runs. The root owns the only
