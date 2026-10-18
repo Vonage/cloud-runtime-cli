@@ -1,1 +1,12 @@
 # <scenario-glob> <field> <reason>; fields: stdout stderr exit files requests
+completion-bash requests help and completion no longer read the config file or use the network
+completion-bash-no-descriptions requests help and completion no longer read the config file or use the network
+completion-fish requests help and completion no longer read the config file or use the network
+completion-fish-no-descriptions requests help and completion no longer read the config file or use the network
+completion-no-config stdout help and completion no longer read the config file or use the network
+completion-no-config stderr help and completion no longer read the config file or use the network
+completion-no-config exit help and completion no longer read the config file or use the network
+completion-powershell requests help and completion no longer read the config file or use the network
+completion-powershell-no-descriptions requests help and completion no longer read the config file or use the network
+completion-zsh requests help and completion no longer read the config file or use the network
+completion-zsh-no-descriptions requests help and completion no longer read the config file or use the network

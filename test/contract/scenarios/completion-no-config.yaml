@@ -1,3 +1,4 @@
 description: "the completion script is printed without a configuration file"
 args: [completion, bash]
 config: none
+scrape-except: [config-not-found-notice]
