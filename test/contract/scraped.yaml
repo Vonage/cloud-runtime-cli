@@ -1,8 +1,9 @@
 # Strings that other tools read from the output of vcr. Every pattern applies
 # to every scenario: the lines it matches in the recorded output must equal, in
 # order, the lines it matches in the output under test (an allowed diff never
-# excuses this). A scenario whose point is sanitised text lists the names it is
-# exempt from under scrape-except.
+# excuses this). A scenario whose point is sanitised text, or whose scraped lines
+# disappear because of an allowed difference, lists the names it is exempt from
+# under scrape-except.
 #
 # name:    how scenarios refer to the entry
 # stream:  stdout (the default), stderr or any (stdout lines, then stderr lines)

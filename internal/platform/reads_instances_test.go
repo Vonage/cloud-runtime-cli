@@ -2,6 +2,7 @@ package platform
 
 import (
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,6 +15,25 @@ const instanceBody = `{"id":"i-1","name":"dev","serviceName":"my-project-dev","a
 
 var wantInstance = Instance{
 	ID: "i-1", Name: "dev", ServiceName: "my-project-dev", APIApplicationID: "app-1", ProjectID: "proj-1", RegionAlias: "aws.euw1",
+}
+
+// badServiceName is a service name that a single-instance answer must not carry, as the JSON string it is sent in.
+type badServiceName struct{ label, json string }
+
+func badServiceNames() []badServiceName {
+	return []badServiceName{
+		{"a traversal", `../x`},
+		{"a dot", `a.b`},
+		{"a leading hyphen", `-a`},
+		{"an empty name", ``},
+		{"a name over 63 characters", strings.Repeat("a", 64)},
+		{"a control sequence", `a\u001b[31mb`},
+	}
+}
+
+func instanceWithServiceName(serviceName string) string {
+	return `{"id":"i-1","name":"dev","serviceName":"` + serviceName +
+		`","apiApplicationId":"app-1","projectId":"proj-1","regionAlias":"aws.euw1"}`
 }
 
 func TestGetInstance(t *testing.T) {
@@ -55,6 +75,20 @@ func TestGetInstance(t *testing.T) {
 
 		require.EqualError(t, err, "the platform returned an invalid instance id: ../x")
 		assert.Equal(t, Instance{}, got)
+	})
+
+	t.Run("a service name from the server that is not a name fails the call", func(t *testing.T) {
+		for _, name := range badServiceNames() {
+			srv := startPlain(t, newRecorder(answerJSON(http.StatusOK, instanceWithServiceName(name.json))))
+			c, _, _ := newTestClient(t, srv)
+
+			got, err := c.GetInstance(t.Context(), "i-1")
+
+			require.Error(t, err, name.label)
+			assert.Contains(t, err.Error(), "the platform returned an invalid service name", name.label)
+			assert.NotContains(t, err.Error(), "\x1b", name.label)
+			assert.Equal(t, Instance{}, got, name.label)
+		}
 	})
 
 	t.Run("a 404 envelope is not found", func(t *testing.T) {
@@ -115,6 +149,18 @@ func TestGetInstanceByName(t *testing.T) {
 		_, err := c.GetInstanceByName(t.Context(), "p", "n")
 
 		require.EqualError(t, err, "the platform returned an invalid instance id: a b")
+	})
+
+	t.Run("a service name from the server that is not a name fails the call", func(t *testing.T) {
+		for _, name := range badServiceNames() {
+			srv := startPlain(t, newRecorder(answerJSON(http.StatusOK, instanceWithServiceName(name.json))))
+			c, _, _ := newTestClient(t, srv)
+
+			_, err := c.GetInstanceByName(t.Context(), "p", "n")
+
+			require.Error(t, err, name.label)
+			assert.Contains(t, err.Error(), "the platform returned an invalid service name", name.label)
+		}
 	})
 
 	t.Run("a 404 envelope is not found", func(t *testing.T) {

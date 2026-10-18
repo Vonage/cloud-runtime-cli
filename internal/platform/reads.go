@@ -153,13 +153,17 @@ const (
 	fieldTemplateVersionID = "template version id"
 )
 
-// readInstance is a GET of one instance, whose id is checked before it is returned.
+// readInstance is a GET of one instance, whose id and service name are checked before it is returned. A single
+// instance is what commands act on; the rows of a list are only shown, so ListInstances checks the ids alone.
 func (c *Client) readInstance(ctx context.Context, rt readRoute, u *url.URL) (Instance, error) {
 	var out Instance
 	if err := c.core.read(ctx, rt, u, &out); err != nil {
 		return Instance{}, err
 	}
 	if err := checkServerID(fieldInstanceID, out.ID); err != nil {
+		return Instance{}, err
+	}
+	if err := checkServiceName(out.ServiceName); err != nil {
 		return Instance{}, err
 	}
 	return out, nil

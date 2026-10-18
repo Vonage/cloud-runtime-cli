@@ -40,6 +40,16 @@ app-generate-keys-id-dotdot stdout ids with path separators, percent signs, dot 
 app-generate-keys-id-dotdot stderr ids with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
 app-generate-keys-id-dotdot requests ids with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
 security-id-with-control-character stderr ids with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+instance-remove-instance-in-other-region stdout instance remove goes to the region the instance runs in
+instance-remove-instance-in-other-region stderr instance remove goes to the region the instance runs in
+instance-remove-instance-in-other-region exit instance remove goes to the region the instance runs in
+instance-remove-instance-in-other-region requests instance remove goes to the region the instance runs in
+security-escape-instance-list stdout terminal control sequences in platform-supplied names are removed
+security-instance-names-with-slash stderr ids and names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+security-server-service-name-malformed stdout ids and service names returned by the platform with path separators, dot segments, control characters or other unsafe characters are rejected before they are used
+security-server-service-name-malformed stderr ids and service names returned by the platform with path separators, dot segments, control characters or other unsafe characters are rejected before they are used
+security-server-service-name-malformed exit ids and service names returned by the platform with path separators, dot segments, control characters or other unsafe characters are rejected before they are used
+security-server-service-name-malformed requests ids and service names returned by the platform with path separators, dot segments, control characters or other unsafe characters are rejected before they are used
 bootstrap-unmappable-flag-endpoint stdout an unrecognised graphql endpoint is an error because the CLI no longer calls a graphql server
 bootstrap-unmappable-flag-endpoint stderr an unrecognised graphql endpoint is an error because the CLI no longer calls a graphql server
 bootstrap-unmappable-flag-endpoint exit an unrecognised graphql endpoint is an error because the CLI no longer calls a graphql server

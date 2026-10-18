@@ -3,10 +3,12 @@ package cli
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"testing"
 
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -88,6 +90,7 @@ func TestHelpPagesMatchGoldens(t *testing.T) {
 func TestRealTreeHelpPagesMatchGoldens(t *testing.T) {
 	probeEnv, _, _ := newTestEnv()
 	probe := withBuiltins(NewRoot(probeEnv))
+	baseline := nodesByPath(loadContractTree(t))
 
 	for _, file := range goldenHelpFiles(t) {
 		want := parseGolden(t, file)
@@ -95,7 +98,7 @@ func TestRealTreeHelpPagesMatchGoldens(t *testing.T) {
 		path := "vcr " + strings.Join(want.args[:len(want.args)-1], " ")
 		t.Run(strings.TrimSuffix(filepath.Base(file), ".txt"), func(t *testing.T) {
 			cmd := findCommand(probe, strings.TrimSpace(path))
-			if cmd == nil || cmd.Annotations[pendingAnnotation] != "" {
+			if cmd == nil || cmd.Annotations[pendingAnnotation] != "" || lacksChildren(cmd, baseline[strings.TrimSpace(path)]) {
 				if portedAll() {
 					t.Fatalf("%q is not a real command yet", path)
 				}
@@ -110,4 +113,11 @@ func TestRealTreeHelpPagesMatchGoldens(t *testing.T) {
 			assert.Equal(t, want.stderr, stderr.String())
 		})
 	}
+}
+
+// lacksChildren reports whether cmd is a group that is ported in parts: its page lists every subcommand of the
+// baseline, so it can match its golden only once all of them exist.
+func lacksChildren(cmd *cobra.Command, baseline treeNode) bool {
+	have := childNames(cmd)
+	return slices.ContainsFunc(baseline.Children, func(name string) bool { return !slices.Contains(have, name) })
 }
