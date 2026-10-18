@@ -51,6 +51,50 @@ func TestCheckURL(t *testing.T) {
 	}
 }
 
+func TestCheckURLRefusesAUserNameOrPassword(t *testing.T) {
+	const want = "release URL must not contain a user name or password"
+
+	t.Run("in an https URL, in either mode", func(t *testing.T) {
+		for _, raw := range []string{
+			"https://user:hunter2@api.github.com/x",
+			"https://user@api.github.com/x",
+			"https://:hunter2@api.github.com/x",
+			"https://@api.github.com/x",
+		} {
+			for _, loopback := range []bool{false, true} {
+				u, err := url.Parse(raw)
+				require.NoError(t, err)
+
+				err = checkURL(u, loopback)
+
+				require.EqualError(t, err, want, "%s loopback=%t", raw, loopback)
+			}
+		}
+	})
+	t.Run("in a loopback http URL, where the scheme would be allowed", func(t *testing.T) {
+		u, err := url.Parse("http://user:hunter2@127.0.0.1:8080/x")
+		require.NoError(t, err)
+
+		assert.EqualError(t, checkURL(u, true), want)
+	})
+	t.Run("the scheme is judged first, and a password is not repeated", func(t *testing.T) {
+		u, err := url.Parse("http://user:hunter2@127.0.0.1:8080/x")
+		require.NoError(t, err)
+
+		err = checkURL(u, false)
+
+		var refused *insecureURLError
+		require.ErrorAs(t, err, &refused)
+		assert.NotContains(t, err.Error(), "hunter2")
+	})
+	t.Run("an address without credentials is not affected", func(t *testing.T) {
+		u, err := url.Parse("https://api.github.com/user@example/x?next=a:b@c")
+		require.NoError(t, err)
+
+		assert.NoError(t, checkURL(u, false))
+	})
+}
+
 func TestLoopbackModeFollowsTheReleaseURL(t *testing.T) {
 	tests := []struct {
 		releaseURL string

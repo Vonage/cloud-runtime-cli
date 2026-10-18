@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 	"syscall"
 	"time"
@@ -21,6 +22,7 @@ import (
 )
 
 const (
+	headerTraceID     = "X-Neru-Traceid"
 	maxRedirects      = 10
 	maxReleaseBytes   = 16 << 20
 	maxErrorBodyBytes = 64 << 10
@@ -29,6 +31,9 @@ const (
 	ellipsis          = "…"
 	traceUnavailable  = "n/a"
 )
+
+// traceIDPattern is what a trace id read from an answer has to look like to be shown.
+var traceIDPattern = regexp.MustCompile(`^[A-Za-z0-9._-]{1,128}$`)
 
 // Client has its own http.Client, https only (plain http only to a loopback address, and only when ReleaseURL itself is loopback,
 // as in test builds): no Authorization or X-Neru-* header ever, and capped response bodies.
@@ -114,17 +119,30 @@ func newTransport(loopback bool) *http.Transport {
 	return transport
 }
 
-// checkURL applies the URL rule to the release URL and to every redirect target: https always, plain http only to
-// a loopback address and only in loopback mode.
+// checkURL applies the URL rule to the release URL, to the address of every download and to every redirect target:
+// https always, plain http only to a loopback address and only in loopback mode, and never a user name or password,
+// which the HTTP client would send as an Authorization header.
 func checkURL(u *url.URL, loopbackMode bool) error {
+	httpsURL := u.Scheme == "https"
+	loopbackURL := u.Scheme == "http" && loopbackMode && isLoopbackHost(u.Hostname())
 	switch {
-	case u.Scheme == "https":
-		return nil
-	case u.Scheme == "http" && loopbackMode && isLoopbackHost(u.Hostname()):
-		return nil
+	case !httpsURL && !loopbackURL:
+		return &insecureURLError{url: u.Redacted()}
+	case u.User != nil:
+		return errURLUserinfo
 	}
-	return fmt.Errorf("release URL must use https: %s", u.Redacted())
+	return nil
 }
+
+// errURLUserinfo is a URL with a user name or password in it. The text leaves the address out, so no credential is
+// repeated.
+var errURLUserinfo = errors.New("release URL must not contain a user name or password")
+
+// insecureURLError is a URL the client refuses to use. The same value comes back for the release URL, for a download
+// and for a redirect, so a caller can tell this refusal from a transport failure.
+type insecureURLError struct{ url string }
+
+func (e *insecureURLError) Error() string { return "release URL must use https: " + e.url }
 
 func isLoopbackURL(raw string) bool {
 	u, err := url.Parse(raw)
@@ -160,7 +178,7 @@ func loopbackDialer() *net.Dialer {
 func statusError(resp *http.Response) error {
 	// The body only explains the status, so a failed read just leaves less to show.
 	body, _ := io.ReadAll(io.LimitReader(resp.Body, maxErrorBodyBytes))
-	e := &clierr.APIError{HTTPStatus: resp.StatusCode, TraceID: traceUnavailable}
+	e := &clierr.APIError{HTTPStatus: resp.StatusCode, TraceID: traceIDOf(resp.Header)}
 	switch {
 	case json.Unmarshal(body, &struct{}{}) == nil:
 		// GitHub's JSON error has no message the CLI shows.
@@ -170,6 +188,14 @@ func statusError(resp *http.Response) error {
 		e.Message = capMessage(term.Sanitize(strings.TrimSpace(string(body))))
 	}
 	return e
+}
+
+// traceIDOf is the trace id the answer carries when it is well formed, else "n/a": the client sends none of its own.
+func traceIDOf(h http.Header) string {
+	if id := h.Get(headerTraceID); traceIDPattern.MatchString(id) {
+		return id
+	}
+	return traceUnavailable
 }
 
 func isHTML(contentType string) bool {

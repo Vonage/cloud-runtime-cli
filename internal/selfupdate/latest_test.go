@@ -155,6 +155,17 @@ func TestLatestRedirects(t *testing.T) {
 		assert.Len(t, seen(), 1)
 	})
 
+	t.Run("a redirect to an address with a user name and password is refused before any request to it", func(t *testing.T) {
+		second, secondSeen := serve(t, answerRelease)
+		first, firstSeen := serve(t, redirectTo("http://user:hunter2@"+strings.TrimPrefix(second.URL, "http://")+"/moved"))
+
+		_, err := newClient(first.URL + "/repos/o/r").Latest(t.Context())
+
+		require.ErrorIs(t, err, errURLUserinfo)
+		assert.Len(t, firstSeen(), 1)
+		assert.Empty(t, secondSeen(), "no Authorization header can have been sent to a server that was never asked")
+	})
+
 	t.Run("a redirect to plain loopback http is refused when the release URL is not loopback", func(t *testing.T) {
 		calls := 0
 		c := newClient("https://api.example.test/repos/o/r")
@@ -189,6 +200,20 @@ func TestLatestURLRule(t *testing.T) {
 			assert.Zero(t, calls)
 		})
 	}
+
+	t.Run("a user name and password in the release URL are refused before any request", func(t *testing.T) {
+		calls := 0
+		c := newClient("https://user:hunter2@api.example.test/repos/o/r")
+		c.http.Transport = roundTripFunc(func(*http.Request) (*http.Response, error) {
+			calls++
+			return nil, fmt.Errorf("unexpected request")
+		})
+
+		_, err := c.Latest(t.Context())
+
+		require.EqualError(t, err, "release URL must not contain a user name or password")
+		assert.Zero(t, calls)
+	})
 
 	t.Run("a credential in the release URL is not repeated in the error", func(t *testing.T) {
 		_, err := newClient("http://user:hunter2@api.example.test/repos/o/r").Latest(t.Context())

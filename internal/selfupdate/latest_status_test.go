@@ -170,3 +170,38 @@ func TestLatestRejectsAnUnreadableAnswer(t *testing.T) {
 	require.Error(t, err)
 	assert.Zero(t, rel)
 }
+
+func TestLatestErrorShowsTheTraceIDOfTheAnswer(t *testing.T) {
+	tests := []struct {
+		name   string
+		header []string
+		want   string
+	}{
+		{"an id the answer carries", []string{"fake-trace-id"}, "fake-trace-id"},
+		{"an id with every allowed character", []string{"aZ09._-"}, "aZ09._-"},
+		{"no id", nil, "n/a"},
+		{"an empty id", []string{""}, "n/a"},
+		{"an id with a space", []string{"two words"}, "n/a"},
+		{"an id with a slash", []string{"id/with/slashes"}, "n/a"},
+		{"an id with a letter outside ASCII", []string{"caf\u00e9"}, "n/a"},
+		{"an id of 129 characters", []string{strings.Repeat("a", 129)}, "n/a"},
+		{"an id of 128 characters", []string{strings.Repeat("a", 128)}, strings.Repeat("a", 128)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			srv, _ := serve(t, func(w http.ResponseWriter, _ *http.Request) {
+				for _, v := range tt.header {
+					w.Header().Set("X-Neru-TraceId", v)
+				}
+				w.WriteHeader(http.StatusInternalServerError)
+				_, _ = io.WriteString(w, "unavailable")
+			})
+
+			_, err := newClient(srv.URL + "/repos/o/r").Latest(t.Context())
+
+			var apiErr *clierr.APIError
+			require.ErrorAs(t, err, &apiErr)
+			assert.Equal(t, tt.want, apiErr.TraceID)
+		})
+	}
+}
