@@ -4,7 +4,6 @@ package debugsession
 
 import (
 	"context"
-	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -24,24 +23,6 @@ type API interface {
 	DeleteDebugService(ctx context.Context, serviceName string, preserveData bool) error
 	DialWebsocket(ctx context.Context, u *url.URL, header http.Header) (*websocket.Conn, *http.Response, error)
 	Region() platform.Region
-}
-
-// Listeners are the local debugger's sockets on 127.0.0.1:<port> and, when IPv6 is available, [::1]:<port>.
-type Listeners struct {
-	V4 net.Listener
-	V6 net.Listener // nil when IPv6 is unavailable
-}
-
-// Listen binds both listeners. Any IPv4 error is fatal; on IPv6 only "not available" errors are tolerated;
-// EADDRINUSE on either is fatal. Called before the debug service is deployed.
-func Listen(port int) (*Listeners, error) { panic("not implemented: debugsession.Listen") }
-
-func (l *Listeners) Close() error { panic("not implemented: debugsession.Listeners.Close") }
-
-// LocalOnly wraps the debugger handler: 403 unless Host is localhost, 127.0.0.1 or [::1] with the port (bare form
-// when the port is 80), and 403 when the request has an Origin or a Sec-Fetch-Site header.
-func LocalOnly(port int, next http.Handler) http.Handler {
-	panic("not implemented: debugsession.LocalOnly")
 }
 
 // Config is everything the command resolved (flag > manifest debug section > manifest instance section > config).
