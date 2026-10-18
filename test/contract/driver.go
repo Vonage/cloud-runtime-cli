@@ -70,6 +70,8 @@ func (d *driver) step(s Step) error {
 		return d.waitText(limit, "stdout", &d.p.out, s.WaitStdout)
 	case "expect":
 		return d.waitText(limit, "stdout", &d.p.out, s.Expect)
+	case "expect-any":
+		return d.waitAnyText(limit, "stdout", &d.p.out, s.ExpectAny)
 	case "wait-stderr":
 		return d.waitText(limit, "stderr", &d.p.err, s.WaitStderr)
 	case "wait-request":
@@ -128,7 +130,20 @@ func (d *driver) waitUntil(limit time.Duration, what string, cond func() bool) e
 // waitText waits for text in a stream. When it does not come, the error shows
 // the end of what both streams held, which is what a scenario author needs to see.
 func (d *driver) waitText(limit time.Duration, stream string, buf *lockedBuffer, text string) error {
-	err := d.waitUntil(limit, fmt.Sprintf("%s to contain %q", stream, text), func() bool { return strings.Contains(buf.String(), text) })
+	return d.waitAnyText(limit, stream, buf, []string{text})
+}
+
+// waitAnyText is waitText for several texts: it returns as soon as the stream
+// holds one of them.
+func (d *driver) waitAnyText(limit time.Duration, stream string, buf *lockedBuffer, texts []string) error {
+	what := fmt.Sprintf("%s to contain %q", stream, texts[0])
+	if len(texts) > 1 {
+		what = fmt.Sprintf("%s to contain one of %q", stream, texts)
+	}
+	err := d.waitUntil(limit, what, func() bool {
+		held := buf.String()
+		return slices.ContainsFunc(texts, func(text string) bool { return strings.Contains(held, text) })
+	})
 	if err == nil {
 		return nil
 	}

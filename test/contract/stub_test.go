@@ -49,6 +49,7 @@ var stubModes = map[string]func(args []string) int{
 	"serve":       stubServe,
 	"tunnel":      stubTunnel,
 	"prompt":      stubPrompt,
+	"read-all":    stubReadAll,
 	"survey-like": stubSurveyLike,
 	"spinner":     stubSpinner,
 	"terminal":    stubTerminal,
@@ -264,6 +265,14 @@ func stubPrompt([]string) int {
 	fmt.Print("Name: ")
 	line, _ := bufio.NewReader(os.Stdin).ReadString('\n')
 	fmt.Printf("hello %s\n", strings.TrimSpace(line))
+	return 0
+}
+
+// stubReadAll reads its input to the end, as a command does with a value typed on a terminal: Ctrl-D ends it.
+func stubReadAll([]string) int {
+	fmt.Print("Value: ")
+	data, _ := io.ReadAll(os.Stdin)
+	fmt.Printf("\ngot %d bytes\n", len(data))
 	return 0
 }
 

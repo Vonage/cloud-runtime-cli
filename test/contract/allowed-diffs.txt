@@ -72,3 +72,37 @@ config-broken-symlink-config stderr an explicit config file that does not exist 
 config-parse-error stderr a malformed config file's error no longer quotes the file content
 config-parse-error-with-secret-line stderr a malformed config file's error no longer quotes the file content
 root-no-config-no-flags stderr without any configured endpoint the CLI uses the production default instead of failing on an empty URL
+security-redirect-post-* stdout redirects of POST, PATCH and DELETE requests are refused
+security-redirect-post-* stderr redirects of POST, PATCH and DELETE requests are refused
+security-redirect-post-* exit redirects of POST, PATCH and DELETE requests are refused
+security-redirect-post-* requests redirects of POST, PATCH and DELETE requests are refused
+security-redirect-patch-* stdout redirects of POST, PATCH and DELETE requests are refused
+security-redirect-patch-* stderr redirects of POST, PATCH and DELETE requests are refused
+security-redirect-patch-* exit redirects of POST, PATCH and DELETE requests are refused
+security-redirect-patch-* requests redirects of POST, PATCH and DELETE requests are refused
+security-redirect-delete-* stdout redirects of POST, PATCH and DELETE requests are refused
+security-redirect-delete-* stderr redirects of POST, PATCH and DELETE requests are refused
+security-redirect-delete-* exit redirects of POST, PATCH and DELETE requests are refused
+security-redirect-delete-* requests redirects of POST, PATCH and DELETE requests are refused
+secret-create-typed-value stdout a value typed on a terminal is read with echo off behind a prompt on stderr and no longer ends with a newline
+secret-create-typed-value requests a value typed on a terminal is read with echo off behind a prompt on stderr and no longer ends with a newline
+secret-create-typed-value-multiline stdout a value typed on a terminal is read with echo off behind a prompt on stderr and no longer ends with a newline
+secret-create-typed-value-multiline requests a value typed on a terminal is read with echo off behind a prompt on stderr and no longer ends with a newline
+secret-update-typed-value stdout a value typed on a terminal is read with echo off behind a prompt on stderr and no longer ends with a newline
+secret-update-typed-value requests a value typed on a terminal is read with echo off behind a prompt on stderr and no longer ends with a newline
+secret-create-value stderr --value prints a warning on stderr
+secret-create-alias-add stderr --value prints a warning on stderr
+secret-create-short-flags stderr --value prints a warning on stderr
+secret-create-value-wins-over-filename stderr --value prints a warning on stderr
+secret-create-already-exists stderr --value prints a warning on stderr
+secret-update-value stderr --value prints a warning on stderr
+secret-update-missing-secret stderr --value prints a warning on stderr
+security-escape-secret-list stdout terminal control sequences in platform-supplied names are removed
+secret-remove-invalid-name stdout names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+secret-remove-invalid-name stderr names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+secret-remove-invalid-name exit names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+secret-remove-invalid-name requests names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+secret-remove-name-with-dotdot stdout names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+secret-remove-name-with-dotdot stderr names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+secret-remove-name-with-dotdot exit names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+secret-remove-name-with-dotdot requests names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request

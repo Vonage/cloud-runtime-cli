@@ -5,6 +5,7 @@ package contract
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"time"
 )
 
@@ -15,6 +16,7 @@ type Step struct {
 	WaitStdout       string
 	WaitStderr       string
 	Expect           string
+	ExpectAny        []string
 	WaitRequest      string
 	WaitPeer         string
 	WaitPeerResponse string
@@ -65,6 +67,7 @@ type rawStep struct {
 	WaitStdout       *string    `yaml:"wait-stdout"`
 	WaitStderr       *string    `yaml:"wait-stderr"`
 	Expect           *string    `yaml:"expect"`
+	ExpectAny        *[]string  `yaml:"expect-any"`
 	WaitRequest      *string    `yaml:"wait-request"`
 	WaitPeer         *string    `yaml:"wait-peer"`
 	PeerSend         *PeerSend  `yaml:"peer-send"`
@@ -107,6 +110,10 @@ func parseStep(r rawStep) (Step, error) {
 	str("wait-peer", r.WaitPeer, &s.WaitPeer)
 	str("wait-peer-response", r.WaitPeerResponse, &s.WaitPeerResponse)
 	str("signal", r.Signal, &s.Signal)
+	set("expect-any", r.ExpectAny != nil)
+	if r.ExpectAny != nil {
+		s.ExpectAny = slices.Clone(*r.ExpectAny)
+	}
 	set("peer-send", r.PeerSend != nil)
 	set("peer-close", r.PeerClose != nil)
 	set("local-call", r.LocalCall != nil)
@@ -150,6 +157,10 @@ func parseDuration(key, v string) (time.Duration, error) {
 // validate checks the values of the action that is set.
 func (s Step) validate() error {
 	switch s.kind {
+	case "expect-any":
+		if len(s.ExpectAny) == 0 || slices.Contains(s.ExpectAny, "") {
+			return fmt.Errorf("expect-any needs a list of texts, none of them empty")
+		}
 	case "signal":
 		if s.Signal != "SIGINT" && s.Signal != "SIGTERM" {
 			return fmt.Errorf("signal: %q is not SIGINT or SIGTERM", s.Signal)

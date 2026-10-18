@@ -244,6 +244,24 @@ func TestEveryGroupHasAScenario(t *testing.T) {
 	}
 }
 
+// endKeys are the keys that end a run or its input instead of answering a prompt: Ctrl-C and Ctrl-D. A scenario
+// may send them without waiting, in the form of the character itself or of its escape written in the file.
+var endKeys = []string{"\x03", `\x03`, "\x04", `\x04`}
+
+// unwaitedSends numbers (from 1) the steps that send keys without an expect or an expect-any right before them.
+func unwaitedSends(steps []Step) []int {
+	var bad []int
+	for i, s := range steps {
+		if s.Send == nil || slices.Contains(endKeys, *s.Send) {
+			continue
+		}
+		if i == 0 || (steps[i-1].Expect == "" && len(steps[i-1].ExpectAny) == 0) {
+			bad = append(bad, i+1)
+		}
+	}
+	return bad
+}
+
 func TestTerminalScenariosAnswerOnlyAfterTheyWait(t *testing.T) {
 	terminal := 0
 	for _, sc := range loadAllScenarios(t) {
@@ -251,12 +269,8 @@ func TestTerminalScenariosAnswerOnlyAfterTheyWait(t *testing.T) {
 			continue
 		}
 		terminal++
-		for i, s := range sc.Steps {
-			if s.Send == nil || *s.Send == "\x03" || *s.Send == `\x03` {
-				continue
-			}
-			assert.True(t, i > 0 && sc.Steps[i-1].Expect != "",
-				"%s: step %d sends keys without waiting for the prompt first (only Ctrl-C may)", sc.ID, i+1)
+		for _, n := range unwaitedSends(sc.Steps) {
+			t.Errorf("%s: step %d sends keys without waiting for the prompt first (only Ctrl-C and Ctrl-D may)", sc.ID, n)
 		}
 	}
 	assert.Positive(t, terminal, "there are no terminal scenarios")

@@ -41,11 +41,13 @@
 //
 // A scenario with tty: true runs on a pseudo-terminal of 100 columns by 40
 // rows, with stdin, stdout and stderr all on it. Its steps are expect (wait
-// until the screen text holds some text) and send (type some keys); a send
-// follows an expect, except Ctrl-C. vt.go keeps the screen a person would see,
-// so spinner frames, redraws and colours leave no trace, and answers the
-// cursor position queries of the prompt library. The transcript's stdout is
-// the final screen text.
+// until the screen text holds some text), expect-any (wait until it holds any
+// one of several texts, for a prompt that differs between builds) and send
+// (type some keys); a send follows an expect or an expect-any, except Ctrl-C
+// and Ctrl-D, which end the run or the typed input. vt.go keeps the screen a
+// person would see, so spinner frames, redraws and colours leave no trace, and
+// answers the cursor position queries of the prompt library. The transcript's
+// stdout is the final screen text.
 //
 // The binaries the harness builds go to .cache/contract/ at the repository
 // root, which git ignores.
