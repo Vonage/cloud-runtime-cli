@@ -68,6 +68,7 @@ func TestConnectRetriesTheFirstDial(t *testing.T) {
 
 	assert.Equal(t, retrySleeps[:2], rig.sleeps())
 	assert.Equal(t, 3, peer.dials())
+	peer.waitTunnel(1) // the client sees the upgrade before the peer has recorded the connection
 	assert.Equal(t, 1, peer.accepted())
 }
 
@@ -256,6 +257,7 @@ func TestSendWaitsForTheNextConnectionAfterAFailedWrite(t *testing.T) {
 	assert.EqualValues(t, 1, goodWrites.writes.Load(), "one write on the connection that replaced it")
 	assert.Zero(t, goodWrites.failed.Load())
 	assert.Len(t, api.dialCalls(), 2, "the writer dialled nothing")
+	peer.waitTunnel(2) // the peer records a connection a moment after the client has seen the upgrade
 	assert.Equal(t, 2, peer.accepted(), "the writer dialled nothing")
 }
 

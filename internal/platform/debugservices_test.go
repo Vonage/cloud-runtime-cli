@@ -75,7 +75,6 @@ func TestDeployDebugServiceChecksServerNames(t *testing.T) {
 		{name: "a name over 63 characters", serviceName: strings.Repeat("a", 64), instanceID: "inst-1", wantError: "invalid service name"},
 		{name: "an empty name", serviceName: "", instanceID: "inst-1", wantError: "invalid service name"},
 		{name: "an instance id with a traversal", serviceName: "dbg-svc-1", instanceID: "../x", wantError: "the platform returned an invalid instance id: ../x"},
-		{name: "an empty instance id", serviceName: "dbg-svc-1", instanceID: "", wantError: "invalid instance id"},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -88,6 +87,16 @@ func TestDeployDebugServiceChecksServerNames(t *testing.T) {
 			assert.Empty(t, got, "a rejected service is not returned")
 		})
 	}
+}
+
+func TestDeployDebugServiceAcceptsNoInstanceID(t *testing.T) {
+	s := newRouteServer(t, answerJSON(http.StatusOK, debugServiceReply("dbg-svc-1", "")))
+
+	got, err := s.client.DeployDebugService(t.Context(), "aws.euw1", "app-1", "", manifest.Capabilities{})
+
+	require.NoError(t, err)
+	assert.Equal(t, DebugService{ServiceName: "dbg-svc-1", PrivateKey: "pk", WebsocketPath: "abc123"}, got,
+		"the debugged app then runs without INSTANCE_ID")
 }
 
 func TestDeployDebugServiceAcceptsANameEndingInAHyphen(t *testing.T) {

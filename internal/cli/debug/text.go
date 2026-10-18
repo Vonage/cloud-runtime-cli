@@ -1,0 +1,76 @@
+package debug
+
+// longText and exampleText are the help texts of `vcr debug`, byte for byte as the contract tree records them.
+const longText = `Run your application locally in debug mode with live VCR integration.
+
+Debug mode allows you to run your application code locally while connected to the
+VCR platform. A remote debug server acts as a proxy, forwarding requests from Vonage
+services (webhooks, events) to your local machine.
+
+HOW IT WORKS
+  1. A debug proxy server is deployed to VCR
+  2. Your local application starts and connects to the proxy
+  3. Vonage webhooks/events are forwarded to your local machine
+  4. You can set breakpoints and debug your code in real-time
+
+REQUIREMENTS
+  • A vcr.yml manifest with a debug.entrypoint defined
+  • A Vonage application linked to your project
+  • The debug.application-id can differ from instance.application-id
+
+VS CODE DEBUGGER INTEGRATION
+  To attach VS Code debugger, add this configuration to .vscode/launch.json:
+
+  {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "node",
+        "request": "attach",
+        "name": "Attach VCR Debugger",
+        "port": 9229,
+        "restart": true,
+        "localRoot": "${workspaceFolder}"
+      }
+    ]
+  }
+
+ENVIRONMENT VARIABLES
+  Environment variables from debug.environment (or instance.environment as fallback)
+  in your manifest are loaded. For secrets, export them locally before running debug.
+
+CLEANUP
+  Press Ctrl+C to stop debug mode. The remote debug server is automatically removed
+  unless --preserve-data is specified.
+`
+
+const exampleText = `# Start debug mode in the current directory
+$ vcr debug
+
+# Start debug mode in a specific directory
+$ vcr debug ./my-project
+
+# Use a custom name for the debug proxy (makes URL deterministic)
+$ vcr debug --name my-debugger
+
+# Use a specific Vonage application for debugging
+$ vcr debug --app-id 12345678-1234-1234-1234-123456789abc
+
+# Change the local application port (default: 3000)
+$ vcr debug --app-port 8080
+
+# Change the debugger proxy port (default: 3001)
+$ vcr debug --debugger-port 4000
+
+# Preserve data after debug session ends
+$ vcr debug --preserve-data
+
+# Skip confirmation prompts
+$ vcr debug --yes
+
+# Enable verbose logging for troubleshooting
+$ vcr debug --verbose
+
+# Use a specific manifest file
+$ vcr debug --filename ./custom-vcr.yml
+`

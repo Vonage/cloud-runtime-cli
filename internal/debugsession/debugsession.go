@@ -10,10 +10,8 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"vonage-cloud-runtime-cli/internal/clock"
 	"vonage-cloud-runtime-cli/internal/manifest"
 	"vonage-cloud-runtime-cli/internal/platform"
-	"vonage-cloud-runtime-cli/internal/term"
 )
 
 // API is the part of *platform.Client that a debug session uses.
@@ -39,14 +37,4 @@ type Config struct {
 	Verbose      bool
 	Timeout      time.Duration        // --timeout: bounds setup and teardown only, never the running session
 	Creds        platform.Credentials // passed to the app's environment as today
-}
-
-// Run binds the listeners, deploys the debug service, waits until it is ready, connects the tunnel, starts the app
-// with the debug environment, serves until ctx ends or the session fails, and always tears down on a fresh context
-// bounded by cfg.Timeout (stop the app's process group, delete the debug service unless told to keep data). ctx is the
-// signal-only context: only Ctrl-C or SIGTERM cancels it, and setup steps add cfg.Timeout themselves. A tunnel close
-// with code 1008 tears down and returns an error whose text is exactly
-// "This debug session was taken over by another connection. Stopping." (clierr.Render prints it once, exit 1).
-func Run(ctx context.Context, t *term.IO, clk clock.Clock, api API, cfg Config) error {
-	panic("not implemented: debugsession.Run")
 }

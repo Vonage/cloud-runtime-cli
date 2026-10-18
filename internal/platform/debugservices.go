@@ -38,8 +38,11 @@ func (c *Client) DeployDebugService(ctx context.Context, region, appID, name str
 	if err := checkServiceName(out.ServiceName); err != nil {
 		return DebugService{}, err
 	}
-	if err := checkServerID(fieldInstanceID, out.InstanceID); err != nil {
-		return DebugService{}, err
+	// The instance id only reaches the app as INSTANCE_ID, and a platform that sends none leaves the variable out.
+	if out.InstanceID != "" {
+		if err := checkServerID(fieldInstanceID, out.InstanceID); err != nil {
+			return DebugService{}, err
+		}
 	}
 	return out, nil
 }

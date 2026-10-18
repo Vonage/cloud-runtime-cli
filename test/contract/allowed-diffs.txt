@@ -150,3 +150,16 @@ security-upload-git-negation-brings-back-git stderr uploads leave out .git/ and 
 security-upload-git-negation-brings-back-git requests uploads leave out .git/ and local .env files, with one stderr notice
 security-upload-skips-git-and-env-files stderr uploads leave out .git/ and local .env files, with one stderr notice
 security-upload-skips-git-and-env-files requests uploads leave out .git/ and local .env files, with one stderr notice
+debug-app-exits-early stderr a warning is printed when the local application exits
+debug-debugger-port-in-use requests the local debugger port is bound before the debug service is deployed
+debug-debugger-port-in-use stdout the local debugger port is bound before the debug service is deployed, so nothing is printed
+debug-debugger-port-in-use stderr the local debugger port is bound before the debug service is deployed, so the error names the local debugger
+debug-debugger-port-in-use exit a local debugger port that is already in use ends the command with exit status 1
+debug-interrupt-during-setup requests the debug service is deleted when interrupted during setup
+debug-interrupt-during-setup stdout the output ends with the removal of the debug service when interrupted during setup
+debug-interrupt-during-setup exit interrupting the command during setup ends it with exit status 0
+debug-takeover-close-1008 stderr a message is printed when the session is taken over by another connection
+debug-takeover-close-1008 exit a taken-over session ends with exit status 1
+debug-takeover-close-1008 requests the debug service is deleted when the session is taken over, instead of the CLI reconnecting
+security-debug-verbose-hides-authorization stdout verbose output hides the values of authorization and cookie headers
+security-escape-debug-access-log stdout terminal control sequences in the path of a relayed request are removed from the access log
