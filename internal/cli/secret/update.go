@@ -10,6 +10,7 @@ import (
 
 	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
 	"vonage-cloud-runtime-cli/internal/platform"
+	"vonage-cloud-runtime-cli/internal/term"
 )
 
 func newUpdate(env *cmdenv.Env) *cobra.Command {
@@ -68,24 +69,29 @@ func newUpdate(env *cmdenv.Env) *cobra.Command {
 }
 
 func runUpdate(ctx context.Context, env *cmdenv.Env, f valueFlags) error {
-	if err := validateName(f.name); err != nil {
-		return err
+	if env.IO.Mode() != term.Classic {
+		return updateRich(ctx, env, f)
 	}
-	value, err := resolveValue(ctx, f.source(env))
+	value, err := f.read(ctx, env)
 	if err != nil {
-		return fmt.Errorf("can't read secret's value: %w", err)
+		return err
 	}
 
 	stop := env.IO.StartSpinner(fmt.Sprintf("Updating secret %q...", f.name))
 	err = env.Client.UpdateSecret(ctx, f.name, value)
 	stop()
-	switch {
-	case errors.Is(err, platform.ErrNotFound):
-		return fmt.Errorf("secret %q not found", f.name)
-	case err != nil:
-		return fmt.Errorf("failed to update secret: %w", err)
+	if err != nil {
+		return updateError(f.name, err)
 	}
 
 	fmt.Fprintf(env.IO.Out, "%s Secret %q updated\n", env.IO.Style().SuccessIcon(), f.name)
 	return nil
+}
+
+// updateError is what a failed update reports: a plain error for a secret that is not there, else the platform's own.
+func updateError(name string, err error) error {
+	if errors.Is(err, platform.ErrNotFound) {
+		return fmt.Errorf("secret %q not found", name)
+	}
+	return fmt.Errorf("failed to update secret: %w", err)
 }

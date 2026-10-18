@@ -14,6 +14,7 @@ import (
 	"vonage-cloud-runtime-cli/internal/cli/secret"
 	"vonage-cloud-runtime-cli/internal/clierr"
 	"vonage-cloud-runtime-cli/internal/config"
+	"vonage-cloud-runtime-cli/internal/term"
 	"vonage-cloud-runtime-cli/test/fakeplatform"
 )
 
@@ -234,4 +235,64 @@ func TestCreateEndsWhenTheDeadlinePasses(t *testing.T) {
 	err := runPastTheDeadline(t, h, "create", "--name", "MY_KEY", "--value", "x")
 
 	require.ErrorIs(t, err, context.DeadlineExceeded)
+}
+
+func TestRichCreateConflictKeepsPlainError(t *testing.T) {
+	h := cmdtest.New(t, startFake(t), cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), secret.NewCmd, "create", "--name", "DB_URL", "--value", "x")
+
+	require.EqualError(t, err, `secret "DB_URL" already exists`)
+	var apiErr *clierr.APIError
+	assert.NotErrorAs(t, err, &apiErr)
+	assert.Equal(t, []string{"euw1 POST /secrets"}, cmdtest.Calls(h.Requests()))
+	assert.Empty(t, h.Screen())
+}
+
+func TestRichValueWarningStillOnStderr(t *testing.T) {
+	h := cmdtest.New(t, startFake(t), cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), secret.NewCmd, "create", "--name", "MY_KEY", "--value", "abc")
+
+	require.NoError(t, err)
+	assert.Equal(t, valueWarning, h.ErrScreen(), "the one classic warning line, on stderr")
+	assert.Contains(t, cmdtest.Collapse(h.Screen()), "✓ Secret \"MY_KEY\" created\n")
+	assert.NotContains(t, h.Screen()+h.ErrScreen(), "abc", "the value is never printed")
+	reqs := h.Requests()
+	require.Len(t, reqs, 1)
+	assert.JSONEq(t, `{"secrets":[{"name":"MY_KEY","value":"abc"}]}`, string(reqs[0].Body))
+}
+
+func TestRichCreateFromFileHasNoWarning(t *testing.T) {
+	h := cmdtest.New(t, startFake(t), cmdtest.Options{Mode: term.Rich})
+	path := writeSecretFile(t, "l1\nl2\n")
+
+	err := h.Run(t.Context(), secret.NewCmd, "create", "--name", "MY_KEY", "--filename", path)
+
+	require.NoError(t, err)
+	assert.Empty(t, h.ErrScreen())
+	assert.Contains(t, cmdtest.Collapse(h.Screen()), "✓ Secret \"MY_KEY\" created\n")
+}
+
+func TestRichCreateInvalidNameSendsNothing(t *testing.T) {
+	h := cmdtest.New(t, startFake(t), cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), secret.NewCmd, "create", "--name", "1abc", "--value", "x")
+
+	require.EqualError(t, err, nameError)
+	assert.Empty(t, h.Requests())
+	assert.Empty(t, h.Screen())
+	assert.Empty(t, h.ErrScreen(), "the value is not read, so no warning either")
+}
+
+func TestRichCreateOtherErrorLeavesNoSuccessLine(t *testing.T) {
+	srv := startFake(t, fakeplatform.Override{Match: "POST /secrets", Status: http.StatusInternalServerError, Body: envelope500})
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), secret.NewCmd, "create", "--name", "MY_KEY", "--filename", writeSecretFile(t, "x"))
+
+	require.Error(t, err)
+	assert.True(t, strings.HasPrefix(err.Error(), "failed to create secret: "), "error = %q", err)
+	assert.Empty(t, h.Screen())
+	assert.Empty(t, h.ErrScreen())
 }

@@ -11,6 +11,7 @@ import (
 	"vonage-cloud-runtime-cli/internal/cli/instance"
 	"vonage-cloud-runtime-cli/internal/clierr"
 	"vonage-cloud-runtime-cli/internal/platform"
+	"vonage-cloud-runtime-cli/internal/term"
 	"vonage-cloud-runtime-cli/test/fakeplatform"
 )
 
@@ -114,4 +115,37 @@ func TestRemoveUsesTheConfiguredRegionWithoutLookingItUpAgain(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, []string{"use1 GET /instances/" + prod, "use1 DELETE /instances/" + prod}, cmdtest.Calls(h.Requests()))
+}
+
+func TestRichRemoveGoesToTheInstanceRegion(t *testing.T) {
+	h := cmdtest.New(t, startFake(t), cmdtest.Options{Mode: term.Rich})
+	prod := h.InstanceID(t, "prod")
+
+	err := h.Run(t.Context(), instance.NewCmd, "remove", "--id", prod, "--yes")
+
+	require.NoError(t, err)
+	assert.Equal(t, []string{
+		"euw1 GET /instances/" + prod,
+		"euw1 GET /regions/aws.use1",
+		"use1 DELETE /instances/" + prod,
+	}, cmdtest.Calls(h.Requests()))
+	assert.Equal(t, "✓ Instance found\n"+successLine(prod), cmdtest.Collapse(h.Screen()))
+}
+
+func TestRichRemoveUnknownRegionStopsBeforeThePrompt(t *testing.T) {
+	const lost = "00000000-0000-4000-8000-000000000511"
+	srv := startFakeWith(t, `
+instances:
+  - {id: `+lost+`, name: lost, serviceName: my-project-lost, apiApplicationId: 00000000-0000-4000-8000-000000000601, projectName: my-project, region: aws.nowhere, updatedAt: "2026-10-14T10:00:00Z"}
+`)
+	script := &cmdtest.Script{}
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich, Prompt: script})
+
+	err := h.Run(t.Context(), instance.NewCmd, "remove", "--id", lost)
+
+	require.Error(t, err)
+	assert.True(t, strings.HasPrefix(err.Error(), `failed to reach region "aws.nowhere": `), "error = %q", err)
+	require.ErrorIs(t, err, platform.ErrNotFound)
+	assert.Empty(t, script.Asked)
+	assert.Empty(t, h.Screen(), "the instance was not usable, so it was not reported as found")
 }

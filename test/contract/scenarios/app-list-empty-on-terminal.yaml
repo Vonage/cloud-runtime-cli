@@ -1,0 +1,7 @@
+description: "an account without applications says so on a terminal"
+args: [app, list]
+tty: true
+fixtures:
+  applications: []
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

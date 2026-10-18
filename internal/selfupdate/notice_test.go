@@ -2,11 +2,14 @@ package selfupdate
 
 import (
 	"fmt"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"vonage-cloud-runtime-cli/internal/clock/clocktest"
 	"vonage-cloud-runtime-cli/internal/term"
 )
 
@@ -88,6 +91,63 @@ func TestPrintNotice(t *testing.T) {
 
 			assert.Equal(t, fmt.Sprintf(want, tt.shown), stdout.String())
 			assert.Empty(t, stderr.String())
+		})
+	}
+}
+
+// richNotice prints the notice on a terminal of the given mode and returns what each stream shows.
+func richNotice(mode term.Mode, current, latest string) (stdout, stderr, raw string) {
+	streams, out, errOut := term.TestRich(mode, 100, clocktest.New(time.Time{}))
+	PrintNotice(streams, current, latest)
+	return out.Raw(), errOut.Screen(), errOut.Raw()
+}
+
+func TestPrintNoticeRich(t *testing.T) {
+	stdout, stderr, raw := richNotice(term.Rich, "v2.6.1", "2.7.0")
+
+	assert.Equal(t, "\nUpdate available 2.6.1 → 2.7.0 · run vcr upgrade\n", stderr, "one blank line, then the notice")
+	assert.Empty(t, stdout, "nothing goes to stdout")
+	assert.NotEqual(t, stderr, raw, "the line is dim")
+	assert.Contains(t, raw, "Update available 2.6.1 → 2.7.0 · run vcr upgrade")
+}
+
+func TestPrintNoticeRichIsDim(t *testing.T) {
+	streams, _, errOut := term.TestRich(term.Rich, 100, clocktest.New(time.Time{}))
+
+	PrintNotice(streams, "v2.6.1", "2.7.0")
+
+	assert.Equal(t, "\n"+streams.Style().Gray("Update available 2.6.1 → 2.7.0 · run vcr upgrade")+"\n", errOut.Raw())
+}
+
+func TestPrintNoticeRichDevBuild(t *testing.T) {
+	stdout, stderr, _ := richNotice(term.Rich, "dev", "2.7.0")
+
+	assert.Equal(t, "\nUpdate available 0.0.1 → 2.7.0 · run vcr upgrade\n", stderr)
+	assert.Empty(t, stdout)
+}
+
+func TestPrintNoticeStaticMatchesRich(t *testing.T) {
+	richOut, richErr, richRaw := richNotice(term.Rich, "v2.6.1", "2.7.0")
+	staticOut, staticErr, staticRaw := richNotice(term.Static, "v2.6.1", "2.7.0")
+
+	assert.Equal(t, richErr, staticErr)
+	assert.Equal(t, richRaw, staticRaw)
+	assert.Equal(t, richOut, staticOut)
+}
+
+func TestNoticeTextMatchesClassicVersions(t *testing.T) {
+	for _, current := range []string{"v2.6.1", "2.6.1", "dev"} {
+		t.Run(current, func(t *testing.T) {
+			streams, stdout, _ := term.Test("", false)
+			PrintNotice(streams, current, "2.7.0")
+			classic := stdout.String()
+			// The classic bytes carry the version between "available: " and " →".
+			_, after, found := strings.Cut(classic, "available: ")
+			require.True(t, found)
+			shown, _, found := strings.Cut(after, " →")
+			require.True(t, found)
+
+			assert.Equal(t, "Update available "+shown+" → 2.7.0 · run vcr upgrade", noticeText(current, "2.7.0"))
 		})
 	}
 }

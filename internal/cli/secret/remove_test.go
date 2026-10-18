@@ -14,6 +14,7 @@ import (
 	"vonage-cloud-runtime-cli/internal/cli/secret"
 	"vonage-cloud-runtime-cli/internal/clierr"
 	"vonage-cloud-runtime-cli/internal/config"
+	"vonage-cloud-runtime-cli/internal/term"
 	"vonage-cloud-runtime-cli/test/fakeplatform"
 )
 
@@ -159,4 +160,46 @@ func TestRemoveEndsWhenTheDeadlinePasses(t *testing.T) {
 	err := runPastTheDeadline(t, h, "remove", "--name", "DB_URL")
 
 	require.ErrorIs(t, err, context.DeadlineExceeded)
+}
+
+func TestRichRemoveEmptyNameSendsNothing(t *testing.T) {
+	h := cmdtest.New(t, startFake(t), cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), secret.NewCmd, "remove", "--name", "")
+
+	require.EqualError(t, err, "name can not be empty")
+	assert.Empty(t, h.Requests())
+	assert.Empty(t, h.Screen())
+}
+
+func TestRichRemoveMissingSecretSucceeds(t *testing.T) {
+	srv := startFake(t, fakeplatform.Override{Match: "DELETE /secrets/*", Status: http.StatusNotFound, Body: `{"error":{"code":1001,"message":"not found"}}`})
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), secret.NewCmd, "remove", "--name", "NO_SUCH_SECRET")
+
+	require.NoError(t, err)
+	assert.Contains(t, cmdtest.Collapse(h.Screen()), "✓ Secret \"NO_SUCH_SECRET\" successfully removed\n")
+}
+
+func TestRichRemoveServerErrorLeavesNoSuccessLine(t *testing.T) {
+	srv := startFake(t, fakeplatform.Override{Match: "DELETE /secrets/*", Status: http.StatusInternalServerError, Body: envelope500})
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), secret.NewCmd, "remove", "--name", "DB_URL")
+
+	require.Error(t, err)
+	assert.True(t, strings.HasPrefix(err.Error(), "failed to remove secret: "), "error = %q", err)
+	assert.Empty(t, h.Screen())
+	assert.Empty(t, h.ErrScreen())
+}
+
+func TestRichRemoveNeverPrompts(t *testing.T) {
+	script := &cmdtest.Script{}
+	h := cmdtest.New(t, startFake(t), cmdtest.Options{Mode: term.Rich, Prompt: script})
+
+	err := h.Run(t.Context(), secret.NewCmd, "remove", "--name", "DB_URL")
+
+	require.NoError(t, err)
+	assert.Empty(t, script.Asked)
 }

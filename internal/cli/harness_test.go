@@ -15,6 +15,7 @@ import (
 	"vonage-cloud-runtime-cli/internal/buildinfo"
 	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
 	"vonage-cloud-runtime-cli/internal/clock"
+	"vonage-cloud-runtime-cli/internal/clock/clocktest"
 	"vonage-cloud-runtime-cli/internal/config"
 	"vonage-cloud-runtime-cli/internal/selfupdate"
 	"vonage-cloud-runtime-cli/internal/term"
@@ -99,13 +100,33 @@ func (h *harness) flags() []string {
 
 func (h *harness) newEnv() (env *cmdenv.Env, stdout, stderr *bytes.Buffer) {
 	streams, out, errOut := term.Test("", false)
+	return h.envOver(streams), out, errOut
+}
+
+func (h *harness) envOver(streams *term.IO) *cmdenv.Env {
 	return &cmdenv.Env{
 		IO:     streams,
 		Prompt: streams.Prompter(),
 		Clock:  h.clk,
 		Build:  buildinfo.Info{Version: testVersion, APIVersion: testAPIVersion},
 		Flags:  &config.Flags{},
-	}, out, errOut
+	}
+}
+
+// richOutcome is what one run on a terminal left behind.
+type richOutcome struct {
+	code   int
+	stdout *term.TermBuffer
+	stderr *term.TermBuffer
+}
+
+// runRich is run on a terminal of the given mode, 100 columns wide.
+func (h *harness) runRich(mode term.Mode, args ...string) richOutcome {
+	h.t.Helper()
+	streams, out, errOut := term.TestRich(mode, 100, clocktest.New(time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)))
+	env := h.envOver(streams)
+	code := run(h.t.Context(), args, env, h.options(env))
+	return richOutcome{code: code, stdout: out, stderr: errOut}
 }
 
 // probes returns the three probe commands, each annotated with its platform mode.

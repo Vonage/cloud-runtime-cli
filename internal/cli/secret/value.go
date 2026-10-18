@@ -51,6 +51,19 @@ func (f *valueFlags) source(env *cmdenv.Env) valueSource {
 	}
 }
 
+// read checks the name and finds the value of the secret, as create and update both begin. The errors are the ones
+// the commands return.
+func (f *valueFlags) read(ctx context.Context, env *cmdenv.Env) (string, error) {
+	if err := validateName(f.name); err != nil {
+		return "", err
+	}
+	value, err := resolveValue(ctx, f.source(env))
+	if err != nil {
+		return "", fmt.Errorf("can't read secret's value: %w", err)
+	}
+	return value, nil
+}
+
 // valueSource is everything resolveValue needs to find the value of one secret.
 type valueSource struct {
 	name        string // the secret, named in the prompt

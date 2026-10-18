@@ -1,0 +1,11 @@
+# vcr rich golden v1
+exit 1
+@@ stdout 217
+✗ failed to list Vonage applications
+  HTTP status  500
+  Message      internal error
+  Trace ID     fake-trace-id
+  App logs     boot failed
+               second line
+  Quote the trace ID when contacting support.
+

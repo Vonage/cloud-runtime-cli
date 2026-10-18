@@ -14,6 +14,7 @@ import (
 	"vonage-cloud-runtime-cli/internal/cli/cmdtest"
 	"vonage-cloud-runtime-cli/internal/clierr"
 	"vonage-cloud-runtime-cli/internal/config"
+	"vonage-cloud-runtime-cli/internal/term"
 	"vonage-cloud-runtime-cli/test/fakeplatform"
 )
 
@@ -219,4 +220,92 @@ func TestCreateEndsWhenTheDeadlinePasses(t *testing.T) {
 	err := runPastTheDeadline(t, h, "create", "--name", "my-new-app")
 
 	require.ErrorIs(t, err, context.DeadlineExceeded)
+}
+
+func TestRichCreateShowsABlock(t *testing.T) {
+	for name, mode := range map[string]term.Mode{"rich": term.Rich, "static": term.Static} {
+		t.Run(name, func(t *testing.T) {
+			srv := startFake(t, createdOverride())
+			h := cmdtest.New(t, srv, cmdtest.Options{Mode: mode})
+
+			err := h.Run(t.Context(), app.NewCmd, "create", "--name", "my-new-app", "--voice", "--yes")
+
+			require.NoError(t, err)
+			screen := cmdtest.Collapse(h.Screen())
+			assert.Contains(t, screen, "✓ Application created\n")
+			assert.Contains(t, screen, "ID "+createdID+"\n")
+			assert.Contains(t, screen, "Name my-new-app\n")
+			assert.NotContains(t, screen, "ℹ")
+			assert.Empty(t, h.ErrScreen())
+			assert.Equal(t, []string{"euw1 POST /applications"}, cmdtest.Calls(h.Requests()))
+		})
+	}
+}
+
+func TestRichCreateDeclinedKeepsTheClassicLine(t *testing.T) {
+	srv := startFake(t, createdOverride())
+	script := &cmdtest.Script{YesNos: []bool{false}}
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich, Prompt: script})
+
+	err := h.Run(t.Context(), app.NewCmd, "create", "--name", "my-new-app")
+
+	require.NoError(t, err)
+	assert.Equal(t, "! Application creation aborted\n", h.ErrScreen())
+	assert.Empty(t, h.Screen())
+	assert.Empty(t, h.Requests())
+	assert.Equal(t, []cmdtest.Ask{{Kind: "yesno", Message: createQuestion}}, script.Asked)
+}
+
+func TestRichCreateAnsweredYesCreates(t *testing.T) {
+	srv := startFake(t, createdOverride())
+	script := &cmdtest.Script{YesNos: []bool{true}}
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich, Prompt: script})
+
+	err := h.Run(t.Context(), app.NewCmd, "create", "--name", "my-new-app")
+
+	require.NoError(t, err)
+	assert.Contains(t, cmdtest.Collapse(h.Screen()), "✓ Application created\n")
+	assert.Equal(t, []cmdtest.Ask{{Kind: "yesno", Message: createQuestion}}, script.Asked)
+	assert.Len(t, h.Requests(), 1)
+}
+
+func TestRichCreateEmptyNameError(t *testing.T) {
+	srv := startFake(t)
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), app.NewCmd, "create", "--name", "")
+
+	require.EqualError(t, err, "name can not be empty")
+	assert.Empty(t, h.Requests())
+	assert.Empty(t, h.Screen(), "no step output")
+	assert.Empty(t, h.ErrScreen())
+}
+
+func TestRichCreateErrorLeavesNoSuccessLine(t *testing.T) {
+	failing := fakeplatform.Override{Match: "POST /applications", Status: http.StatusInternalServerError, Body: envelope500}
+	classic := cmdtest.New(t, startFake(t, failing), cmdtest.Options{})
+	want := classic.Run(t.Context(), app.NewCmd, "create", "--name", "my-new-app", "--yes")
+	h := cmdtest.New(t, startFake(t, failing), cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), app.NewCmd, "create", "--name", "my-new-app", "--yes")
+
+	require.Error(t, err)
+	assert.Equal(t, want.Error(), err.Error(), "the error is the one of the classic run")
+	var apiErr *clierr.APIError
+	require.ErrorAs(t, err, &apiErr)
+	assert.Empty(t, h.Screen())
+	assert.Empty(t, h.ErrScreen(), "clierr.Render prints the failure; the command prints nothing")
+}
+
+func TestRichCreateSanitisesServerText(t *testing.T) {
+	body := `{"applicationId":"i\u001b]0;x\u0007d","applicationName":"a\u001b[2Jb"}`
+	srv := startFake(t, fakeplatform.Override{Match: "POST /applications", Body: body})
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), app.NewCmd, "create", "--name", "my-new-app", "--yes")
+
+	require.NoError(t, err)
+	assert.NotContains(t, h.Screen(), "\x1b")
+	assert.Contains(t, cmdtest.Collapse(h.Screen()), "ID id\n")
+	assert.Contains(t, cmdtest.Collapse(h.Screen()), "Name ab\n")
 }

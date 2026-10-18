@@ -10,6 +10,7 @@ import (
 
 	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
 	"vonage-cloud-runtime-cli/internal/platform"
+	"vonage-cloud-runtime-cli/internal/term"
 )
 
 func newCreate(env *cmdenv.Env) *cobra.Command {
@@ -73,24 +74,29 @@ func newCreate(env *cmdenv.Env) *cobra.Command {
 }
 
 func runCreate(ctx context.Context, env *cmdenv.Env, f valueFlags) error {
-	if err := validateName(f.name); err != nil {
-		return err
+	if env.IO.Mode() != term.Classic {
+		return createRich(ctx, env, f)
 	}
-	value, err := resolveValue(ctx, f.source(env))
+	value, err := f.read(ctx, env)
 	if err != nil {
-		return fmt.Errorf("can't read secret's value: %w", err)
+		return err
 	}
 
 	stop := env.IO.StartSpinner(fmt.Sprintf("Creating secret %q...", f.name))
 	err = env.Client.CreateSecret(ctx, f.name, value)
 	stop()
-	switch {
-	case errors.Is(err, platform.ErrAlreadyExists):
-		return fmt.Errorf("secret %q already exists", f.name)
-	case err != nil:
-		return fmt.Errorf("failed to create secret: %w", err)
+	if err != nil {
+		return createError(f.name, err)
 	}
 
 	fmt.Fprintf(env.IO.Out, "%s Secret %q created\n", env.IO.Style().SuccessIcon(), f.name)
 	return nil
+}
+
+// createError is what a failed create reports: a plain error for a name that is taken, else the platform's own.
+func createError(name string, err error) error {
+	if errors.Is(err, platform.ErrAlreadyExists) {
+		return fmt.Errorf("secret %q already exists", name)
+	}
+	return fmt.Errorf("failed to create secret: %w", err)
 }

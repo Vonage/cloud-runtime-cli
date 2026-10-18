@@ -1,0 +1,5 @@
+description: "applications are listed on a terminal"
+args: [app, list]
+tty: true
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

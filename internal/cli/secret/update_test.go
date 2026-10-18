@@ -14,6 +14,7 @@ import (
 	"vonage-cloud-runtime-cli/internal/cli/secret"
 	"vonage-cloud-runtime-cli/internal/clierr"
 	"vonage-cloud-runtime-cli/internal/config"
+	"vonage-cloud-runtime-cli/internal/term"
 	"vonage-cloud-runtime-cli/test/fakeplatform"
 )
 
@@ -191,4 +192,28 @@ func TestUpdateEndsWhenTheDeadlinePasses(t *testing.T) {
 	err := runPastTheDeadline(t, h, "update", "--name", "DB_URL", "--value", "x")
 
 	require.ErrorIs(t, err, context.DeadlineExceeded)
+}
+
+func TestRichUpdateNotFoundKeepsPlainError(t *testing.T) {
+	h := cmdtest.New(t, startFake(t), cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), secret.NewCmd, "update", "--name", "NOPE", "--value", "x")
+
+	require.EqualError(t, err, `secret "NOPE" not found`)
+	var apiErr *clierr.APIError
+	assert.NotErrorAs(t, err, &apiErr)
+	assert.Equal(t, []string{"euw1 PATCH /secrets"}, cmdtest.Calls(h.Requests()))
+	assert.Empty(t, h.Screen())
+}
+
+func TestRichUpdateOtherErrorLeavesNoSuccessLine(t *testing.T) {
+	srv := startFake(t, fakeplatform.Override{Match: "PATCH /secrets", Status: http.StatusInternalServerError, Body: envelope500})
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), secret.NewCmd, "update", "--name", "DB_URL", "--filename", writeSecretFile(t, "x"))
+
+	require.Error(t, err)
+	assert.True(t, strings.HasPrefix(err.Error(), "failed to update secret: "), "error = %q", err)
+	assert.Empty(t, h.Screen())
+	assert.Empty(t, h.ErrScreen())
 }

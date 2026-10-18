@@ -86,6 +86,7 @@ func TestRichTableNeverCutsAKeepColumn(t *testing.T) {
 	streams.RichTable([]string{"ID", "Name"}, [][]string{{long, "short"}}, []int{0}, "item", "None.")
 
 	assert.Contains(t, stdout.Screen(), long)
+	assert.Contains(t, stdout.Screen(), "short", "the table cannot fit, so the other column is not cut either")
 }
 
 func TestRichTableCutsOnRuneBoundaries(t *testing.T) {
@@ -104,7 +105,7 @@ func TestRichTableCutsOnRuneBoundaries(t *testing.T) {
 }
 
 func TestRichTableColumnFloor(t *testing.T) {
-	streams, stdout, _, _ := newRich(t, Rich, 10)
+	streams, stdout, _, _ := newRich(t, Rich, 11) // id-01, the gutter and a name cut to four runes: exactly 11
 
 	streams.RichTable([]string{"ID", "Name"}, [][]string{{"id-01", "Longer name"}}, []int{0}, "item", "None.")
 
@@ -112,11 +113,52 @@ func TestRichTableColumnFloor(t *testing.T) {
 }
 
 func TestRichTableFloorIsTheHeaderWidthWhenLonger(t *testing.T) {
-	streams, stdout, _, _ := newRich(t, Rich, 10)
+	streams, stdout, _, _ := newRich(t, Rich, 19) // id-01, the gutter and a name cut to its header's twelve runes
 
 	streams.RichTable([]string{"ID", "Service name"}, [][]string{{"id-01", "Longer name than that"}}, []int{0}, "item", "None.")
 
 	assert.Equal(t, "ID     Service name\nid-01  Longer name…\n\n1 item\n", stdout.Screen())
+}
+
+func TestRichTableThatCannotFitIsNotElided(t *testing.T) {
+	// One column short of what the floors allow: cutting the name would save no line from wrapping, so it stays whole.
+	streams, stdout, _, _ := newRich(t, Rich, 10)
+
+	streams.RichTable([]string{"ID", "Name"}, [][]string{{"id-01", "Longer name"}}, []int{0}, "item", "None.")
+
+	assert.Equal(t, "ID     Name\nid-01  Longer name\n\n1 item\n", stdout.Screen())
+	assert.NotContains(t, stdout.Screen(), "…")
+}
+
+func TestRichTableElidesOnlyWhenTheShrunkTableFits(t *testing.T) {
+	headers := []string{"Instance ID", "Application ID", "Instance Name", "Service Name"}
+	row := []string{strings.Repeat("a", 36), strings.Repeat("b", 36), "dev", "my-project-staging"}
+	// With both ids whole the narrowest table is 36 + 36 + 13 + 12 columns and three gutters.
+	const narrowest = 36 + 36 + 13 + 12 + 6
+
+	tests := []struct {
+		name      string
+		width     int
+		wantElide bool
+	}{
+		{"the narrowest the floors allow", narrowest, true},
+		{"one column less", narrowest - 1, false},
+		{"far too narrow", 40, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			streams, stdout, _, _ := newRich(t, Rich, tt.width)
+
+			streams.RichTable(headers, [][]string{row}, []int{0, 1}, "instance", "None.")
+
+			screen := stdout.Screen()
+			assert.Contains(t, screen, row[0]+"  "+row[1]+"  ", "the id columns stay whole")
+			assert.Equal(t, tt.wantElide, strings.Contains(screen, "…"), screen)
+			if !tt.wantElide {
+				assert.Contains(t, screen, "my-project-staging", "the natural widths are used")
+			}
+		})
+	}
 }
 
 func TestRichTableUnknownWidthDoesNotCut(t *testing.T) {

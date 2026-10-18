@@ -1,16 +1,11 @@
 # vcr rich golden v1
 exit 1
-@@ stdout 624
+@@ stdout 215
 ? Enter your project name: project
 ? Enter your Instance name: dev
 ? Select a runtime: nodejs18
-────────────────────────────────────────────────────────
-✗ Error Encountered: failed to ask region
-
-ℹ Details:
-  - HTTP Status : 500
-  - Trace ID    : fake-trace-id
-
-Please refer to the documentation or contact support for further assistance.
-────────────────────────────────────────────────────────
+✗ failed to ask region
+  HTTP status  500
+  Trace ID     fake-trace-id
+  Quote the trace ID when contacting support.
 

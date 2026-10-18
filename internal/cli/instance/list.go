@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
+	"vonage-cloud-runtime-cli/internal/platform"
 	"vonage-cloud-runtime-cli/internal/term"
 )
 
@@ -55,6 +56,9 @@ func newList(env *cmdenv.Env) *cobra.Command {
 // runList prints the instances in the order the platform returned them, four columns each; an empty result is a
 // table with only its header.
 func runList(ctx context.Context, env *cmdenv.Env, filter string) error {
+	if env.IO.Mode() != term.Classic {
+		return listRich(ctx, env, filter)
+	}
 	stop := env.IO.StartSpinner(" Fetching instances list...")
 	instances, err := env.Client.ListInstances(ctx, filter)
 	stop()
@@ -62,11 +66,17 @@ func runList(ctx context.Context, env *cmdenv.Env, filter string) error {
 		return fmt.Errorf("failed to list instances: %w", err)
 	}
 
+	return term.Table(env.IO.Out, listHeaders, listRows(instances))
+}
+
+// listRows are the instances as table rows, four cells each, in the order the platform returned them and with their
+// text sanitised.
+func listRows(instances []platform.Instance) [][]string {
 	rows := make([][]string, 0, len(instances))
 	for _, in := range instances {
 		rows = append(rows, []string{
 			term.Sanitize(in.ID), term.Sanitize(in.APIApplicationID), term.Sanitize(in.Name), term.Sanitize(in.ServiceName),
 		})
 	}
-	return term.Table(env.IO.Out, listHeaders, rows)
+	return rows
 }

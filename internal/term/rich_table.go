@@ -57,16 +57,19 @@ func columnWidths(headers []string, rows [][]string) (widths, floors []int) {
 	return widths, floors
 }
 
-// shrinkColumns cuts the widest column that may be cut, one rune at a time, until the table fits in limit columns or
-// nothing is left to cut. A table that still does not fit is printed as it is.
+// shrinkColumns cuts the widest column that may be cut, one rune at a time, until the table fits in limit columns.
+// When cutting everything that may be cut still leaves the table too wide, it cuts nothing: an elided cell would save
+// no line from wrapping, and the text would be lost for no gain.
 func shrinkColumns(widths, floors, keep []int, limit int) {
-	for tableWidth(widths) > limit {
-		col := widestCuttable(widths, floors, keep)
+	shrunk := slices.Clone(widths)
+	for tableWidth(shrunk) > limit {
+		col := widestCuttable(shrunk, floors, keep)
 		if col < 0 {
 			return
 		}
-		widths[col]--
+		shrunk[col]--
 	}
+	copy(widths, shrunk)
 }
 
 func tableWidth(widths []int) int {

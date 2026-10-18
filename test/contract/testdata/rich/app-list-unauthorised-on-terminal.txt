@@ -1,0 +1,10 @@
+# vcr rich golden v1
+exit 1
+@@ stdout 212
+✗ failed to list Vonage applications
+  HTTP status  401
+  Message      invalid credentials
+  Trace ID     fake-trace-id
+  Check your credentials: run vcr configure
+  Quote the trace ID when contacting support.
+

@@ -10,6 +10,7 @@ import (
 
 	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
 	"vonage-cloud-runtime-cli/internal/platform"
+	"vonage-cloud-runtime-cli/internal/term"
 )
 
 func newRemove(env *cmdenv.Env) *cobra.Command {
@@ -48,7 +49,10 @@ func newRemove(env *cmdenv.Env) *cobra.Command {
 }
 
 func runRemove(ctx context.Context, env *cmdenv.Env, id string, yes bool) error {
-	proceed, err := confirm(env, yes, fmt.Sprintf("Are you sure you want to remove application %q?", id), "Application removal aborted")
+	if env.IO.Mode() != term.Classic {
+		return removeRich(ctx, env, id, yes)
+	}
+	proceed, err := confirmRemove(env, id, yes)
 	if err != nil || !proceed {
 		return err
 	}
@@ -56,13 +60,24 @@ func runRemove(ctx context.Context, env *cmdenv.Env, id string, yes bool) error 
 	stop := env.IO.StartSpinner(fmt.Sprintf(" Removing application %q...", id))
 	err = env.Client.DeleteApplication(ctx, id)
 	stop()
-	if errors.Is(err, platform.ErrNotFound) {
-		return fmt.Errorf("application %q could not be found or may have already been deleted", id)
-	}
 	if err != nil {
-		return fmt.Errorf("failed to remove application: %w", err)
+		return removeError(id, err)
 	}
 
 	fmt.Fprintf(env.IO.Out, "%s Application %q successfully removed\n", env.IO.Style().SuccessIcon(), id)
 	return nil
+}
+
+// confirmRemove asks for the confirmation, the part of remove that every presentation shares.
+func confirmRemove(env *cmdenv.Env, id string, yes bool) (bool, error) {
+	return confirm(env, yes, fmt.Sprintf("Are you sure you want to remove application %q?", id), "Application removal aborted")
+}
+
+// removeError is what a failed removal reports: a plain error for an application that is not there, else the
+// platform's own.
+func removeError(id string, err error) error {
+	if errors.Is(err, platform.ErrNotFound) {
+		return fmt.Errorf("application %q could not be found or may have already been deleted", id)
+	}
+	return fmt.Errorf("failed to remove application: %w", err)
 }

@@ -15,6 +15,7 @@ import (
 	"vonage-cloud-runtime-cli/internal/clierr"
 	"vonage-cloud-runtime-cli/internal/config"
 	"vonage-cloud-runtime-cli/internal/platform"
+	"vonage-cloud-runtime-cli/internal/term"
 	"vonage-cloud-runtime-cli/test/fakeplatform"
 )
 
@@ -116,4 +117,39 @@ func TestGenerateKeysEndsWhenTheDeadlinePasses(t *testing.T) {
 	err := runPastTheDeadline(t, h, "generate-keys", "--app-id", id)
 
 	require.ErrorIs(t, err, context.DeadlineExceeded)
+}
+
+func TestRichGenerateKeysLine(t *testing.T) {
+	srv := startFake(t)
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich})
+	id := h.AppID(t, "my-app")
+
+	err := h.Run(t.Context(), app.NewCmd, "generate-keys", "--app-id", id)
+
+	require.NoError(t, err)
+	assert.Contains(t, cmdtest.Collapse(h.Screen()), "✓ Application \""+id+"\" configured with newly generated keys\n")
+	assert.Empty(t, h.ErrScreen())
+	assert.Equal(t, []string{"euw1 PATCH /applications/" + id + "/keys"}, cmdtest.Calls(h.Requests()))
+}
+
+func TestRichGenerateKeysEmptyIDFails(t *testing.T) {
+	srv := startFake(t)
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), app.NewCmd, "generate-keys", "--app-id", "")
+
+	require.EqualError(t, err, "app-id can not be empty")
+	assert.Empty(t, h.Requests())
+	assert.Empty(t, h.Screen())
+}
+
+func TestRichGenerateKeysErrorLeavesNoSuccessLine(t *testing.T) {
+	h := cmdtest.New(t, startFake(t), cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), app.NewCmd, "generate-keys", "--app-id", unknownID)
+
+	require.Error(t, err)
+	assert.True(t, strings.HasPrefix(err.Error(), "failed to generate application keys: "), "error = %q", err)
+	assert.Empty(t, h.Screen())
+	assert.Empty(t, h.ErrScreen())
 }

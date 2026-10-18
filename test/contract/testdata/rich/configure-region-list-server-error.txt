@@ -1,15 +1,10 @@
 # vcr rich golden v1
 exit 1
-@@ stdout 640
+@@ stdout 231
 ? Enter your Vonage api key: abc123
 ? Enter your Vonage api secret (leave blank to keep the current one):
-────────────────────────────────────────────────────────
-✗ Error Encountered: failed to retrieve regions
-
-ℹ Details:
-  - HTTP Status : 500
-  - Trace ID    : fake-trace-id
-
-Please refer to the documentation or contact support for further assistance.
-────────────────────────────────────────────────────────
+✗ failed to retrieve regions
+  HTTP status  500
+  Trace ID     fake-trace-id
+  Quote the trace ID when contacting support.
 

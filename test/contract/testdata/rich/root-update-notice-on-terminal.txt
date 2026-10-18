@@ -1,0 +1,11 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 146
+ID                                    Name
+<uuid>  my-app
+<uuid>  second-app
+
+2 applications
+
+Update available 2.6.1 → 9.9.9 · run vcr upgrade
+

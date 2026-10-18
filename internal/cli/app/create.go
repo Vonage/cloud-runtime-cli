@@ -74,10 +74,10 @@ func newCreate(env *cmdenv.Env) *cobra.Command {
 }
 
 func runCreate(ctx context.Context, env *cmdenv.Env, f createFlags) error {
-	if f.name == "" {
-		return errors.New("name can not be empty")
+	if env.IO.Mode() != term.Classic {
+		return createRich(ctx, env, f)
 	}
-	proceed, err := confirm(env, f.yes, "Are you sure you want to create an application?", "Application creation aborted")
+	proceed, err := confirmCreate(env, f)
 	if err != nil || !proceed {
 		return err
 	}
@@ -94,4 +94,12 @@ func runCreate(ctx context.Context, env *cmdenv.Env, f createFlags) error {
 	fmt.Fprintf(env.IO.Out, "%s Application created\n%s id: %s\n%s name: %s\n",
 		style.SuccessIcon(), info, term.Sanitize(created.ApplicationID), info, term.Sanitize(created.ApplicationName))
 	return nil
+}
+
+// confirmCreate checks the name and asks for the confirmation, the part of create that every presentation shares.
+func confirmCreate(env *cmdenv.Env, f createFlags) (bool, error) {
+	if f.name == "" {
+		return false, errors.New("name can not be empty")
+	}
+	return confirm(env, f.yes, "Are you sure you want to create an application?", "Application creation aborted")
 }

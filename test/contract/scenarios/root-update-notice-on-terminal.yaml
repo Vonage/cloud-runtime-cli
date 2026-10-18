@@ -1,0 +1,7 @@
+description: "a newer release is announced on a terminal after the command output"
+args: [app, list]
+tty: true
+fixtures:
+  release: {tag: v9.9.9}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

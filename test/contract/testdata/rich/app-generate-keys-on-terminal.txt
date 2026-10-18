@@ -1,0 +1,5 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 92
+✓ Application "00000000-0000-4000-8000-000000000601" configured with newly generated keys
+

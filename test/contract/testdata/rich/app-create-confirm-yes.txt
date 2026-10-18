@@ -1,8 +1,8 @@
 # vcr rich golden v1
 exit 0
-@@ stdout 115
+@@ stdout 113
 Are you sure you want to create an application? [y/n]: y
 ✓ Application created
-ℹ id: <uuid>
-ℹ name: test-app
+  ID    <uuid>
+  Name  test-app
 

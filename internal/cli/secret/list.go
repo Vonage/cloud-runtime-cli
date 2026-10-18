@@ -48,6 +48,9 @@ func newList(env *cmdenv.Env) *cobra.Command {
 
 // runList prints the names in the order the platform returned them.
 func runList(ctx context.Context, env *cmdenv.Env) error {
+	if env.IO.Mode() != term.Classic {
+		return listRich(ctx, env)
+	}
 	stop := env.IO.StartSpinner(" Fetching secrets...")
 	names, err := env.Client.ListSecrets(ctx)
 	stop()

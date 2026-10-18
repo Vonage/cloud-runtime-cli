@@ -42,6 +42,10 @@ func Newer(current string, latest Release) (string, error) {
 // PrintNotice prints v2.6.1's notice on stdout: a blank line pair, "A new release of vcr is available: <cur> → <new>"
 // (yellow and cyan) and "To upgrade, run: vcr upgrade".
 func PrintNotice(t *term.IO, current, latest string) {
+	if t.Mode() != term.Classic {
+		t.Notice(noticeText(current, latest))
+		return
+	}
 	style := t.Style()
 	fmt.Fprintf(t.Out, "\n\n%s %s → %s\nTo upgrade, run: vcr upgrade\n",
 		style.Yellow("A new release of vcr is available:"), style.Cyan(shownVersion(current)), style.Cyan(latest))

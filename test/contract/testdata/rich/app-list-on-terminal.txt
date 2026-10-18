@@ -1,0 +1,9 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 93
+ID                                    Name
+<uuid>  my-app
+<uuid>  second-app
+
+2 applications
+

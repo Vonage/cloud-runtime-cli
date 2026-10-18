@@ -78,13 +78,12 @@ type current struct {
 }
 
 func run(ctx context.Context, env *cmdenv.Env) error {
+	if env.IO.Mode() != term.Classic {
+		return runRich(ctx, env)
+	}
 	path := env.Flags.ConfigFile // as given: the messages show it the way the user typed it
 	stored := readStored(env, path)
-	cur := current{
-		key:    cmp.Or(env.Flags.APIKey, stored.APIKey),
-		secret: cmp.Or(env.Flags.APISecret, stored.APISecret),
-		region: cmp.Or(env.Flags.Region, stored.DefaultRegion),
-	}
+	cur := currentOf(env.Flags, stored)
 
 	key, secret, err := askCredentials(env.Prompt, cur)
 	if err != nil {
@@ -99,17 +98,30 @@ func run(ctx context.Context, env *cmdenv.Env) error {
 		return err
 	}
 
-	file := config.File{
-		GraphQLEndpoint: graphqlEndpointToWrite(env.Flags.GraphQLEndpoint, env.Flags.Region, stored.GraphQLEndpoint),
-		DefaultRegion:   region,
-		APIKey:          key,
-		APISecret:       secret,
-	}
-	if err := config.Write(path, file); err != nil {
+	if err := config.Write(path, fileToWrite(env.Flags, stored, key, secret, region)); err != nil {
 		return fmt.Errorf("failed to write config: %w", err)
 	}
 	fmt.Fprintf(env.IO.Out, "%s New configuration file written to %s\n", env.IO.Style().SuccessIcon(), path)
 	return nil
+}
+
+// currentOf is what the questions start from: each flag, else what the stored file holds.
+func currentOf(flags *config.Flags, stored config.File) current {
+	return current{
+		key:    cmp.Or(flags.APIKey, stored.APIKey),
+		secret: cmp.Or(flags.APISecret, stored.APISecret),
+		region: cmp.Or(flags.Region, stored.DefaultRegion),
+	}
+}
+
+// fileToWrite is the new config file: the answers, and the GraphQL endpoint the flags or the stored file name.
+func fileToWrite(flags *config.Flags, stored config.File, key, secret, region string) config.File {
+	return config.File{
+		GraphQLEndpoint: graphqlEndpointToWrite(flags.GraphQLEndpoint, flags.Region, stored.GraphQLEndpoint),
+		DefaultRegion:   region,
+		APIKey:          key,
+		APISecret:       secret,
+	}
 }
 
 // readStored returns what the file at path holds. A file that cannot be read is not an error here: configure makes
@@ -149,28 +161,9 @@ func askSecret(prompt term.Prompter, currentSecret string) (string, error) {
 	return cmp.Or(typed, currentSecret), nil
 }
 
-// fetchRegions lists the regions with the credentials that were just entered. env.Resolver is empty for this
-// command, so the resolver is built here. The --region flag picks the production default and the stored
-// default_region does not: an endpoint in the file must not be replaced by it.
+// fetchRegions lists the regions with the credentials that were just entered.
 func fetchRegions(ctx context.Context, env *cmdenv.Env, stored config.File, creds platform.Credentials) ([]platform.Region, error) {
-	flags := env.Flags
-	bootstrap, err := endpoint.Bootstrap(endpoint.Inputs{
-		DeploymentAPIURL: flags.DeploymentAPIURL,
-		GraphQLFlag:      flags.GraphQLEndpoint,
-		Region:           flags.Region,
-		GraphQLConfig:    stored.GraphQLEndpoint,
-	})
-	if err != nil {
-		return nil, err
-	}
-	resolver, err := platform.NewResolver(platform.Options{
-		Bootstrap:  bootstrap,
-		APIVersion: env.Build.APIVersion,
-		Creds:      creds,
-		UserAgent:  env.Build.UserAgent(),
-		Clock:      env.Clock,
-		Notices:    env.IO.ErrOut,
-	})
+	resolver, err := newResolver(env, stored, creds)
 	if err != nil {
 		return nil, err
 	}
@@ -182,6 +175,30 @@ func fetchRegions(ctx context.Context, env *cmdenv.Env, stored config.File, cred
 		return nil, fmt.Errorf("failed to retrieve regions: %w", err)
 	}
 	return regions, nil
+}
+
+// newResolver builds the resolver that lists the regions. env.Resolver is empty for this command, so it is built
+// here. The --region flag picks the production default and the stored default_region does not: an endpoint in the
+// file must not be replaced by it.
+func newResolver(env *cmdenv.Env, stored config.File, creds platform.Credentials) (*platform.Resolver, error) {
+	flags := env.Flags
+	bootstrap, err := endpoint.Bootstrap(endpoint.Inputs{
+		DeploymentAPIURL: flags.DeploymentAPIURL,
+		GraphQLFlag:      flags.GraphQLEndpoint,
+		Region:           flags.Region,
+		GraphQLConfig:    stored.GraphQLEndpoint,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return platform.NewResolver(platform.Options{
+		Bootstrap:  bootstrap,
+		APIVersion: env.Build.APIVersion,
+		Creds:      creds,
+		UserAgent:  env.Build.UserAgent(),
+		Clock:      env.Clock,
+		Notices:    env.IO.ErrOut,
+	})
 }
 
 // chooseRegion asks which of the regions is the default and returns its alias. The picker starts on the current

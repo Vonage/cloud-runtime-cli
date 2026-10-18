@@ -15,6 +15,7 @@ import (
 	"vonage-cloud-runtime-cli/internal/clierr"
 	"vonage-cloud-runtime-cli/internal/config"
 	"vonage-cloud-runtime-cli/internal/platform"
+	"vonage-cloud-runtime-cli/internal/term"
 	"vonage-cloud-runtime-cli/test/fakeplatform"
 )
 
@@ -288,4 +289,89 @@ func TestRemoveEndsWhenTheDeadlinePasses(t *testing.T) {
 	err := runPastTheDeadline(t, h, "remove", "--id", dev, "--yes")
 
 	require.ErrorIs(t, err, context.DeadlineExceeded)
+}
+
+func TestRichRemoveLines(t *testing.T) {
+	h := cmdtest.New(t, startFake(t), cmdtest.Options{Mode: term.Rich})
+	dev := h.InstanceID(t, "dev")
+
+	err := h.Run(t.Context(), instance.NewCmd, "remove", "--id", dev, "--yes")
+
+	require.NoError(t, err)
+	assert.Equal(t, "✓ Instance found\n"+successLine(dev), cmdtest.Collapse(h.Screen()))
+	assert.Empty(t, h.ErrScreen())
+	assert.Equal(t, []string{"euw1 GET /instances/" + dev, "euw1 DELETE /instances/" + dev}, cmdtest.Calls(h.Requests()))
+}
+
+func TestRichRemoveByNames(t *testing.T) {
+	h := cmdtest.New(t, startFake(t), cmdtest.Options{Mode: term.Rich})
+	dev := h.InstanceID(t, "dev")
+
+	err := h.Run(t.Context(), instance.NewCmd, "remove", "-p", "my-project", "-n", "dev", "-y")
+
+	require.NoError(t, err)
+	assert.Contains(t, cmdtest.Collapse(h.Screen()), successLine(dev))
+	assert.Equal(t, []string{"euw1 GET /projects/my-project/instances/dev", "euw1 DELETE /instances/" + dev}, cmdtest.Calls(h.Requests()))
+}
+
+func TestRichRemoveRequiresATargetBeforeAnyStep(t *testing.T) {
+	h := cmdtest.New(t, startFake(t), cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), instance.NewCmd, "remove", "--project-name", "my-project")
+
+	require.EqualError(t, err, noTargetMessage)
+	assert.Empty(t, h.Requests())
+	assert.Empty(t, h.Screen())
+}
+
+func TestRichRemoveDeclinedKeepsTheClassicLine(t *testing.T) {
+	script := &cmdtest.Script{YesNos: []bool{false}}
+	h := cmdtest.New(t, startFake(t), cmdtest.Options{Mode: term.Rich, Prompt: script})
+	dev := h.InstanceID(t, "dev")
+
+	err := h.Run(t.Context(), instance.NewCmd, "remove", "--id", dev)
+
+	require.NoError(t, err)
+	assert.Equal(t, "! Instance removal aborted\n", h.ErrScreen())
+	assert.Equal(t, "✓ Instance found\n", cmdtest.Collapse(h.Screen()), "the instance was found before the question")
+	assert.Equal(t, []string{"euw1 GET /instances/" + dev}, cmdtest.Calls(h.Requests()))
+	assert.Equal(t, []cmdtest.Ask{{Kind: "yesno", Message: removeQuestion(dev, "my-project-dev")}}, script.Asked)
+}
+
+func TestRichRemoveAnsweredYesDeletes(t *testing.T) {
+	script := &cmdtest.Script{YesNos: []bool{true}}
+	h := cmdtest.New(t, startFake(t), cmdtest.Options{Mode: term.Rich, Prompt: script})
+	dev := h.InstanceID(t, "dev")
+
+	err := h.Run(t.Context(), instance.NewCmd, "remove", "--id", dev)
+
+	require.NoError(t, err)
+	assert.Equal(t, "✓ Instance found\n"+successLine(dev), cmdtest.Collapse(h.Screen()))
+	assert.Len(t, script.Asked, 1)
+}
+
+func TestRichRemoveNotFoundKeepsPlainError(t *testing.T) {
+	h := cmdtest.New(t, startFake(t), cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), instance.NewCmd, "remove", "--yes", "--id", unknownID)
+
+	require.EqualError(t, err, `failed to get instance: instance with id="`+unknownID+`" could not be found or may have been deleted`)
+	var apiErr *clierr.APIError
+	assert.NotErrorAs(t, err, &apiErr)
+	assert.Empty(t, h.Screen(), "no 'found' line for an instance that is not there")
+	assert.Empty(t, h.ErrScreen())
+}
+
+func TestRichRemoveDeleteErrorLeavesNoSuccessLine(t *testing.T) {
+	body := `{"error":{"code":2003,"message":"refused","traceId":"trace-1"}}`
+	srv := startFake(t, fakeplatform.Override{Match: "DELETE /instances/*", Status: http.StatusConflict, Body: body})
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich})
+	dev := h.InstanceID(t, "dev")
+
+	err := h.Run(t.Context(), instance.NewCmd, "remove", "--id", dev, "--yes")
+
+	require.Error(t, err)
+	assert.True(t, strings.HasPrefix(err.Error(), "failed to remove instance: "), "error = %q", err)
+	assert.Equal(t, "✓ Instance found\n", cmdtest.Collapse(h.Screen()), "only what succeeded is shown")
+	assert.Empty(t, h.ErrScreen())
 }

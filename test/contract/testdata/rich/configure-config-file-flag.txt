@@ -1,8 +1,9 @@
 # vcr rich golden v1
 exit 0
-@@ stdout 227
+@@ stdout 249
 ? Enter your Vonage api key: abc123
 ? Enter your Vonage api secret (leave blank to keep the current one):
+✓ Regions retrieved
 ? Select your Vonage region: AWS - Europe (Ireland) - (aws.euw1)
 ✓ New configuration file written to <HOME>/custom.ini
 

@@ -67,6 +67,9 @@ func newRemove(env *cmdenv.Env) *cobra.Command {
 // the region it runs in. The region is resolved before the question, so a region that cannot be reached is
 // reported without asking.
 func runRemove(ctx context.Context, env *cmdenv.Env, t target, yes bool) error {
+	if env.IO.Mode() != term.Classic {
+		return removeRich(ctx, env, t, yes)
+	}
 	if err := t.validate(); err != nil {
 		return err
 	}

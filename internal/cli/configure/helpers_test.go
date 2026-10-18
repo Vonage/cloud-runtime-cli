@@ -70,6 +70,7 @@ type setup struct {
 	flags    config.Flags         // ConfigFile defaults to a path in a fresh temporary directory
 	script   *cmdtest.Script      // answers the questions; empty when nil
 	prompter term.Prompter        // replaces the script when set
+	mode     term.Mode            // the presentation; Classic when zero
 }
 
 // run is one execution of configure on a harness that has no platform and no credentials of its own.
@@ -100,7 +101,7 @@ func start(t *testing.T, s setup) *run {
 	if s.stored != nil {
 		require.NoError(t, config.Write(flags.ConfigFile, *s.stored))
 	}
-	h := cmdtest.New(t, srv, cmdtest.Options{NoPlatform: true, NoCredentials: true, Flags: flags, Prompt: prompt})
+	h := cmdtest.New(t, srv, cmdtest.Options{NoPlatform: true, NoCredentials: true, Flags: flags, Prompt: prompt, Mode: s.mode})
 	return &run{Harness: h, path: flags.ConfigFile, script: script}
 }
 

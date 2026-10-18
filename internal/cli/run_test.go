@@ -12,8 +12,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"vonage-cloud-runtime-cli/internal/buildinfo"
 	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
 	"vonage-cloud-runtime-cli/internal/clierr"
+	"vonage-cloud-runtime-cli/internal/clock/clocktest"
 	"vonage-cloud-runtime-cli/internal/term"
 )
 
@@ -234,4 +236,52 @@ func TestRunWithNilArgumentsPrintsRootHelp(t *testing.T) {
 
 	assert.Equal(t, 0, code)
 	assert.Contains(t, out.String(), "VCR CLI is a powerful command-line interface")
+}
+
+// liveStep starts a step on a rich terminal that nobody will stop, and moves its clock past the debounce, so the
+// next write to the terminal draws the live line.
+func liveStep(t *testing.T) (streams *term.IO, stdout, stderr *term.TermBuffer) {
+	t.Helper()
+	clk := clocktest.New(time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC))
+	streams, stdout, stderr = term.TestRich(term.Rich, 100, clk)
+	streams.StartStep("Working")
+	require.NoError(t, clk.Sleep(t.Context(), time.Second))
+	return streams, stdout, stderr
+}
+
+func TestRunClosesALiveStepThatIsStillRunning(t *testing.T) {
+	streams, stdout, stderr := liveStep(t)
+	bi := buildinfo.Info{Version: testVersion, APIVersion: testAPIVersion}
+
+	code := Run(t.Context(), []string{"--version"}, streams, bi)
+
+	assert.Equal(t, 0, code)
+	assert.Equal(t, bi.VersionLine()+"\n", stdout.Screen())
+	assert.Contains(t, stderr.Raw(), "Working", "the live line was on the screen while the command printed")
+	assert.Empty(t, stderr.Screen(), "Run erased it before it returned")
+}
+
+func TestRunClosesTheLiveLineWhenTheContextIsCancelled(t *testing.T) {
+	h := newHarness(t)
+	streams, _, stderr := liveStep(t)
+	bi := buildinfo.Info{Version: testVersion, APIVersion: testAPIVersion, ReleaseURL: h.srv.GitHubURL()}
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+
+	code := Run(ctx, append([]string{"app", "list"}, h.flags()...), streams, bi)
+
+	assert.Equal(t, 1, code, "the cancelled run ends with an error")
+	assert.Contains(t, stderr.Raw(), "Working", "the live line was on the screen while the error was printed")
+	assert.NotContains(t, stderr.Screen(), "Working", "Run erased it before it returned")
+}
+
+func TestRunCloseIsNeutralInClassic(t *testing.T) {
+	streams, stdout, stderr := term.Test("", false)
+	bi := buildinfo.Info{Version: testVersion, APIVersion: testAPIVersion}
+
+	code := Run(t.Context(), []string{"--version"}, streams, bi)
+
+	assert.Equal(t, 0, code)
+	assert.Equal(t, bi.VersionLine()+"\n", stdout.String())
+	assert.Empty(t, stderr.String())
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
+	"vonage-cloud-runtime-cli/internal/term"
 )
 
 func newGenerateKeys(env *cmdenv.Env) *cobra.Command {
@@ -53,8 +54,11 @@ func newGenerateKeys(env *cmdenv.Env) *cobra.Command {
 
 // runGenerateKeys never asks for a confirmation; the help text carries the warning.
 func runGenerateKeys(ctx context.Context, env *cmdenv.Env, appID string) error {
-	if appID == "" {
-		return errors.New("app-id can not be empty")
+	if env.IO.Mode() != term.Classic {
+		return generateKeysRich(ctx, env, appID)
+	}
+	if err := checkAppID(appID); err != nil {
+		return err
 	}
 
 	stop := env.IO.StartSpinner(fmt.Sprintf(" Generating keys for application %q...", appID))
@@ -65,5 +69,13 @@ func runGenerateKeys(ctx context.Context, env *cmdenv.Env, appID string) error {
 	}
 
 	fmt.Fprintf(env.IO.Out, "%s Application %q configured with newly generated keys\n", env.IO.Style().SuccessIcon(), appID)
+	return nil
+}
+
+// checkAppID refuses an empty application id before anything is sent.
+func checkAppID(appID string) error {
+	if appID == "" {
+		return errors.New("app-id can not be empty")
+	}
 	return nil
 }

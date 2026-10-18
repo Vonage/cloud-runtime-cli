@@ -33,7 +33,7 @@ func (st *runState) preRun(cmd *cobra.Command, _ []string) error {
 	if err := st.loadConfig(); err != nil {
 		return err
 	}
-	stop := env.IO.StartSpinner(spinnerMessage(cmd))
+	stop := startConnecting(env, cmd, connectingRegion(env, mode))
 	defer stop()
 	if err := st.initPlatform(ctx, mode); err != nil {
 		return fmt.Errorf("failed to initialize cli: %w", err)

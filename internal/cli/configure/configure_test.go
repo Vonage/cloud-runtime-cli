@@ -1,9 +1,11 @@
 package configure_test
 
 import (
+	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,6 +15,8 @@ import (
 	"vonage-cloud-runtime-cli/internal/cli/cmdtest"
 	"vonage-cloud-runtime-cli/internal/cli/configure"
 	"vonage-cloud-runtime-cli/internal/config"
+	"vonage-cloud-runtime-cli/internal/term"
+	"vonage-cloud-runtime-cli/test/fakeplatform"
 )
 
 // answers is the script of a run that types the account of the fake platform and takes the first region.
@@ -235,4 +239,98 @@ func TestConfigureCommandMetadata(t *testing.T) {
 	assert.Equal(t, "Configure VCR CLI with your Vonage API credentials", cmd.Short)
 	assert.Equal(t, cmdenv.None, cmd.Annotations[cmdenv.Annotation])
 	assert.False(t, cmd.Flags().HasFlags(), "configure has no flags of its own")
+}
+
+func TestRichConfigureLines(t *testing.T) {
+	for name, mode := range map[string]term.Mode{"rich": term.Rich, "static": term.Static} {
+		t.Run(name, func(t *testing.T) {
+			r := start(t, setup{script: answers(), mode: mode})
+
+			err := r.execute(t)
+
+			require.NoError(t, err)
+			assert.Equal(t, "✓ Regions retrieved\n✓ New configuration file written to "+r.path+"\n", cmdtest.Collapse(r.Screen()))
+			assert.Equal(t, "! Fail to read config file "+r.path+". Creating a new config...\n", r.ErrScreen())
+			assert.Equal(t, []string{"euw1 GET /regions"}, cmdtest.Calls(r.Requests()))
+			assertPrivate(t, r.path)
+		})
+	}
+}
+
+func TestRichConfigureWritesTheSameFileAsClassic(t *testing.T) {
+	classic := start(t, setup{script: answers()})
+	rich := start(t, setup{script: answers(), mode: term.Rich})
+
+	require.NoError(t, classic.execute(t))
+	require.NoError(t, rich.execute(t))
+
+	want, err := os.ReadFile(classic.path)
+	require.NoError(t, err)
+	got, err := os.ReadFile(rich.path)
+	require.NoError(t, err)
+	assert.Equal(t, string(want), string(got))
+	assert.Equal(t, classic.script.Asked, rich.script.Asked, "the same questions, in the same order")
+}
+
+func TestRichConfigureRegionListError(t *testing.T) {
+	srv := startFake(t, fakeplatform.Override{Match: "GET /regions", Status: http.StatusInternalServerError, Body: `{"error":{"code":1001,"message":"boom"}}`})
+	r := start(t, setup{srv: srv, script: answers(), mode: term.Rich})
+
+	err := r.execute(t)
+
+	require.Error(t, err)
+	assert.True(t, strings.HasPrefix(err.Error(), "failed to retrieve regions: "), "got %q", err.Error())
+	assert.NotContains(t, r.Screen()+r.ErrScreen(), "✓")
+	assert.NoFileExists(t, r.path)
+}
+
+func TestRichConfigureWarnsAsClassic(t *testing.T) {
+	path := filepath.Join(t.TempDir(), ".vcr-cli")
+	require.NoError(t, os.WriteFile(path, []byte("= not valid\n"), 0o600))
+	r := start(t, setup{flags: config.Flags{ConfigFile: path}, script: answers(), mode: term.Rich})
+
+	err := r.execute(t)
+
+	require.NoError(t, err)
+	assert.Equal(t, "! Fail to read config file "+path+". Creating a new config...\n", r.ErrScreen())
+}
+
+func TestRichConfigureReportsAConfigFileThatCannotBeWritten(t *testing.T) {
+	blocker := filepath.Join(t.TempDir(), "blocker")
+	require.NoError(t, os.WriteFile(blocker, []byte("a file, not a directory"), 0o600))
+	r := start(t, setup{flags: config.Flags{ConfigFile: filepath.Join(blocker, ".vcr-cli")}, script: answers(), mode: term.Rich})
+
+	err := r.execute(t)
+
+	require.Error(t, err)
+	assert.True(t, strings.HasPrefix(err.Error(), "failed to write config: "), "got %q", err.Error())
+	assert.Equal(t, "✓ Regions retrieved\n", cmdtest.Collapse(r.Screen()), "no success line when the file was not written")
+}
+
+func TestRichConfigurePrintsThePathAsGiven(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("the home directory of the test is not honoured the same way")
+	}
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+	r := start(t, setup{flags: config.Flags{ConfigFile: config.DefaultFlagValue}, script: answers(), mode: term.Rich})
+
+	err := r.execute(t)
+
+	require.NoError(t, err)
+	assert.Contains(t, r.Screen(), "✓ New configuration file written to ~/.vcr-cli\n")
+	assert.FileExists(t, filepath.Join(home, ".vcr-cli"))
+}
+
+func TestRichConfigureAsksTheSameQuestions(t *testing.T) {
+	r := start(t, setup{script: answers(), mode: term.Rich})
+
+	require.NoError(t, r.execute(t))
+
+	assert.Equal(t, []cmdtest.Ask{
+		{Kind: "input", Message: keyPrompt},
+		{Kind: "password", Message: newSecretPrompt, Required: true},
+		{Kind: "select", Message: regionPrompt, Options: []string{euw1Label, use1Label}},
+	}, r.script.Asked)
 }

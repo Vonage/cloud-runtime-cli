@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"unicode/utf8"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -185,4 +186,90 @@ func TestListEndsWhenTheDeadlinePasses(t *testing.T) {
 	err := runPastTheDeadline(t, h, "list")
 
 	require.ErrorIs(t, err, context.DeadlineExceeded)
+}
+
+func TestRichListTable(t *testing.T) {
+	body := `{"instances":[` +
+		`{"id":"id-zeta","name":"zeta","serviceName":"svc-zeta","apiApplicationId":"app-1","regionAlias":"aws.euw1"},` +
+		`{"id":"id-alpha","name":"alpha","serviceName":"svc-alpha","apiApplicationId":"app-2","regionAlias":"aws.use1"}]}`
+	srv := startFake(t, fakeplatform.Override{Match: "GET /instances", Body: body})
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), instance.NewCmd, "list")
+
+	require.NoError(t, err)
+	assert.Equal(t, "Instance ID API Application ID Instance Name Service Name\n"+
+		"id-zeta app-1 zeta svc-zeta\n"+
+		"id-alpha app-2 alpha svc-alpha\n"+
+		"\n2 instances\n", cmdtest.Collapse(h.Screen()), "the server's order, the classic header words, a count")
+	assert.Empty(t, h.ErrScreen())
+	assert.Equal(t, []string{"euw1 GET /instances"}, cmdtest.Calls(h.Requests()))
+}
+
+func TestRichListShortensTheNamesAndNeverTheIDs(t *testing.T) {
+	longID := strings.Repeat("a", 36)
+	longApp := strings.Repeat("b", 36)
+	body := `{"instances":[{"id":"` + longID + `","name":"` + strings.Repeat("n", 40) + `","serviceName":"` +
+		strings.Repeat("s", 40) + `","apiApplicationId":"` + longApp + `","regionAlias":"aws.euw1"}]}`
+	srv := startFake(t, fakeplatform.Override{Match: "GET /instances", Body: body})
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich, Width: 110}) // the ids and the headers of the others need 103
+
+	err := h.Run(t.Context(), instance.NewCmd, "list")
+
+	require.NoError(t, err)
+	row := strings.Split(h.Screen(), "\n")[1]
+	assert.True(t, strings.HasPrefix(row, longID+"  "+longApp+"  "), "both id columns are whole: %q", row)
+	assert.Contains(t, row, "…", "the name columns give way")
+	assert.NotContains(t, row, strings.Repeat("n", 40))
+	assert.Equal(t, 110, utf8.RuneCountInString(row), "the table fills the terminal exactly")
+}
+
+func TestRichListWiderThanAnyTerminalIsNotElided(t *testing.T) {
+	// 36 + 36 columns of ids and the headers of the others come to 103: no cut can make this fit in 100, so none is made.
+	srv := startFake(t, fakeplatform.Override{Match: "GET /instances", Body: `{"instances":[` +
+		`{"id":"` + strings.Repeat("a", 36) + `","name":"dev","serviceName":"my-project-dev","apiApplicationId":"` + strings.Repeat("b", 36) + `","regionAlias":"aws.euw1"},` +
+		`{"id":"` + strings.Repeat("c", 36) + `","name":"staging","serviceName":"my-project-staging","apiApplicationId":"` + strings.Repeat("d", 36) + `","regionAlias":"aws.euw1"}]}`})
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), instance.NewCmd, "list")
+
+	require.NoError(t, err)
+	assert.NotContains(t, h.Screen(), "…")
+	assert.Contains(t, h.Screen(), "my-project-dev\n")
+	assert.Contains(t, h.Screen(), "my-project-staging\n")
+}
+
+func TestRichListEmpty(t *testing.T) {
+	srv := startFakeWith(t, "instances: []")
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), instance.NewCmd, "list")
+
+	require.NoError(t, err)
+	assert.Equal(t, "No instances found.\n", h.Screen())
+	assert.Empty(t, h.ErrScreen())
+}
+
+func TestRichListSanitisesCells(t *testing.T) {
+	body := `{"instances":[{"id":"id1","name":"a\u001b[2Jb","serviceName":"s\u001b]0;t\u0007v","apiApplicationId":"p","regionAlias":"aws.euw1"}]}`
+	srv := startFake(t, fakeplatform.Override{Match: "GET /instances", Body: body})
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), instance.NewCmd, "list")
+
+	require.NoError(t, err)
+	assert.NotContains(t, h.Screen(), "\x1b")
+	assert.Contains(t, cmdtest.Collapse(h.Screen()), "id1 p ab sv\n")
+}
+
+func TestRichListErrorPrintsNoTable(t *testing.T) {
+	srv := startFake(t, fakeplatform.Override{Match: "GET /instances", Status: http.StatusInternalServerError, Body: envelope500})
+	h := cmdtest.New(t, srv, cmdtest.Options{Mode: term.Rich})
+
+	err := h.Run(t.Context(), instance.NewCmd, "list")
+
+	require.Error(t, err)
+	assert.True(t, strings.HasPrefix(err.Error(), "failed to list instances: "), "error = %q", err)
+	assert.Empty(t, h.Screen())
+	assert.Empty(t, h.ErrScreen())
 }

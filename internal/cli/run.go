@@ -17,6 +17,7 @@ import (
 // Run executes args and returns the exit code: 0 on success, help, --version and an aborted confirmation; 1 for every
 // error, rendered by clierr.Render. --timeout becomes ctx's deadline here, in one place.
 func Run(ctx context.Context, args []string, t *term.IO, bi buildinfo.Info) int {
+	defer t.Close() // erases a live line that is still up, whichever way the run ends
 	env := &cmdenv.Env{
 		IO:     t,
 		Prompt: t.Prompter(),

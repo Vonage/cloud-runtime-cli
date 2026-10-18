@@ -1,0 +1,8 @@
+description: "an account without instances says so on a terminal"
+args: [instance, list]
+tty: true
+fixtures:
+  instances: []
+expect-reads:
+  - "euw1 GET /instances"
+  - "euw1 GET /regions/aws.euw1"

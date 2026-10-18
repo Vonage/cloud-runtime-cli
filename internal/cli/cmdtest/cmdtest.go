@@ -37,6 +37,13 @@ var startTime = time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC)
 type Options struct {
 	Stdin string // what the command can read from stdin
 	TTY   bool   // stdin, stdout and stderr are terminals
+	// Mode is the presentation of Env.IO. The zero value, term.Classic, is the v2.6.1 output over plain buffers. Rich
+	// and Static build the IO with term.TestRich: driven by the clock of the harness, with all three streams
+	// reporting as terminals (TTY has no say there), so a Prompt answers the confirmations. Read what such a run
+	// printed with Screen, ErrScreen and ErrRaw.
+	Mode term.Mode
+	// Width is the width in columns of the terminal of a Rich or Static run; the default is 100.
+	Width int
 	// Region is the region alias of Env.Settings and Env.Client; the default is aws.euw1.
 	Region string
 	// Prompt answers the questions a command asks. A *Script is handed the test; the default is a Script with no
@@ -57,11 +64,15 @@ type Options struct {
 
 // Harness is the environment of one test run and the buffers and fake behind it.
 type Harness struct {
-	Env    *cmdenv.Env
+	Env *cmdenv.Env
+	// Stdout and Stderr hold what a Classic run printed. They are nil in Rich and Static mode, where the output
+	// goes to terminal buffers: read it with Screen, ErrScreen and ErrRaw, which work in every mode.
 	Stdout *bytes.Buffer
 	Stderr *bytes.Buffer
 	Clock  *clocktest.Fake
 	Server *fakeplatform.Server
+
+	screen, errScreen *term.TermBuffer // Rich and Static: stdout and stderr
 }
 
 // New builds the environment of a command run over srv. Unless o.NoPlatform it resolves the region the way the
@@ -73,8 +84,8 @@ func New(t testing.TB, srv *fakeplatform.Server, o Options) *Harness {
 		t.Fatalf("cmdtest: NoCredentials needs NoPlatform, because the fake rejects an unauthenticated region lookup")
 		return nil
 	}
-	streams, stdout, stderr := term.Test(o.Stdin, o.TTY)
 	clk := clocktest.New(startTime)
+	streams := newStreams(t, o, clk)
 	flags := flagsFor(srv, o)
 	region := o.Region
 	if region == "" {
@@ -82,17 +93,20 @@ func New(t testing.TB, srv *fakeplatform.Server, o Options) *Harness {
 	}
 	h := &Harness{
 		Env: &cmdenv.Env{
-			IO:       streams,
-			Prompt:   prompterFor(t, streams, o),
+			IO:       streams.io,
+			Prompt:   prompterFor(t, streams.io, o),
 			Clock:    clk,
 			Build:    buildinfo.Info{Version: testVersion, APIVersion: testAPIVersion, ReleaseURL: srv.GitHubURL()},
 			Flags:    &flags,
 			Settings: settingsFor(flags, region, o.NoCredentials),
 		},
-		Stdout: stdout,
-		Stderr: stderr,
+		Stdout: streams.out,
+		Stderr: streams.errOut,
 		Clock:  clk,
 		Server: srv,
+
+		screen:    streams.screen,
+		errScreen: streams.errScreen,
 	}
 	if !o.NoPlatform {
 		connect(t, h, region)
@@ -153,7 +167,7 @@ func connect(t testing.TB, h *Harness, region string) {
 		Creds:      platform.Credentials{APIKey: env.Settings.APIKey, APISecret: env.Settings.APISecret},
 		UserAgent:  testUserAgent,
 		Clock:      h.Clock,
-		Notices:    h.Stderr,
+		Notices:    env.IO.ErrOut,
 	})
 	if err != nil {
 		t.Fatalf("cmdtest: cannot build the resolver: %v", err)

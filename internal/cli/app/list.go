@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
+	"vonage-cloud-runtime-cli/internal/platform"
 	"vonage-cloud-runtime-cli/internal/term"
 )
 
@@ -63,6 +64,9 @@ func newList(env *cmdenv.Env) *cobra.Command {
 // runList prints the applications in the order the platform returned them; an empty result is a table with only
 // its header.
 func runList(ctx context.Context, env *cmdenv.Env, filter string) error {
+	if env.IO.Mode() != term.Classic {
+		return listRich(ctx, env, filter)
+	}
 	stop := env.IO.StartSpinner(" Fetching applications list...")
 	apps, err := env.Client.ListApplications(ctx, filter)
 	stop()
@@ -70,9 +74,17 @@ func runList(ctx context.Context, env *cmdenv.Env, filter string) error {
 		return fmt.Errorf("failed to list Vonage applications: %w", err)
 	}
 
+	return term.Table(env.IO.Out, listHeaders, listRows(apps))
+}
+
+// listHeaders are the columns of the table, in the words of every presentation.
+var listHeaders = []string{"ID", "Name"}
+
+// listRows are the applications as table rows, in the order the platform returned them, their text sanitised.
+func listRows(apps []platform.Application) [][]string {
 	rows := make([][]string, 0, len(apps))
 	for _, a := range apps {
 		rows = append(rows, []string{term.Sanitize(a.ID), term.Sanitize(a.Name)})
 	}
-	return term.Table(env.IO.Out, []string{"ID", "Name"}, rows)
+	return rows
 }

@@ -1,7 +1,7 @@
 # vcr rich golden v1
 exit 0
-@@ stdout 54
+@@ stdout 52
 ✓ Application created
-ℹ id: <uuid>
-ℹ name: demo
+  ID    <uuid>
+  Name  demo
 

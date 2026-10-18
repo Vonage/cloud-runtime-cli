@@ -25,11 +25,13 @@ var separatorLine = strings.Repeat("─", 56)
 //
 // Remote text inside the block (message, container logs) is printed through term.SanitizeStream.
 func Render(t *term.IO, err error, usage string) (notice bool) {
+	if t.Mode() != term.Classic && !isUsage(err) {
+		return renderRich(t, err)
+	}
 	raw := err.Error()
 	text := term.Sanitize(raw)
 
-	var usageErr *UsageError
-	if errors.As(err, &usageErr) || strings.HasPrefix(raw, unknownCommandPrefix) {
+	if isUsage(err) {
 		fmt.Fprintf(t.ErrOut, "%s\n%s\n", text, usage)
 		return false
 	}

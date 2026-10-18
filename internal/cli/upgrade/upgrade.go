@@ -13,6 +13,7 @@ import (
 	"vonage-cloud-runtime-cli/internal/buildinfo"
 	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
 	"vonage-cloud-runtime-cli/internal/selfupdate"
+	"vonage-cloud-runtime-cli/internal/term"
 )
 
 const errDevelopmentBuild = textError("Cannot upgrade a development build")
@@ -67,15 +68,12 @@ func newCmd(env *cmdenv.Env, h host) *cobra.Command {
 // run prints the version line, finds the latest release and, when it is newer, installs it. Every step that can
 // fail comes before the first change to the installed binary.
 func run(ctx context.Context, env *cmdenv.Env, h host, opts options) error {
-	fmt.Fprintln(env.IO.Out, env.Build.VersionLine())
-
-	dir, err := installDir(opts.path)
+	if env.IO.Mode() != term.Classic {
+		return runRich(ctx, env, h, opts)
+	}
+	dir, current, err := begin(env, opts)
 	if err != nil {
 		return err
-	}
-	current, err := parseVersion(env.Build.Version)
-	if err != nil {
-		return errDevelopmentBuild
 	}
 
 	up := h.newUpdater(env.Build)
@@ -99,33 +97,73 @@ func run(ctx context.Context, env *cmdenv.Env, h host, opts options) error {
 	return install(ctx, env, up, rel, exe, latest)
 }
 
+// begin prints the version line and checks what the run depends on before it asks anything: the --path directory,
+// and that the running build is a release. It returns the directory and the running version.
+func begin(env *cmdenv.Env, opts options) (dir, current string, err error) {
+	fmt.Fprintln(env.IO.Out, env.Build.VersionLine())
+
+	dir, err = installDir(opts.path)
+	if err != nil {
+		return "", "", err
+	}
+	current, err = parseVersion(env.Build.Version)
+	if err != nil {
+		return "", "", errDevelopmentBuild
+	}
+	return dir, current, nil
+}
+
 // findLatest asks for the latest release and returns it with its version.
 func findLatest(ctx context.Context, env *cmdenv.Env, up updater) (selfupdate.Release, string, error) {
 	stop := env.IO.StartSpinner(" Checking for update...")
-	rel, err := up.Latest(ctx)
+	rel, err := latestRelease(ctx, up)
 	stop()
 	if err != nil {
-		return selfupdate.Release{}, "", fmt.Errorf("failed to get assets: %w", err)
+		return selfupdate.Release{}, "", err
 	}
-	latest, err := parseVersion(rel.TagName)
+	latest, err := releaseVersion(rel)
 	if err != nil {
-		return selfupdate.Release{}, "", fmt.Errorf("failed to get latest version: invalid update found: %w", err)
+		return selfupdate.Release{}, "", err
 	}
 	return rel, latest, nil
 }
 
+// latestRelease asks for the latest release. The error says that the assets could not be got.
+func latestRelease(ctx context.Context, up updater) (selfupdate.Release, error) {
+	rel, err := up.Latest(ctx)
+	if err != nil {
+		return selfupdate.Release{}, fmt.Errorf("failed to get assets: %w", err)
+	}
+	return rel, nil
+}
+
+// releaseVersion is the version a release is tagged with.
+func releaseVersion(rel selfupdate.Release) (string, error) {
+	latest, err := parseVersion(rel.TagName)
+	if err != nil {
+		return "", fmt.Errorf("failed to get latest version: invalid update found: %w", err)
+	}
+	return latest, nil
+}
+
 // reportNothingToDo says so when the release is not newer than the running version, and reports whether it did.
 func reportNothingToDo(env *cmdenv.Env, current, latest string) bool {
-	icon := env.IO.Style().SuccessIcon()
+	text, done := nothingToDo(current, latest)
+	if done {
+		fmt.Fprintf(env.IO.Out, "%s %s\n", env.IO.Style().SuccessIcon(), text)
+	}
+	return done
+}
+
+// nothingToDo is what to say when the release is not newer than the running version, and whether that is so.
+func nothingToDo(current, latest string) (text string, done bool) {
 	switch cmp := compareVersions(current, latest); {
 	case cmp == 0:
-		fmt.Fprintf(env.IO.Out, "%s You are using the latest version of vcr-cli (%s)\n", icon, current)
-		return true
+		return fmt.Sprintf("You are using the latest version of vcr-cli (%s)", current), true
 	case cmp > 0:
-		fmt.Fprintf(env.IO.Out, "%s Current version (%s) is newer than the latest version (%s) !\n", icon, current, latest)
-		return true
+		return fmt.Sprintf("Current version (%s) is newer than the latest version (%s) !", current, latest), true
 	}
-	return false
+	return "", false
 }
 
 // confirm asks whether to install latest. It asks only where the run may prompt and --force is not given, so a run

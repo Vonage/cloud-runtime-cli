@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
+	"vonage-cloud-runtime-cli/internal/term"
 )
 
 func newRemove(env *cmdenv.Env) *cobra.Command {
@@ -55,8 +56,11 @@ func newRemove(env *cmdenv.Env) *cobra.Command {
 // runRemove deletes the secret without asking. The platform answers 404 for a secret that is not there, and the
 // client counts that as removed.
 func runRemove(ctx context.Context, env *cmdenv.Env, name string) error {
-	if name == "" {
-		return errors.New("name can not be empty")
+	if env.IO.Mode() != term.Classic {
+		return removeRich(ctx, env, name)
+	}
+	if err := checkRemoveName(name); err != nil {
+		return err
 	}
 
 	stop := env.IO.StartSpinner(" Removing secret...")
@@ -67,5 +71,13 @@ func runRemove(ctx context.Context, env *cmdenv.Env, name string) error {
 	}
 
 	fmt.Fprintf(env.IO.Out, "%s Secret %q successfully removed\n", env.IO.Style().SuccessIcon(), name)
+	return nil
+}
+
+// checkRemoveName refuses an empty name before anything is sent. Any other name goes to the platform as it is.
+func checkRemoveName(name string) error {
+	if name == "" {
+		return errors.New("name can not be empty")
+	}
 	return nil
 }

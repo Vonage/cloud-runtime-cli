@@ -1,16 +1,19 @@
 package upgrade
 
 import (
+	"bytes"
 	"context"
 	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
 	"vonage-cloud-runtime-cli/internal/buildinfo"
 	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
+	"vonage-cloud-runtime-cli/internal/clock/clocktest"
 	"vonage-cloud-runtime-cli/internal/config"
 	"vonage-cloud-runtime-cli/internal/selfupdate"
 	"vonage-cloud-runtime-cli/internal/term"
@@ -66,6 +69,7 @@ type setup struct {
 	tag     string
 	stdin   string
 	tty     bool
+	mode    term.Mode // the presentation; Classic when zero. On a Rich or Static terminal tty has no say
 	goos    string
 	updater *fakeUpdater
 	exeErr  error
@@ -116,7 +120,7 @@ func (s setup) withDefaults(t testing.TB) setup {
 func execute(t *testing.T, s setup, args ...string) outcome {
 	t.Helper()
 	s = s.withDefaults(t)
-	streams, stdout, stderr := term.Test(s.stdin, s.tty)
+	streams, readStdout, readStderr := newStreams(t, s)
 	env := &cmdenv.Env{
 		IO:     streams,
 		Prompt: streams.Prompter(),
@@ -143,8 +147,23 @@ func execute(t *testing.T, s setup, args ...string) outcome {
 		ctx = t.Context()
 	}
 	out.err = cmd.ExecuteContext(ctx)
-	out.stdout, out.stderr = stdout.String(), stderr.String()
+	out.stdout, out.stderr = readStdout(), readStderr()
 	return out
+}
+
+// newStreams builds the terminal of a run and the functions that read what it printed: the bytes in Classic mode, the
+// final screen on a Rich or Static terminal.
+func newStreams(t testing.TB, s setup) (streams *term.IO, stdout, stderr func() string) {
+	t.Helper()
+	if s.mode == term.Classic {
+		streams, out, errOut := term.Test(s.stdin, s.tty)
+		return streams, out.String, errOut.String
+	}
+	streams, out, errOut := term.TestRich(s.mode, 100, clocktest.New(time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)))
+	in, ok := streams.In.(*bytes.Buffer)
+	require.True(t, ok, "the stdin of a test terminal is a buffer")
+	in.WriteString(s.stdin)
+	return streams, out.Screen, errOut.Screen
 }
 
 // missingPath is a path inside a new directory where nothing exists.
