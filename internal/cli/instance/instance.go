@@ -1,4 +1,4 @@
-// Package instance is the `vcr instance` group: list and remove deployed instances.
+// Package instance is the `vcr instance` group: list, read the logs of and remove deployed instances.
 package instance
 
 import (
@@ -8,7 +8,7 @@ import (
 	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
 )
 
-// NewCmd returns `vcr instance` with list and remove, annotated cmdenv.Full.
+// NewCmd returns `vcr instance` with list, log and remove, annotated cmdenv.Full.
 func NewCmd(env *cmdenv.Env) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "instance <command>",
@@ -57,6 +57,6 @@ func NewCmd(env *cmdenv.Env) *cobra.Command {
 		// The leaves inherit the mode: the root's pre-run finds the nearest annotation going up from the command.
 		Annotations: map[string]string{cmdenv.Annotation: cmdenv.Full},
 	}
-	cmd.AddCommand(newList(env), newRemove(env))
+	cmd.AddCommand(newList(env), newLog(env), newRemove(env))
 	return cmd
 }

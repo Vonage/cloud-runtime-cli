@@ -25,7 +25,7 @@ func TestGroupIsAnnotatedFullAndHasNoRunFunction(t *testing.T) {
 	assert.False(t, group.Runnable())
 }
 
-func TestGroupHasListAndRemove(t *testing.T) {
+func TestGroupHasListLogAndRemove(t *testing.T) {
 	srv := startFake(t)
 	h := cmdtest.New(t, srv, cmdtest.Options{})
 
@@ -41,6 +41,7 @@ func TestGroupHasListAndRemove(t *testing.T) {
 	}
 	assert.Equal(t, map[string][]string{
 		"list":   {"ls"},
+		"log":    {"logs"},
 		"remove": {"rm"},
 	}, names)
 }
