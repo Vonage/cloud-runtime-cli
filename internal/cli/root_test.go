@@ -159,6 +159,18 @@ func TestGlobalFlagsBindIntoEnvFlags(t *testing.T) {
 		assert.Equal(t, "g", env.Flags.GraphQLEndpoint)
 		assert.Equal(t, "u", env.Flags.DeploymentAPIURL)
 		assert.Equal(t, 5*time.Second, env.Flags.Timeout)
+		assert.True(t, env.Flags.ConfigFileSet)
+	})
+
+	t.Run("the config file is marked as set only when the flag is given", func(t *testing.T) {
+		env, _, _ := newTestEnv()
+		root := buildTestRoot(env, nil)
+		root.SetArgs([]string{"completion", "bash"})
+
+		require.NoError(t, root.ExecuteContext(t.Context()))
+
+		assert.False(t, env.Flags.ConfigFileSet)
+		assert.Equal(t, "~/.vcr-cli", env.Flags.ConfigFile)
 	})
 
 	t.Run("a nil Flags is created", func(t *testing.T) {

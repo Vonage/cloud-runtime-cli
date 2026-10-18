@@ -3,7 +3,6 @@
 package cmdenv
 
 import (
-	"context"
 	"errors"
 
 	"vonage-cloud-runtime-cli/internal/buildinfo"
@@ -43,25 +42,4 @@ type Env struct {
 	Resolver *platform.Resolver
 	// Set by PersistentPreRunE for Full commands only: the client of Settings.Region.
 	Client *platform.Client
-}
-
-// WithSignalContext returns ctx carrying signal, the context that only Ctrl-C or SIGTERM cancels (no --timeout
-// deadline). cli.Run calls it before it applies the --timeout deadline.
-func WithSignalContext(ctx, signal context.Context) context.Context {
-	panic("not implemented: cmdenv.WithSignalContext")
-}
-
-// SignalContext returns the signal-only context stored by WithSignalContext, or ctx itself when there is none.
-// The phases that v2.6.1 never bounded by --timeout use it: the `instance log --follow` loop (each poll still gets its
-// own --timeout) and the `vcr debug` session after setup. Everything else runs under cmd.Context()'s deadline.
-func SignalContext(ctx context.Context) context.Context {
-	panic("not implemented: cmdenv.SignalContext")
-}
-
-// RegionClient resolves alias the way v2.6.1's start-up did. An empty alias first calls Resolver.Regions, so bad
-// credentials still fail with the platform's error, and then fails with ErrRegionNotFound; an unknown alias fails
-// with ErrRegionNotFound; other errors are returned unchanged. Callers wrap the error as
-// "failed to initialize cli: %w". Used by the root's pre-run for full commands, and by deploy and debug.
-func (e *Env) RegionClient(ctx context.Context, alias string) (*platform.Client, error) {
-	panic("not implemented: cmdenv.Env.RegionClient")
 }

@@ -19,25 +19,32 @@ const (
 
 // NewRoot builds the whole tree (also used by docs generation and the contract tree test). Each group package
 // exposes NewCmd(env *cmdenv.Env) *cobra.Command.
-func NewRoot(env *cmdenv.Env) *cobra.Command { return buildRoot(env, registeredGroups(env)) }
+func NewRoot(env *cmdenv.Env) *cobra.Command {
+	opts := defaultOptions(env)
+	return buildRoot(env, opts.groups, newRunState(env, opts))
+}
 
 // registeredGroups returns the command groups that have a real implementation; each command group adds its
 // NewCmd(env) here. A top-level name that none of them claims gets a stand-in from pending.go.
 func registeredGroups(_ *cmdenv.Env) []*cobra.Command { return nil }
 
 // buildRoot returns the root command with groups under it, a stand-in for every top-level group that groups lacks,
-// and cobra's help command. cobra adds the completion command itself when the tree runs.
-func buildRoot(env *cmdenv.Env, groups []*cobra.Command) *cobra.Command {
+// and cobra's help command. cobra adds the completion command itself when the tree runs. The root owns the only
+// persistent hooks, which set up the platform before a command and show the update notice after it: a group or a
+// command that defines its own would replace them, because cobra runs the nearest one only.
+func buildRoot(env *cmdenv.Env, groups []*cobra.Command, st *runState) *cobra.Command {
 	if env.Flags == nil {
 		env.Flags = &config.Flags{}
 	}
 	root := &cobra.Command{
-		Use:           rootUse,
-		Short:         rootShort,
-		Long:          rootLong,
-		Example:       rootExample,
-		SilenceErrors: true,
-		SilenceUsage:  true,
+		Use:               rootUse,
+		Short:             rootShort,
+		Long:              rootLong,
+		Example:           rootExample,
+		SilenceErrors:     true,
+		SilenceUsage:      true,
+		PersistentPreRunE: st.preRun,
+		PersistentPostRun: st.postRun,
 	}
 	root.SetOut(env.IO.Out)
 	root.SetErr(env.IO.ErrOut)

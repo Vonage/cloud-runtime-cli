@@ -91,7 +91,7 @@ func newTestEnv() (env *cmdenv.Env, stdout, stderr *bytes.Buffer) {
 
 // buildTestRoot is the only place the tests call buildRoot.
 func buildTestRoot(env *cmdenv.Env, groups []*cobra.Command) *cobra.Command {
-	return buildRoot(env, groups)
+	return buildRoot(env, groups, newRunState(env, defaultOptions(env)))
 }
 
 // executeTestRoot runs args on root the way Run does and returns the exit code.
