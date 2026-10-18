@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/AlecAivazis/survey/v2/terminal"
 )
 
 // Prompter asks questions. Commands receive it through their Deps so tests can fake it.
@@ -34,14 +35,32 @@ type surveyPrompter struct {
 }
 
 func (p *surveyPrompter) askString(prompt survey.Prompt, validate survey.Validator) (string, error) {
-	ios := p.streams.ios
 	questions := []*survey.Question{{Prompt: prompt, Validate: validate}}
 
 	var answer string
-	if err := p.ask(questions, &answer, survey.WithStdio(ios.In, ios.Out, ios.ErrOut)); err != nil {
+	if err := p.ask(questions, &answer, p.streams.surveyStdio()); err != nil {
 		return "", err
 	}
+	p.streams.lineEnded()
 	return answer, nil
+}
+
+// surveyStdio hands survey this IO's own streams, so that in Rich mode a prompt goes through the locked writers. survey
+// needs a descriptor on each of them: a stream without one (a test's buffer) is replaced by iostreams' value for it.
+func (t *IO) surveyStdio() survey.AskOpt {
+	in, ok := t.In.(terminal.FileReader)
+	if !ok {
+		in = t.ios.In
+	}
+	out, ok := t.Out.(terminal.FileWriter)
+	if !ok {
+		out = t.ios.Out
+	}
+	var errOut io.Writer = t.ios.ErrOut
+	if file, ok := t.ErrOut.(terminal.FileWriter); ok {
+		errOut = file
+	}
+	return survey.WithStdio(in, out, errOut)
 }
 
 func (p *surveyPrompter) Input(message, defaultValue string) (string, error) {
@@ -75,6 +94,9 @@ func (p *surveyPrompter) YesNo(question string) (bool, error) {
 		atEOF := errors.Is(err, io.EOF)
 		if err != nil && !atEOF {
 			return false, err
+		}
+		if err == nil && p.streams.IsStdinTTY() {
+			p.streams.lineEnded() // the terminal echoed the newline of the answer
 		}
 
 		if fields := strings.Fields(line); len(fields) == 1 && (fields[0] == "y" || fields[0] == "n") {

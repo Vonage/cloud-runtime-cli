@@ -9,6 +9,8 @@ import (
 	"io"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
+
+	"vonage-cloud-runtime-cli/internal/clock"
 )
 
 // Icons used in v2.6.1 output.
@@ -25,12 +27,24 @@ type IO struct {
 
 	ios   *iostreams.IOStreams
 	lines *bufio.Reader // answer lines for YesNo, shared by every prompter of this IO
+
+	mode   Mode
+	clk    clock.Clock
+	surf   *surface           // the screen both streams share; nil unless Rich
+	width  func() (int, bool) // stderr's terminal width
+	manual bool               // tests drive the live line: no ticker goroutine runs
 }
 
 // System returns an IO bound to the real stdio (iostreams.System()).
 func System() *IO {
 	ios := iostreams.System()
-	return &IO{In: ios.In, Out: ios.Out, ErrOut: ios.ErrOut, ios: ios}
+	env := systemGateEnv(ios)
+	t := &IO{In: ios.In, Out: ios.Out, ErrOut: ios.ErrOut, ios: ios, clk: clock.System(), width: env.Width}
+	t.mode = Decide(env).Mode
+	if t.mode == Rich {
+		t.enableSurface(ios.Out, ios.ErrOut)
+	}
+	return t
 }
 
 // Test returns an IO over buffers. tty makes stdin, stdout and stderr report as terminals
@@ -48,7 +62,7 @@ func newTestIO(stdin string, stdinTTY, stdoutTTY, stderrTTY, colour bool) (*IO, 
 	ios.SetStdoutTTY(stdoutTTY)
 	ios.SetStderrTTY(stderrTTY)
 	ios.SetColorEnabled(colour)
-	return &IO{In: in, Out: out, ErrOut: errOut, ios: ios}, out, errOut
+	return &IO{In: in, Out: out, ErrOut: errOut, ios: ios, clk: clock.System()}, out, errOut
 }
 
 func (t *IO) IsStdinTTY() bool  { return t.ios.IsStdinTTY() }

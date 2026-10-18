@@ -6,19 +6,40 @@ import "github.com/cli/cli/v2/pkg/iostreams"
 func (t *IO) Style() Style {
 	// Built from the colour flags alone: iostreams' ColorScheme() also asks the terminal for its background
 	// colour, which no Style method uses.
-	return Style{scheme: &iostreams.ColorScheme{
-		Enabled:       t.ios.ColorEnabled(),
-		EightBitColor: t.ios.ColorSupport256(),
-		TrueColor:     t.ios.HasTrueColor(),
-	}}
+	return Style{
+		scheme: &iostreams.ColorScheme{
+			Enabled:       t.ios.ColorEnabled(),
+			EightBitColor: t.ios.ColorSupport256(),
+			TrueColor:     t.ios.HasTrueColor(),
+		},
+		rich: t.mode != Classic,
+	}
 }
 
 // Style wraps the colour scheme.
-type Style struct{ scheme *iostreams.ColorScheme }
+type Style struct {
+	scheme *iostreams.ColorScheme
+	rich   bool // Rich and Static sessions show the theme's failure glyph instead of v2.6.1's X
+}
 
-func (s Style) SuccessIcon() string    { return s.scheme.SuccessIcon() }
-func (s Style) WarningIcon() string    { return s.scheme.WarningIcon() }
-func (s Style) FailureIcon() string    { return s.scheme.FailureIcon() }
+const (
+	failureGlyph = "✗"
+	infoGlyph    = "•"
+)
+
+func (s Style) SuccessIcon() string { return s.scheme.SuccessIcon() }
+func (s Style) WarningIcon() string { return s.scheme.WarningIcon() }
+
+func (s Style) FailureIcon() string {
+	if s.rich {
+		return s.scheme.Red(failureGlyph)
+	}
+	return s.scheme.FailureIcon()
+}
+
+// infoIcon is the theme's dim bullet for informational lines.
+func (s Style) infoIcon() string { return s.Gray(infoGlyph) }
+
 func (s Style) Red(x string) string    { return s.scheme.Red(x) }
 func (s Style) Yellow(x string) string { return s.scheme.Yellow(x) }
 func (s Style) Green(x string) string  { return s.scheme.Green(x) }

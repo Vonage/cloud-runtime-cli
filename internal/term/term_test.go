@@ -58,6 +58,7 @@ func TestTestIOInputHasNoFileDescriptor(t *testing.T) {
 }
 
 func TestSystemBindsTheProcessStreams(t *testing.T) {
+	t.Setenv("VCR_UI", "classic") // a rich session wraps the streams, and this test may run on a terminal
 	streams := System()
 
 	assert.Same(t, os.Stdin, streams.In)
