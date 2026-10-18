@@ -1,0 +1,6 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 88
+Are you sure you want to create an application? [y/n]: n
+! Application creation aborted
+

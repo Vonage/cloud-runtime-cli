@@ -23,6 +23,7 @@ type Config struct {
 	RepoRoot         string
 	ScenariosDir     string
 	TranscriptsDir   string
+	RichDir          string // the rich goldens of the terminal scenarios
 	AllowedDiffsFile string
 	ScrapedFile      string
 	Groups           map[string]bool // the groups to run; empty means all
@@ -33,14 +34,17 @@ type Config struct {
 	Port             int    // the one port the fake binds; 0 picks a free one per run
 	BaselineLabel    string // "<ref> <sha>", the header of the transcripts a recording writes
 	ExtraEnv         []string
+	Rich             bool // replay and record the rich leg of the terminal scenarios, not the classic one
 }
 
 func (c Config) contractDir() string { return filepath.Join(c.RepoRoot, "test", "contract") }
 
 // Result is what one run produced: the exit and the four sections as stored in
-// a transcript (normalised and escaped), and the raw request log.
+// a transcript (normalised and escaped), the raw request log and, for a terminal
+// scenario, every byte the terminal delivered before the screen emulator saw it.
 type Result struct {
 	Exit, Stdout, Stderr, Files, Requests string
+	Raw                                   string
 	Log                                   []fakeplatform.Request
 }
 
@@ -194,7 +198,7 @@ func (r *run) execute(bin string, c Config) (Result, error) {
 	if err != nil {
 		return Result{}, err
 	}
-	p, err := startChild(exe, r.sc, r.l, ChildEnv(r.l, r.sc, c.ExtraEnv))
+	p, err := startChild(exe, r.sc, r.l, ChildEnv(r.l, r.sc, c.leg(), c.ExtraEnv))
 	if err != nil {
 		return Result{}, err
 	}
@@ -223,6 +227,7 @@ func (r *run) result(p *proc, d *driver, before, after Snapshot) Result {
 		Stderr:   Escape(n.Stream(p.err.String(), true)),
 		Files:    Escape(RenderFiles(DiffSnapshots(before, after, n))),
 		Requests: Escape(RenderRequests(obs, n)),
+		Raw:      p.raw.String(),
 		Log:      log,
 	}
 }

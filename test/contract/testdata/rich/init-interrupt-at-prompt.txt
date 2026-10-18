@@ -1,0 +1,6 @@
+# vcr rich golden v1
+exit 1
+@@ stdout 79
+? Enter your project name: (project)
+✗ failed to ask project name: interrupt
+

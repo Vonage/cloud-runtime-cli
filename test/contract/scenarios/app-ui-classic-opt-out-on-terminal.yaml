@@ -1,0 +1,8 @@
+description: "VCR_UI=classic on a terminal gets the classic output"
+args: [app, create, --name, demo, --yes]
+tty: true
+presentation: classic
+env:
+  VCR_UI: classic
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

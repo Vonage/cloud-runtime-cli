@@ -1,0 +1,13 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 468
+? Enter your project name: project
+? Enter your Instance name: dev
+? Select a runtime: nodejs18
+? Select a region: AWS - Europe (Ireland) - (aws.euw1)
+? Select your Vonage application ID for deployment: SKIP
+? Select your Vonage application ID for debug: SKIP
+? Select a product template for runtime nodejs18:  Starter Project - Node.js
+! Failed to parse template manifest file due to yaml: line 1: did not find expected ',' or ']'.
+✓ <WORK>/project/vcr.yml created
+

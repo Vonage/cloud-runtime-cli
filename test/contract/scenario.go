@@ -24,7 +24,17 @@ const (
 	configNone     = "none"
 	fileTypeDir    = "dir"
 	fileTypeFifo   = "fifo"
+
+	// The presentations a scenario can be replayed in: a terminal scenario runs in both by default, a scenario
+	// without a terminal only has the classic output.
+	presentationBoth    = "both"
+	presentationClassic = "classic"
+	presentationRich    = "rich"
 )
+
+// gateKeys are the variables that decide the presentation of a terminal. A scenario that runs in both presentations
+// leaves them to the harness.
+var gateKeys = []string{"VCR_UI", "CI", "CLICOLOR_FORCE", "TERM"}
 
 // groups are the groups a scenario can belong to.
 var groups = []string{
@@ -97,6 +107,7 @@ type Scenario struct {
 	RequiresHotfix     bool
 	HoldPorts          []string
 	Env                map[string]string
+	Presentation       string // both, classic or rich
 	Config             string
 	ConfigFile         string
 	Files              []FileSpec
@@ -125,6 +136,7 @@ type rawScenario struct {
 	RequiresHotfix     bool              `yaml:"requires-hotfix"`
 	HoldPorts          []string          `yaml:"hold-ports"`
 	Env                map[string]string `yaml:"env"`
+	Presentation       string            `yaml:"presentation"`
 	Config             string            `yaml:"config"`
 	ConfigFile         string            `yaml:"config-file"`
 	Files              []FileSpec        `yaml:"files"`
@@ -164,6 +176,7 @@ func parseScenario(id string, raw []byte) (Scenario, error) {
 		FencedHost: r.FencedHost, FencedHostBaseline: r.FencedHostBaseline,
 		Cwd: orDefault(r.Cwd, "work"), Build: orDefault(r.Build, "release"),
 		Exe: orDefault(r.Exe, "stamped"), Config: orDefault(r.Config, "default"),
+		Presentation: orDefault(r.Presentation, defaultPresentation(r.TTY)),
 	}
 	if r.Args == nil {
 		return Scenario{}, errors.New("args is required (it may be [])")
@@ -241,7 +254,43 @@ func validateScenario(sc Scenario, hasReads bool) error {
 		}
 	}
 	errs = append(errs, validateChoices(sc)...)
+	errs = append(errs, validatePresentation(sc)...)
 	return errors.Join(errs...)
+}
+
+// defaultPresentation is both for a terminal scenario and classic for one without a terminal.
+func defaultPresentation(tty bool) string {
+	if tty {
+		return presentationBoth
+	}
+	return presentationClassic
+}
+
+// validatePresentation checks the presentation against the rest of the scenario: both and rich need a terminal, and
+// both leaves the variables of the gate to the harness.
+func validatePresentation(sc Scenario) []error {
+	var errs []error
+	switch sc.Presentation {
+	case presentationClassic:
+	case presentationBoth, presentationRich:
+		if !sc.TTY {
+			errs = append(errs, fmt.Errorf("presentation %s needs tty: true", sc.Presentation))
+		}
+		if sc.Presentation == presentationBoth && slices.ContainsFunc(gateKeys, func(k string) bool { _, ok := sc.Env[k]; return ok }) {
+			errs = append(errs, errors.New("presentation both owns VCR_UI, CI, CLICOLOR_FORCE and TERM: use classic or rich"))
+		}
+	default:
+		errs = append(errs, fmt.Errorf("unknown presentation %q", sc.Presentation))
+	}
+	return errs
+}
+
+// runsClassic reports whether make contract replays the scenario: every scenario but a rich-only one.
+func (sc Scenario) runsClassic() bool { return sc.Presentation != presentationRich }
+
+// runsRich reports whether make contract-rich replays the scenario: a terminal scenario that is not classic.
+func (sc Scenario) runsRich() bool {
+	return sc.Presentation == presentationBoth || sc.Presentation == presentationRich
 }
 
 func validateChoices(sc Scenario) []error {

@@ -76,6 +76,7 @@ func (p *proc) showOutput(master *os.File, keys *keyboard) {
 	buf := make([]byte, readChunk)
 	for {
 		n, err := master.Read(buf)
+		_, _ = p.raw.Write(buf[:n])
 		visible := noise.filter(buf[:n])
 		if err != nil {
 			visible = append(visible, noise.flush()...)

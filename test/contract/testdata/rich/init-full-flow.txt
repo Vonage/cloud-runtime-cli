@@ -1,0 +1,12 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 409
+? Enter your project name: my-project
+? Enter your Instance name: staging
+? Select a runtime: nodejs18
+? Select a region: AWS - Europe (Ireland) - (aws.euw1)
+? Select your Vonage application ID for deployment: my-app - (<uuid>)
+? Select your Vonage application ID for debug: second-app - (<uuid>)
+? Select a product template for runtime nodejs18:  Starter Project - Node.js
+✓ <WORK>/project/vcr.yml created
+

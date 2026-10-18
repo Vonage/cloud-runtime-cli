@@ -33,9 +33,13 @@ func ParseGroups(v string) (map[string]bool, error) {
 }
 
 // Select splits the scenarios into those to run and those to skip because
-// their group is not ported. A scenario that the SCENARIO glob leaves out is in neither.
+// their group is not ported. A scenario that the SCENARIO glob leaves out, or
+// that has no replay in the leg of c, is in neither.
 func Select(scs []Scenario, c Config) (run, skipped []Scenario) {
 	for _, sc := range scs {
+		if !sc.runsIn(c.leg()) {
+			continue
+		}
 		if c.Filter != "" {
 			if ok, _ := path.Match(c.Filter, sc.ID); !ok {
 				continue
@@ -85,6 +89,15 @@ func loadTranscript(c Config, id string) (Transcript, error) {
 	return tr, nil
 }
 
+// hotfixSkipReason says why a scenario that needs a security fix is not held to a transcript recorded before the fix,
+// or is "" when it is. Both legs of a terminal scenario skip what the transcript pins for this reason.
+func hotfixSkipReason(sc Scenario, base Transcript) string {
+	if !sc.RequiresHotfix || releaseTag.MatchString(base.Ref) {
+		return ""
+	}
+	return fmt.Sprintf("%s expects a security fix that the transcript, recorded from %s, lacks", sc.ID, base.Ref)
+}
+
 // Check replays one scenario with c.Bin and compares it with its transcript;
 // the failures come back as data. A scenario that needs a fix the recorded
 // commit lacks is skipped while the new binary is under test.
@@ -98,8 +111,8 @@ func Check(t testing.TB, c Config, sc Scenario) []Failure {
 		return fail("transcript", err)
 	}
 	fromRelease := releaseTag.MatchString(base.Ref)
-	if sc.RequiresHotfix && c.NoGraphQL && !fromRelease {
-		t.Skipf("%s expects a security fix that the transcript, recorded from %s, lacks", sc.ID, base.Ref)
+	if why := hotfixSkipReason(sc, base); why != "" && c.NoGraphQL {
+		t.Skip(why)
 	}
 	allowed, err := LoadAllowed(c.AllowedDiffsFile, scenarioIDs(c.ScenariosDir))
 	if err != nil {
@@ -119,7 +132,8 @@ func Check(t testing.TB, c Config, sc Scenario) []Failure {
 	})
 }
 
-// Replay runs the selected scenarios as sub-tests and reports every failure.
+// Replay runs the selected scenarios as sub-tests and reports every failure. With c.Rich it replays the rich leg of
+// the terminal scenarios, else the classic leg of the scenarios that have one.
 func Replay(t *testing.T, c Config) {
 	t.Helper()
 	scs, err := LoadScenarios(c.ScenariosDir)
@@ -137,6 +151,8 @@ func Replay(t *testing.T, c Config) {
 	case len(scs) == 0:
 		t.Log("no scenarios selected: there are no scenarios yet")
 		return
+	case c.Filter != "" && len(run)+len(skipped) == 0 && c.Rich:
+		t.Fatalf("no scenario with a rich leg matches SCENARIO=%q", c.Filter)
 	case c.Filter != "" && len(run)+len(skipped) == 0:
 		t.Fatalf("no scenario matches SCENARIO=%q", c.Filter)
 	}
@@ -147,14 +163,28 @@ func Replay(t *testing.T, c Config) {
 		t.Log("no scenarios selected")
 		return
 	}
-	bin, devBin, port, err := BuildNew(t, c, slices.ContainsFunc(run, func(sc Scenario) bool { return sc.Build == "dev" }))
-	if err != nil {
+	if c, err = withBuild(t, c, run); err != nil {
 		t.Fatal(err)
 	}
-	c.Bin, c.DevBin, c.Port = bin, devBin, port
 	for _, sc := range run {
-		t.Run(sc.ID, func(t *testing.T) { report(t, c, sc, Check(t, c, sc)) })
+		t.Run(sc.ID, func(t *testing.T) {
+			if c.Rich {
+				reportRich(t, checkRich(t, c, sc))
+				return
+			}
+			report(t, c, sc, Check(t, c, sc))
+		})
 	}
+}
+
+// withBuild sets the binaries c replays or records with: VCR_BIN, else a build of the repository root.
+func withBuild(t testing.TB, c Config, run []Scenario) (Config, error) {
+	bin, devBin, port, err := BuildNew(t, c, slices.ContainsFunc(run, func(sc Scenario) bool { return sc.Build == "dev" }))
+	if err != nil {
+		return c, err
+	}
+	c.Bin, c.DevBin, c.Port = bin, devBin, port
+	return c, nil
 }
 
 // report turns the failures of a scenario into sub-tests per field.
@@ -178,6 +208,30 @@ func report(t *testing.T, c Config, sc Scenario, failures []Failure) {
 				if f.Field == field {
 					t.Error(f.Detail)
 				}
+			}
+		})
+	}
+}
+
+// reportRich turns the result of a rich leg into sub-tests per field. A field it did not check is skipped with its
+// reason, after any failure it still found (the golden's exit, for one).
+func reportRich(t *testing.T, res richResult) {
+	t.Helper()
+	fields := slices.Clone(richFields)
+	for _, f := range res.Failures {
+		if !slices.Contains(fields, f.Field) {
+			fields = append(fields, f.Field)
+		}
+	}
+	for _, field := range fields {
+		t.Run(field, func(t *testing.T) {
+			for _, f := range res.Failures {
+				if f.Field == field {
+					t.Error(f.Detail)
+				}
+			}
+			if why, skipped := res.Skipped[field]; skipped {
+				t.Skip(why)
 			}
 		})
 	}

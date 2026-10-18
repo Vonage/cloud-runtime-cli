@@ -1,0 +1,6 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 206
+are you sure you want to remove instance with id="00000000-0000-4000-8000-000000000501" and service_name="my-project-dev" ? [y/n]: y
+✓ Instance "00000000-0000-4000-8000-000000000501" successfully removed
+

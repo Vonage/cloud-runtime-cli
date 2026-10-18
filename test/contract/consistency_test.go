@@ -146,8 +146,10 @@ func TestEveryScenarioHasATranscriptAndBack(t *testing.T) {
 			transcripts = append(transcripts, id)
 		}
 	}
-	for _, id := range ids {
-		assert.Contains(t, transcripts, id, "the scenario %s has no transcript: run make contract-record", id)
+	for _, sc := range loadAllScenarios(t) {
+		if sc.runsClassic() {
+			assert.Contains(t, transcripts, sc.ID, "the scenario %s has no transcript: run make contract-record", sc.ID)
+		}
 	}
 	for _, id := range transcripts {
 		assert.Contains(t, ids, id, "the transcript %s has no scenario", id)

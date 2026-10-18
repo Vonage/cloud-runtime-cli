@@ -94,6 +94,72 @@ func recordScenario(t testing.TB, bin string, sc Scenario, c Config, scrapes []S
 	return out, nil
 }
 
+// richRecording is what recording the rich leg of one scenario came to: the golden to write and the problems that
+// forbid writing it.
+type richRecording struct {
+	Golden   RichGolden
+	Problems []string
+}
+
+// RecordRich runs the terminal scenarios that have a rich leg twice each with the binary under test (c.Bin, else a
+// build of the repository root) and writes a golden for every one whose screen is the same both times. It never
+// touches the transcripts.
+func RecordRich(t *testing.T, c Config) {
+	t.Helper()
+	c.Rich = true
+	scs, err := LoadScenarios(c.ScenariosDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	run, _ := Select(scs, c)
+	if len(run) == 0 {
+		t.Log("no scenarios selected")
+		return
+	}
+	if c, err = withBuild(t, c, run); err != nil {
+		t.Fatal(err)
+	}
+	for _, sc := range run {
+		t.Run(sc.ID, func(t *testing.T) {
+			rec, err := recordRichScenario(t, c.Bin, sc, c)
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, p := range rec.Problems {
+				t.Error(p)
+			}
+			if len(rec.Problems) > 0 {
+				return
+			}
+			if err := writeRichGolden(c, sc.ID, rec.Golden); err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
+// recordRichScenario runs a scenario twice with bin and checks that the two rich screens, after the normaliser and the
+// removal of durations, are the same.
+func recordRichScenario(t testing.TB, bin string, sc Scenario, c Config) (richRecording, error) {
+	t.Helper()
+	c.Rich = true
+	first, err := RunScenario(t, bin, sc, c)
+	if err != nil {
+		return richRecording{}, err
+	}
+	second, err := RunScenario(t, bin, sc, c)
+	if err != nil {
+		return richRecording{}, err
+	}
+	rec := richRecording{Golden: RichGolden{Exit: first.Exit, Stdout: richScreen(first)}}
+	if again := (RichGolden{Exit: second.Exit, Stdout: richScreen(second)}); again != rec.Golden {
+		rec.Problems = append(rec.Problems, fmt.Sprintf(
+			"%s: non-deterministic rich screen: fix the code or the scenario\n--- run 1 ---\nexit %s\n%s\n--- run 2 ---\nexit %s\n%s",
+			sc.ID, rec.Golden.Exit, rec.Golden.Stdout, again.Exit, again.Stdout))
+	}
+	return rec, nil
+}
+
 // describeRun is the whole of a result as text.
 func describeRun(r Result) string {
 	return fmt.Sprintf("exit %s\n@@ stdout\n%s\n@@ stderr\n%s\n@@ files\n%s\n@@ requests\n%s", r.Exit, r.Stdout, r.Stderr, r.Files, r.Requests)

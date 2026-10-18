@@ -11,6 +11,9 @@ import (
 
 const allowedHint = "If this change is deliberate and documented, add a line to test/contract/allowed-diffs.txt; otherwise fix the code."
 
+// graphQLRequestMessage starts the failure of a binary under test that sent a GraphQL request.
+const graphQLRequestMessage = "the binary sent a GraphQL request: "
+
 // Failure is one thing that differs from the transcript. Field is stdout,
 // stderr, exit, files, requests, reads, scrape/<name>, or transcript, run and
 // allowed-diffs for a problem that is not a difference.
@@ -115,7 +118,7 @@ func (c *comparison) requests(base Transcript, got Result) {
 	}
 	for _, r := range got.Log {
 		if r.Kind == kindGraphQL {
-			c.fail("requests", "the binary sent a GraphQL request: "+r.Route)
+			c.fail("requests", graphQLRequestMessage+r.Route)
 			break
 		}
 	}

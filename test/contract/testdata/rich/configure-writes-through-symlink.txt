@@ -1,0 +1,8 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 225
+? Enter your Vonage api key: abc123
+? Enter your Vonage api secret (leave blank to keep the current one):
+? Select your Vonage region: AWS - US East (N. Virginia) - (aws.use1)
+✓ New configuration file written to ~/.vcr-cli
+

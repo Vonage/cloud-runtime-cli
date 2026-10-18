@@ -28,6 +28,7 @@ func stubConfig(t *testing.T) Config {
 		RepoRoot:         filepath.Join("..", ".."),
 		ScenariosDir:     t.TempDir(),
 		TranscriptsDir:   t.TempDir(),
+		RichDir:          t.TempDir(),
 		AllowedDiffsFile: filepath.Join(t.TempDir(), "allowed-diffs.txt"),
 		ScrapedFile:      "scraped.yaml",
 		Bin:              exe,

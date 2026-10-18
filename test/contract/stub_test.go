@@ -53,6 +53,8 @@ var stubModes = map[string]func(args []string) int{
 	"survey-like": stubSurveyLike,
 	"spinner":     stubSpinner,
 	"terminal":    stubTerminal,
+	"ui":          stubUI,
+	"rich-demo":   stubRichDemo,
 }
 
 func runStub(args []string) int {
@@ -331,4 +333,26 @@ func stubTerminal([]string) int {
 	fmt.Printf("size %dx%d\n", cols, rows)
 	fmt.Printf("TERM %s\n", os.Getenv("TERM"))
 	return 0
+}
+
+// stubUI prints the presentation setting the process was started with.
+func stubUI([]string) int {
+	fmt.Printf("ui=%s\n", os.Getenv("VCR_UI"))
+	return 0
+}
+
+// stubRichDemo prints one resolved line. Unless VCR_UI is classic it behaves as the rich presentation does: the line
+// carries a duration, STUB_RICH_EXIT sets the exit code and STUB_RICH_RANDOM=1 adds a number that differs on every run.
+func stubRichDemo([]string) int {
+	if os.Getenv("VCR_UI") == "classic" {
+		fmt.Println("✓ done")
+		return 0
+	}
+	line := "✓ done  (2.4s)"
+	if os.Getenv("STUB_RICH_RANDOM") == "1" {
+		line += fmt.Sprintf(" %d", time.Now().UnixNano())
+	}
+	fmt.Println(line)
+	n, _ := strconv.Atoi(os.Getenv("STUB_RICH_EXIT"))
+	return n
 }

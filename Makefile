@@ -39,6 +39,12 @@ contract:
 contract-record:
 	VCR_CONTRACT=1 BASELINE_REF='$(BASELINE_REF)' SCENARIO='$(SCENARIO)' go test ./test/contract/ -run '^TestRecord$$' -count=1 -timeout 60m
 
+contract-rich:
+	VCR_CONTRACT=1 VCR_BIN='$(VCR_BIN)' PORTED='$(PORTED)' SCENARIO='$(SCENARIO)' go test ./test/contract/ -run '^TestContractRich$$' -count=1 -timeout 30m
+
+contract-rich-record:
+	VCR_CONTRACT=1 VCR_BIN='$(VCR_BIN)' SCENARIO='$(SCENARIO)' go test ./test/contract/ -run '^TestRecordRich$$' -count=1 -timeout 30m
+
 contract-baseline:
 	@VCR_CONTRACT=1 BASELINE_REF='$(BASELINE_REF)' go test ./test/contract/ -run '^TestBuildBaseline$$' -count=1 -v | sed -n 's/^BASELINE_BIN=//p'
 
@@ -62,7 +68,7 @@ run:
 deps:
 	$(GOGET) -u
 
-.PHONY: build build-linux build-windows build-macos test clean run deps install-macos lint contract contract-record contract-baseline contract-self contract-mutate contract-baseline-check
+.PHONY: build build-linux build-windows build-macos test clean run deps install-macos lint contract contract-record contract-rich contract-rich-record contract-baseline contract-self contract-mutate contract-baseline-check
 
 install-macos:
 	go build -o $(GOPATH)/bin/vcr main.go

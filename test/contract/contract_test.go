@@ -32,7 +32,7 @@ func TestMain(m *testing.M) {
 func requireContract(t *testing.T) {
 	t.Helper()
 	if os.Getenv("VCR_CONTRACT") != "1" {
-		t.Skip("set VCR_CONTRACT=1 (make contract, make contract-record) to run the contract harness")
+		t.Skip("set VCR_CONTRACT=1 (make contract, make contract-rich, make contract-record) to run the contract harness")
 	}
 }
 
@@ -52,6 +52,7 @@ func envConfig(t *testing.T) Config {
 		RepoRoot:         root,
 		ScenariosDir:     "scenarios",
 		TranscriptsDir:   filepath.Join("testdata", "transcripts"),
+		RichDir:          filepath.Join("testdata", "rich"),
 		AllowedDiffsFile: "allowed-diffs.txt",
 		ScrapedFile:      "scraped.yaml",
 		Groups:           groups,
@@ -81,6 +82,17 @@ func TestContract(t *testing.T) {
 	Replay(t, envConfig(t))
 }
 
+// TestContractRich replays the rich leg of the terminal scenarios with the
+// binary under test: the screen against the rich golden, and the exit, files,
+// requests and reads against the transcripts. Only the binary under test has a
+// rich leg, so it is held to the new binary's rules whatever NO_GRAPHQL says.
+func TestContractRich(t *testing.T) {
+	requireContract(t)
+	c := envConfig(t)
+	c.Rich, c.NoGraphQL = true, true
+	Replay(t, c)
+}
+
 // TestRecord builds the baseline and records a transcript of every selected
 // scenario from it.
 func TestRecord(t *testing.T) {
@@ -92,6 +104,13 @@ func TestRecord(t *testing.T) {
 	}
 	c.Bin, c.DevBin, c.BaselineLabel, c.Port = b.Bin, b.DevBin, b.Label, b.Port
 	Record(t, c)
+}
+
+// TestRecordRich records the rich goldens of the selected terminal scenarios
+// from the binary under test. It never touches the transcripts.
+func TestRecordRich(t *testing.T) {
+	requireContract(t)
+	RecordRich(t, envConfig(t))
 }
 
 // TestBuildBaseline builds the baseline and prints its path on a line of its

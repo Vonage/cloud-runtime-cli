@@ -18,7 +18,11 @@
 //     or else the part of the id before the first "-". The groups are version,
 //     help, completion, root, config, bootstrap, app, secret, instance,
 //     deploy, init, debug, configure and upgrade.
-//   - testdata/transcripts/<id>.txt: the transcript recorded for each scenario.
+//   - testdata/transcripts/<id>.txt: the transcript recorded for each scenario
+//     that has a classic leg.
+//   - testdata/rich/<id>.txt: the rich golden of each scenario that has a rich
+//     leg: the exit and the final screen of the interactive presentation,
+//     recorded from the binary under test.
 //   - testdata/contract-tree.json: every command of the baseline with its use
 //     line, aliases, help texts, flags and subcommands.
 //   - testdata/golden-help/: the --help output of every command, one file per
@@ -49,6 +53,51 @@
 // answers the cursor position queries of the prompt library. The transcript's
 // stdout is the final screen text.
 //
+// # Presentations
+//
+// A process whose stdout and stderr are terminals shows the interactive
+// presentation unless VCR_UI contains classic, CI is set or TERM is dumb. A
+// terminal scenario therefore runs in the presentations its presentation: key
+// names:
+//
+//   - both (the default for tty: true) runs the scenario twice. The classic
+//     leg adds VCR_UI=classic to the environment and is compared with the
+//     transcript like any other scenario. The rich leg adds nothing, so the
+//     process shows what a person at a terminal sees, and is compared with the
+//     rich golden. Both legs drive the same steps, so every expect must hold
+//     in both; a scenario that waits for a line only one presentation prints
+//     is written twice, as a classic and a rich scenario. A both scenario
+//     cannot set VCR_UI, CI, CLICOLOR_FORCE or TERM in its env.
+//   - classic (the default for a scenario without a terminal) runs once, in
+//     make contract, with the environment exactly as the scenario states. The
+//     harness adds nothing, not even VCR_UI.
+//   - rich runs once, in make contract-rich, with the environment as the
+//     scenario states. It has no transcript, so only the exit and the screen
+//     (against the golden), the reads and the raw bytes are checked.
+//
+// The rich leg is checked in sub-tests of its own:
+//
+//   - rich/stdout: the final screen, passed through the normaliser and then
+//     stripped of the duration that a resolved line shows from two seconds on,
+//     equals the golden. No allowed diff excuses it.
+//   - rich/exit: the exit equals the golden's and the transcript's.
+//   - rich/files and rich/requests: the files and the requests equal those of
+//     the transcript, with the same allowed diffs.
+//   - rich/reads: the reads equal the scenario's expect-reads, and the binary
+//     sends no GraphQL request.
+//   - rich/raw: the bytes the terminal delivered leave the cursor shown, use
+//     no alternate screen or mouse mode, and hold no colour or style sequence
+//     when NO_COLOR is set (a scenario that clears it must show colour).
+//
+// A rich scenario has no transcript, so rich/files and rich/requests are
+// skipped for it. A scenario that needs a fix which its transcript predates
+// skips rich/exit, rich/files and rich/requests too, as the classic leg skips
+// the whole scenario. rich/reads and rich/raw need no transcript and always
+// run.
+//
+// A rich golden is a regression pin recorded from the binary under test, not
+// an oracle of the baseline: a person reviews it whenever it changes.
+//
 // The binaries the harness builds go to .cache/contract/ at the repository
 // root, which git ignores.
 //
@@ -73,10 +122,13 @@
 //
 // # Make targets
 //
-// make contract replays the transcripts and make contract-record records them
-// again. make contract-self replays a baseline build against its own
-// transcripts five times, make contract-mutate checks that deliberately
-// altered scenarios and transcripts turn the replay red, and
+// make contract replays the transcripts (the classic leg of every scenario)
+// and make contract-record records them again. make contract-rich replays the
+// rich leg of the terminal scenarios and make contract-rich-record records
+// their goldens, twice per scenario, failing when the two screens differ; it
+// never touches the transcripts. make contract-self replays a baseline build
+// against its own transcripts five times, make contract-mutate checks that
+// deliberately altered scenarios and transcripts turn the replay red, and
 // make contract-baseline-check checks that every transcript was recorded from
 // one and the same release tag.
 package contract

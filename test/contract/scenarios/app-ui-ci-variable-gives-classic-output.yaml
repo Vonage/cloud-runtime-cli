@@ -1,0 +1,8 @@
+description: "a terminal with CI set gets the classic output"
+args: [app, create, --name, demo, --yes]
+tty: true
+presentation: classic
+env:
+  CI: "1"
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

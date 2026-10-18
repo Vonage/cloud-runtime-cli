@@ -65,6 +65,7 @@ type proc struct {
 	stdinOnce  sync.Once
 	devnull    *os.File
 	out, err   lockedBuffer
+	raw        lockedBuffer // on a terminal, every byte it delivered, before the screen
 	done       chan struct{}
 	drained    chan struct{}
 	lastOutput atomic.Int64 // when the terminal last printed, in Unix nanoseconds
