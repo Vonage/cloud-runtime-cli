@@ -25,6 +25,7 @@ security-region-record-with-insecure-url stderr a region record with a plain htt
 security-region-record-with-insecure-url requests a region record with a plain http URL is refused before any request
 security-escape-app-list stdout terminal control sequences in platform-supplied names are removed
 security-escape-error-message stderr terminal control sequences in platform-supplied error text are removed
+security-escape-region-picker stdout terminal control sequences in platform-supplied region names are removed
 security-error-body-html stderr long or HTML error bodies are summarised and truncated, the API secret is redacted and an invalid trace id is replaced
 security-error-body-long-plain-text stderr long or HTML error bodies are summarised and truncated, the API secret is redacted and an invalid trace id is replaced
 security-error-body-contains-api-secret stderr long or HTML error bodies are summarised and truncated, the API secret is redacted and an invalid trace id is replaced
@@ -77,6 +78,15 @@ config-broken-symlink-config stderr an explicit config file that does not exist 
 config-parse-error stderr a malformed config file's error no longer quotes the file content
 config-parse-error-with-secret-line stderr a malformed config file's error no longer quotes the file content
 root-no-config-no-flags stderr without any configured endpoint the CLI uses the production default instead of failing on an empty URL
+configure-fresh stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+configure-existing-keep-defaults stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+configure-existing-change-region stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+configure-hides-test-regions stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+configure-config-file-flag stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+configure-api-key-flag-is-the-default stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+configure-writes-through-symlink stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+configure-region-list-server-error stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+security-escape-region-picker stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
 security-redirect-post-* stdout redirects of POST, PATCH and DELETE requests are refused
 security-redirect-post-* stderr redirects of POST, PATCH and DELETE requests are refused
 security-redirect-post-* exit redirects of POST, PATCH and DELETE requests are refused

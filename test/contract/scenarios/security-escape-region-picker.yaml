@@ -2,6 +2,7 @@ description: "a region name with terminal control sequences is shown without the
 group: configure
 args: [configure, --graphql-endpoint, "${FAKE}/v1/vcr/euw1/api/graphql/v1/graphql"]
 tty: true
+requires-hotfix: true
 config: none
 fixtures:
   regions:

@@ -73,6 +73,7 @@ var hotfixScenarios = []string{
 	"security-debug-origin-header-is-refused",
 	"security-debug-sec-fetch-mode-alone-is-allowed",
 	"security-debug-sec-fetch-site-is-refused",
+	"security-escape-region-picker",
 	"security-github-requests-carry-no-credentials",
 	"security-init-template-absolute-path",
 	"security-init-template-dot-dot-in-the-middle",
