@@ -39,11 +39,7 @@ func (s *session) askApplication(ctx context.Context, q appQuestion) (string, er
 }
 
 func (s *session) chooseApplication(ctx context.Context, q appQuestion) (string, error) {
-	var (
-		apps []platform.Application
-		err  error
-	)
-	s.waiting(" Retrieving app list... ", func() { apps, err = s.api.ListApplications(ctx, "") })
+	apps, err := s.retrieveApplications(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -62,6 +58,19 @@ func (s *session) chooseApplication(ctx context.Context, q appQuestion) (string,
 	}
 }
 
+// retrieveApplications lists the account's applications behind a spinner.
+func (s *session) retrieveApplications(ctx context.Context) ([]platform.Application, error) {
+	if s.io.Mode() != term.Classic {
+		return s.retrieveApplicationsRich(ctx)
+	}
+	var (
+		apps []platform.Application
+		err  error
+	)
+	s.waiting(" Retrieving app list... ", func() { apps, err = s.api.ListApplications(ctx, "") })
+	return apps, err
+}
+
 // createApplication asks for a name and creates the application, asking again after a refusal.
 func (s *session) createApplication(ctx context.Context, question string) (string, error) {
 	for {
@@ -69,16 +78,26 @@ func (s *session) createApplication(ctx context.Context, question string) (strin
 		if err != nil {
 			return "", err
 		}
-		var (
-			created platform.CreatedApplication
-			failed  error
-		)
-		s.waiting(fmt.Sprintf(" Creating Application %q...", name), func() {
-			created, failed = s.api.CreateApplication(ctx, name, false, false, false)
-		})
+		created, failed := s.submitApplication(ctx, name)
 		if failed == nil {
 			return created.ApplicationID, nil
 		}
 		fmt.Fprintf(s.io.ErrOut, "%s %s\n", s.style.FailureIcon(), term.Sanitize(failed.Error()))
 	}
+}
+
+// submitApplication asks the platform for a new application with the name and every capability off, behind a
+// spinner.
+func (s *session) submitApplication(ctx context.Context, name string) (platform.CreatedApplication, error) {
+	if s.io.Mode() != term.Classic {
+		return s.submitApplicationRich(ctx, name)
+	}
+	var (
+		created platform.CreatedApplication
+		failed  error
+	)
+	s.waiting(fmt.Sprintf(" Creating Application %q...", name), func() {
+		created, failed = s.api.CreateApplication(ctx, name, false, false, false)
+	})
+	return created, failed
 }

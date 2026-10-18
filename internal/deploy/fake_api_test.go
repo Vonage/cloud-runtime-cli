@@ -46,6 +46,8 @@ type fakeAPI struct {
 
 	// hooks run first in the call they are named after, to let a test end the context in the middle of a run
 	onValidate func()
+	// onCall runs first in every call with the name of the method, to let a test move the clock inside a call
+	onCall func(name string)
 
 	// what the calls received
 	validateReq  platform.ValidateRequest
@@ -73,6 +75,14 @@ func newFakeAPI() *fakeAPI {
 	}
 }
 
+// enter records a call and runs the hook before the method does anything else.
+func (f *fakeAPI) enter(name string) {
+	f.calls = append(f.calls, name)
+	if f.onCall != nil {
+		f.onCall(name)
+	}
+}
+
 func (f *fakeAPI) called(name string) bool {
 	for _, c := range f.calls {
 		if c == name {
@@ -83,7 +93,7 @@ func (f *fakeAPI) called(name string) bool {
 }
 
 func (f *fakeAPI) GetProject(_ context.Context, name string) (platform.Project, error) {
-	f.calls = append(f.calls, callGetProject)
+	f.enter(callGetProject)
 	f.projectAsked = name
 	if f.getProjectErr != nil {
 		return platform.Project{}, f.getProjectErr
@@ -92,7 +102,7 @@ func (f *fakeAPI) GetProject(_ context.Context, name string) (platform.Project, 
 }
 
 func (f *fakeAPI) CreateProject(_ context.Context, name string) (string, error) {
-	f.calls = append(f.calls, callCreateProject)
+	f.enter(callCreateProject)
 	f.createdName = name
 	if f.createErr != nil {
 		return "", f.createErr
@@ -101,7 +111,7 @@ func (f *fakeAPI) CreateProject(_ context.Context, name string) (string, error) 
 }
 
 func (f *fakeAPI) ValidateDeployment(_ context.Context, req platform.ValidateRequest) (platform.ValidateResult, error) {
-	f.calls = append(f.calls, callValidate)
+	f.enter(callValidate)
 	f.validateReq = req
 	if f.onValidate != nil {
 		f.onValidate()
@@ -114,7 +124,7 @@ func (f *fakeAPI) ValidateDeployment(_ context.Context, req platform.ValidateReq
 
 // UploadSource reads the archive while it is still there: the file is removed when Run returns.
 func (f *fakeAPI) UploadSource(_ context.Context, path string) (string, error) {
-	f.calls = append(f.calls, callUploadSource)
+	f.enter(callUploadSource)
 	f.uploadedPath = path
 	f.entries = tarEntries(path)
 	if f.uploadErr != nil {
@@ -124,7 +134,7 @@ func (f *fakeAPI) UploadSource(_ context.Context, path string) (string, error) {
 }
 
 func (f *fakeAPI) CreatePackage(_ context.Context, req platform.PackageRequest) (string, error) {
-	f.calls = append(f.calls, callCreatePackage)
+	f.enter(callCreatePackage)
 	f.packageReq = req
 	if f.packageErr != nil {
 		return "", f.packageErr
@@ -133,7 +143,7 @@ func (f *fakeAPI) CreatePackage(_ context.Context, req platform.PackageRequest) 
 }
 
 func (f *fakeAPI) WatchBuild(_ context.Context, packageID string, onLine func(frame string)) error {
-	f.calls = append(f.calls, callWatchBuild)
+	f.enter(callWatchBuild)
 	f.watchedID = packageID
 	for _, frame := range f.frames {
 		onLine(frame)
@@ -142,7 +152,7 @@ func (f *fakeAPI) WatchBuild(_ context.Context, packageID string, onLine func(fr
 }
 
 func (f *fakeAPI) DeployInstance(_ context.Context, req platform.DeployRequest) (platform.DeployResult, error) {
-	f.calls = append(f.calls, callDeployInstance)
+	f.enter(callDeployInstance)
 	f.deployReq = req
 	if f.deployErr != nil {
 		return platform.DeployResult{}, f.deployErr

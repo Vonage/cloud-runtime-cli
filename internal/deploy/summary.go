@@ -11,6 +11,10 @@ import (
 // summary prints the block that closes a deploy. Each piece is yellow on a colour terminal; the host addresses are
 // yellow and bold wherever they go. The id, the service name and the addresses are the platform's words.
 func (r *runner) summary(deployed platform.DeployResult) {
+	if r.t.Mode() != term.Classic {
+		r.summaryRich(deployed)
+		return
+	}
 	yellow := r.c.Yellow
 	line := func(pieces ...string) string { return strings.Join(pieces, " ") + "\n" }
 

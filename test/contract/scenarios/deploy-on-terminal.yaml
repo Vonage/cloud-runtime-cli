@@ -1,0 +1,24 @@
+description: deploy from a terminal shows each stage, the build output and the deployed instance
+group: deploy
+args: [deploy]
+cwd: work/project
+tty: true
+presentation: both
+env:
+  NO_COLOR: ""
+files:
+  - path: work/project/vcr.yml
+    content: |
+      project: {name: my-project}
+      instance: {name: dev, runtime: nodejs18, region: aws.euw1, application-id: 0f39f387-579b-4259-9f76-2715ff73b8b7, entrypoint: [node, index.js]}
+  - {path: work/project/index.js, content: "console.log('hi')\n"}
+  - {path: work/project/package.json, content: "{\"name\": \"my-project\", \"version\": \"1.0.0\"}\n"}
+fixtures:
+  build:
+    connections:
+      - - {send: "Starting build"}
+        - {send: "Step 1/2 : install dependencies"}
+        - {send: "\u001b[35mℹ\u001b[0m Status - completed"}   # the server's real status frame, colour included
+steps: []
+expect-reads: [euw1 GET /regions/aws.euw1, euw1 GET /projects/my-project]
+scrape: [deployed-banner, deployed-host-address]

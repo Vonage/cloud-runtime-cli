@@ -108,8 +108,17 @@ func run(ctx context.Context, d deps, arg string) error {
 	if err = proj.WriteManifest(m, name); err != nil {
 		return err
 	}
-	fmt.Fprintf(s.io.Out, "%s %s created\n", s.style.SuccessIcon(), filepath.Join(dir, manifestName))
+	s.finish()
 	return nil
+}
+
+// finish tells the user the project is ready.
+func (s *session) finish() {
+	if s.io.Mode() != term.Classic {
+		s.finishRich()
+		return
+	}
+	fmt.Fprintf(s.io.Out, "%s %s created\n", s.style.SuccessIcon(), filepath.Join(s.dir, manifestName))
 }
 
 func newSession(d deps, dir string, proj *scaffold.Project) *session {
@@ -199,11 +208,7 @@ func (s *session) askRuntime(ctx context.Context) (runtimeChoice, error) {
 }
 
 func (s *session) chooseRuntime(ctx context.Context) (runtimeChoice, error) {
-	var (
-		runtimes []platform.Runtime
-		err      error
-	)
-	s.waiting(" Retrieving runtime list... ", func() { runtimes, err = s.api.ListRuntimes(ctx) })
+	runtimes, err := s.retrieveRuntimes(ctx)
 	if err != nil {
 		return runtimeChoice{}, err
 	}
@@ -215,6 +220,19 @@ func (s *session) chooseRuntime(ctx context.Context) (runtimeChoice, error) {
 	return opts.values[label], nil
 }
 
+// retrieveRuntimes lists the platform's runtimes behind a spinner.
+func (s *session) retrieveRuntimes(ctx context.Context) ([]platform.Runtime, error) {
+	if s.io.Mode() != term.Classic {
+		return s.retrieveRuntimesRich(ctx)
+	}
+	var (
+		runtimes []platform.Runtime
+		err      error
+	)
+	s.waiting(" Retrieving runtime list... ", func() { runtimes, err = s.api.ListRuntimes(ctx) })
+	return runtimes, err
+}
+
 func (s *session) askRegion(ctx context.Context) (string, error) {
 	alias, err := s.chooseRegion(ctx)
 	if err != nil {
@@ -224,11 +242,7 @@ func (s *session) askRegion(ctx context.Context) (string, error) {
 }
 
 func (s *session) chooseRegion(ctx context.Context) (string, error) {
-	var (
-		regions []platform.Region
-		err     error
-	)
-	s.waiting(" Retrieving region list... ", func() { regions, err = s.api.ListRegions(ctx) })
+	regions, err := s.retrieveRegions(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -238,4 +252,17 @@ func (s *session) chooseRegion(ctx context.Context) (string, error) {
 		return "", err
 	}
 	return opts.values[label], nil
+}
+
+// retrieveRegions lists the platform's regions behind a spinner.
+func (s *session) retrieveRegions(ctx context.Context) ([]platform.Region, error) {
+	if s.io.Mode() != term.Classic {
+		return s.retrieveRegionsRich(ctx)
+	}
+	var (
+		regions []platform.Region
+		err     error
+	)
+	s.waiting(" Retrieving region list... ", func() { regions, err = s.api.ListRegions(ctx) })
+	return regions, err
 }

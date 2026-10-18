@@ -28,11 +28,7 @@ func (s *session) applyTemplate(ctx context.Context, chosen answers) (*manifest.
 // askTemplate offers the templates written for the runtime's language. picked is false when none exists or the
 // user skips.
 func (s *session) askTemplate(ctx context.Context, rt runtimeChoice) (platform.Template, bool, error) {
-	var (
-		all []platform.Template
-		err error
-	)
-	s.waiting(" Retrieving product templates... ", func() { all, err = s.api.ListTemplates(ctx) })
+	all, err := s.retrieveTemplates(ctx)
 	if err != nil {
 		return platform.Template{}, false, fmt.Errorf("failed to list product templates: %w", err)
 	}
@@ -58,8 +54,36 @@ func (s *session) askTemplate(ctx context.Context, rt runtimeChoice) (platform.T
 	return template, true, nil
 }
 
+// retrieveTemplates lists the product templates behind a spinner.
+func (s *session) retrieveTemplates(ctx context.Context) ([]platform.Template, error) {
+	if s.io.Mode() != term.Classic {
+		return s.retrieveTemplatesRich(ctx)
+	}
+	var (
+		all []platform.Template
+		err error
+	)
+	s.waiting(" Retrieving product templates... ", func() { all, err = s.api.ListTemplates(ctx) })
+	return all, err
+}
+
 // unpack downloads the template's active version and extracts it into the project.
 func (s *session) unpack(ctx context.Context, template platform.Template) error {
+	archive, err := s.downloadTemplate(ctx, template)
+	if err != nil {
+		return fmt.Errorf("failed to download template files: %w", err)
+	}
+	if err = s.unpackTemplate(archive); err != nil {
+		return fmt.Errorf("failed to uncompress template files: %w", err)
+	}
+	return nil
+}
+
+// downloadTemplate fetches the template's active version behind a spinner.
+func (s *session) downloadTemplate(ctx context.Context, template platform.Template) ([]byte, error) {
+	if s.io.Mode() != term.Classic {
+		return s.downloadTemplateRich(ctx, template)
+	}
 	var (
 		archive []byte
 		err     error
@@ -67,14 +91,17 @@ func (s *session) unpack(ctx context.Context, template platform.Template) error 
 	s.waiting(" Downloading template files... ", func() {
 		archive, err = s.api.DownloadTemplate(ctx, template.ID, template.ActiveVersionID)
 	})
-	if err != nil {
-		return fmt.Errorf("failed to download template files: %w", err)
+	return archive, err
+}
+
+// unpackTemplate extracts the archive into the project behind a spinner.
+func (s *session) unpackTemplate(archive []byte) error {
+	if s.io.Mode() != term.Classic {
+		return s.unpackTemplateRich(archive)
 	}
+	var err error
 	s.waiting(" Uncompressing template files... ", func() { err = s.proj.Extract(archive, scaffold.DefaultLimits) })
-	if err != nil {
-		return fmt.Errorf("failed to uncompress template files: %w", err)
-	}
-	return nil
+	return err
 }
 
 // layOverTemplateManifest reads the manifest the template brought. The answers win over its six values and every

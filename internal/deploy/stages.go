@@ -29,6 +29,9 @@ func spinFor[T any](t *term.IO, label string, fn func() (T, error)) (T, error) {
 
 // project finds the project by name, or creates it when the platform has none, and returns its id.
 func (r *runner) project(ctx context.Context) (string, error) {
+	if r.t.Mode() != term.Classic {
+		return r.projectRich(ctx)
+	}
 	name := r.p.ProjectName
 	found, err := spinFor(r.t, " Getting project details...", func() (platform.Project, error) {
 		return r.api.GetProject(ctx, name)
@@ -44,6 +47,9 @@ func (r *runner) project(ctx context.Context) (string, error) {
 }
 
 func (r *runner) createProject(ctx context.Context) (string, error) {
+	if r.t.Mode() != term.Classic {
+		return r.createProjectRich(ctx)
+	}
 	name := r.p.ProjectName
 	label := fmt.Sprintf(" Project %q not found. Creating new project for project %q...", name, name)
 	id, err := spinFor(r.t, label, func() (string, error) { return r.api.CreateProject(ctx, name) })
@@ -56,6 +62,9 @@ func (r *runner) createProject(ctx context.Context) (string, error) {
 
 // validate asks the platform whether it would accept the deployment.
 func (r *runner) validate(ctx context.Context, projectID string) error {
+	if r.t.Mode() != term.Classic {
+		return r.validateRich(ctx, projectID)
+	}
 	inst := r.p.Manifest.Instance
 	result, err := spinFor(r.t, " Validating deployment parameters...", func() (platform.ValidateResult, error) {
 		return r.api.ValidateDeployment(ctx, platform.ValidateRequest{
@@ -104,12 +113,24 @@ func (r *runner) source(ctx context.Context) (string, error) {
 			return "", fmt.Errorf("failed to compress and upload file: %w", err)
 		}
 	}
-	fmt.Fprintf(r.t.Out, "%s Source code uploaded.\n", r.c.SuccessIcon())
+	r.reportUploaded()
 	return key, nil
+}
+
+// reportUploaded prints the classic line for a finished upload. On a terminal the step of the upload has resolved
+// into its own line by now.
+func (r *runner) reportUploaded() {
+	if r.t.Mode() != term.Classic {
+		return
+	}
+	fmt.Fprintf(r.t.Out, "%s Source code uploaded.\n", r.c.SuccessIcon())
 }
 
 // uploadArchive checks the --tgz file and uploads it where it is.
 func (r *runner) uploadArchive(ctx context.Context) (string, error) {
+	if r.t.Mode() != term.Classic {
+		return r.uploadArchiveRich(ctx)
+	}
 	path := r.p.TgzPath
 	if err := spin(r.t, fmt.Sprintf(" Reading %q...", path), func() error { return bundle.CheckTgz(path) }); err != nil {
 		return "", err
@@ -126,6 +147,9 @@ func (r *runner) uploadArchive(ctx context.Context) (string, error) {
 // uploadProject packages the project directory into a temporary archive and uploads that. The archive is removed
 // on every path.
 func (r *runner) uploadProject(ctx context.Context) (string, error) {
+	if r.t.Mode() != term.Classic {
+		return r.uploadProjectRich(ctx)
+	}
 	dir := r.p.ProjectDir
 	warnings := &warningLines{icon: r.c.WarningIcon()}
 	stop := r.t.StartSpinner(" Compressing files...")
@@ -184,6 +208,9 @@ func (r *runner) packageRequest(sourceKey string) (platform.PackageRequest, erro
 
 // createPackage asks the platform to build the uploaded code and returns the package id.
 func (r *runner) createPackage(ctx context.Context, req platform.PackageRequest) (string, error) {
+	if r.t.Mode() != term.Classic {
+		return r.createPackageRich(ctx, req)
+	}
 	id, err := spinFor(r.t, " Creating package...", func() (string, error) { return r.api.CreatePackage(ctx, req) })
 	if err != nil {
 		return "", fmt.Errorf("failed to create package: %w", err)
@@ -195,6 +222,9 @@ func (r *runner) createPackage(ctx context.Context, req platform.PackageRequest)
 // watchBuild shows the build output as it arrives and returns when the build is over. The platform decides when
 // that is, on the frame as it came; what is shown has the control sequences taken out.
 func (r *runner) watchBuild(ctx context.Context, packageID string) error {
+	if r.t.Mode() != term.Classic {
+		return r.watchBuildRich(ctx, packageID)
+	}
 	fmt.Fprintf(r.t.Out, "%s Waiting for build to start...\n", r.c.Blue(term.InfoIcon))
 	err := r.api.WatchBuild(ctx, packageID, func(frame string) {
 		fmt.Fprintln(r.t.Out, term.SanitizeStream(frame))
@@ -208,6 +238,9 @@ func (r *runner) watchBuild(ctx context.Context, packageID string) error {
 
 // deploy starts the instance from the built package.
 func (r *runner) deploy(ctx context.Context, projectID, packageID string) (platform.DeployResult, error) {
+	if r.t.Mode() != term.Classic {
+		return r.deployRich(ctx, projectID, packageID)
+	}
 	inst := r.p.Manifest.Instance
 	result, err := spinFor(r.t, " Deploying instance...", func() (platform.DeployResult, error) {
 		return r.api.DeployInstance(ctx, platform.DeployRequest{
