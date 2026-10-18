@@ -37,6 +37,7 @@ type Client struct {
 	releaseURL string
 	userAgent  string
 	loopback   bool // ReleaseURL is a loopback address: plain http to loopback is allowed and nothing else is dialled
+	keys       []TrustedKey
 }
 
 // New returns a client for bi.ReleaseURL; bi.UpgradeTestKey, when set, is added to the trusted keys.
@@ -55,6 +56,7 @@ func New(bi buildinfo.Info) *Client {
 		releaseURL: bi.ReleaseURL,
 		userAgent:  bi.UserAgent(),
 		loopback:   loopback,
+		keys:       trustedKeys(releaseKeys, bi.UpgradeTestKey),
 	}
 }
 
