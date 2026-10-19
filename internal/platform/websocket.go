@@ -187,5 +187,18 @@ func (c *core) connectWithRetry(ctx context.Context, u *url.URL) (*websocket.Con
 // isFinal reports whether a failed attempt is the last one: the context has ended, or a rule refused.
 func isFinal(ctx context.Context, err error) bool {
 	var refusal *policyError
-	return ctx.Err() != nil || errors.As(err, &refusal)
+	return ctxEnded(ctx) != nil || errors.As(err, &refusal)
+}
+
+// ctxEnded is ctx.Err() with a deadline that has passed counted as ended: a dial gives up at the deadline, and
+// the context's own timer may not have run yet. It reads the wall clock, as context deadlines do, not the injected
+// clock.
+func ctxEnded(ctx context.Context) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if deadline, ok := ctx.Deadline(); ok && !time.Now().Before(deadline) {
+		return context.DeadlineExceeded
+	}
+	return nil
 }

@@ -20,6 +20,7 @@ import (
 func TestRetryReason(t *testing.T) {
 	ended, cancel := context.WithCancel(t.Context())
 	cancel()
+	late := lateTimerContext{Context: t.Context(), deadline: time.Now().Add(-time.Second)}
 	// What send returns for a failure of Go's HTTP client: its *url.Error with the trace id appended.
 	transport := func(cause error) error {
 		return fmt.Errorf("%w: trace_id = abc", &url.Error{Op: "Post", URL: "http://api.example.test/x", Err: cause})
@@ -47,6 +48,7 @@ func TestRetryReason(t *testing.T) {
 		{name: "any other failure of the network", ctx: t.Context(), err: transport(errors.New("write: broken pipe")), wantReason: "write: broken pipe", wantAgain: true},
 		{name: "the cause is shown without control sequences", ctx: t.Context(), err: transport(errors.New("a\x1b[2Jb")), wantReason: "ab", wantAgain: true},
 		{name: "the context has ended", ctx: ended, err: transport(context.Canceled)},
+		{name: "the deadline has passed before the context noticed", ctx: late, err: transport(errors.New("i/o timeout"))},
 		{name: "a refused redirect", ctx: t.Context(), err: transport(policyErrorf("unexpected redirect from api.example.test"))},
 		{name: "a refused dial", ctx: t.Context(), err: transport(refusedDial)},
 		{name: "a redirect that cannot be followed", ctx: t.Context(), err: transport(errors.New(`failed to parse Location header "http://[bad": parse error`))},
@@ -87,6 +89,17 @@ func TestWaitToRetryAnnouncesNothingOnceTheContextHasEnded(t *testing.T) {
 	err := s.client.waitToRetry(ended, 0, "HTTP 503")
 
 	assert.Equal(t, context.Canceled, err)
+	assert.Empty(t, s.notices.String())
+	assert.Empty(t, s.clock.Sleeps())
+}
+
+func TestWaitToRetryAnnouncesNothingOnceTheDeadlineHasPassed(t *testing.T) {
+	s := newRouteServer(t, nil)
+	late := lateTimerContext{Context: t.Context(), deadline: time.Now().Add(-time.Second)}
+
+	err := s.client.waitToRetry(late, 0, "HTTP 503")
+
+	assert.Equal(t, context.DeadlineExceeded, err)
 	assert.Empty(t, s.notices.String())
 	assert.Empty(t, s.clock.Sleeps())
 }

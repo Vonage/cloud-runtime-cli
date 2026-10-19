@@ -178,12 +178,21 @@ func TestWaitStepTimesOut(t *testing.T) {
 	assert.Contains(t, err.Error(), "timed out")
 }
 
+// hangAttempts is how often TestTimeoutKillsTheGroup runs its scenario: on a loaded machine the deadline, which runs
+// from the start of the process, may end the run before the process has printed its child.
+const hangAttempts = 3
+
 func TestTimeoutKillsTheGroup(t *testing.T) {
-	res, err := runStubScenario(t, "version-hang", "args: [spawn]\ntimeout: 1500ms\n")
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "timed out")
-	m := regexp.MustCompile(`child (\d+)`).FindStringSubmatch(res.Stdout)
-	require.NotNil(t, m, "the process printed its child: %q", res.Stdout)
+	var m []string
+	for attempt := 1; m == nil && attempt <= hangAttempts; attempt++ {
+		res, err := runStubScenario(t, "version-hang", "args: [spawn]\ntimeout: 1500ms\n")
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "timed out")
+		if m = regexp.MustCompile(`child (\d+)`).FindStringSubmatch(res.Stdout); m == nil {
+			t.Logf("attempt %d of %d: the process had not printed its child yet: %q", attempt, hangAttempts, res.Stdout)
+		}
+	}
+	require.NotNil(t, m, "the process printed its child")
 	pid, _ := strconv.Atoi(m[1])
 	require.Eventually(t, func() bool { return syscall.Kill(pid, 0) == syscall.ESRCH }, 5*time.Second, 50*time.Millisecond,
 		"the child of the killed process is gone")

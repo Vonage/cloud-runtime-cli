@@ -108,6 +108,7 @@ func TestReadFailureOrder(t *testing.T) {
 	cancel()
 	closed := func(code int) error { return &websocket.CloseError{Code: code} }
 	reset := &net.OpError{Op: "read", Err: syscall.ECONNRESET}
+	late := lateTimerContext{Context: t.Context(), deadline: time.Now().Add(-time.Second)}
 
 	tests := []struct {
 		name      string
@@ -119,6 +120,8 @@ func TestReadFailureOrder(t *testing.T) {
 		{"an ended context wins over a normal closure", ended, closed(websocket.CloseNormalClosure), false, wantCanceled},
 		{"an ended context wins over the read limit", ended, websocket.ErrReadLimit, false, wantCanceled},
 		{"an ended context wins over a reset", ended, reset, false, wantCanceled},
+		{"a passed deadline wins over a normal closure", late, closed(websocket.CloseNormalClosure), false, wantTimedOut},
+		{"a passed deadline wins over a reset", late, reset, false, wantTimedOut},
 		{"the read limit", t.Context(), websocket.ErrReadLimit, false, "build log message from api.example.test is larger than 16 MiB"},
 		{"a normal closure", t.Context(), closed(websocket.CloseNormalClosure), false, "error while building package pkg-1, normal closure from server"},
 		{"going away", t.Context(), closed(websocket.CloseGoingAway), true, ""},
@@ -139,4 +142,50 @@ func TestReadFailureOrder(t *testing.T) {
 			assert.EqualError(t, err, tc.want)
 		})
 	}
+}
+
+// lateTimerContext has a deadline that has passed while its own timer has not run yet.
+type lateTimerContext struct {
+	context.Context
+	deadline time.Time
+	err      error
+}
+
+func (c lateTimerContext) Deadline() (time.Time, bool) { return c.deadline, !c.deadline.IsZero() }
+func (c lateTimerContext) Err() error                  { return c.err }
+
+func TestCtxEnded(t *testing.T) {
+	cancelled, cancel := context.WithCancel(t.Context())
+	cancel()
+	now := time.Now()
+	tests := []struct {
+		name string
+		ctx  context.Context
+		want error
+	}{
+		{"a context without a deadline", t.Context(), nil},
+		{"a cancelled context", cancelled, context.Canceled},
+		{"a deadline ahead", lateTimerContext{Context: t.Context(), deadline: now.Add(time.Hour)}, nil},
+		{"a deadline that has passed before the timer ran", lateTimerContext{Context: t.Context(), deadline: now.Add(-time.Second)}, context.DeadlineExceeded},
+		{"the error of the context wins over a passed deadline", lateTimerContext{Context: t.Context(), deadline: now.Add(-time.Second), err: context.Canceled}, context.Canceled},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, ctxEnded(tc.ctx))
+		})
+	}
+}
+
+func TestWatchErrorCountsAPassedDeadline(t *testing.T) {
+	late := lateTimerContext{Context: t.Context(), deadline: time.Now().Add(-time.Second)}
+
+	assert.EqualError(t, watchError(late, testPackageID, assert.AnError), wantTimedOut)
+	assert.Equal(t, assert.AnError, watchError(t.Context(), testPackageID, assert.AnError))
+}
+
+func TestIsFinalCountsAPassedDeadline(t *testing.T) {
+	late := lateTimerContext{Context: t.Context(), deadline: time.Now().Add(-time.Second)}
+
+	assert.True(t, isFinal(late, assert.AnError))
+	assert.False(t, isFinal(t.Context(), assert.AnError))
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"vonage-cloud-runtime-cli/internal/platform"
 	"vonage-cloud-runtime-cli/internal/term"
 )
 
@@ -30,4 +31,37 @@ func TestIntroBlockColoursTheHostEvenWithoutColour(t *testing.T) {
 
 	assert.Contains(t, got, "\x1b[0;1;33mhttp://localhost:9000\x1b[0m")
 	assert.NotContains(t, got, "\x1b[0;1;33m| ", "the other lines have no colour when the terminal has none")
+}
+
+func TestPrintIntroKeepsControlCharactersOffTheTerminal(t *testing.T) {
+	tio, out, _ := term.Test("", false)
+	s := &session{
+		tio:     tio,
+		con:     newConsole(tio, false),
+		service: platform.DebugService{ServiceName: "svc\x1b[2J\u009b2J-1"},
+		addrs:   serviceAddresses{Host: "https://svc\u009b2J\u202e-1.debug.example.test\x1b[2J"},
+	}
+
+	s.printIntro()
+
+	got := out.String()
+	assert.Contains(t, got, "https://svc")
+	assert.Contains(t, got, ".debug.example.test")
+	for _, control := range []string{"\x1b[2J", "\u009b", "\u202e"} {
+		assert.NotContains(t, got, control)
+	}
+}
+
+func TestPrintIntroLeavesOrdinaryNamesAsTheyAre(t *testing.T) {
+	tio, out, _ := term.Test("", false)
+	s := &session{
+		tio:     tio,
+		con:     newConsole(tio, false),
+		service: platform.DebugService{ServiceName: "dbg-service-1"},
+		addrs:   serviceAddresses{Host: "https://dbg-service-1.debug.example.test"},
+	}
+
+	s.printIntro()
+
+	assert.Equal(t, introBlock(tio.Style(), "dbg-service-1", "https://dbg-service-1.debug.example.test"), out.String())
 }

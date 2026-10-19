@@ -20,5 +20,5 @@ func (s *session) printIntro() {
 		s.printIntroRich()
 		return
 	}
-	s.con.stdout(introBlock(s.con.style, s.service.ServiceName, s.addrs.Host))
+	s.con.stdout(introBlock(s.con.style, term.Sanitize(s.service.ServiceName), term.Sanitize(s.addrs.Host)))
 }

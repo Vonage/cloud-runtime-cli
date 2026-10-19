@@ -349,13 +349,6 @@ func (t *tunnel) takePending(id string) (chan responseMessage, bool) {
 	return answer, ok
 }
 
-// pendingCount is the number of calls waiting for an answer.
-func (t *tunnel) pendingCount() int {
-	t.pendingMu.Lock()
-	defer t.pendingMu.Unlock()
-	return len(t.pending)
-}
-
 // handleRemoteResponse gives the platform's answer to the call that waits for it. A call that gave up leaves nothing
 // to give it to, which is no reason to end the session.
 func (t *tunnel) handleRemoteResponse(msg responseMessage) {

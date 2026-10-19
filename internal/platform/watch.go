@@ -83,9 +83,10 @@ func followBuild(ctx context.Context, conn *websocket.Conn, u *url.URL, packageI
 
 // readFailure says what a failed read means: the end of the watch, or a connection worth replacing.
 func readFailure(ctx context.Context, u *url.URL, packageID string, err error) (reconnect bool, _ error) {
+	if ctxErr := ctxEnded(ctx); ctxErr != nil {
+		return false, endedError(packageID, ctxErr)
+	}
 	switch {
-	case ctx.Err() != nil:
-		return false, endedError(packageID, ctx.Err())
 	case errors.Is(err, websocket.ErrReadLimit):
 		return false, fmt.Errorf("build log message from %s is larger than %d MiB", u.Host, maxFrameBytes>>20)
 	case websocket.IsCloseError(err, websocket.CloseNormalClosure):
@@ -96,7 +97,7 @@ func readFailure(ctx context.Context, u *url.URL, packageID string, err error) (
 
 // watchError is the error of a watch that could not connect: when its context has ended, that is the reason.
 func watchError(ctx context.Context, packageID string, err error) error {
-	if ctxErr := ctx.Err(); ctxErr != nil {
+	if ctxErr := ctxEnded(ctx); ctxErr != nil {
 		return endedError(packageID, ctxErr)
 	}
 	return err

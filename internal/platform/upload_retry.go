@@ -40,7 +40,7 @@ func retryReason(ctx context.Context, err error) (reason string, again bool) {
 
 	var urlErr *url.Error
 	var refusal *policyError
-	if ctx.Err() != nil || !errors.As(err, &urlErr) || errors.As(err, &refusal) || isLocationFailure(urlErr) {
+	if ctxEnded(ctx) != nil || !errors.As(err, &urlErr) || errors.As(err, &refusal) || isLocationFailure(urlErr) {
 		return "", false
 	}
 	return term.Sanitize(urlErr.Err.Error()), true
@@ -55,7 +55,7 @@ func isLocationFailure(err *url.Error) bool {
 // waitToRetry announces retry number retry+1 and waits out its delay. It returns the context's error when the
 // context ends first; once the context has ended it announces nothing.
 func (c *Client) waitToRetry(ctx context.Context, retry int, reason string) error {
-	if err := ctx.Err(); err != nil {
+	if err := ctxEnded(ctx); err != nil {
 		return err
 	}
 	base := uploadBackoff[retry]

@@ -140,6 +140,13 @@ func newSharedRig(t *testing.T, srv *fakeplatform.Server, opts rigOptions) *rig 
 	return r
 }
 
+// pendingCount is the number of calls waiting for an answer.
+func (t *tunnel) pendingCount() int {
+	t.pendingMu.Lock()
+	defer t.pendingMu.Unlock()
+	return len(t.pending)
+}
+
 // executeFrame is an execute message of the proxy.
 func executeFrame(id, method, route string) requestMessage {
 	return requestMessage{ID: id, Operation: opExecute, Method: method, Route: route}

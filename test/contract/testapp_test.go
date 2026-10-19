@@ -4,6 +4,7 @@ package contract
 
 import (
 	"bufio"
+	"bytes"
 	"io"
 	"net"
 	"net/http"
@@ -20,37 +21,53 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// startTestapp starts the helper with the given environment and flags and
+// testappAttempts is how often startTestapp tries: another process can take the port between freePort and the
+// helper's bind.
+const testappAttempts = 3
+
+// startTestapp starts the helper on a free port, which it gets as portVar, with the given environment and flags and
 // returns it once it said it is ready; lines gets the rest of its output.
-func startTestapp(t *testing.T, env []string, flags ...string) (cmd *exec.Cmd, lines func() []string) {
+func startTestapp(t *testing.T, portVar string, env []string, flags ...string) (cmd *exec.Cmd, port int, lines func() []string) {
 	t.Helper()
 	exe, err := testappBinary(t, stubConfig(t))
 	require.NoError(t, err)
-	cmd = exec.CommandContext(t.Context(), exe, flags...)
-	cmd.Env = append([]string{"PATH=" + os.Getenv("PATH")}, env...)
-	out, err := cmd.StdoutPipe()
-	require.NoError(t, err)
-	require.NoError(t, cmd.Start())
-	t.Cleanup(func() { _ = cmd.Process.Kill(); _ = cmd.Wait() })
+	for attempt := 1; ; attempt++ {
+		port, err = freePort()
+		require.NoError(t, err)
+		var stderr bytes.Buffer
+		cmd = exec.CommandContext(t.Context(), exe, flags...)
+		cmd.Env = append([]string{"PATH=" + os.Getenv("PATH"), portVar + "=" + strconv.Itoa(port)}, env...)
+		cmd.Stderr = &stderr
+		out, err := cmd.StdoutPipe()
+		require.NoError(t, err)
+		require.NoError(t, cmd.Start())
 
-	sc := bufio.NewScanner(out)
-	require.True(t, sc.Scan(), "the helper prints a first line")
-	require.Equal(t, "testapp ready", sc.Text())
-	done := make(chan []string, 1)
-	go func() {
-		var rest []string
-		for sc.Scan() {
-			rest = append(rest, sc.Text())
+		sc := bufio.NewScanner(out)
+		printed := sc.Scan()
+		if printed && sc.Text() == "testapp ready" {
+			t.Cleanup(func() { _ = cmd.Process.Kill(); _ = cmd.Wait() })
+			done := make(chan []string, 1)
+			go func() {
+				var rest []string
+				for sc.Scan() {
+					rest = append(rest, sc.Text())
+				}
+				done <- rest
+			}()
+			return cmd, port, func() []string { return <-done }
 		}
-		done <- rest
-	}()
-	return cmd, func() []string { return <-done }
+		_ = cmd.Process.Kill()
+		_ = cmd.Wait()
+		if !printed && strings.Contains(stderr.String(), "address already in use") && attempt < testappAttempts {
+			t.Logf("port %d was taken before the helper bound it, trying another (attempt %d of %d)", port, attempt+1, testappAttempts)
+			continue
+		}
+		require.FailNowf(t, "the helper did not say it is ready", "first line %q (printed: %t), stderr: %q", sc.Text(), printed, stderr.String())
+	}
 }
 
 func TestTestappServesItsRoutes(t *testing.T) {
-	port, err := freePort()
-	require.NoError(t, err)
-	cmd, lines := startTestapp(t, []string{"NERU_APP_PORT=" + strconv.Itoa(port), "ZED=1", "ALPHA=2"})
+	cmd, port, lines := startTestapp(t, "NERU_APP_PORT", []string{"ZED=1", "ALPHA=2"})
 	base := "http://127.0.0.1:" + strconv.Itoa(port)
 
 	res, err := httpGet(t, base+"/hello")
@@ -87,9 +104,7 @@ func TestTestappServesItsRoutes(t *testing.T) {
 }
 
 func TestTestappFallsBackToVCRPortAndExitsAfterTheGivenTime(t *testing.T) {
-	port, err := freePort()
-	require.NoError(t, err)
-	cmd, _ := startTestapp(t, []string{"VCR_PORT=" + strconv.Itoa(port)}, "--exit-after", "300ms", "--exit-code", "7")
+	cmd, port, _ := startTestapp(t, "VCR_PORT", nil, "--exit-after", "300ms", "--exit-code", "7")
 	conn, err := (&net.Dialer{Timeout: 2 * time.Second}).DialContext(t.Context(), "tcp", net.JoinHostPort("127.0.0.1", strconv.Itoa(port)))
 	require.NoError(t, err, "it listens on VCR_PORT when NERU_APP_PORT is not set")
 	_ = conn.Close()
