@@ -30,7 +30,7 @@ const (
 	keptModeBits                = 0o755 // owner rwx and group/other read and execute
 )
 
-var errTemplateTooLarge = errors.New("template too large")
+var errTemplateTooLarge = api.ErrTemplateTooLarge
 
 // templateLimits bound a template. Past any of them: "template too large".
 type templateLimits struct {

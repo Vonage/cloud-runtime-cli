@@ -2,7 +2,10 @@ package api
 
 import (
 	"errors"
+	"io"
 	"net/http"
+	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"github.com/go-resty/resty/v2"
@@ -87,6 +90,59 @@ func TestMarketplaceClientGetTemplate(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, tt.want.output, output)
 			httpmock.Reset()
+		})
+	}
+}
+
+// zeroBody serves size zero bytes in small writes, so the test never holds the whole body. With declareLength the
+// response carries a Content-Length; without it the body is chunked and only the bytes that arrive can be counted.
+func zeroBody(size int64, declareLength bool) http.HandlerFunc {
+	return func(w http.ResponseWriter, _ *http.Request) {
+		if declareLength {
+			w.Header().Set("Content-Length", strconv.FormatInt(size, 10))
+		}
+		_, _ = io.CopyN(w, zeroReader{}, size)
+	}
+}
+
+type zeroReader struct{}
+
+func (zeroReader) Read(p []byte) (int, error) {
+	clear(p)
+	return len(p), nil
+}
+
+func TestMarketplaceClientGetTemplateDownloadLimit(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name          string
+		size          int64
+		declareLength bool
+		wantTooLarge  bool
+	}{
+		{"exactly at the limit with a declared length", maxTemplateDownload, true, false},
+		{"exactly at the limit without a declared length", maxTemplateDownload, false, false},
+		{"one byte over the limit with a declared length", maxTemplateDownload + 1, true, true},
+		{"one byte over the limit without a declared length", maxTemplateDownload + 1, false, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			server := httptest.NewServer(zeroBody(tt.size, tt.declareLength))
+			defer server.Close()
+			client := NewMarketplaceClient(server.URL, resty.New())
+
+			output, err := client.GetTemplate(t.Context(), "product1-id", "version1-id")
+
+			if tt.wantTooLarge {
+				require.EqualError(t, err, "template too large")
+				require.ErrorIs(t, err, ErrTemplateTooLarge)
+				require.Nil(t, output)
+				return
+			}
+			require.NoError(t, err)
+			require.Len(t, output, maxTemplateDownload)
 		})
 	}
 }
