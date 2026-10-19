@@ -148,3 +148,36 @@ func TestGetAsset(t *testing.T) {
 		})
 	}
 }
+
+func TestGetAssetRefusesABodyOverTheLimit(t *testing.T) {
+	previous := maxAssetBytes
+	t.Cleanup(func() { maxAssetBytes = previous })
+	maxAssetBytes = 8
+
+	client := resty.New()
+	httpmock.ActivateNonDefault(client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	for name, tt := range map[string]struct {
+		body    string
+		wantErr error
+	}{
+		"a body at the limit":      {body: "12345678"},
+		"a body over the limit":    {body: "123456789", wantErr: ErrAssetTooLarge},
+		"a long body over the cap": {body: "123456789012345678901234567890", wantErr: ErrAssetTooLarge},
+	} {
+		t.Run(name, func(t *testing.T) {
+			httpmock.RegisterResponder("GET", "https://example.com/asset", httpmock.NewStringResponder(http.StatusOK, tt.body))
+
+			output, err := NewReleaseClient("https://example.com", client).GetAsset(t.Context(), "https://example.com/asset")
+
+			if tt.wantErr != nil {
+				require.ErrorIs(t, err, tt.wantErr)
+				require.Nil(t, output)
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, tt.body, string(output))
+		})
+	}
+}

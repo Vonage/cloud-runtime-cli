@@ -5,14 +5,11 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/blang/semver"
 	"github.com/inconshreveable/go-update"
-	"github.com/rhysd/go-github-selfupdate/selfupdate"
 	"github.com/spf13/cobra"
 
 	"vonage-cloud-runtime-cli/pkg/api"
@@ -20,16 +17,29 @@ import (
 	"vonage-cloud-runtime-cli/pkg/config"
 )
 
+// textError is an error whose text is shown as it is, capital letter included.
+type textError string
+
+func (e textError) Error() string { return string(e) }
+
+const errDevelopmentBuild = textError("Cannot upgrade a development build")
+
 type Options struct {
 	cmdutil.Factory
 
 	forceUpdate bool
 	path        string
+	keys        []trustedKey
 }
 
 func NewCmdUpgrade(f cmdutil.Factory, version string) *cobra.Command {
+	return newCmdUpgrade(f, version, trustedKeys())
+}
+
+func newCmdUpgrade(f cmdutil.Factory, version string, keys []trustedKey) *cobra.Command {
 	opts := Options{
 		Factory: f,
+		keys:    keys,
 	}
 
 	cmd := &cobra.Command{
@@ -49,9 +59,13 @@ func NewCmdUpgrade(f cmdutil.Factory, version string) *cobra.Command {
 			UPDATE PROCESS
 			  If a new version is available:
 			  1. You'll be prompted to confirm the update (unless --force is used)
-			  2. The new binary is downloaded from GitHub releases
-			  3. The current binary is replaced with the new one
-			  4. Success message confirms the update
+			  2. The release's signed checksums are downloaded and verified
+			  3. The new binary is downloaded from GitHub releases and checked against them
+			  4. The current binary is replaced with the new one
+			  5. Success message confirms the update
+
+			  If the release cannot be verified, nothing is changed and the command fails.
+			  Development builds cannot be upgraded.
 
 			CUSTOM INSTALLATION PATH
 			  If you installed the CLI in a custom location (not the default), use
@@ -105,9 +119,9 @@ func runUpgrade(ctx context.Context, opts *Options, version string) error {
 	io := opts.IOStreams()
 	c := opts.IOStreams().ColorScheme()
 
-	current, err := GetCurrentVersion(version)
+	current, err := semver.Parse(strings.TrimPrefix(version, "v"))
 	if err != nil {
-		return fmt.Errorf("current update is invalid: %w", err)
+		return errDevelopmentBuild
 	}
 
 	spinner := cmdutil.DisplaySpinnerMessageWithHandle(" Checking for update...")
@@ -200,43 +214,18 @@ func GetLatestVersion(release api.Release) (semver.Version, error) {
 }
 
 func updateByAsset(ctx context.Context, opts *Options, release api.Release, exePath string) error {
-	latestAssetURL, err := getDownloadURL(release)
+	binary, err := verifiedBinary(ctx, opts.ReleaseClient(), release, opts.keys)
 	if err != nil {
-		return fmt.Errorf("failed to get download url: %w", err)
+		return err
 	}
 
-	asset, err := opts.ReleaseClient().GetAsset(ctx, latestAssetURL)
-	if err != nil {
-		return fmt.Errorf("failed to get release asset: %w", err)
-	}
-
-	_, baseName := filepath.Split(exePath)
-	cmd := strings.TrimSuffix(baseName, filepath.Ext(baseName))
-
-	binary, err := selfupdate.UncompressCommand(bytes.NewReader(asset), latestAssetURL, cmd)
-	if err != nil {
-		return fmt.Errorf("failed to uncompress command: %w", err)
-	}
-
-	err = update.Apply(binary, update.Options{
+	err = update.Apply(bytes.NewReader(binary), update.Options{
 		TargetPath: exePath,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to apply update: %w", err)
 	}
 	return nil
-}
-
-func getDownloadURL(release api.Release) (string, error) {
-	for _, asset := range release.Assets {
-		if asset.Name == fmt.Sprintf("vcr_%s_%s.tar.gz", runtime.GOOS, runtime.GOARCH) {
-			if asset.BrowserDownloadURL == "" {
-				return "", fmt.Errorf("download url not found for %s %s", runtime.GOOS, runtime.GOARCH)
-			}
-			return asset.BrowserDownloadURL, nil
-		}
-	}
-	return "", fmt.Errorf("no asset found for %s %s", runtime.GOOS, runtime.GOARCH)
 }
 
 func executableExists(path string) bool {

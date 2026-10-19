@@ -2,9 +2,16 @@ package api
 
 import (
 	"context"
+	"errors"
 
 	"github.com/go-resty/resty/v2"
 )
+
+// ErrAssetTooLarge is a release file longer than maxAssetBytes.
+var ErrAssetTooLarge = errors.New("release asset is too large")
+
+// maxAssetBytes is the most GetAsset reads: the largest file an upgrade accepts.
+var maxAssetBytes = 100 << 20
 
 type ReleaseClient struct {
 	baseURL    string
@@ -38,7 +45,11 @@ func (r *ReleaseClient) GetLatestRelease(ctx context.Context) (Release, error) {
 func (r *ReleaseClient) GetAsset(ctx context.Context, url string) ([]byte, error) {
 	resp, err := r.httpClient.R().
 		SetContext(ctx).
+		SetResponseBodyLimit(maxAssetBytes).
 		Get(url)
+	if errors.Is(err, resty.ErrResponseBodyTooLarge) {
+		return nil, ErrAssetTooLarge
+	}
 	if err != nil {
 		return nil, err
 	}
