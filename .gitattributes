@@ -7,3 +7,6 @@ internal/**/testdata/** -text
 test/contract/scenarios/** text eol=lf
 test/contract/allowed-diffs.txt text eol=lf
 test/contract/scraped.yaml text eol=lf
+
+# Generated command pages are compared byte for byte with the command tree: always LF, even on a Windows checkout.
+docs/vcr*.md text eol=lf

@@ -33,6 +33,10 @@ test:
 lint:
 	go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION) run ./...
 
+## docs: regenerate docs/vcr*.md from the command tree
+docs:
+	go run ./docs
+
 contract:
 	VCR_CONTRACT=1 VCR_BIN='$(VCR_BIN)' PORTED='$(PORTED)' NO_GRAPHQL='$(NO_GRAPHQL)' SCENARIO='$(SCENARIO)' go test ./test/contract/ -run '^TestContract$$' -count=1 -timeout 30m
 
@@ -68,7 +72,7 @@ run:
 deps:
 	$(GOGET) -u
 
-.PHONY: build build-linux build-windows build-macos test clean run deps install-macos lint contract contract-record contract-rich contract-rich-record contract-baseline contract-self contract-mutate contract-baseline-check
+.PHONY: build build-linux build-windows build-macos test clean run deps install-macos lint docs contract contract-record contract-rich contract-rich-record contract-baseline contract-self contract-mutate contract-baseline-check
 
 install-macos:
 	go build -o $(GOPATH)/bin/vcr main.go
