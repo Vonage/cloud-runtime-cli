@@ -98,9 +98,9 @@ func TestRealTreeHelpPagesMatchGoldens(t *testing.T) {
 		path := "vcr " + strings.Join(want.args[:len(want.args)-1], " ")
 		t.Run(strings.TrimSuffix(filepath.Base(file), ".txt"), func(t *testing.T) {
 			cmd := findCommand(probe, strings.TrimSpace(path))
-			if cmd == nil || cmd.Annotations[pendingAnnotation] != "" || lacksChildren(cmd, baseline[strings.TrimSpace(path)]) {
+			if cmd == nil || lacksChildren(cmd, baseline[strings.TrimSpace(path)]) {
 				if portedAll() {
-					t.Fatalf("%q is not a real command yet", path)
+					t.Fatalf("%q is missing from the command tree", path)
 				}
 				t.Skip("not ported yet")
 			}

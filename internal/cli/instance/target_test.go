@@ -68,7 +68,7 @@ func TestValidate(t *testing.T) {
 }
 
 func TestLookupByIDWinsOverNames(t *testing.T) {
-	reader := &fakeReader{byID: found("I1"), byName: foundByName("N1")}
+	reader := &fakeReader{byID: found("I1"), byName: foundByName("from-names")}
 
 	inst, err := target{id: "I1", project: "p", instance: "n"}.lookup(t.Context(), reader, removeNameForm)
 
@@ -79,12 +79,12 @@ func TestLookupByIDWinsOverNames(t *testing.T) {
 }
 
 func TestLookupByNamesAsksForTheNames(t *testing.T) {
-	reader := &fakeReader{byID: found("I1"), byName: foundByName("N1")}
+	reader := &fakeReader{byID: found("I1"), byName: foundByName("from-names")}
 
 	inst, err := target{project: "p", instance: "n"}.lookup(t.Context(), reader, removeNameForm)
 
 	require.NoError(t, err)
-	assert.Equal(t, "N1", inst.ID)
+	assert.Equal(t, "from-names", inst.ID)
 	assert.Empty(t, reader.idCalls)
 	assert.Equal(t, [][2]string{{"p", "n"}}, reader.namePair)
 }

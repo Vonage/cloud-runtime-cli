@@ -44,11 +44,11 @@ func TestReadmeTerminalOutputFollowsUsage(t *testing.T) {
 
 	usage := strings.Index(readme, "\n## Usage\n")
 	terminal := strings.Index(readme, "\n## Terminal output\n")
-	setup := strings.Index(readme, "\n## Development Setup\n")
+	development := strings.Index(readme, "\n## Development\n")
 
 	require.GreaterOrEqual(t, usage, 0)
 	require.GreaterOrEqual(t, terminal, 0)
-	require.GreaterOrEqual(t, setup, 0)
+	require.GreaterOrEqual(t, development, 0)
 	assert.Less(t, usage, terminal, "the section comes after the usage section")
-	assert.Less(t, terminal, setup, "and before the sections for contributors")
+	assert.Less(t, terminal, development, "and before the sections for contributors")
 }

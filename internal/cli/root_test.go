@@ -8,11 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
 	"vonage-cloud-runtime-cli/internal/term"
 )
 
@@ -333,50 +331,10 @@ func TestCompletionScriptsAreGenerated(t *testing.T) {
 	assert.Empty(t, entries)
 }
 
-func TestStubsYieldToRealGroups(t *testing.T) {
+func TestRootListsEveryGroup(t *testing.T) {
 	env, _, _ := newTestEnv()
 
-	t.Run("stubs carry the baseline texts", func(t *testing.T) {
-		baseline := nodesByPath(loadContractTree(t))
-		root := buildTestRoot(env, nil)
+	root := withBuiltins(NewRoot(env))
 
-		stubs := 0
-		for _, cmd := range root.Commands() {
-			if cmd.Annotations[pendingAnnotation] == "" {
-				continue
-			}
-			stubs++
-			want, ok := baseline["vcr "+cmd.Name()]
-			require.True(t, ok, "no baseline node for %s", cmd.Name())
-			assert.Equal(t, want.Use, cmd.Use)
-			assert.Equal(t, want.Aliases, cmd.Aliases)
-			assert.Equal(t, want.Short, cmd.Short)
-			assert.True(t, cmd.Runnable())
-			assert.Equal(t, cmdenv.None, cmd.Annotations[cmdenv.Annotation])
-			assert.EqualError(t, cmd.RunE(cmd, nil), "this command is not available in this build yet")
-		}
-		assert.Equal(t, 8, stubs)
-	})
-
-	t.Run("a real group replaces its stub", func(t *testing.T) {
-		fake := &cobra.Command{Use: "app <command>", Short: "fake"}
-
-		root := buildTestRoot(env, []*cobra.Command{fake})
-
-		var apps []*cobra.Command
-		for _, cmd := range root.Commands() {
-			if cmd.Name() == "app" {
-				apps = append(apps, cmd)
-			}
-		}
-		require.Len(t, apps, 1)
-		assert.Same(t, fake, apps[0])
-		assert.Empty(t, apps[0].Annotations[pendingAnnotation])
-	})
-
-	t.Run("the root lists every group", func(t *testing.T) {
-		root := withBuiltins(buildTestRoot(env, nil))
-
-		assert.Equal(t, rootUsageBlock, usageText(root))
-	})
+	assert.Equal(t, rootUsageBlock, usageText(root))
 }

@@ -1,6 +1,6 @@
 # Vonage cloud runtime - CLI
 
-![Actions](https://github.com/Vonage/vonage-cloud-runtime-cli/workflows/Release%20CLI/badge.svg)
+![Actions](https://github.com/Vonage/vonage-cloud-runtime-cli/workflows/CI-Pipeline/badge.svg)
 
 <img src="https://developer.nexmo.com/assets/images/Vonage_Nexmo.svg" height="48px" alt="Nexmo is now known as Vonage" />
 
@@ -12,7 +12,7 @@ the [Vonage Cloud Runtime platform](https://developer.vonage.com/en/cloud-runtim
 * [Project Structure](#project-structure)
 * [Usage](#usage)
 * [Terminal output](#terminal-output)
-* [Development Setup](#development-setup)
+* [Development](#development)
 * [Contributions](#contributions)
 * [Conventional Commits](#conventional-commits)
 * [Release Process](#release-process)
@@ -61,7 +61,7 @@ The first command prints `Good "vcr-release" signature` and the second prints `O
 
 ## Project Structure
 
-[Structure](PLAN.md) of the project
+The layout of the code, the rules it follows and how to check a change are in [AGENTS.md](AGENTS.md).
 
 ## Usage
 
@@ -80,68 +80,33 @@ The new presentation is used when stdout and stderr are both terminals, `TERM` i
 
 `NO_COLOR` turns colour off and keeps the layout. Help pages are not affected.
 
-## Development Setup
+## Development
 
-### Prerequisites
+Prerequisites: Go 1.27 or newer, `make`, and Node.js 20 for the commit-message hook.
 
-- Go 1.26+
-- Node.js 18+ (for commitlint)
-- [golangci-lint](https://golangci-lint.run/welcome/install/)
-- [Lefthook](https://github.com/evilmartians/lefthook) (for git hooks)
-
-### Setting Up Git Hooks
-
-This project uses [Lefthook](https://github.com/evilmartians/lefthook) to manage git hooks. Install and configure it:
-
-```bash
-# Install lefthook (macOS)
-brew install lefthook
-
-# Or with Go
-go install github.com/evilmartians/lefthook@latest
-
-# Install commitlint dependencies
-npm install
-
-# Install the git hooks
-lefthook install
+```sh
+make hooks      # git hooks: gofmt report and lint on commit, commit-message check, tests on push (once per clone; needs lefthook and Node.js, and also runs `npm ci --ignore-scripts` for the commit-message tool)
+make build      # dist/vcr, stamped like a release
+make test       # go test -race ./...
+make lint       # pinned golangci-lint
+make contract   # replay the recorded command-line contract against the built binary
+make contract-rich  # replay the terminal goldens
+make vulncheck  # govulncheck ./...
+make docs       # regenerate docs/vcr*.md
+make help       # every target
 ```
 
-### What the Hooks Do
-
-| Hook | Action |
-|------|--------|
-| `commit-msg` | Validates commit message follows [conventional commits](#conventional-commits) format |
-| `pre-commit` | Runs `gofmt` and `go vet` on staged Go files |
-| `pre-push` | Runs `go test` and `golangci-lint` before pushing |
-
-### Skipping Hooks (when needed)
-
-```bash
-# Skip all hooks
-git commit --no-verify -m "wip: work in progress"
-
-# Skip specific hooks
-LEFTHOOK_EXCLUDE=pre-push git push
-```
-
-### Local Hook Overrides
-
-Create a `lefthook-local.yml` to override hooks locally (this file is gitignored):
-
-```yaml
-# lefthook-local.yml
-pre-push:
-  commands:
-    go-test:
-      skip: true  # Skip tests on push locally
-```
+The command-line contract is frozen: `test/contract` holds scenarios and transcripts recorded from v2.6.1, and
+`make contract` replays them against the binary built from the working tree. A deliberate difference is a line in
+`test/contract/allowed-diffs.txt` with a plain reason; `make contract-record` re-records the transcripts from
+`BASELINE_REF` (default `v2.6.1`). Layout and conventions are in [AGENTS.md](AGENTS.md). `git commit --no-verify`
+skips the hooks; CI runs the same checks.
 
 ## Contributions
 
 Yes please! This command-line interface is open source, community-driven, and benefits greatly from the input of its users.
 
-Please make all your changes on a branch, and open a pull request, these are welcome and will be reviewed with delight! If it's a big change, it is recommended to open an issue for discussion before you start.
+Please work on a branch and open a pull request; these are welcome and will be reviewed with delight! If it's a big change, it is recommended to open an issue for discussion before you start.
 
 All changes require tests to go with them.
 
@@ -218,7 +183,7 @@ This project uses [Release Please](https://github.com/googleapis/release-please)
 ### Manual Release
 
 If needed, you can trigger a manual release via the GitHub Actions UI:
-1. Go to Actions → "Release CLI"
+1. Go to Actions → "Manual Release"
 2. Click "Run workflow"
 3. Enter the release tag (e.g., `v2.1.3`)
 
