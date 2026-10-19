@@ -135,3 +135,35 @@ func TestInitKeepsPlatformCredentialsOnPlatformClient(t *testing.T) {
 	require.Equal(t, apiKey, requests[0].Get("X-Neru-ApiAccountId"))
 	require.NotEmpty(t, requests[0].Get("X-Neru-TraceId"))
 }
+
+func TestMakeGraphqlEndpoint(t *testing.T) {
+	tests := []struct {
+		name   string
+		region string
+		want   string
+	}{
+		{name: "well-formed", region: "aws.euw1", want: "https://graphql.euw1.runtime.vonage.cloud/v1/graphql"},
+		{name: "empty", region: ""},
+		{name: "shorter-than-prefix", region: "aw"},
+		{name: "prefix-only", region: "aws."},
+		{name: "no-prefix", region: "euw1.example.com"},
+		{name: "extra-label", region: "aws.example.com"},
+		{name: "path-after-name", region: "aws.example.com/x"},
+		{name: "userinfo", region: "aws.euw1@example.com"},
+		{name: "name-over-length-limit", region: "aws." + strings.Repeat("a", 64)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			require.NotPanics(t, func() {
+				require.Equal(t, tt.want, makeGraphqlEndpoint(tt.region))
+			})
+		})
+	}
+}
+
+func TestGraphQLURLIgnoresMalformedRegion(t *testing.T) {
+	f := NewDefaultFactory("v0.4", "https://github.example.com")
+	f.SetGlobalOptions(&config.GlobalOptions{Region: "aws.example.com/x"})
+
+	require.Empty(t, f.GraphQLURL())
+}
