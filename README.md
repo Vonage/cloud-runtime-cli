@@ -71,7 +71,7 @@ Usage examples are in the `docs/` folder - [vcr](docs/vcr.md)
 
 ### Prerequisites
 
-- Go 1.24+
+- Go 1.26+
 - Node.js 18+ (for commitlint)
 - [golangci-lint](https://golangci-lint.run/welcome/install/)
 - [Lefthook](https://github.com/evilmartians/lefthook) (for git hooks)
