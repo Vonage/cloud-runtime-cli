@@ -233,19 +233,19 @@ func PrintAPIError(out *iostreams.IOStreams, err error, httpErr *api.Error) stri
 	containerLogs = fmt.Sprintf("%s App logs captured before failure:\n%s", c.Red(cmdutil.InfoIcon), httpErr.ContainerLogs)
 
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("Error Encountered: %s\n\n", mainErrMsg))
-	sb.WriteString(fmt.Sprintf("%s\n", mainIssue))
+	fmt.Fprintf(&sb, "Error Encountered: %s\n\n", mainErrMsg)
+	fmt.Fprintf(&sb, "%s\n", mainIssue)
 	if httpErr.HTTPStatusCode != 0 {
-		sb.WriteString(fmt.Sprintf("  %s\n", httpStatus))
+		fmt.Fprintf(&sb, "  %s\n", httpStatus)
 	}
 	if httpErr.Message != "" {
-		sb.WriteString(fmt.Sprintf("  %s\n", detailedMessage))
+		fmt.Fprintf(&sb, "  %s\n", detailedMessage)
 	}
 	if httpErr.TraceID != "" {
-		sb.WriteString(fmt.Sprintf("  %s\n", traceID))
+		fmt.Fprintf(&sb, "  %s\n", traceID)
 	}
 	if httpErr.ContainerLogs != "" {
-		sb.WriteString(fmt.Sprintf("\n%s\n", containerLogs))
+		fmt.Fprintf(&sb, "\n%s\n", containerLogs)
 	}
 	sb.WriteString("\nPlease refer to the documentation or contact support for further assistance.")
 	return sb.String()
