@@ -50,11 +50,16 @@ func ReadDefaultCLIConfig() (CLIConfig, string, error) {
 	return CLIConfig{}, "", ErrNoConfig
 }
 
-func ReadCLIConfig(path string) (CLIConfig, error) {
+// ReadCLIConfig reads the config file at path. A file the current user owns that others can read is made
+// private first (not on Windows); the mode never fails the read.
+func ReadCLIConfig(path string) (CLIConfig, error) { return readCLIConfig(defaultOps, path) }
+
+func readCLIConfig(o ops, path string) (CLIConfig, error) {
 	path, err := homedir.Expand(path)
 	if err != nil {
 		return CLIConfig{}, err
 	}
+	tighten(o, path)
 	f, err := ini.Load(path)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -69,19 +74,30 @@ func ReadCLIConfig(path string) (CLIConfig, error) {
 	return c, nil
 }
 
-// WriteCLIConfig writes the CLIConfig to the given path.
-func WriteCLIConfig(c CLIConfig, path string) error {
+// WriteCLIConfig writes the CLIConfig to the given path as a private file. A symlink is followed to its target
+// (a dangling one is an error) and the file is replaced through a temporary one in the same directory. Where
+// that is not possible, such as a read-only directory, the file is rewritten in place.
+func WriteCLIConfig(c CLIConfig, path string) error { return writeCLIConfig(defaultOps, c, path) }
 
-	path, err := homedir.Expand(path)
+func writeCLIConfig(o ops, c CLIConfig, path string) error {
+	expanded, err := homedir.Expand(path)
 	if err != nil {
 		return err
 	}
-	f := ini.Empty()
-	if err := f.ReflectFrom(&c); err != nil {
+	target, err := linkTarget(expanded, path)
+	if err != nil {
 		return err
 	}
-	if err := f.SaveTo(path); err != nil {
+	data, err := render(c)
+	if err != nil {
 		return err
+	}
+	err = replaceFile(o, target, data)
+	if err == nil || !fallsBackInPlace(err) {
+		return err
+	}
+	if inPlaceErr := writeInPlace(o, target, data); inPlaceErr != nil {
+		return &incompleteError{path: path, err: inPlaceErr}
 	}
 	return nil
 }
