@@ -43,10 +43,9 @@ From v2.6.1 each release has a `checksums.txt` and a signature of it, `checksums
 
 To check a download by hand you need OpenSSH 8.0 or newer. Save the release key as `allowed_signers`:
 
-<!-- Replace both REPLACE_WITH_ values with the release key before merging. -->
 ```
-# key id REPLACE_WITH_KEYID
-vcr-release namespaces="vcr-release" ssh-ed25519 REPLACE_WITH_PUBLIC_KEY
+# key id fd1652cb1b7cc0c3
+vcr-release namespaces="vcr-release" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB6MAISQBLbNYWna92jPv0bjwWW4uNkeF7cQeJ1PN5FI
 ```
 
 Then, next to the downloaded files:

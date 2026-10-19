@@ -26,9 +26,8 @@ const (
 	beginMarker = "# BEGIN RELEASE KEYS"
 	endMarker   = "# END RELEASE KEYS"
 
-	placeholderKeyID  = "REPLACE_WITH_KEYID"
-	placeholderKey    = "REPLACE_WITH_PUBLIC_KEY"
-	placeholderPrefix = "REPLACE_WITH_"
+	// Written in two parts so that a search for the placeholder finds only one that is really left in a file.
+	placeholderPrefix = "REPLACE" + "_WITH_"
 )
 
 var (
@@ -175,6 +174,10 @@ func describeBlob(blob string) string {
 	return fmt.Sprintf("keyid %s (key ending ...%s)", key.id, tail)
 }
 
+func TestReleasesHaveAtLeastOneKey(t *testing.T) {
+	require.NotEmpty(t, releasePublicKeys, "%s: releasePublicKeys is empty, and releases need at least one key to be signed and verified", keysGoFile)
+}
+
 func TestReleaseKeysAreTheSameInEveryFile(t *testing.T) {
 	reference := goKeys(t)
 	for _, other := range otherLists(t) {
@@ -197,14 +200,8 @@ func TestInstallScriptKeyIDsMatchTheirKeys(t *testing.T) {
 
 func TestReadmeShowsTheReleaseKeys(t *testing.T) {
 	readme := repoText(t, readmeFile)
-	keys := goKeys(t).keys
 
-	if len(keys) == 0 {
-		assert.True(t, strings.Contains(readme, placeholderKeyID), "%s: no release key is set yet, so %s should still be there", readmeFile, placeholderKeyID)
-		assert.True(t, strings.Contains(readme, placeholderKey), "%s: no release key is set yet, so %s should still be there", readmeFile, placeholderKey)
-		return
-	}
-	for _, listed := range keys {
+	for _, listed := range goKeys(t).keys {
 		key, err := parsePublicKey(keyTypeEd25519 + " " + listed.blob)
 		require.NoError(t, err)
 		assert.True(t, strings.Contains(readme, keyTypeEd25519+" "+listed.blob), "%s does not show the public key of %s", readmeFile, describeBlob(listed.blob))

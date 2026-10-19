@@ -21,7 +21,9 @@ type trustedKey struct {
 
 // releasePublicKeys holds the release public keys, one OpenSSH public key line each, as ssh-keygen writes them to
 // a .pub file. With none listed no release verifies.
-var releasePublicKeys = []string{}
+var releasePublicKeys = []string{
+	"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB6MAISQBLbNYWna92jPv0bjwWW4uNkeF7cQeJ1PN5FI vcr-release",
+}
 
 // testPublicKey is one more trusted public key, set by test builds only (see SetTestKey).
 var testPublicKey string

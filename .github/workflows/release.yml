@@ -28,7 +28,7 @@ env:
   # Release assets get one signature file per key listed here. While the list is empty, sign and publish refuse to run.
   # Keep this list identical to the one in release-please.yml.
   RELEASE_PUBLIC_KEYS: |
-    # ssh-ed25519 AAAA...
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB6MAISQBLbNYWna92jPv0bjwWW4uNkeF7cQeJ1PN5FI
   RELEASE_ARCHIVES: >-
     vcr_darwin_amd64.tar.gz
     vcr_darwin_arm64.tar.gz

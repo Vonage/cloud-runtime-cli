@@ -8,6 +8,7 @@ FIRST_VERIFIED=v2.6.1
 # Release signing keys, one per line: <keyid> ssh-ed25519 <base64 public key>
 # BEGIN RELEASE KEYS
 RELEASE_KEYS='
+fd1652cb1b7cc0c3 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB6MAISQBLbNYWna92jPv0bjwWW4uNkeF7cQeJ1PN5FI
 '
 # END RELEASE KEYS
 
