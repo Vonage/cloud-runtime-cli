@@ -17,6 +17,7 @@ import (
 
 	"github.com/shirou/gopsutil/process"
 	"github.com/stretchr/testify/require"
+	xterm "golang.org/x/term"
 )
 
 const (
@@ -75,6 +76,14 @@ func runHelper(mode string, args []string) int {
 		return code
 	case "sleep":
 		return sleepUntilKilled()
+	case "report-terminal":
+		_, _ = os.Stdout.WriteString("app-stdout-terminal=" + strconv.FormatBool(isTerminalFile(os.Stdout)) +
+			" app-stderr-terminal=" + strconv.FormatBool(isTerminalFile(os.Stderr)) + "\n")
+	case "own-pid":
+		if writeHelperFile(args[0], strconv.Itoa(os.Getpid())) != 0 {
+			return 1
+		}
+		return sleepUntilKilled()
 	case "ignore-term":
 		signal.Ignore(syscall.SIGTERM, syscall.SIGINT)
 		return sleepUntilKilled()
@@ -94,6 +103,20 @@ func runHelper(mode string, args []string) int {
 		return 2
 	}
 	return 0
+}
+
+// isTerminalFile reports whether f is a terminal, as a program that colours or buffers its output by that test sees it.
+// It asks the terminal driver: /dev/null is a character device too, and is not one.
+func isTerminalFile(f *os.File) bool {
+	return xterm.IsTerminal(int(f.Fd())) //nolint:gosec // a descriptor fits in an int
+}
+
+func TestIsTerminalFileIsNotFooledByDevNull(t *testing.T) {
+	null, err := os.Open(os.DevNull)
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = null.Close() })
+
+	require.False(t, isTerminalFile(null), "a character device that is not a terminal")
 }
 
 func sleepUntilKilled() int {

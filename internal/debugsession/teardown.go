@@ -3,6 +3,8 @@ package debugsession
 import (
 	"context"
 	"fmt"
+
+	"vonage-cloud-runtime-cli/internal/term"
 )
 
 // cause is how a session ends, and so what its teardown reports.
@@ -54,12 +56,21 @@ func (s *session) stopApp() {
 	if s.child == nil {
 		return
 	}
-	stop := s.tio.StartSpinner(" Shutting down process...")
-	err := s.child.Stop()
-	stop()
+	err := stopLocalApp(s.tio, s.child.Stop)
 	if err != nil {
 		s.con.stderr(fmt.Sprintf("%s failed to kill debug process: %s\n", s.con.style.FailureIcon(), err))
 	}
+}
+
+// stopLocalApp runs stop, which ends the app and what it started, behind a spinner, and returns what stop returned.
+func stopLocalApp(t *term.IO, stop func() error) error {
+	if t.Mode() != term.Classic {
+		return stopLocalAppRich(t, stop)
+	}
+	done := t.StartSpinner(" Shutting down process...")
+	err := stop()
+	done()
+	return err
 }
 
 // removeService deletes the service, if there is one. It runs on a context of its own, because the session's has
@@ -69,9 +80,10 @@ func (s *session) removeService(c cause) error {
 	if !s.deployed {
 		return c.err
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), s.cfg.Timeout)
-	defer cancel()
-	if err := s.api.DeleteDebugService(ctx, s.service.ServiceName, s.cfg.PreserveData); err != nil {
+	if s.tio.Mode() != term.Classic {
+		return s.removeServiceRich(c)
+	}
+	if err := s.deleteService(); err != nil {
 		if c.err != nil {
 			s.con.stderr(fmt.Sprintf("%s %s\n", s.con.style.FailureIcon(), c.err))
 		}
@@ -81,4 +93,11 @@ func (s *session) removeService(c cause) error {
 		s.con.stdout(s.con.style.SuccessIcon() + " Debugger removed")
 	}
 	return c.err
+}
+
+// deleteService asks the platform to delete the service, on a context of its own that the timeout bounds.
+func (s *session) deleteService() error {
+	ctx, cancel := context.WithTimeout(context.Background(), s.cfg.Timeout)
+	defer cancel()
+	return s.api.DeleteDebugService(ctx, s.service.ServiceName, s.cfg.PreserveData)
 }

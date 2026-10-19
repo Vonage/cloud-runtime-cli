@@ -16,5 +16,9 @@ func accessLogLine(start time.Time, latency time.Duration, status int, method, p
 
 // accessLog prints the line of a request. It is not a verbose output: every request gets one.
 func (c *console) accessLog(start time.Time, latency time.Duration, status int, method, path string) {
+	if c.tio.Mode() != term.Classic {
+		c.accessLogRich(start, latency, status, method, path)
+		return
+	}
 	c.stdout(accessLogLine(start, latency, status, method, path))
 }

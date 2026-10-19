@@ -13,3 +13,12 @@ func introBlock(style term.Style, serviceName, hostText string) string {
 		yellow("| Application Host:") + " " + term.YellowBold(hostText) + "\n" +
 		yellow(`\-------`) + "\n\n"
 }
+
+// printIntro shows where the debugger can be reached.
+func (s *session) printIntro() {
+	if s.tio.Mode() != term.Classic {
+		s.printIntroRich()
+		return
+	}
+	s.con.stdout(introBlock(s.con.style, s.service.ServiceName, s.addrs.Host))
+}

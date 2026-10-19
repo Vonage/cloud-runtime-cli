@@ -11,6 +11,7 @@ import (
 
 	"vonage-cloud-runtime-cli/internal/clock"
 	"vonage-cloud-runtime-cli/internal/clock/clocktest"
+	"vonage-cloud-runtime-cli/internal/term"
 	"vonage-cloud-runtime-cli/test/fakeplatform"
 )
 
@@ -25,6 +26,7 @@ type rigOptions struct {
 	api       API         // a localAPI
 	tunnelURL *url.URL
 	proxyURL  *url.URL
+	io        *term.IO // the terminal the console writes to, instead of a classic one over buffers
 }
 
 // rig is a tunnel that is connected and running in the background, with the console it prints to.
@@ -54,6 +56,9 @@ func newRig(t *testing.T, opts rigOptions) *rig {
 		r.api = &localAPI{}
 	}
 	r.con, r.out, r.errOut = newTestConsole(opts.verbose)
+	if opts.io != nil {
+		r.con = newConsole(opts.io, opts.verbose)
+	}
 	r.tun = newTunnel(tunnelConfig{
 		API: r.api, Clock: r.clk, Console: r.con, TunnelURL: opts.tunnelURL, ProxyURL: opts.proxyURL, AppPort: opts.appPort,
 	})

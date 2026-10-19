@@ -116,9 +116,7 @@ func (s *session) preflight() error {
 
 // deploy asks the platform for the debug service.
 func (s *session) deploy() *cause {
-	stop := s.tio.StartSpinner(" Deploying debug server...")
-	service, err := s.api.DeployDebugService(s.setup, s.region.Alias, s.cfg.AppID, s.cfg.Name, s.caps)
-	stop()
+	service, err := s.deployService()
 	if err != nil {
 		return s.setupFailure(fmt.Errorf("failed to deploy debug server: %w", err))
 	}
@@ -126,8 +124,22 @@ func (s *session) deploy() *cause {
 	return nil
 }
 
+// deployService is the call that deploys the service, behind a spinner.
+func (s *session) deployService() (platform.DebugService, error) {
+	if s.tio.Mode() != term.Classic {
+		return s.deployServiceRich()
+	}
+	stop := s.tio.StartSpinner(" Deploying debug server...")
+	service, err := s.api.DeployDebugService(s.setup, s.region.Alias, s.cfg.AppID, s.cfg.Name, s.caps)
+	stop()
+	return service, err
+}
+
 // awaitReady waits until the service answers.
 func (s *session) awaitReady() *cause {
+	if s.tio.Mode() != term.Classic {
+		return s.awaitReadyRich()
+	}
 	stop := s.tio.StartSpinner(" Waiting for debug server to be ready...")
 	err := waitForReady(s.setup, s.clk, s.api, s.service.ServiceName)
 	stop()
@@ -138,11 +150,19 @@ func (s *session) awaitReady() *cause {
 	return nil
 }
 
-// connect works out where the service is and connects the tunnel to it. A proxy that cannot be reached is the same
-// failure as one that stops later.
+// connect works out where the service is and connects the tunnel to it, behind a spinner.
 func (s *session) connect() *cause {
+	if s.tio.Mode() != term.Classic {
+		return s.connectRich()
+	}
 	stop := s.tio.StartSpinner(" Starting debug process...")
 	defer stop()
+	return s.connectProxy()
+}
+
+// connectProxy works out where the service is and connects the tunnel to it. A proxy that cannot be reached is the
+// same failure as one that stops later.
+func (s *session) connectProxy() *cause {
 	addrs, err := serviceURLs(s.region.HostTemplate, s.service.ServiceName, s.service.WebsocketPath)
 	if err != nil {
 		return &cause{err: fmt.Errorf("failed to get http and websocket urls: %w", err)}
@@ -162,7 +182,7 @@ func (s *session) connect() *cause {
 
 // startApp shows where the debugger can be reached and starts the app with the debug environment.
 func (s *session) startApp() *cause {
-	s.con.stdout(introBlock(s.con.style, s.service.ServiceName, s.addrs.Host))
+	s.printIntro()
 	env := debugEnvironment(os.Environ(), s.vars, debugVars{
 		ServiceName: s.service.ServiceName,
 		InstanceID:  s.service.InstanceID,
@@ -175,11 +195,12 @@ func (s *session) startApp() *cause {
 		Region:      s.region,
 		AppPort:     s.cfg.AppPort,
 	})
+	stdout, stderr := s.tio.ChildOutput()
 	c, err := startChild(childSpec{
 		Entrypoint: s.cfg.Manifest.Debug.Entrypoint,
 		Env:        env,
-		Stdout:     s.con.childWriter(s.tio.Out),
-		Stderr:     s.con.childWriter(s.tio.ErrOut),
+		Stdout:     s.con.childWriter(stdout),
+		Stderr:     s.con.childWriter(stderr),
 	}, s.childExited)
 	if err != nil {
 		return &cause{err: fmt.Errorf("failed to run local debug process: %w", err)}

@@ -11,6 +11,7 @@ the [Vonage Cloud Runtime platform](https://developer.vonage.com/en/cloud-runtim
 * [Installation](#installation)
 * [Project Structure](#project-structure)
 * [Usage](#usage)
+* [Terminal output](#terminal-output)
 * [Development Setup](#development-setup)
 * [Contributions](#contributions)
 * [Conventional Commits](#conventional-commits)
@@ -65,6 +66,19 @@ The first command prints `Good "vcr-release" signature` and the second prints `O
 ## Usage
 
 Usage examples are in the `docs/` folder - [vcr](docs/vcr.md)
+
+## Terminal output
+
+In an interactive terminal, `vcr` shows live progress that settles into result lines with timings, titled result blocks and compact error messages with hints. Output that is piped, redirected or produced in CI is the same as in earlier releases, so scripts and editor integrations keep working.
+
+The new presentation is used when stdout and stderr are both terminals, `TERM` is set and is not `dumb`, and `CI` is unset (or `0` or `false`). Two settings change it:
+
+| Setting | Effect |
+|---|---|
+| `VCR_UI=classic` | The output of earlier releases, exactly. Use it for anything that allocates a terminal but reads the output, such as an `expect` script. |
+| `VCR_UI=static` | The same lines and layout without animation or cursor movement, for screen readers and recordings. Also used when the terminal is narrower than 40 columns. |
+
+`NO_COLOR` turns colour off and keeps the layout. Help pages are not affected.
 
 ## Development Setup
 

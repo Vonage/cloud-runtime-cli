@@ -38,6 +38,46 @@ func TestNormaliseRichDurations(t *testing.T) {
 		"whether a step took 1.9 s or 2.1 s, the screen is the same")
 }
 
+func TestNormaliseRichAccessLines(t *testing.T) {
+	cases := []struct{ name, in, want string }{
+		{"a request", "15:04:05  POST  /hook  200  12ms", "<time>  POST  /hook  200  <dur>"},
+		{"a path with a space", "15:04:05  GET  /a b  200  1.23s", "<time>  GET  /a b  200  <dur>"},
+		{"a latency under a millisecond", "15:04:06  GET  /x  404  <1ms", "<time>  GET  /x  404  <dur>"},
+		{
+			"only the access lines of a whole screen",
+			"✓ Source uploaded\n15:04:05  POST  /hook  200  12ms\nForwarding requests.\n15:04:06  GET  /x  404  <1ms\n",
+			"✓ Source uploaded\n<time>  POST  /hook  200  <dur>\nForwarding requests.\n<time>  GET  /x  404  <dur>\n",
+		},
+		{"a status line", "Status 200  12ms", "Status 200  12ms"},
+		{"a resolved line with a duration", "✓ Source uploaded  (2.4s)", "✓ Source uploaded  (2.4s)"},
+		{"a resolved line with a detail", "Files packaged  42 files", "Files packaged  42 files"},
+		{"a time that does not start the line", "at 15:04:05  GET  /x  200  1ms", "at 15:04:05  GET  /x  200  1ms"},
+		{"a status that is not three digits", "15:04:05  GET  /x  20  1ms", "15:04:05  GET  /x  20  1ms"},
+		{"empty", "", ""},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			assert.Equal(t, c.want, normaliseRichAccessLines(c.in))
+		})
+	}
+	assert.Equal(t, normaliseRichAccessLines("15:04:05  GET  /x  200  1ms"), normaliseRichAccessLines("23:59:59  GET  /x  200  1.5s"),
+		"whatever the clock said and however long the request took, the screen is the same")
+}
+
+func TestNormaliseRichInterruptEcho(t *testing.T) {
+	want := "Forwarding\n\n✓ Debugger removed\n"
+	assert.Equal(t, want, normaliseRichInterruptEcho("Forwarding\n^C\n✓ Debugger removed\n"), "the echo before the output")
+	assert.Equal(t, want, normaliseRichInterruptEcho("Forwarding\n\n^C✓ Debugger removed\n"), "the echo after the output")
+	assert.Equal(t, "Forwarding\n✓ Debugger removed\n", normaliseRichInterruptEcho("Forwarding\n✓ Debugger removed\n"), "no echo, no change")
+	assert.Empty(t, normaliseRichInterruptEcho(""))
+}
+
+func TestRichScreenAppliesTheNormalisersInOrder(t *testing.T) {
+	res := Result{Stdout: "✓ Debug proxy connected  (2.1s)\n15:04:05  GET  /hello  200  12ms\n^C\n✓ Debugger removed  (3s)\n"}
+
+	assert.Equal(t, "✓ Debug proxy connected\n<time>  GET  /hello  200  <dur>\n\n✓ Debugger removed\n", richScreen(res))
+}
+
 func TestRichGoldenRoundTrip(t *testing.T) {
 	screen := Escape("✗ failed\n\x1b[31mred\x1b[0m and a \\ backslash\n")
 	g := RichGolden{Exit: "1", Stdout: screen}

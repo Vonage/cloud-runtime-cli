@@ -1,0 +1,23 @@
+description: debug from a terminal shows the setup steps, the ready block and an access line, and stops on Ctrl-C
+group: debug
+args: [debug, --yes, --app-port, "${PORT:app}", --debugger-port, "${PORT:debugger}"]
+cwd: work/project
+tty: true
+presentation: both
+env:
+  NO_COLOR: ""
+files:
+  - path: work/project/vcr.yml
+    content: |
+      project: {name: my-project}
+      instance: {name: dev, runtime: nodejs18, region: aws.euw1, application-id: 0f39f387-579b-4259-9f76-2715ff73b8b7}
+      debug: {application-id: 0f39f387-579b-4259-9f76-2715ff73b8b7, entrypoint: ["${TESTAPP}"]}
+steps:
+  - {wait-peer: connected}
+  - {expect: testapp ready}
+  - {peer-send: {id: r1, operation: execute, method: GET, route: /hello, payload: ""}}
+  - {wait-peer-response: r1}
+  - {expect: /hello}      # the access line is on screen before the interrupt (both legs print the path)
+  - {send: "\x03"}        # Ctrl-C through the PTY: the terminal echoes ^C, as for a person
+expect-reads: [euw1 GET /regions/aws.euw1]
+scrape: [debug-access-log]

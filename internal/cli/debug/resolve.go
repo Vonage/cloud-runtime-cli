@@ -142,9 +142,7 @@ func (in *invocation) confirmApplication(ctx context.Context, client *platform.C
 // pickApplication lets the user choose one of the applications of the account. SKIP keeps current, and CREATE NEW APP
 // has no id: the platform rejects the empty one, as it always did.
 func (in *invocation) pickApplication(ctx context.Context, client *platform.Client, current string) (string, error) {
-	stop := in.env.IO.StartSpinner(" Fetching applications list...")
-	apps, err := client.ListApplications(ctx, "")
-	stop()
+	apps, err := in.fetchApplications(ctx, client)
 	if err != nil {
 		return "", fmt.Errorf("failed to list Vonage applications: %w", err)
 	}
@@ -157,6 +155,17 @@ func (in *invocation) pickApplication(ctx context.Context, client *platform.Clie
 		return current, nil
 	}
 	return ids[label], nil
+}
+
+// fetchApplications lists the applications of the account behind a spinner.
+func (in *invocation) fetchApplications(ctx context.Context, client *platform.Client) ([]platform.Application, error) {
+	if in.env.IO.Mode() != term.Classic {
+		return in.fetchApplicationsRich(ctx, client)
+	}
+	stop := in.env.IO.StartSpinner(" Fetching applications list...")
+	apps, err := client.ListApplications(ctx, "")
+	stop()
+	return apps, err
 }
 
 // applicationChoices are the labels of the picker, in the order of the platform's list after SKIP and CREATE NEW APP,

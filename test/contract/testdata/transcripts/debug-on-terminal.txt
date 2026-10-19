@@ -1,0 +1,112 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 0
+@@ stdout 1245
+✓ Debug server deployed: service_name="dbg-service-1"
+
+/-------
+| 🐞 Debugger proxy connection established - Have a play around!
+| Application Name: dbg-service-1
+| Application Host: <OTHER>
+\\-------
+
+testapp ready
+testapp env API_ACCOUNT_ID
+testapp env API_ACCOUNT_SECRET
+testapp env API_APPLICATION_ID
+testapp env CODE_DIR
+testapp env DEBUG
+testapp env DEBUGGER_URL_SCHEME
+testapp env ENDPOINT_URL_SCHEME
+testapp env FORCE_COLOR
+testapp env HOME
+testapp env HTTPS_PROXY
+testapp env HTTP_PROXY
+testapp env INSTANCE_ID
+testapp env INSTANCE_SERVICE_NAME
+testapp env NERU_APP_PORT
+testapp env NO_COLOR
+testapp env NO_PROXY
+testapp env PATH
+testapp env PRIVATE_KEY
+testapp env REGION
+testapp env TERM
+testapp env TMPDIR
+testapp env TZ
+testapp env VCR_API_ACCOUNT_ID
+testapp env VCR_API_ACCOUNT_SECRET
+testapp env VCR_API_APPLICATION_ID
+testapp env VCR_CODE_DIR
+testapp env VCR_DEBUG
+testapp env VCR_DEBUGGER_URL_SCHEME
+testapp env VCR_ENDPOINT_URL_SCHEME
+testapp env VCR_INSTANCE_PUBLIC_URL
+testapp env VCR_INSTANCE_SERVICE_NAME
+testapp env VCR_PORT
+testapp env VCR_PRIVATE_KEY
+testapp env VCR_REGION
+testapp env VCR_UI
+testapp env XDG_CACHE_HOME
+testapp env XDG_CONFIG_HOME
+[VCR-debug] <time> | 200 | <dur> | GET  /hello
+✓ Debugger removed
+
+@@ stderr 0
+
+@@ files 0
+
+@@ requests 2041
+euw1 POST graphql:Region
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($alias: String!) {\\n  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {\\n    name\\n    alias\\n\\tdeployment_api_url\\n\\tmarketplace_api_url\\n\\tassets_api_url\\n\\tendpoint_url_scheme\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":{"alias":"aws.euw1"}}
+
+euw1 POST graphql:Region
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($alias: String!) {\\n  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {\\n    name\\n    alias\\n\\tdeployment_api_url\\n\\tmarketplace_api_url\\n\\tassets_api_url\\n\\tendpoint_url_scheme\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":{"alias":"aws.euw1"}}
+
+euw1 POST /debug/services
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"apiApplicationId":"0f39f387-579b-4259-9f76-2715ff73b8b7","capabilities":{},"region":"aws.euw1","runtime":"debug-proxy"}
+
+euw1 GET /debug/services/dbg-service-1/status
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+
+euw1 POST graphql:Region
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($alias: String!) {\\n  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {\\n    name\\n    alias\\n\\tdeployment_api_url\\n\\tmarketplace_api_url\\n\\tassets_api_url\\n\\tendpoint_url_scheme\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":{"alias":"aws.euw1"}}
+
+other WS /0123456789abcdef0123456789abcdef
+  auth: none
+  acct: none
+  trace: no
+
+euw1 DELETE /debug/services/dbg-service-1?preserveData=false
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+
+gh GET /releases/latest
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+
+[peer]
+connected
+sent execute id=r1 GET /hello
+received execute-response id=r1 status=200 payload="hello from app"
+closed by cli code=1006
+

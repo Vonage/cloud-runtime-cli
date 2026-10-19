@@ -37,6 +37,9 @@ const (
 var (
 	// richDurationPattern is a duration token of a resolved line with the two spaces before it.
 	richDurationPattern = regexp.MustCompile(` {2}\(\d+(?:\.\d+)?(?:ms|[smh])(?:\d+(?:\.\d+)?(?:ms|[smh]))*\)`)
+	// richAccessPattern is a line of the debug session's access log: the time, the method, the path (which may hold
+	// spaces), the status and the latency, each two spaces apart. (?m) makes it match at every line of a screen.
+	richAccessPattern = regexp.MustCompile(`(?m)^\d{2}:\d{2}:\d{2}  (\S+)  (.+?)  (\d{3})  \S+$`)
 	// sgrPattern is a colour or style sequence.
 	sgrPattern = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
@@ -111,8 +114,25 @@ func normaliseRichDurations(screen string) string {
 	return richDurationPattern.ReplaceAllString(screen, "")
 }
 
-// richScreen is the screen of a rich run as a golden stores it.
-func richScreen(r Result) string { return normaliseRichDurations(r.Stdout) }
+// normaliseRichAccessLines replaces the time and the latency of every access line of the debug session, which depend
+// on the wall clock and on how long the request took, so that they cannot change a golden. It runs only on rich
+// screens, after normaliseRichDurations.
+func normaliseRichAccessLines(screen string) string {
+	return richAccessPattern.ReplaceAllString(screen, "<time>  $1  $2  $3  <dur>")
+}
+
+// normaliseRichInterruptEcho removes the ^C that a terminal echoes when Ctrl-C is sent through it. Whether the echo
+// reaches the screen before or after the output that the interrupt causes is a race of the kernel, and the CLI's own
+// text does not depend on it: it prints one empty line where the echo may come, so both orders give the same screen.
+func normaliseRichInterruptEcho(screen string) string {
+	return strings.ReplaceAll(screen, "^C", "")
+}
+
+// richScreen is the screen of a rich run as a golden stores it: the durations of resolved lines are removed, then the
+// time and latency of access lines are replaced, then the echo of Ctrl-C is removed.
+func richScreen(r Result) string {
+	return normaliseRichInterruptEcho(normaliseRichAccessLines(normaliseRichDurations(r.Stdout)))
+}
 
 // checkRichRaw looks at the bytes a rich run delivered, which the screen emulator cannot show: the cursor is not left
 // hidden (survey's own hide and show pair around a picker is fine), no alternate screen or mouse mode is used, no
