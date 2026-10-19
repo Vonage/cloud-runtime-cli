@@ -51,7 +51,7 @@ func TestUpgradeRefusesOversizedDownloads(t *testing.T) {
 		site := hostile{onArchive: func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Length", strconv.Itoa(1<<10+1))
 			w.WriteHeader(http.StatusOK)
-			w.(http.Flusher).Flush()
+			_ = http.NewResponseController(w).Flush()
 			select {
 			case <-r.Context().Done():
 			case <-time.After(10 * time.Second):

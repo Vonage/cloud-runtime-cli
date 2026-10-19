@@ -74,7 +74,10 @@ func TestConfirmationErrorIsReturnedUnchanged(t *testing.T) {
 		args func(t testing.TB, h *cmdtest.Harness) []string
 	}{
 		{"create", func(testing.TB, *cmdtest.Harness) []string { return []string{"create", "--name", "my-new-app"} }},
-		{"remove", func(t testing.TB, h *cmdtest.Harness) []string { return []string{"remove", h.AppID(t, "second-app")} }},
+		{"remove", func(tb testing.TB, h *cmdtest.Harness) []string {
+			tb.Helper()
+			return []string{"remove", h.AppID(tb, "second-app")}
+		}},
 	}
 	for _, c := range commands {
 		t.Run(c.name, func(t *testing.T) {

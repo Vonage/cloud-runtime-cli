@@ -67,25 +67,26 @@ type built struct {
 
 // Start starts a server on 127.0.0.1 with free ports, serving f with its
 // placeholders expanded, and closes it when the test ends.
-func Start(t testing.TB, f Fixtures) *Server {
-	t.Helper()
-	return StartOn(t, net.JoinHostPort(loopbackIP, "0"), f)
+func Start(tb testing.TB, f Fixtures) *Server {
+	tb.Helper()
+	return StartOn(tb, net.JoinHostPort(loopbackIP, "0"), f)
 }
 
 // StartOn is Start with the primary listener on addr, a 127.0.0.1 address
 // such as the one port a contract run uses; the other listener still takes a
 // free port.
-func StartOn(t testing.TB, addr string, f Fixtures) *Server {
-	t.Helper()
-	s, err := start(t, addr, f)
+func StartOn(tb testing.TB, addr string, f Fixtures) *Server {
+	tb.Helper()
+	s, err := start(tb, addr, f)
 	if err != nil {
-		t.Fatalf("fakeplatform: %v", err)
+		tb.Fatalf("fakeplatform: %v", err)
 	}
-	t.Cleanup(s.close)
+	tb.Cleanup(s.close)
 	return s
 }
 
 func start(tb testing.TB, addr string, f Fixtures) (*Server, error) {
+	tb.Helper()
 	host, _, err := net.SplitHostPort(addr)
 	if err != nil {
 		return nil, fmt.Errorf("address %q: %w", addr, err)
@@ -281,7 +282,7 @@ func (s *Server) handle(listener string, rw http.ResponseWriter, r *http.Request
 		}
 	}
 	if t.auth && !s.authorized(r) {
-		writeError(rw, http.StatusUnauthorized, http.StatusUnauthorized, msgInvalidCredentials)
+		writeError(rw, http.StatusUnauthorized, http.StatusUnauthorized, msgUnauthorized)
 		return
 	}
 	if t.handler == nil {

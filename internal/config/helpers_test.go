@@ -50,7 +50,7 @@ func setMode(t *testing.T, path string, mode os.FileMode) {
 
 func readText(t *testing.T, path string) string {
 	t.Helper()
-	data, err := os.ReadFile(path) //nolint:gosec // the tests read paths they created
+	data, err := os.ReadFile(path)
 	require.NoError(t, err)
 	return string(data)
 }

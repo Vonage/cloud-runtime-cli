@@ -251,7 +251,7 @@ func TestSignatureAcceptedBySSHKeygen(t *testing.T) {
 	sigPath := filepath.Join(dir, "checksums.txt.sig")
 	require.NoError(t, os.WriteFile(sigPath, sig, 0o600))
 	run := func(input []byte, args ...string) (string, error) {
-		cmd := exec.Command(keygen, append(append([]string{"-Y"}, args...), "-s", sigPath)...)
+		cmd := exec.CommandContext(t.Context(), keygen, append(append([]string{"-Y"}, args...), "-s", sigPath)...)
 		cmd.Stdin = bytes.NewReader(input)
 		out, err := cmd.CombinedOutput()
 		return string(out), err

@@ -95,7 +95,7 @@ func withCredentials(key, secret, account string) option {
 	return func(r *http.Request) {
 		r.SetBasicAuth(key, secret)
 		if account != "" {
-			r.Header.Set("X-Neru-ApiAccountId", account)
+			r.Header.Set("X-Neru-Apiaccountid", account)
 		}
 	}
 }
@@ -119,7 +119,7 @@ func sendWith(t *testing.T, client *http.Client, method, url string, body []byte
 	if body != nil {
 		rd = bytes.NewReader(body)
 	}
-	req, err := http.NewRequest(method, url, rd)
+	req, err := http.NewRequestWithContext(t.Context(), method, url, rd)
 	require.NoError(t, err)
 	for _, o := range opts {
 		o(req)

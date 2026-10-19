@@ -30,7 +30,8 @@ type streams struct {
 }
 
 // newStreams builds the IO of a harness for o.Mode, with its output buffers.
-func newStreams(t testing.TB, o Options, clk clock.Clock) streams {
+func newStreams(tb testing.TB, o Options, clk clock.Clock) streams {
+	tb.Helper()
 	if o.Mode == term.Classic {
 		io, out, errOut := term.Test(o.Stdin, o.TTY)
 		return streams{io: io, out: out, errOut: errOut}
@@ -39,7 +40,7 @@ func newStreams(t testing.TB, o Options, clk clock.Clock) streams {
 	if in, ok := io.In.(*bytes.Buffer); ok {
 		in.WriteString(o.Stdin)
 	} else if o.Stdin != "" {
-		t.Fatalf("cmdtest: the stdin of a Rich or Static harness cannot be filled")
+		tb.Fatalf("cmdtest: the stdin of a Rich or Static harness cannot be filled")
 	}
 	return streams{io: io, screen: screen, errScreen: errScreen}
 }

@@ -8,7 +8,7 @@ import (
 
 // Read parses a manifest file.
 func Read(path string) (*Manifest, error) {
-	data, err := os.ReadFile(path) //nolint:gosec // the path is the manifest the user pointed at or the project holds
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}

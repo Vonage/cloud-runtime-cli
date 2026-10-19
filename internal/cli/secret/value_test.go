@@ -283,16 +283,16 @@ func TestTypedReadGetsTheContext(t *testing.T) {
 	ctx := context.WithValue(t.Context(), key{}, "marker")
 	s := newSource("")
 	s.stdinTTY = true
-	var seen context.Context
+	var seen any
 	s.readMasked = func(c context.Context) (string, error) {
-		seen = c
+		seen = c.Value(key{})
 		return "v", nil
 	}
 
 	_, err := resolveValue(ctx, s.valueSource)
 
 	require.NoError(t, err)
-	assert.Equal(t, "marker", seen.Value(key{}))
+	assert.Equal(t, "marker", seen)
 }
 
 func TestTypedNotAskedWhenValueOrFileGiven(t *testing.T) {

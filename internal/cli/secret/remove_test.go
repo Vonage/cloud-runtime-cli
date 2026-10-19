@@ -90,7 +90,7 @@ func TestRemoveBadNamesSendNothing(t *testing.T) {
 	for label, name := range map[string]string{
 		"slash":             "a/b",
 		"escaped slash":     "a%2Fb",
-		"dot dot":           "..",
+		"double dot":        "..",
 		"dot":               ".",
 		"over 256 bytes":    strings.Repeat("a", 257),
 		"control character": "a\x07b",

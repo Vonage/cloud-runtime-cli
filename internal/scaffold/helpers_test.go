@@ -27,7 +27,7 @@ func newProject(t *testing.T) (*scaffold.Project, string) {
 
 func readString(t *testing.T, elem ...string) string {
 	t.Helper()
-	data, err := os.ReadFile(filepath.Join(elem...)) //nolint:gosec // the tests read files they created
+	data, err := os.ReadFile(filepath.Join(elem...))
 	require.NoError(t, err)
 	return string(data)
 }

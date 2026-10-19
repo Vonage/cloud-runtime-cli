@@ -23,7 +23,7 @@ func TestAuthRequired(t *testing.T) {
 	} {
 		r := send(t, http.MethodGet, url, nil, opts...)
 		require.Equal(t, http.StatusUnauthorized, r.status, name)
-		assert.Equal(t, "fake-trace-id", r.header.Get("X-Neru-TraceId"), name)
+		assert.Equal(t, "fake-trace-id", r.header.Get("X-Neru-Traceid"), name)
 		assert.Equal(t, "application/json", r.header.Get("Content-Type"), name)
 		code, msg := r.apiError(t)
 		assert.Equal(t, http.StatusUnauthorized, code, name)
@@ -32,7 +32,7 @@ func TestAuthRequired(t *testing.T) {
 
 	ok := send(t, http.MethodGet, url, nil, asAccount)
 	assert.Equal(t, http.StatusOK, ok.status)
-	assert.Equal(t, "fake-trace-id", ok.header.Get("X-Neru-TraceId"))
+	assert.Equal(t, "fake-trace-id", ok.header.Get("X-Neru-Traceid"))
 
 	for _, family := range deploymentAPI {
 		for _, rt := range family {
@@ -86,7 +86,9 @@ func TestApplicationsLifecycle(t *testing.T) {
 func TestSecretsLifecycle(t *testing.T) {
 	s := Start(t, Defaults())
 	list := func() []any {
-		return rest(t, s, http.MethodGet, "/secrets", nil).object(t)["secrets"].([]any)
+		secrets, ok := rest(t, s, http.MethodGet, "/secrets", nil).object(t)["secrets"].([]any)
+		require.True(t, ok, "secrets is a list")
+		return secrets
 	}
 	assert.Equal(t, []any{"DB_URL", "API_TOKEN"}, list())
 

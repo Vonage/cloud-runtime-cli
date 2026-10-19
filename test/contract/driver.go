@@ -3,6 +3,7 @@
 package contract
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -245,7 +246,7 @@ func (d *driver) publicCall(c Call) error {
 
 // call makes the HTTP call of a step and records what came back.
 func (d *driver) call(c Call, target string) (CallRecord, error) {
-	req, err := http.NewRequest(c.Method, target, strings.NewReader(c.Body))
+	req, err := http.NewRequestWithContext(context.Background(), c.Method, target, strings.NewReader(c.Body))
 	if err != nil {
 		return CallRecord{}, err
 	}

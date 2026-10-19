@@ -5,6 +5,7 @@ package contract
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -99,7 +100,7 @@ func stubExit(args []string) int {
 // stubGet fetches args[0] and prints the status and body; an error goes to
 // stderr with exit 1, as the CLI reports a failed request.
 func stubGet(args []string, header http.Header) int {
-	req, err := http.NewRequest(http.MethodGet, args[0], nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, args[0], nil)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
@@ -111,7 +112,7 @@ func stubGet(args []string, header http.Header) int {
 }
 
 func stubPost(args []string) int {
-	req, err := http.NewRequest(http.MethodPost, args[0], strings.NewReader(args[1]))
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, args[0], strings.NewReader(args[1]))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
@@ -151,8 +152,10 @@ func stubMix(args []string) int {
 		return 1
 	}
 	if args[4] != "" {
-		if res, err := http.Get(args[4]); err == nil {
-			_ = res.Body.Close()
+		if req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, args[4], nil); err == nil {
+			if res, err := http.DefaultClient.Do(req); err == nil {
+				_ = res.Body.Close()
+			}
 		}
 	}
 	n, _ := strconv.Atoi(args[2])
@@ -160,7 +163,7 @@ func stubMix(args []string) int {
 }
 
 func stubDial(args []string) int {
-	conn, err := net.DialTimeout("tcp", args[0], 2*time.Second)
+	conn, err := (&net.Dialer{Timeout: 2 * time.Second}).DialContext(context.Background(), "tcp", args[0])
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
@@ -195,7 +198,7 @@ func stubWaitSignal([]string) int {
 // stubSpawn starts a child in the same process group and waits for ever.
 func stubSpawn([]string) int {
 	exe, _ := os.Executable()
-	child := exec.Command(exe, "wait-signal")
+	child := exec.CommandContext(context.Background(), exe, "wait-signal")
 	child.Env = append(os.Environ(), stubEnv+"=1")
 	if err := child.Start(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -214,7 +217,7 @@ func stubServe(args []string) int {
 		w.WriteHeader(http.StatusCreated)
 		_, _ = io.Copy(w, r.Body)
 	})
-	ln, err := net.Listen("tcp", "127.0.0.1:"+args[0])
+	ln, err := listen("tcp", "127.0.0.1:"+args[0])
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
@@ -233,7 +236,7 @@ func stubServe(args []string) int {
 func stubTunnel(args []string) int {
 	header := http.Header{}
 	if len(args) > 1 {
-		header.Set("X-Neru-TraceId", args[1])
+		header.Set("X-Neru-Traceid", args[1])
 	}
 	conn, resp, err := websocket.DefaultDialer.Dial(args[0], header)
 	if resp != nil {

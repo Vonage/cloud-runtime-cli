@@ -71,6 +71,7 @@ func readMasked(ctx context.Context, in io.Reader, ready func()) (string, error)
 			return input.value(), nil
 		case feedInterrupt:
 			return "", errInterrupted
+		case feedMore:
 		}
 	}
 }
@@ -144,6 +145,7 @@ func (m *maskedInput) feed(b byte) feedResult {
 // the skipping and is handled as typed: Ctrl-C always gets through.
 func (m *maskedInput) skipKeySequence(b byte) bool {
 	switch m.keys {
+	case keyTyping:
 	case keyAfterEsc:
 		if b == '[' || b == 'O' {
 			m.keys = keyInSequence

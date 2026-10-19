@@ -50,16 +50,17 @@ func TestSystemSleepEndsWithContext(t *testing.T) {
 }
 
 func TestSystemSleepNonPositive(t *testing.T) {
-	cancelled, cancel := context.WithCancel(t.Context())
+	live := t.Context()
+	cancelled, cancel := context.WithCancel(live)
 	cancel()
-	expired, cancelExpired := context.WithDeadline(t.Context(), time.Now().Add(-time.Second))
+	expired, cancelExpired := context.WithDeadline(live, time.Now().Add(-time.Second))
 	defer cancelExpired()
 
 	for _, d := range []time.Duration{0, -time.Second} {
 		t.Run(d.String(), func(t *testing.T) {
 			start := time.Now()
 
-			require.NoError(t, System().Sleep(t.Context(), d))
+			require.NoError(t, System().Sleep(live, d))
 			require.ErrorIs(t, System().Sleep(cancelled, d), context.Canceled)
 			require.ErrorIs(t, System().Sleep(expired, d), context.DeadlineExceeded)
 

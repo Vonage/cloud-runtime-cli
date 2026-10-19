@@ -26,7 +26,7 @@ func startTestapp(t *testing.T, env []string, flags ...string) (cmd *exec.Cmd, l
 	t.Helper()
 	exe, err := testappBinary(t, stubConfig(t))
 	require.NoError(t, err)
-	cmd = exec.Command(exe, flags...)
+	cmd = exec.CommandContext(t.Context(), exe, flags...)
 	cmd.Env = append([]string{"PATH=" + os.Getenv("PATH")}, env...)
 	out, err := cmd.StdoutPipe()
 	require.NoError(t, err)
@@ -53,26 +53,27 @@ func TestTestappServesItsRoutes(t *testing.T) {
 	cmd, lines := startTestapp(t, []string{"NERU_APP_PORT=" + strconv.Itoa(port), "ZED=1", "ALPHA=2"})
 	base := "http://127.0.0.1:" + strconv.Itoa(port)
 
-	res, err := http.Get(base + "/hello")
+	res, err := httpGet(t, base+"/hello")
 	require.NoError(t, err)
 	body, _ := io.ReadAll(res.Body)
 	_ = res.Body.Close()
 	assert.Equal(t, "hello from app", string(body))
 	assert.Equal(t, "testapp", res.Header.Get("X-App"))
 
-	res, err = http.Post(base+"/echo", "text/plain", strings.NewReader("ping"))
+	res, err = httpPost(t, base+"/echo", "text/plain", "ping")
 	require.NoError(t, err)
 	body, _ = io.ReadAll(res.Body)
 	_ = res.Body.Close()
 	assert.Equal(t, "ping", string(body))
 
-	res, err = http.Get(base + "/status/418")
+	res, err = httpGet(t, base+"/status/418")
 	require.NoError(t, err)
 	_ = res.Body.Close()
 	assert.Equal(t, http.StatusTeapot, res.StatusCode)
 
-	ws, _, err := websocket.DefaultDialer.Dial("ws://127.0.0.1:"+strconv.Itoa(port)+"/ws", nil)
+	ws, handshake, err := websocket.DefaultDialer.Dial("ws://127.0.0.1:"+strconv.Itoa(port)+"/ws", nil)
 	require.NoError(t, err)
+	_ = handshake.Body.Close()
 	require.NoError(t, ws.WriteMessage(websocket.TextMessage, []byte("echo me")))
 	_, msg, err := ws.ReadMessage()
 	require.NoError(t, err)
@@ -89,7 +90,7 @@ func TestTestappFallsBackToVCRPortAndExitsAfterTheGivenTime(t *testing.T) {
 	port, err := freePort()
 	require.NoError(t, err)
 	cmd, _ := startTestapp(t, []string{"VCR_PORT=" + strconv.Itoa(port)}, "--exit-after", "300ms", "--exit-code", "7")
-	conn, err := net.DialTimeout("tcp", net.JoinHostPort("127.0.0.1", strconv.Itoa(port)), 2*time.Second)
+	conn, err := (&net.Dialer{Timeout: 2 * time.Second}).DialContext(t.Context(), "tcp", net.JoinHostPort("127.0.0.1", strconv.Itoa(port)))
 	require.NoError(t, err, "it listens on VCR_PORT when NERU_APP_PORT is not set")
 	_ = conn.Close()
 
@@ -102,10 +103,27 @@ func TestTestappFallsBackToVCRPortAndExitsAfterTheGivenTime(t *testing.T) {
 func TestTestappNeedsAPort(t *testing.T) {
 	exe, err := testappBinary(t, stubConfig(t))
 	require.NoError(t, err)
-	cmd := exec.Command(exe)
+	cmd := exec.CommandContext(t.Context(), exe)
 	cmd.Env = []string{"PATH=" + os.Getenv("PATH")}
 	err = cmd.Run()
 	var exit *exec.ExitError
 	require.ErrorAs(t, err, &exit)
 	assert.Equal(t, 2, exit.ExitCode())
+}
+
+// httpGet sends a GET under the test's context; the caller closes the body.
+func httpGet(t *testing.T, url string) (*http.Response, error) {
+	t.Helper()
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, url, nil)
+	require.NoError(t, err)
+	return http.DefaultClient.Do(req)
+}
+
+// httpPost sends a POST under the test's context; the caller closes the body.
+func httpPost(t *testing.T, url, contentType, body string) (*http.Response, error) {
+	t.Helper()
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodPost, url, strings.NewReader(body))
+	require.NoError(t, err)
+	req.Header.Set("Content-Type", contentType)
+	return http.DefaultClient.Do(req)
 }

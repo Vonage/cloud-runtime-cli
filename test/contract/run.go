@@ -79,14 +79,14 @@ type run struct {
 // fresh fake platform. The error is a problem of the run itself (a step that
 // timed out, a process that would not start); a command that fails is a
 // Result with its exit.
-func RunScenario(t testing.TB, bin string, sc Scenario, c Config) (Result, error) {
-	t.Helper()
+func RunScenario(tb testing.TB, bin string, sc Scenario, c Config) (Result, error) {
+	tb.Helper()
 	for _, req := range sc.Requires {
 		if why := RequirementUnmet(req); why != "" {
-			t.Skipf("%s: %s", sc.ID, why)
+			tb.Skipf("%s: %s", sc.ID, why)
 		}
 	}
-	scope := &scopedTB{TB: t}
+	scope := &scopedTB{TB: tb}
 	defer scope.release()
 	r, err := prepare(scope, sc, c)
 	if err != nil {
@@ -102,10 +102,11 @@ func RunScenario(t testing.TB, bin string, sc Scenario, c Config) (Result, error
 
 // prepare creates the sandbox, allocates the ports, expands the runner's
 // placeholders, starts the fake on the run's port and expands the fake's.
-func prepare(t testing.TB, sc Scenario, c Config) (*run, error) {
+func prepare(tb testing.TB, sc Scenario, c Config) (*run, error) {
+	tb.Helper()
 	r := &run{cdir: c.contractDir(), port: c.Port}
 	var err error
-	if r.l, err = CreateSandbox(t.TempDir()); err != nil {
+	if r.l, err = CreateSandbox(tb.TempDir()); err != nil {
 		return nil, err
 	}
 	if r.port == 0 {
@@ -115,7 +116,7 @@ func prepare(t testing.TB, sc Scenario, c Config) (*run, error) {
 	}
 	raw := string(sc.Raw)
 	if strings.Contains(raw, "${TESTAPP}") {
-		if r.testapp, err = testappBinary(t, c); err != nil {
+		if r.testapp, err = testappBinary(tb, c); err != nil {
 			return nil, err
 		}
 	}
@@ -132,7 +133,7 @@ func prepare(t testing.TB, sc Scenario, c Config) (*run, error) {
 		r.ports.Close()
 		return nil, err
 	}
-	r.srv = fakeplatform.StartOn(t, net.JoinHostPort("127.0.0.1", strconv.Itoa(r.port)), fx)
+	r.srv = fakeplatform.StartOn(tb, net.JoinHostPort("127.0.0.1", strconv.Itoa(r.port)), fx)
 	if r.sc, err = pass1.Reparse(r.srv.Expand); err != nil {
 		r.ports.Close()
 		return nil, err

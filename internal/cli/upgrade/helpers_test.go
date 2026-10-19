@@ -86,15 +86,16 @@ func hostBinary() string {
 }
 
 // goodExecutable makes an executable file in a new directory and returns its path.
-func goodExecutable(t testing.TB) string {
-	t.Helper()
-	path := filepath.Join(t.TempDir(), hostBinary())
-	require.NoError(t, os.WriteFile(path, []byte("#!/bin/sh\n"), 0o600))
-	require.NoError(t, os.Chmod(path, 0o755)) //nolint:gosec // the file has to be executable
+func goodExecutable(tb testing.TB) string {
+	tb.Helper()
+	path := filepath.Join(tb.TempDir(), hostBinary())
+	require.NoError(tb, os.WriteFile(path, []byte("#!/bin/sh\n"), 0o600))
+	require.NoError(tb, os.Chmod(path, 0o755))
 	return path
 }
 
-func (s setup) withDefaults(t testing.TB) setup {
+func (s setup) withDefaults(tb testing.TB) setup {
+	tb.Helper()
 	if s.version == "" {
 		s.version = runningVersion
 	}
@@ -111,7 +112,7 @@ func (s setup) withDefaults(t testing.TB) setup {
 		s.updater.release = selfupdate.Release{TagName: s.tag}
 	}
 	if s.exePath == "" && s.exeErr == nil {
-		s.exePath = goodExecutable(t)
+		s.exePath = goodExecutable(tb)
 	}
 	return s
 }
@@ -153,21 +154,21 @@ func execute(t *testing.T, s setup, args ...string) outcome {
 
 // newStreams builds the terminal of a run and the functions that read what it printed: the bytes in Classic mode, the
 // final screen on a Rich or Static terminal.
-func newStreams(t testing.TB, s setup) (streams *term.IO, stdout, stderr func() string) {
-	t.Helper()
+func newStreams(tb testing.TB, s setup) (streams *term.IO, stdout, stderr func() string) {
+	tb.Helper()
 	if s.mode == term.Classic {
 		streams, out, errOut := term.Test(s.stdin, s.tty)
 		return streams, out.String, errOut.String
 	}
 	streams, out, errOut := term.TestRich(s.mode, 100, clocktest.New(time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)))
 	in, ok := streams.In.(*bytes.Buffer)
-	require.True(t, ok, "the stdin of a test terminal is a buffer")
+	require.True(tb, ok, "the stdin of a test terminal is a buffer")
 	in.WriteString(s.stdin)
 	return streams, out.Screen, errOut.Screen
 }
 
 // missingPath is a path inside a new directory where nothing exists.
-func missingPath(t testing.TB) string {
-	t.Helper()
-	return filepath.Join(t.TempDir(), "missing")
+func missingPath(tb testing.TB) string {
+	tb.Helper()
+	return filepath.Join(tb.TempDir(), "missing")
 }

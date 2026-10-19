@@ -143,7 +143,10 @@ func newLocalSetup(t *testing.T, mode ...string) *localSetup {
 	}
 }
 
-func (l *localSetup) start(t *testing.T) *runHandle { return startRun(t, l.api, l.clk, l.cfg) }
+func (l *localSetup) start(t *testing.T) *runHandle {
+	t.Helper()
+	return startRun(t, l.api, l.clk, l.cfg)
+}
 
 // debugServiceRequests are the requests the shared fake got for debug services, as "METHOD /path?query" lines in the
 // order they arrived.

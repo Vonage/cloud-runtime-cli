@@ -4,6 +4,7 @@ package contract
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -272,10 +273,25 @@ func collectScalars(n *yaml.Node, out *[]string) {
 
 // freePort returns a TCP port on 127.0.0.1 that was free a moment ago.
 func freePort() (int, error) {
-	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	ln, err := listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		return 0, err
 	}
 	defer ln.Close()
-	return ln.Addr().(*net.TCPAddr).Port, nil
+	return listenerPort(ln)
+}
+
+// listen binds a TCP address. The harness holds what it binds until it closes it, so no context ends a listener.
+func listen(network, address string) (net.Listener, error) {
+	var lc net.ListenConfig
+	return lc.Listen(context.Background(), network, address)
+}
+
+// listenerPort is the port a TCP listener is bound to.
+func listenerPort(ln net.Listener) (int, error) {
+	addr, ok := ln.Addr().(*net.TCPAddr)
+	if !ok {
+		return 0, errors.New("listener address is not a TCP address")
+	}
+	return addr.Port, nil
 }

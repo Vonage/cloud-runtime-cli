@@ -162,7 +162,7 @@ func (f *fakeAPI) DeployInstance(_ context.Context, req platform.DeployRequest) 
 
 // tarEntries returns the names in the tar.gz at path, or nil when it is not one.
 func tarEntries(path string) []string {
-	raw, err := os.Open(path) //nolint:gosec // the path is the archive Run passed to the upload
+	raw, err := os.Open(path)
 	if err != nil {
 		return nil
 	}
@@ -171,7 +171,7 @@ func tarEntries(path string) []string {
 	if err != nil {
 		return nil
 	}
-	defer zr.Close()
+	defer func() { _ = zr.Close() }()
 	var names []string
 	tr := tar.NewReader(io.LimitReader(zr, maxUploadedBodySize))
 	for {

@@ -206,6 +206,7 @@ func TestTamperModes(t *testing.T) {
 	}
 	for mode, check := range map[string]func(t *testing.T, r tamperedRelease){
 		"archive-bitflip": func(t *testing.T, r tamperedRelease) {
+			t.Helper()
 			signedByTrusted(t, r, "vcr-release")
 			assert.Equal(t, r.pristineList, r.list)
 			assert.Equal(t, r.pristineSig, r.sig)
@@ -213,6 +214,7 @@ func TestTamperModes(t *testing.T) {
 			assert.NotEqual(t, sha256Hex(r.archive), r.listedMachineDigest, "the hash no longer matches")
 		},
 		"list-bitflip": func(t *testing.T, r tamperedRelease) {
+			t.Helper()
 			assert.Equal(t, 1, bitsChanged(t, r.pristineList, r.list))
 			_, _, err := verifySSHSIG(r.sig, r.list)
 			assert.Error(t, err, "the signature does not cover the served list")
@@ -220,6 +222,7 @@ func TestTamperModes(t *testing.T) {
 			assert.NoError(t, err)
 		},
 		"signature-bitflip": func(t *testing.T, r tamperedRelease) {
+			t.Helper()
 			assert.Equal(t, r.pristineList, r.list)
 			blob, err := dearmor(r.sig)
 			require.NoError(t, err)
@@ -232,6 +235,7 @@ func TestTamperModes(t *testing.T) {
 			assert.ErrorContains(t, err, "does not verify")
 		},
 		"unknown-key": func(t *testing.T, r tamperedRelease) {
+			t.Helper()
 			assert.Equal(t, r.pristineList, r.list)
 			assert.Equal(t, http.StatusNotFound, r.sigStatus)
 			assert.Contains(t, r.names, sigNameOf(otherTestKey))
@@ -242,22 +246,26 @@ func TestTamperModes(t *testing.T) {
 			assert.Equal(t, "vcr-release", ns)
 		},
 		"missing-signature": func(t *testing.T, r tamperedRelease) {
+			t.Helper()
 			assert.Equal(t, http.StatusNotFound, r.sigStatus)
 			assert.Equal(t, r.pristineList, r.list)
 			assert.Nil(t, r.otherSig)
 		},
 		"missing-entry": func(t *testing.T, r tamperedRelease) {
+			t.Helper()
 			signedByTrusted(t, r, "vcr-release")
 			assert.Empty(t, r.listedMachineDigest, "no line for this machine")
 			line := sha256Hex(r.pristineArc) + "  " + archiveOf(machinePlatform()) + "\n"
 			assert.Equal(t, strings.Replace(string(r.pristineList), line, "", 1), string(r.list), "only that line is gone")
 		},
 		"tag-mismatch": func(t *testing.T, r tamperedRelease) {
+			t.Helper()
 			signedByTrusted(t, r, "vcr-release")
 			assert.Equal(t, strings.Replace(string(r.pristineList), "# vcr v2.6.1\n", "# vcr v0.0.1\n", 1), string(r.list),
 				"only the first line differs")
 		},
 		"wrong-namespace": func(t *testing.T, r tamperedRelease) {
+			t.Helper()
 			signedByTrusted(t, r, "file")
 			assert.Equal(t, r.pristineList, r.list)
 		},
@@ -291,7 +299,7 @@ func TestReleaseHostNeverRequiresAuthAndLogsCredentials(t *testing.T) {
 	assert.Equal(t, "/releases/latest", reqs[0].Rel)
 	assert.Empty(t, reqs[0].Header.Get("Authorization"))
 	assert.NotEmpty(t, reqs[1].Header.Get("Authorization"), "the log keeps the credentials that were sent")
-	assert.Equal(t, testKey, reqs[1].Header.Get("X-Neru-ApiAccountId"))
+	assert.Equal(t, testKey, reqs[1].Header.Get("X-Neru-Apiaccountid"))
 	assert.Equal(t, testKey, reqs[1].User)
 	assert.Equal(t, "GET gh:/download/{tag}/{name}", reqs[2].Route)
 	assert.Equal(t, "/download/v2.6.1/checksums.txt", reqs[2].Rel)

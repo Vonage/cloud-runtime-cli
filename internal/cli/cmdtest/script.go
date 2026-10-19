@@ -42,10 +42,11 @@ type Script struct {
 var _ term.Prompter = (*Script)(nil)
 
 // bind gives the script the test it fails.
-func (s *Script) bind(t testing.TB) {
+func (s *Script) bind(tb testing.TB) {
+	tb.Helper()
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.t = t
+	s.t = tb
 }
 
 // Input records the question and returns the next of Inputs.

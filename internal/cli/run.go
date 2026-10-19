@@ -25,7 +25,7 @@ func Run(ctx context.Context, args []string, t *term.IO, bi buildinfo.Info) int 
 		Build:  bi,
 		Flags:  &config.Flags{},
 	}
-	return run(ctx, args, env, defaultOptions(env))
+	return run(ctx, args, env, defaultOptions(env)) //nolint:contextcheck // building the command tree needs no context: cobra hands each command its own when it runs
 }
 
 // runOptions are the seams of a run that tests replace.

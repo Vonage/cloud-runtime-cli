@@ -11,7 +11,7 @@ var gzipMagic = [2]byte{0x1f, 0x8b}
 
 // CheckTgz validates a prebuilt --tgz archive the way v2.6.1 does (gzip magic, readable) before it is uploaded as-is.
 func CheckTgz(path string) error {
-	f, err := os.Open(path) //nolint:gosec // the caller names the archive to upload
+	f, err := os.Open(path)
 	if err != nil {
 		return unreadable(path, err)
 	}

@@ -29,8 +29,8 @@ func specialEntry(typeflag byte, name, link string) tarEntry {
 }
 
 // tarBytes is the uncompressed tar of entries.
-func tarBytes(t testing.TB, entries ...tarEntry) []byte {
-	t.Helper()
+func tarBytes(tb testing.TB, entries ...tarEntry) []byte {
+	tb.Helper()
 	var buf bytes.Buffer
 	tw := tar.NewWriter(&buf)
 	for _, e := range entries {
@@ -38,28 +38,28 @@ func tarBytes(t testing.TB, entries ...tarEntry) []byte {
 		if h.Typeflag == tar.TypeReg {
 			h.Size = int64(len(e.content))
 		}
-		require.NoError(t, tw.WriteHeader(&h))
+		require.NoError(tb, tw.WriteHeader(&h))
 		_, err := tw.Write(e.content)
-		require.NoError(t, err)
+		require.NoError(tb, err)
 	}
-	require.NoError(t, tw.Close())
+	require.NoError(tb, tw.Close())
 	return buf.Bytes()
 }
 
-func gzipBytes(t testing.TB, data []byte) []byte {
-	t.Helper()
+func gzipBytes(tb testing.TB, data []byte) []byte {
+	tb.Helper()
 	var buf bytes.Buffer
 	zw := gzip.NewWriter(&buf)
 	_, err := zw.Write(data)
-	require.NoError(t, err)
-	require.NoError(t, zw.Close())
+	require.NoError(tb, err)
+	require.NoError(tb, zw.Close())
 	return buf.Bytes()
 }
 
 // archiveOf is a gzip-compressed tar of entries.
-func archiveOf(t testing.TB, entries ...tarEntry) []byte {
-	t.Helper()
-	return gzipBytes(t, tarBytes(t, entries...))
+func archiveOf(tb testing.TB, entries ...tarEntry) []byte {
+	tb.Helper()
+	return gzipBytes(tb, tarBytes(tb, entries...))
 }
 
 // countingWriter keeps what it was given and fails after failAfter bytes when that is positive.
@@ -170,18 +170,18 @@ func globalHeader() tarEntry {
 }
 
 // tarWithJunk is a tar whose only entry is followed by a block that is not a header.
-func tarWithJunk(t testing.TB, e tarEntry) []byte {
-	t.Helper()
+func tarWithJunk(tb testing.TB, e tarEntry) []byte {
+	tb.Helper()
 	var buf bytes.Buffer
 	tw := tar.NewWriter(&buf)
 	h := e.header
 	h.Size = int64(len(e.content))
-	require.NoError(t, tw.WriteHeader(&h))
+	require.NoError(tb, tw.WriteHeader(&h))
 	_, err := tw.Write(e.content)
-	require.NoError(t, err)
-	require.NoError(t, tw.Flush())
+	require.NoError(tb, err)
+	require.NoError(tb, tw.Flush())
 	buf.Write(bytes.Repeat([]byte("x"), 512))
-	require.NoError(t, tw.Close())
+	require.NoError(tb, tw.Close())
 	return buf.Bytes()
 }
 

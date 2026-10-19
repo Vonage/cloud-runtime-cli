@@ -56,7 +56,7 @@ func TestTerminalSessionHelper(t *testing.T) {
 // onTerminal runs the helper with stdin, stdout and stderr on a pseudo-terminal and returns what it printed.
 func onTerminal(t *testing.T, env ...string) string {
 	t.Helper()
-	cmd := exec.CommandContext(t.Context(), os.Args[0], "-test.run=^TestTerminalSessionHelper$") //nolint:gosec // the test runs its own binary again
+	cmd := exec.CommandContext(t.Context(), os.Args[0], "-test.run=^TestTerminalSessionHelper$")
 	cmd.Env = append([]string{"PATH=" + os.Getenv("PATH"), "HOME=" + t.TempDir(), "TERM=xterm", terminalHelperEnv + "=1"}, env...)
 	master, err := pty.StartWithSize(cmd, &pty.Winsize{Rows: 24, Cols: 100})
 	require.NoError(t, err)

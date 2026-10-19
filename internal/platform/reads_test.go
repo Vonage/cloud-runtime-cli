@@ -79,25 +79,31 @@ func TestEmptyListsDecodeToNonNilSlices(t *testing.T) {
 		run  func(t *testing.T, srv *httptest.Server) (any, error)
 	}{
 		{"Resolver.Regions", "regions", func(t *testing.T, srv *httptest.Server) (any, error) {
+			t.Helper()
 			return newTestResolver(t, srv.URL, "v0.3", nil).Regions(t.Context())
 		}},
 		{"Client.ListRegions", "regions", func(t *testing.T, srv *httptest.Server) (any, error) {
+			t.Helper()
 			c, _, _ := newTestClient(t, srv)
 			return c.ListRegions(t.Context())
 		}},
 		{"ListRuntimes", "runtimes", func(t *testing.T, srv *httptest.Server) (any, error) {
+			t.Helper()
 			c, _, _ := newTestClient(t, srv)
 			return c.ListRuntimes(t.Context())
 		}},
 		{"ListTemplates", "products", func(t *testing.T, srv *httptest.Server) (any, error) {
+			t.Helper()
 			c, _, _ := newTestClient(t, srv)
 			return c.ListTemplates(t.Context())
 		}},
 		{"ListInstances", "instances", func(t *testing.T, srv *httptest.Server) (any, error) {
+			t.Helper()
 			c, _, _ := newTestClient(t, srv)
 			return c.ListInstances(t.Context(), "")
 		}},
 		{"ListLogs", "logs", func(t *testing.T, srv *httptest.Server) (any, error) {
+			t.Helper()
 			c, _, _ := newTestClient(t, srv)
 			return c.ListLogs(t.Context(), "i-1", 300, "")
 		}},
@@ -157,7 +163,7 @@ func TestListTemplates(t *testing.T) {
 			wantErr: "the platform returned an invalid template id: "},
 		{name: "version id with a slash", rows: `{"id":"p-1","name":"x","programmingLanguage":"go","activeVersionId":"v/1"}`,
 			wantErr: "the platform returned an invalid template version id: v/1"},
-		{name: "dot dot version id", rows: `{"id":"p-1","name":"x","programmingLanguage":"go","activeVersionId":".."}`,
+		{name: "double dot version id", rows: `{"id":"p-1","name":"x","programmingLanguage":"go","activeVersionId":".."}`,
 			wantErr: "the platform returned an invalid template version id: .."},
 		{name: "a bad row after a good one fails the whole call", rows: good + `,{"id":"../x","name":"x","programmingLanguage":"go"}`,
 			wantErr: "the platform returned an invalid template id: ../x"},

@@ -15,6 +15,7 @@ import (
 func TestWatchBuildConnectRetries(t *testing.T) {
 	t.Run("an attempt that works ends the retries", func(t *testing.T) {
 		forEachTransport(t, func(t *testing.T, useTLS bool) {
+			t.Helper()
 			srv := scriptedWatchServer(t, useTLS,
 				refuse(http.StatusServiceUnavailable, envelopeUnavailable),
 				refuse(http.StatusServiceUnavailable, envelopeUnavailable),
@@ -65,7 +66,7 @@ func TestWatchBuildConnectRetries(t *testing.T) {
 
 		err := watchBuild(t, c, func(string) {})
 
-		apiErr := requireAPIError(t, err, http.StatusBadGateway)
+		apiErr := apiErrorWithStatus(t, err, http.StatusBadGateway)
 		assert.Equal(t, "bad gateway", apiErr.Message)
 	})
 }

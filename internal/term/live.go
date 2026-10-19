@@ -94,27 +94,26 @@ func resolvedDuration(d time.Duration) string {
 
 // goLive puts the step on the surface's stack and, outside tests, starts the goroutine that redraws the live line.
 func (s *Step) goLive() {
-	var ctx context.Context
 	ticking := !s.owner.manual
 	if ticking {
-		ctx, s.cancel = context.WithCancel(context.Background())
+		s.tickCtx, s.cancel = context.WithCancel(context.Background())
 		s.exited = make(chan struct{})
 	}
 	if !s.owner.surf.push(s) {
 		if ticking {
 			s.cancel()
-			s.cancel, s.exited = nil, nil
+			s.tickCtx, s.cancel, s.exited = nil, nil, nil
 		}
 		return
 	}
 	if ticking {
-		go s.tick(ctx)
+		go s.tick()
 	}
 }
 
-func (s *Step) tick(ctx context.Context) {
+func (s *Step) tick() {
 	defer close(s.exited)
-	for s.owner.clk.Sleep(ctx, tickEvery) == nil {
+	for s.owner.clk.Sleep(s.tickCtx, tickEvery) == nil {
 		s.owner.tickLive()
 	}
 }

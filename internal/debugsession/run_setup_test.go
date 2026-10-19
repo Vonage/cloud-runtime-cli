@@ -19,7 +19,10 @@ import (
 )
 
 // notStartedFile is where a child in dump-env mode would write if the session started it.
-func notStartedFile(t *testing.T) string { return filepath.Join(t.TempDir(), "child-started") }
+func notStartedFile(t *testing.T) string {
+	t.Helper()
+	return filepath.Join(t.TempDir(), "child-started")
+}
 
 func debuggerAddress(cfg Config) string { return "127.0.0.1:" + strconv.Itoa(cfg.DebuggerPort) }
 

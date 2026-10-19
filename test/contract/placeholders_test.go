@@ -58,12 +58,12 @@ func TestHeldPortsStayBoundUntilClosed(t *testing.T) {
 	require.Positive(t, held)
 	require.Positive(t, ports.Port("loose"))
 
-	conn, err := net.Dial("tcp", net.JoinHostPort("127.0.0.1", strconv.Itoa(held)))
+	conn, err := (&net.Dialer{}).DialContext(t.Context(), "tcp", net.JoinHostPort("127.0.0.1", strconv.Itoa(held)))
 	require.NoError(t, err, "the runner holds the port open")
 	_ = conn.Close()
 
 	ports.Close()
-	_, err = net.Dial("tcp", net.JoinHostPort("127.0.0.1", strconv.Itoa(held)))
+	_, err = (&net.Dialer{}).DialContext(t.Context(), "tcp", net.JoinHostPort("127.0.0.1", strconv.Itoa(held)))
 	assert.Error(t, err, "closing the set releases the held ports")
 }
 

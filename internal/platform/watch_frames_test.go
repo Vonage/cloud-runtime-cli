@@ -63,6 +63,7 @@ func TestWatchBuildEndsOnCompletedFrame(t *testing.T) {
 	for name, final := range finals {
 		t.Run(name, func(t *testing.T) {
 			forEachTransport(t, func(t *testing.T, useTLS bool) {
+				t.Helper()
 				srv := scriptedWatchServer(t, useTLS, serve("compiling", final))
 				c, fake := watchClient(t, srv)
 				onLine, got := collect()
@@ -106,6 +107,7 @@ func TestWatchBuildFailedFrames(t *testing.T) {
 	for name, final := range finals {
 		t.Run(name, func(t *testing.T) {
 			forEachTransport(t, func(t *testing.T, useTLS bool) {
+				t.Helper()
 				srv := scriptedWatchServer(t, useTLS, serve("compiling", final))
 				c, _ := watchClient(t, srv)
 				onLine, got := collect()
@@ -130,6 +132,7 @@ func TestWatchBuildIgnoresLookalikeFrames(t *testing.T) {
 		"STATUS - FAILED",
 	}
 	forEachTransport(t, func(t *testing.T, useTLS bool) {
+		t.Helper()
 		frames := slices.Concat(lookalikes, []string{"Status - completed"})
 		srv := scriptedWatchServer(t, useTLS, serve(frames...))
 		c, _ := watchClient(t, srv)
@@ -168,6 +171,7 @@ func TestWatchBuildClosesTheConnectionWhenItEnds(t *testing.T) {
 
 func TestWatchBuildNormalClosure(t *testing.T) {
 	forEachTransport(t, func(t *testing.T, useTLS bool) {
+		t.Helper()
 		srv := scriptedWatchServer(t, useTLS, serve("only"))
 		c, fake := watchClient(t, srv)
 		onLine, got := collect()
@@ -191,6 +195,7 @@ func TestWatchBuildReconnectsAfterAbnormalClose(t *testing.T) {
 	for name, first := range endings {
 		t.Run(name, func(t *testing.T) {
 			forEachTransport(t, func(t *testing.T, useTLS bool) {
+				t.Helper()
 				srv := scriptedWatchServer(t, useTLS, first, serve("second", "Status - completed"))
 				c, fake := watchClient(t, srv)
 				onLine, got := collect()

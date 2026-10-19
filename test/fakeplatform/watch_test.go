@@ -26,7 +26,7 @@ func credentialHeader(key, secret, account string) http.Header {
 	h := http.Header{}
 	h.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(key+":"+secret)))
 	if account != "" {
-		h.Set("X-Neru-ApiAccountId", account)
+		h.Set("X-Neru-Apiaccountid", account)
 	}
 	return h
 }
@@ -196,6 +196,6 @@ func TestWatchIsLogged(t *testing.T) {
 	assert.Equal(t, "/packages/"+packageID+"/build/watch", req.Rel)
 	assert.Equal(t, "euw1", req.Region)
 	assert.Equal(t, testKey, req.User)
-	assert.Equal(t, testKey, req.Header.Get("X-Neru-ApiAccountId"))
+	assert.Equal(t, testKey, req.Header.Get("X-Neru-Apiaccountid"))
 	assert.Equal(t, "websocket", strings.ToLower(req.Header.Get("Upgrade")))
 }

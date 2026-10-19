@@ -99,7 +99,7 @@ func readFile(path string) (string, error) {
 		}
 		return "", err
 	}
-	data, err := os.ReadFile(path) //nolint:gosec // the user chooses which file holds the secret
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return "", err
 	}

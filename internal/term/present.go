@@ -58,6 +58,7 @@ type Step struct {
 	label string // the live line's label, normalised
 	start time.Time
 
+	tickCtx     context.Context    // the ticker goroutine's context, which cancel ends
 	cancel      context.CancelFunc // ends the ticker goroutine; nil when there is none
 	exited      chan struct{}      // closed once the ticker goroutine has returned
 	stopClassic func()             // Classic: stops the v2.6.1 spinner

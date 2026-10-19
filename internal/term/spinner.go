@@ -20,8 +20,9 @@ func (t *IO) StartSpinner(msg string) (stop func()) {
 		return t.StartStep(msg).Stop
 	case Static:
 		return func() {}
+	default:
+		return t.startClassicSpinner(msg)
 	}
-	return t.startClassicSpinner(msg)
 }
 
 // startClassicSpinner is the v2.6.1 spinner, untouched.

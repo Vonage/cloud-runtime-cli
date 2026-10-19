@@ -113,7 +113,7 @@ func TestDeployDebugServiceFailureIsAnAPIError(t *testing.T) {
 
 	_, err := s.client.DeployDebugService(t.Context(), "aws.nowhere", "app-1", "", manifest.Capabilities{})
 
-	apiErr := requireAPIError(t, err, http.StatusBadRequest)
+	apiErr := apiErrorWithStatus(t, err, http.StatusBadRequest)
 	assert.Equal(t, "unknown region", apiErr.Message)
 }
 

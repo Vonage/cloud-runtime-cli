@@ -164,7 +164,7 @@ func TestExecuteBodyReadFailureAnswers500(t *testing.T) {
 		w.Header().Set("Content-Length", "100")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("partial"))
-		w.(http.Flusher).Flush()
+		_ = http.NewResponseController(w).Flush()
 		panic(http.ErrAbortHandler) // ends the connection in the middle of the body
 	}))
 	rig := newLocalRig(t, peer, rigOptions{appPort: port})

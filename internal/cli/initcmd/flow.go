@@ -94,7 +94,7 @@ func run(ctx context.Context, d deps, arg string) error {
 	if err != nil {
 		return err
 	}
-	defer proj.Close()
+	defer func() { _ = proj.Close() }()
 
 	s := newSession(d, dir, proj)
 	chosen, err := s.askAll(ctx)

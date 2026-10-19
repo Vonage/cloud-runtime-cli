@@ -93,7 +93,7 @@ func TestDownloadTemplateSizeLimit(t *testing.T) {
 		srv := startPlain(t, newRecorder(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Length", "70000000")
 			w.WriteHeader(http.StatusOK)
-			w.(http.Flusher).Flush()
+			_ = http.NewResponseController(w).Flush()
 			select {
 			case <-release:
 			case <-r.Context().Done():

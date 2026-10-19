@@ -318,32 +318,32 @@ func outputFault(out string) string {
 	return ""
 }
 
-func checkSanitizeInvariants(t testing.TB, in string) {
-	t.Helper()
+func checkSanitizeInvariants(tb testing.TB, in string) {
+	tb.Helper()
 	plain, stream := Sanitize(in), SanitizeStream(in)
 
 	if strings.Contains(plain, "\x1b") {
-		t.Fatalf("Sanitize(%q) = %q keeps an ESC", in, plain)
+		tb.Fatalf("Sanitize(%q) = %q keeps an ESC", in, plain)
 	}
 	if fault := outputFault(plain); fault != "" {
-		t.Fatalf("Sanitize(%q) = %q: %s", in, plain, fault)
+		tb.Fatalf("Sanitize(%q) = %q: %s", in, plain, fault)
 	}
 	if fault := outputFault(stream); fault != "" {
-		t.Fatalf("SanitizeStream(%q) = %q: %s", in, stream, fault)
+		tb.Fatalf("SanitizeStream(%q) = %q: %s", in, stream, fault)
 	}
 	if again := Sanitize(plain); again != plain {
-		t.Fatalf("Sanitize is not idempotent on %q: %q then %q", in, plain, again)
+		tb.Fatalf("Sanitize is not idempotent on %q: %q then %q", in, plain, again)
 	}
 	if again := SanitizeStream(stream); again != stream {
-		t.Fatalf("SanitizeStream is not idempotent on %q: %q then %q", in, stream, again)
+		tb.Fatalf("SanitizeStream is not idempotent on %q: %q then %q", in, stream, again)
 	}
 	if stripped := colourSequence.ReplaceAllString(stream, ""); stripped != plain {
-		t.Fatalf("SanitizeStream(%q) = %q differs from Sanitize(%q) = %q beyond colour", in, stream, in, plain)
+		tb.Fatalf("SanitizeStream(%q) = %q differs from Sanitize(%q) = %q beyond colour", in, stream, in, plain)
 	}
 }
 
 func TestSanitizeInvariantOnRandomInput(t *testing.T) {
-	rng := rand.New(rand.NewSource(1)) //nolint:gosec // a fixed seed keeps the inputs the same on every run
+	rng := rand.New(rand.NewSource(1))
 
 	withColour := 0
 	for range 20000 {

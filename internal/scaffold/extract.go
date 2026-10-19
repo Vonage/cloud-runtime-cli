@@ -31,7 +31,7 @@ func (p *Project) Extract(tgz []byte, lim Limits) error {
 	if err != nil {
 		return fmt.Errorf("failed to create a new gzip reader: %w", err)
 	}
-	defer gz.Close()
+	defer func() { _ = gz.Close() }()
 	return p.extractEntries(tar.NewReader(gz), lim)
 }
 

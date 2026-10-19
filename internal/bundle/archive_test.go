@@ -24,14 +24,14 @@ func TestBuildWritesGzipLevelOneTarWithRelativeNames(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	writeTree(t, root, map[string]string{"a.txt": "alpha", "sub/b.txt": "beta"})
-	require.NoError(t, os.Chmod(filepath.Join(root, "sub", "b.txt"), 0o755)) //nolint:gosec // an executable file
+	require.NoError(t, os.Chmod(filepath.Join(root, "sub", "b.txt"), 0o755))
 
 	path, files, cleanup, err := Build(context.Background(), root, io.Discard)
 
 	require.NoError(t, err)
 	t.Cleanup(cleanup)
 	assert.Equal(t, 2, files)
-	raw, err := os.ReadFile(path) //nolint:gosec // the path comes from Build
+	raw, err := os.ReadFile(path)
 	require.NoError(t, err)
 	require.Greater(t, len(raw), gzipFastestFlagOffset)
 	assert.Equal(t, byte(4), raw[gzipFastestFlagOffset], "level 1 sets the fastest-compression flag")

@@ -207,19 +207,19 @@ func TestVerifyAgreesWithTheFakeReleaseHost(t *testing.T) {
 }
 
 // fetch downloads url; found is false for a 404.
-func fetch(t testing.TB, url string) (body []byte, found bool) {
-	t.Helper()
-	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, url, http.NoBody)
-	require.NoError(t, err)
+func fetch(tb testing.TB, url string) (body []byte, found bool) {
+	tb.Helper()
+	req, err := http.NewRequestWithContext(tb.Context(), http.MethodGet, url, http.NoBody)
+	require.NoError(tb, err)
 	resp, err := http.DefaultClient.Do(req)
-	require.NoError(t, err)
+	require.NoError(tb, err)
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusNotFound {
 		return nil, false
 	}
-	require.Equal(t, http.StatusOK, resp.StatusCode)
+	require.Equal(tb, http.StatusOK, resp.StatusCode)
 	body, err = io.ReadAll(resp.Body)
-	require.NoError(t, err)
+	require.NoError(tb, err)
 	return body, true
 }
 

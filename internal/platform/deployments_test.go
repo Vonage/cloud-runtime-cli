@@ -32,7 +32,7 @@ func TestCreateProjectFailureIsAnAPIError(t *testing.T) {
 
 	_, err := s.client.CreateProject(t.Context(), "p")
 
-	apiErr := requireAPIError(t, err, http.StatusConflict)
+	apiErr := apiErrorWithStatus(t, err, http.StatusConflict)
 	assert.Equal(t, 2011, apiErr.ServerCode)
 }
 
@@ -208,7 +208,7 @@ func TestDeployInstanceFailureIsAnAPIError(t *testing.T) {
 
 	_, err := s.client.DeployInstance(t.Context(), DeployRequest{PackageID: "pkg-1"})
 
-	apiErr := requireAPIError(t, err, http.StatusUnprocessableEntity)
+	apiErr := apiErrorWithStatus(t, err, http.StatusUnprocessableEntity)
 	assert.Equal(t, "cannot deploy", apiErr.Message)
 }
 
@@ -230,7 +230,7 @@ func TestDeleteInstancePathAndConflict(t *testing.T) {
 
 		err := s.client.DeleteInstance(t.Context(), "inst-1")
 
-		apiErr := requireAPIError(t, err, http.StatusConflict)
+		apiErr := apiErrorWithStatus(t, err, http.StatusConflict)
 		assert.Equal(t, "instance lives in another region", apiErr.Message)
 		assert.NotErrorIs(t, err, ErrNotFound)
 		assert.NotErrorIs(t, err, ErrAlreadyExists)

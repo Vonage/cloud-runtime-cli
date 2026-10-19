@@ -85,7 +85,7 @@ func readGolden(t *testing.T, name string) string {
 
 func readText(t *testing.T, path string) string {
 	t.Helper()
-	data, err := os.ReadFile(path) //nolint:gosec // the tests read paths they created
+	data, err := os.ReadFile(path)
 	require.NoError(t, err)
 	return string(data)
 }

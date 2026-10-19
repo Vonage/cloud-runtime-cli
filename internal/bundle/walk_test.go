@@ -33,7 +33,7 @@ func TestListReportsModeAndSize(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	writeTree(t, root, map[string]string{"a.txt": "hello", "bin/run.sh": "#!/bin/sh\n"})
-	require.NoError(t, os.Chmod(filepath.Join(root, "bin", "run.sh"), 0o755)) //nolint:gosec // an executable script
+	require.NoError(t, os.Chmod(filepath.Join(root, "bin", "run.sh"), 0o755))
 
 	entries, err := List(context.Background(), root, io.Discard)
 
@@ -223,7 +223,7 @@ func TestUnreadableDirectoryAbortsTheWalk(t *testing.T) {
 	writeTree(t, root, map[string]string{"sub/a.txt": "x", "ok.txt": "x"})
 	sub := filepath.Join(root, "sub")
 	require.NoError(t, os.Chmod(sub, 0))
-	t.Cleanup(func() { _ = os.Chmod(sub, 0o750) }) //nolint:gosec // lets the temporary directory be removed
+	t.Cleanup(func() { _ = os.Chmod(sub, 0o750) })
 	useTempDir(t, scratch)
 	var warn bytes.Buffer
 

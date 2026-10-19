@@ -183,15 +183,15 @@ func TestRunKeepsASignalContextTheTestInstalled(t *testing.T) {
 	signal, cancel := context.WithCancel(t.Context())
 	defer cancel()
 	ctx := cmdenv.WithSignalContext(t.Context(), signal)
-	var seen context.Context
+	var sameAsSignal bool
 
 	err := h.Run(ctx, probe(func(cmd *cobra.Command, _ *cmdenv.Env) error {
-		seen = cmdenv.SignalContext(cmd.Context())
+		sameAsSignal = cmdenv.SignalContext(cmd.Context()) == signal
 		return nil
 	}))
 
 	require.NoError(t, err)
-	assert.Same(t, signal, seen)
+	assert.True(t, sameAsSignal)
 }
 
 func TestRunReturnsTheUnrenderedError(t *testing.T) {

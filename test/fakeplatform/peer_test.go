@@ -206,7 +206,7 @@ func TestPublicRequestIsRelayedThroughTheTunnel(t *testing.T) {
 	assert.Equal(t, "relayed", string(r.body))
 	assert.Equal(t, "yes", r.header.Get("X-Reply"))
 	assert.Equal(t, "text/plain", r.header.Get("Content-Type"))
-	assert.Empty(t, r.header.Get("X-Neru-TraceId"), "the debug host is not the platform")
+	assert.Empty(t, r.header.Get("X-Neru-Traceid"), "the debug host is not the platform")
 
 	frame, ok := <-seen
 	require.True(t, ok)

@@ -163,16 +163,16 @@ func TestCancellingTheParentEndsTheCommandContext(t *testing.T) {
 
 func TestTheCommandContextEndsWhenTheRunReturns(t *testing.T) {
 	h := newHarness(t)
-	var commandCtx context.Context
+	var commandErr func() error
 	h.bodies["plain"] = func(cmd *cobra.Command, _ *cmdenv.Env) error {
-		commandCtx = cmd.Context()
+		commandErr = cmd.Context().Err
 		return nil
 	}
 
 	h.run("plain")
 
-	require.NotNil(t, commandCtx)
-	assert.ErrorIs(t, commandCtx.Err(), context.Canceled)
+	require.NotNil(t, commandErr)
+	assert.ErrorIs(t, commandErr(), context.Canceled)
 }
 
 func TestSignalContextOutlivesTheDeadline(t *testing.T) {

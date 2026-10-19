@@ -58,7 +58,7 @@ type sanitizer struct {
 	keepSGR  bool
 	out      strings.Builder
 	state    sanitizeState
-	paramsAt int  // where the parameter bytes of the open control sequence start in in
+	paramsAt int  // index into in of the first parameter byte of the open control sequence
 	styled   bool // the last kept colour sequence left a colour or style switched on
 }
 
@@ -89,6 +89,7 @@ func (z *sanitizer) feed(u unit) {
 		taken = z.inControlSeq(u)
 	case stateString:
 		taken = z.inString(u)
+	case stateText:
 	}
 	if !taken {
 		z.text(u)

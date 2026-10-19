@@ -102,7 +102,7 @@ func goBuild(dir, out, flags, pkg string) error {
 	if flags != "" {
 		args = append(args, "-ldflags", flags)
 	}
-	cmd := exec.CommandContext(ctx, "go", append(args, "-o", abs, pkg)...)
+	cmd := exec.CommandContext(ctx, "go", append(args, "-o", abs, pkg)...) //nolint:gosec // the harness builds the packages it chose with the go tool
 	cmd.Dir = dir
 	var output bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &output, &output
@@ -135,14 +135,14 @@ func buildOne(src, out string, port int, dev bool) error {
 	if err := goBuild(src, out, stampFlags(port, dev), "."); err != nil {
 		return err
 	}
-	return os.WriteFile(out+".port", []byte(strconv.Itoa(port)+"\n"), 0o644)
+	return os.WriteFile(out+".port", []byte(strconv.Itoa(port)+"\n"), 0o600)
 }
 
 // BuildNew returns the binary under test: Config.Bin when given (VCR_BIN),
 // else a build of the repository root in .cache/contract/new. The dev build
 // is made, or looked for next to Config.Bin, only when wantDev.
-func BuildNew(t testing.TB, c Config, wantDev bool) (bin, devBin string, port int, err error) {
-	t.Helper()
+func BuildNew(tb testing.TB, c Config, wantDev bool) (bin, devBin string, port int, err error) {
+	tb.Helper()
 	if c.Bin != "" {
 		if port, err = ResolvePort(c, c.Bin); err != nil {
 			return "", "", 0, err
@@ -168,10 +168,10 @@ func fileExists(p string) bool {
 // BuildBaseline builds the baseline ref of the repository: the tags are
 // fetched first (a failure is only a warning), the ref is resolved, its tree
 // is exported with git archive and built with the stamp.
-func BuildBaseline(t testing.TB, ref string, c Config) (Baseline, error) {
-	t.Helper()
+func BuildBaseline(tb testing.TB, ref string, c Config) (Baseline, error) {
+	tb.Helper()
 	if out, err := git(c.RepoRoot, gitTimeout, "fetch", "--tags"); err != nil {
-		t.Logf("warning: git fetch --tags failed: %v %s", err, strings.TrimSpace(string(out)))
+		tb.Logf("warning: git fetch --tags failed: %v %s", err, strings.TrimSpace(string(out)))
 	}
 	out, err := git(c.RepoRoot, gitTimeout, "rev-parse", "--verify", ref+"^{commit}")
 	if err != nil {
@@ -187,7 +187,7 @@ func BuildBaseline(t testing.TB, ref string, c Config) (Baseline, error) {
 	if baselineBuilt(b) {
 		return b, nil
 	}
-	src := t.TempDir()
+	src := tb.TempDir()
 	if err := exportTree(c.RepoRoot, sha, src); err != nil {
 		return Baseline{}, err
 	}
@@ -211,7 +211,7 @@ func baselineBuilt(b Baseline) bool {
 func git(dir string, limit time.Duration, args ...string) ([]byte, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), limit)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, "git", append([]string{"-C", dir}, args...)...)
+	cmd := exec.CommandContext(ctx, "git", append([]string{"-C", dir}, args...)...) //nolint:gosec // git runs on a repository the harness checked out
 	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0")
 	return cmd.CombinedOutput()
 }
@@ -220,7 +220,7 @@ func git(dir string, limit time.Duration, args ...string) ([]byte, error) {
 func exportTree(repo, sha, dst string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), gitTimeout)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, "git", "-C", repo, "archive", "--format=tar", sha)
+	cmd := exec.CommandContext(ctx, "git", "-C", repo, "archive", "--format=tar", sha) //nolint:gosec // git runs on a repository the harness checked out
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
@@ -276,7 +276,7 @@ func extractEntry(r io.Reader, h *tar.Header, target string) error {
 		if err := os.MkdirAll(filepath.Dir(target), dirMode); err != nil {
 			return err
 		}
-		f, err := os.OpenFile(target, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.FileMode(h.Mode).Perm())
+		f, err := os.OpenFile(target, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.FileMode(h.Mode&0o777))
 		if err != nil {
 			return err
 		}
@@ -290,8 +290,8 @@ func extractEntry(r io.Reader, h *tar.Header, target string) error {
 }
 
 // testappBinary builds the stand-in for the debugged program once per process.
-func testappBinary(t testing.TB, c Config) (string, error) {
-	t.Helper()
+func testappBinary(tb testing.TB, c Config) (string, error) {
+	tb.Helper()
 	testappMu.Lock()
 	defer testappMu.Unlock()
 	if p, ok := testappBuilt[c.RepoRoot]; ok {

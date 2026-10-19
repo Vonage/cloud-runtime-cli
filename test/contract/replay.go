@@ -101,8 +101,8 @@ func hotfixSkipReason(sc Scenario, base Transcript) string {
 // Check replays one scenario with c.Bin and compares it with its transcript;
 // the failures come back as data. A scenario that needs a fix the recorded
 // commit lacks is skipped while the new binary is under test.
-func Check(t testing.TB, c Config, sc Scenario) []Failure {
-	t.Helper()
+func Check(tb testing.TB, c Config, sc Scenario) []Failure {
+	tb.Helper()
 	fail := func(field string, err error) []Failure {
 		return []Failure{{Scenario: sc.ID, Field: field, Detail: err.Error()}}
 	}
@@ -112,7 +112,7 @@ func Check(t testing.TB, c Config, sc Scenario) []Failure {
 	}
 	fromRelease := releaseTag.MatchString(base.Ref)
 	if why := hotfixSkipReason(sc, base); why != "" && c.NoGraphQL {
-		t.Skip(why)
+		tb.Skip(why)
 	}
 	allowed, err := LoadAllowed(c.AllowedDiffsFile, scenarioIDs(c.ScenariosDir))
 	if err != nil {
@@ -122,7 +122,7 @@ func Check(t testing.TB, c Config, sc Scenario) []Failure {
 	if err != nil {
 		return fail("scraped", err)
 	}
-	res, err := RunScenario(t, c.Bin, sc, c)
+	res, err := RunScenario(tb, c.Bin, sc, c)
 	if err != nil {
 		return fail("run", err)
 	}
@@ -178,8 +178,9 @@ func Replay(t *testing.T, c Config) {
 }
 
 // withBuild sets the binaries c replays or records with: VCR_BIN, else a build of the repository root.
-func withBuild(t testing.TB, c Config, run []Scenario) (Config, error) {
-	bin, devBin, port, err := BuildNew(t, c, slices.ContainsFunc(run, func(sc Scenario) bool { return sc.Build == "dev" }))
+func withBuild(tb testing.TB, c Config, run []Scenario) (Config, error) {
+	tb.Helper()
+	bin, devBin, port, err := BuildNew(tb, c, slices.ContainsFunc(run, func(sc Scenario) bool { return sc.Build == "dev" }))
 	if err != nil {
 		return c, err
 	}

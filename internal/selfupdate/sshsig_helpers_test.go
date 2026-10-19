@@ -45,18 +45,18 @@ func frame(tag, reason string) string {
 }
 
 // fixture reads a file made with ssh-keygen from testdata.
-func fixture(t testing.TB, name string) []byte {
-	t.Helper()
-	data, err := os.ReadFile(filepath.Join("testdata", name)) //nolint:gosec // the tests name their own fixtures
-	require.NoError(t, err)
+func fixture(tb testing.TB, name string) []byte {
+	tb.Helper()
+	data, err := os.ReadFile(filepath.Join("testdata", name))
+	require.NoError(tb, err)
 	return data
 }
 
 // fixtureKey is the trusted key in a testdata public key file.
-func fixtureKey(t testing.TB, name string) TrustedKey {
-	t.Helper()
-	key, err := ParsePublicKey(string(fixture(t, name)))
-	require.NoError(t, err)
+func fixtureKey(tb testing.TB, name string) TrustedKey {
+	tb.Helper()
+	key, err := ParsePublicKey(string(fixture(tb, name)))
+	require.NoError(tb, err)
 	return key
 }
 
@@ -108,14 +108,14 @@ func armor(blob []byte) []byte {
 }
 
 // decodeBlob is the binary SSHSIG inside an armored signature file.
-func decodeBlob(t testing.TB, armored []byte) []byte {
-	t.Helper()
+func decodeBlob(tb testing.TB, armored []byte) []byte {
+	tb.Helper()
 	lines := strings.Split(strings.TrimSpace(string(armored)), "\n")
-	require.GreaterOrEqual(t, len(lines), 3)
-	require.Equal(t, armorHead, lines[0])
-	require.Equal(t, armorFoot, lines[len(lines)-1])
+	require.GreaterOrEqual(tb, len(lines), 3)
+	require.Equal(tb, armorHead, lines[0])
+	require.Equal(tb, armorFoot, lines[len(lines)-1])
 	blob, err := base64.StdEncoding.DecodeString(strings.Join(lines[1:len(lines)-1], ""))
-	require.NoError(t, err)
+	require.NoError(tb, err)
 	return blob
 }
 
@@ -148,15 +148,15 @@ func validVariant(message []byte) variantOpts {
 }
 
 // signVariant returns the armored SSHSIG that o describes, signed with priv.
-func signVariant(t testing.TB, priv ed25519.PrivateKey, o variantOpts) []byte {
-	t.Helper()
-	return armor(variantBlob(t, priv, o))
+func signVariant(tb testing.TB, priv ed25519.PrivateKey, o variantOpts) []byte {
+	tb.Helper()
+	return armor(variantBlob(tb, priv, o))
 }
 
 // variantBlob is the binary form of signVariant's result. The signature is made over the signed-data blob the
 // way ssh-keygen makes it, with the digest of the algorithm o names (SHA-512 for any name but sha256).
-func variantBlob(t testing.TB, priv ed25519.PrivateKey, o variantOpts) []byte {
-	t.Helper()
+func variantBlob(tb testing.TB, priv ed25519.PrivateKey, o variantOpts) []byte {
+	tb.Helper()
 	var digest []byte
 	if o.hashAlg == "sha256" {
 		sum := sha256.Sum256(o.message)
@@ -193,6 +193,6 @@ func variantBlob(t testing.TB, priv ed25519.PrivateKey, o variantOpts) []byte {
 
 // appendString appends s as an SSH wire string: a big-endian uint32 length, then the bytes.
 func appendString(b, s []byte) []byte {
-	b = binary.BigEndian.AppendUint32(b, uint32(len(s))) //nolint:gosec // test strings are a few bytes long
+	b = binary.BigEndian.AppendUint32(b, uint32(len(s)))
 	return append(b, s...)
 }

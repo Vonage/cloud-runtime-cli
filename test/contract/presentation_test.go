@@ -191,7 +191,7 @@ func replayedSubtests(t *testing.T) map[string]map[string][]string {
 	t.Helper()
 	exe, err := os.Executable()
 	require.NoError(t, err)
-	cmd := exec.Command(exe, "-test.run=^TestReplayOfEachScenarioShape$", "-test.v", "-test.count=1")
+	cmd := exec.CommandContext(t.Context(), exe, "-test.run=^TestReplayOfEachScenarioShape$", "-test.v", "-test.count=1")
 	cmd.Env = append(os.Environ(), legsInnerEnv+"=1")
 	out, err := cmd.CombinedOutput()
 	require.NoError(t, err, string(out))

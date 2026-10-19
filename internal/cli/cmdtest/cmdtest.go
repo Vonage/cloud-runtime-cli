@@ -77,15 +77,15 @@ type Harness struct {
 
 // New builds the environment of a command run over srv. Unless o.NoPlatform it resolves the region the way the
 // root's pre-run does for a full command, then clears the request log of srv, so Requests shows only what happens
-// after New. Setup that cannot work fails t.
-func New(t testing.TB, srv *fakeplatform.Server, o Options) *Harness {
-	t.Helper()
+// after New. Setup that cannot work fails tb.
+func New(tb testing.TB, srv *fakeplatform.Server, o Options) *Harness {
+	tb.Helper()
 	if o.NoCredentials && !o.NoPlatform {
-		t.Fatalf("cmdtest: NoCredentials needs NoPlatform, because the fake rejects an unauthenticated region lookup")
+		tb.Fatalf("cmdtest: NoCredentials needs NoPlatform, because the fake rejects an unauthenticated region lookup")
 		return nil
 	}
 	clk := clocktest.New(startTime)
-	streams := newStreams(t, o, clk)
+	streams := newStreams(tb, o, clk)
 	flags := flagsFor(srv, o)
 	region := o.Region
 	if region == "" {
@@ -94,7 +94,7 @@ func New(t testing.TB, srv *fakeplatform.Server, o Options) *Harness {
 	h := &Harness{
 		Env: &cmdenv.Env{
 			IO:       streams.io,
-			Prompt:   prompterFor(t, streams.io, o),
+			Prompt:   prompterFor(tb, streams.io, o),
 			Clock:    clk,
 			Build:    buildinfo.Info{Version: testVersion, APIVersion: testAPIVersion, ReleaseURL: srv.GitHubURL()},
 			Flags:    &flags,
@@ -109,7 +109,7 @@ func New(t testing.TB, srv *fakeplatform.Server, o Options) *Harness {
 		errScreen: streams.errScreen,
 	}
 	if !o.NoPlatform {
-		connect(t, h, region)
+		connect(tb, h, region)
 	}
 	srv.Reset()
 	return h
@@ -141,25 +141,26 @@ func settingsFor(f config.Flags, region string, noCredentials bool) config.Setti
 	return config.Settings{APIKey: f.APIKey, APISecret: f.APISecret, Region: region}
 }
 
-func prompterFor(t testing.TB, streams *term.IO, o Options) term.Prompter {
+func prompterFor(tb testing.TB, streams *term.IO, o Options) term.Prompter {
+	tb.Helper()
 	if o.RealPrompter {
 		return streams.Prompter()
 	}
 	if script, ok := o.Prompt.(*Script); ok {
-		script.bind(t)
+		script.bind(tb)
 		return script
 	}
 	if o.Prompt != nil {
 		return o.Prompt
 	}
 	script := &Script{}
-	script.bind(t)
+	script.bind(tb)
 	return script
 }
 
 // connect gives h.Env the resolver and the client of region, as the pre-run of a full command does.
-func connect(t testing.TB, h *Harness, region string) {
-	t.Helper()
+func connect(tb testing.TB, h *Harness, region string) {
+	tb.Helper()
 	env := h.Env
 	resolver, err := platform.NewResolver(platform.Options{
 		Bootstrap:  h.Server.DeploymentAPIURL(bootstrapSlug),
@@ -170,13 +171,13 @@ func connect(t testing.TB, h *Harness, region string) {
 		Notices:    env.IO.ErrOut,
 	})
 	if err != nil {
-		t.Fatalf("cmdtest: cannot build the resolver: %v", err)
+		tb.Fatalf("cmdtest: cannot build the resolver: %v", err)
 		return
 	}
 	env.Resolver = resolver
-	client, err := env.RegionClient(t.Context(), region)
+	client, err := env.RegionClient(tb.Context(), region)
 	if err != nil {
-		t.Fatalf("cmdtest: cannot resolve the region %q on the fake platform: %v", region, err)
+		tb.Fatalf("cmdtest: cannot resolve the region %q on the fake platform: %v", region, err)
 		return
 	}
 	env.Client = client
@@ -223,15 +224,15 @@ func Calls(reqs []fakeplatform.Request) []string {
 
 // AppID is the id the fake platform lists for the application called name. Call it before Run: it asks the fake
 // through Env.Client and then clears the request log.
-func (h *Harness) AppID(t testing.TB, name string) string {
-	t.Helper()
-	if !h.hasClient(t) {
+func (h *Harness) AppID(tb testing.TB, name string) string {
+	tb.Helper()
+	if !h.hasClient(tb) {
 		return ""
 	}
 	defer h.Server.Reset()
-	apps, err := h.Env.Client.ListApplications(t.Context(), "")
+	apps, err := h.Env.Client.ListApplications(tb.Context(), "")
 	if err != nil {
-		t.Fatalf("cmdtest: cannot list the applications of the fake platform: %v", err)
+		tb.Fatalf("cmdtest: cannot list the applications of the fake platform: %v", err)
 		return ""
 	}
 	for _, a := range apps {
@@ -239,21 +240,21 @@ func (h *Harness) AppID(t testing.TB, name string) string {
 			return a.ID
 		}
 	}
-	t.Fatalf("cmdtest: the fake platform has no application named %q", name)
+	tb.Fatalf("cmdtest: the fake platform has no application named %q", name)
 	return ""
 }
 
 // InstanceID is the id the fake platform lists for the instance called name. Call it before Run: it asks the fake
 // through Env.Client and then clears the request log.
-func (h *Harness) InstanceID(t testing.TB, name string) string {
-	t.Helper()
-	if !h.hasClient(t) {
+func (h *Harness) InstanceID(tb testing.TB, name string) string {
+	tb.Helper()
+	if !h.hasClient(tb) {
 		return ""
 	}
 	defer h.Server.Reset()
-	instances, err := h.Env.Client.ListInstances(t.Context(), "")
+	instances, err := h.Env.Client.ListInstances(tb.Context(), "")
 	if err != nil {
-		t.Fatalf("cmdtest: cannot list the instances of the fake platform: %v", err)
+		tb.Fatalf("cmdtest: cannot list the instances of the fake platform: %v", err)
 		return ""
 	}
 	for _, in := range instances {
@@ -261,14 +262,14 @@ func (h *Harness) InstanceID(t testing.TB, name string) string {
 			return in.ID
 		}
 	}
-	t.Fatalf("cmdtest: the fake platform has no instance named %q", name)
+	tb.Fatalf("cmdtest: the fake platform has no instance named %q", name)
 	return ""
 }
 
-func (h *Harness) hasClient(t testing.TB) bool {
-	t.Helper()
+func (h *Harness) hasClient(tb testing.TB) bool {
+	tb.Helper()
 	if h.Env.Client == nil {
-		t.Fatalf("cmdtest: the id helpers need a harness with a platform client")
+		tb.Fatalf("cmdtest: the id helpers need a harness with a platform client")
 		return false
 	}
 	return true

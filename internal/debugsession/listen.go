@@ -102,7 +102,7 @@ func (l *Listeners) serve(ctx context.Context, h http.Handler) error {
 		pending--
 		first = serveFailure(err)
 	}
-	stopServer(srv)
+	stopServer(ctx, srv)
 	for ; pending > 0; pending-- {
 		if err := serveFailure(<-results); first == nil {
 			first = err
@@ -133,11 +133,11 @@ func serveFailure(err error) error {
 
 // stopServer waits for running requests and, when they take too long, ends their connections. The session is over
 // either way, so the errors of closing the sockets say nothing that anyone could act on.
-func stopServer(srv *http.Server) {
+func stopServer(ctx context.Context, srv *http.Server) {
 	// The session's context has ended already, so the wait gets one of its own.
-	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+	wait, cancel := context.WithTimeout(context.WithoutCancel(ctx), shutdownTimeout)
 	defer cancel()
-	_ = srv.Shutdown(ctx)
+	_ = srv.Shutdown(wait)
 	_ = srv.Close()
 }
 

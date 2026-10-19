@@ -125,13 +125,13 @@ func TestBodyAppliesTheStringRulesThenCanonicalJSON(t *testing.T) {
 }
 
 func TestPathsNormaliseTheResolvedFormToo(t *testing.T) {
-	real := t.TempDir()
+	target := t.TempDir()
 	via := filepath.Join(t.TempDir(), "via")
-	require.NoError(t, os.Symlink(real, via))
+	require.NoError(t, os.Symlink(target, via))
 	l, err := CreateSandbox(via)
 	require.NoError(t, err)
 	n := NewNormaliser(l, "", 0, 0, nil, nil)
-	resolved, err := filepath.EvalSymlinks(filepath.Join(real, "s", "work"))
+	resolved, err := filepath.EvalSymlinks(filepath.Join(target, "s", "work"))
 	require.NoError(t, err)
 	assert.Equal(t, "boom <WORK>/x", n.Paths("boom "+resolved+"/x"))
 	assert.Equal(t, "boom <WORK>/x", n.Paths("boom "+l.Work+"/x"))

@@ -43,7 +43,7 @@ func (c *Client) UploadSource(ctx context.Context, path string) (sourceCodeKey s
 // uploadOnce makes one attempt: it opens the file afresh, so that a retry sees the file as it is by then, and
 // streams it as the one part of a multipart form.
 func (c *Client) uploadOnce(ctx context.Context, path, boundary string) (string, error) {
-	f, err := os.Open(path) //nolint:gosec // the caller chooses which archive to upload
+	f, err := os.Open(path)
 	if err != nil {
 		return "", err
 	}

@@ -37,7 +37,7 @@ func withBasic(user string) reqOpt {
 	return func(r *fakeplatform.Request) {
 		r.User = user
 		r.Header.Set("Authorization", "Basic dGVzdA==")
-		r.Header.Set("X-Neru-ApiAccountId", user)
+		r.Header.Set("X-Neru-Apiaccountid", user)
 	}
 }
 

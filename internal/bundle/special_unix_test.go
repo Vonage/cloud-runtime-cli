@@ -20,7 +20,7 @@ const fifoDeadline = 10 * time.Second
 
 // releaseFIFO unblocks a reader stuck opening the pipe, so a failing run does not leave a goroutine behind.
 func releaseFIFO(path string) {
-	if w, err := os.OpenFile(path, os.O_WRONLY|syscall.O_NONBLOCK, 0); err == nil { //nolint:gosec // a pipe the test created
+	if w, err := os.OpenFile(path, os.O_WRONLY|syscall.O_NONBLOCK, 0); err == nil {
 		_ = w.Close()
 	}
 }
@@ -79,17 +79,20 @@ func TestVcrignoreThatIsNotAFileIsRefusedWithoutBeingRead(t *testing.T) {
 		set func(t *testing.T, root string) []string
 	}{
 		{"a pipe", func(t *testing.T, root string) []string {
+			t.Helper()
 			pipe := filepath.Join(root, ".vcrignore")
 			require.NoError(t, syscall.Mkfifo(pipe, 0o600))
 			return []string{pipe}
 		}},
 		{"a link to a pipe", func(t *testing.T, root string) []string {
+			t.Helper()
 			pipe := filepath.Join(root, "rules")
 			require.NoError(t, syscall.Mkfifo(pipe, 0o600))
 			symlinkOrSkip(t, "rules", filepath.Join(root, ".vcrignore"))
 			return []string{pipe}
 		}},
 		{"a link to a device that never ends", func(t *testing.T, root string) []string {
+			t.Helper()
 			if _, err := os.Stat("/dev/zero"); err != nil {
 				t.Skip("there is no /dev/zero here")
 			}

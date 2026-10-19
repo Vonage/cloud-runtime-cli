@@ -51,24 +51,24 @@ type fileState struct {
 }
 
 // snapshot records every file of dir.
-func snapshot(t testing.TB, dir string) map[string]fileState {
-	t.Helper()
+func snapshot(tb testing.TB, dir string) map[string]fileState {
+	tb.Helper()
 	entries, err := os.ReadDir(dir)
-	require.NoError(t, err)
+	require.NoError(tb, err)
 	out := make(map[string]fileState, len(entries))
 	for _, e := range entries {
 		info, err := e.Info()
-		require.NoError(t, err)
-		out[e.Name()] = fileState{content: readFile(t, filepath.Join(dir, e.Name())), mode: info.Mode()}
+		require.NoError(tb, err)
+		out[e.Name()] = fileState{content: readFile(tb, filepath.Join(dir, e.Name())), mode: info.Mode()}
 	}
 	return out
 }
 
 // installTarget makes a directory holding a "vcr" file with the content "old" and a mode that is not the default.
-func installTarget(t testing.TB) (dir, target string) {
-	t.Helper()
-	dir = t.TempDir()
-	return dir, writeFile(t, dir, "vcr", "old", 0o750)
+func installTarget(tb testing.TB) (dir, target string) {
+	tb.Helper()
+	dir = tb.TempDir()
+	return dir, writeFile(tb, dir, "vcr", "old", 0o750)
 }
 
 // hostile describes a release host that is served by hand. The zero value is a good release for this platform
@@ -131,10 +131,10 @@ func (h hostile) start(t *testing.T) hostileSite {
 }
 
 // signatureAsset is the name of the signature file of the key the clients of these tests trust.
-func signatureAsset(t testing.TB) string {
-	t.Helper()
+func signatureAsset(tb testing.TB) string {
+	tb.Helper()
 	key, err := ParsePublicKey(fakeplatform.TestPublicKey())
-	require.NoError(t, err)
+	require.NoError(tb, err)
 	return listAsset + "." + key.ID + ".sig"
 }
 

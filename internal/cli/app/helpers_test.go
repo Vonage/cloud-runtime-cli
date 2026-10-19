@@ -31,7 +31,7 @@ func badIDs() []badID {
 		{"slash", "a/b"},
 		{"backslash", `a\b`},
 		{"percent", "a%2Fb"},
-		{"dot dot", ".."},
+		{"double dot", ".."},
 		{"dot", "."},
 		{"over 256 bytes", strings.Repeat("a", 257)},
 		{"control character", "a\x07b"},

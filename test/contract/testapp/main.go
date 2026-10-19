@@ -4,6 +4,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -38,7 +39,8 @@ func run() int {
 		fmt.Fprintln(os.Stderr, "testapp: NERU_APP_PORT (or VCR_PORT) is not set")
 		return 2
 	}
-	ln, err := net.Listen("tcp", ":"+port)
+	var lc net.ListenConfig
+	ln, err := lc.Listen(context.Background(), "tcp", ":"+port)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "testapp:", err)
 		return 1
@@ -124,7 +126,7 @@ func echoWebsocket(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 	for {
 		mt, data, err := conn.ReadMessage()
 		if err != nil {

@@ -27,7 +27,7 @@ var errNoEntrypoint = errors.New("no debug entrypoint found in manifest")
 // "This debug session was taken over by another connection. Stopping." (clierr.Render prints it once, exit 1).
 func Run(ctx context.Context, t *term.IO, clk clock.Clock, api API, cfg Config) error {
 	s := &session{ctx: ctx, tio: t, clk: clk, api: api, cfg: cfg, con: newConsole(t, cfg.Verbose), region: api.Region()}
-	return s.run()
+	return s.run() //nolint:contextcheck // the session keeps ctx in a field, and the teardown runs on a context of its own because Ctrl-C has ended the session's context
 }
 
 // session is one run of Run: what its stages share and what the teardown has to undo.
@@ -67,7 +67,7 @@ func (s *session) run() error {
 		return err
 	}
 	s.ls = ls
-	defer ls.Close()
+	defer func() { _ = ls.Close() }()
 
 	setup, cancelSetup := context.WithTimeout(s.ctx, s.cfg.Timeout)
 	defer cancelSetup()

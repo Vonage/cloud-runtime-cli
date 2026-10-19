@@ -3,27 +3,132 @@ name: CI-Pipeline
 on:
   workflow_dispatch: {}
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, labeled, unlabeled] # the labels are read by the govulncheck job
 
-permissions:
-  actions: write
-  checks: write
-  contents: read
-  deployments: read
-  issues: write
-  discussions: write
-  packages: read
-  pages: write
-  pull-requests: write
-  security-events: write
-  statuses: write
+permissions: {}
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  API_VERSION: ${{ vars.API_VERSION || 'v0.3' }}
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions: { contents: read }
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { persist-credentials: false }
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with: { go-version-file: go.mod, cache: true }
+      - run: make lint
+
+  test:
+    name: test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    permissions: { contents: read }
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { persist-credentials: false }
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with: { go-version-file: go.mod, cache: true }
+      - name: Test # the one command of `make test`; Windows runners may lack make, and the harness compiles to nothing there (unit tests only)
+        shell: bash
+        run: go test -race ./...
+
+  govulncheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions: { contents: read }
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { persist-credentials: false }
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with: { go-version-file: go.mod, cache: true }
+      - id: scan
+        continue-on-error: true
+        run: make vulncheck
+      - name: Fail unless overridden
+        if: steps.scan.outcome == 'failure' && !contains(github.event.pull_request.labels.*.name, 'vulncheck-override')
+        run: |
+          echo "govulncheck found vulnerabilities. Fix them, or add the vulncheck-override label and say why in a comment."
+          exit 1
+
+  contract: # ubuntu only: the harness is Unix-only (`//go:build !windows`); macOS is optional
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions: { contents: read }
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { persist-credentials: false }
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with: { go-version-file: go.mod, cache: true }
+      - run: make contract
+      - run: make contract-rich
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions: { contents: read }
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { persist-credentials: false }
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with: { go-version-file: go.mod, cache: true }
+      - name: Cross compile the five targets
+        run: |
+          [ -n "$API_VERSION" ] || { echo "API_VERSION is empty"; exit 1; }
+          make build-all VERSION="ci-$GITHUB_SHA"
+      - name: Check every binary was built from a clean tree with -trimpath
+        run: |
+          for f in dist/*; do
+            go version -m "$f" | grep -q 'vcs.modified=false' || { echo "$f: tree was modified"; exit 1; }
+            go version -m "$f" | grep -q -e '-trimpath=true' || { echo "$f: not built with -trimpath"; exit 1; }
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with: { name: dist, path: dist/, retention-days: 1 }
+
+  smoke:
+    name: smoke (${{ matrix.file }})
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: ubuntu-latest, file: vcr_linux_amd64 }
+          - { runner: ubuntu-24.04-arm, file: vcr_linux_arm64 }
+          - { runner: macos-latest, file: vcr_darwin_arm64 }
+          - { runner: macos-15-intel, file: vcr_darwin_amd64 }
+          - { runner: windows-latest, file: vcr_windows_amd64.exe }
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    permissions: { contents: read }
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with: { name: dist, path: dist }
+      - name: vcr --version
+        shell: bash
+        run: |
+          chmod +x "dist/${{ matrix.file }}" || true
+          out="$("dist/${{ matrix.file }}" --version)"; echo "$out"
+          case "$out" in "vcr-cli version ci-"*) ;; *) echo "unexpected version output"; exit 1 ;; esac
+
   test-install-using-action:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions: { contents: read }
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { persist-credentials: false }
       - name: Install Cloud Runtime CLI
         uses: ./
       - name: Verify installation
@@ -31,65 +136,14 @@ jobs:
 
   test-install-using-script:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions: { contents: read }
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { persist-credentials: false }
       - name: Install Cloud Runtime CLI
         shell: sh
         run: ./script/install.sh
       - name: Verify installation
         run: vcr --version
-
-  unit-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.25.5'
-          cache: true
-
-      - name: Run unit tests
-        run: make test
-
-  contract:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.25.5'
-          cache: true
-
-      - name: Run contract tests
-        run: make contract PORTED=version
-
-  build:
-    runs-on: ubuntu-latest
-    env:
-      API_VERSION: ${{ vars.API_VERSION || 'v0.4' }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.25.5'
-          cache: true
-
-      - name: Cross compile binaries
-        env:
-          GO_LDFLAGS: "-s -w -X 'main.apiVersion=${{env.API_VERSION}}' -X 'main.version=${{github.ref_name}}' -X 'main.buildDate=${{github.event.repository.updated_at}}' -X 'main.commit=${{github.sha}}' -X 'main.releaseURL=https://api.github.com/repos/${{github.repository}}'"
-        run: |
-          GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_darwin_amd64 .
-          GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_darwin_arm64 .
-          GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_linux_arm64 .
-          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_linux_amd64 .
-          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_windows_amd64.exe .

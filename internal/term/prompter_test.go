@@ -194,7 +194,7 @@ func TestYesNo(t *testing.T) {
 		{name: "blank lines ask again", stdin: "\n\nn\n", want: false, wantPrompts: 3},
 		{name: "yes spelled out asks again", stdin: "yes\ny\n", want: true, wantPrompts: 2},
 		{name: "upper case asks again", stdin: "Y\nn\n", want: false, wantPrompts: 2},
-		{name: "two fields ask again", stdin: "y n\nn\n", want: false, wantPrompts: 2},
+		{name: "two fields ask again", stdin: "y x\nn\n", want: false, wantPrompts: 2},
 		{name: "surrounding spaces are ignored", stdin: "  y  \n", want: true, wantPrompts: 1},
 		{name: "carriage return line ending", stdin: "y\r\n", want: true, wantPrompts: 1},
 		{name: "last line without a newline counts", stdin: "y", want: true, wantPrompts: 1},

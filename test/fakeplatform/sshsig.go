@@ -87,7 +87,7 @@ func publicKeyBlob(pub ed25519.PublicKey) []byte {
 
 // appendString appends s as an SSH wire string: its length as a big-endian uint32, then its bytes.
 func appendString(b, s []byte) []byte {
-	b = binary.BigEndian.AppendUint32(b, uint32(len(s)))
+	b = binary.BigEndian.AppendUint32(b, uint32(len(s))) //nolint:gosec // test strings are a few bytes long
 	return append(b, s...)
 }
 

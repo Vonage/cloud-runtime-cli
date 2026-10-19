@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	headerTraceID     = "X-Neru-TraceId"
-	headerAccountID   = "X-Neru-ApiAccountId"
+	headerTraceID     = "X-Neru-Traceid"
+	headerAccountID   = "X-Neru-Apiaccountid"
 	headerContentType = "Content-Type"
 	traceID           = "fake-trace-id"
 	mediaJSON         = "application/json"
@@ -29,7 +29,7 @@ const (
 	codeInvalidQuery        = 3006
 	codeUpstream            = 9001
 
-	msgInvalidCredentials  = "invalid credentials"
+	msgUnauthorized        = "invalid credentials"
 	msgApplicationNotFound = "application not found"
 	msgRegionNotFound      = "region not found"
 	msgInstanceNotFound    = "instance not found"
@@ -65,7 +65,7 @@ func writeRaw(rw http.ResponseWriter, status int, contentType string, body []byt
 		rw.Header().Set(headerContentType, contentType)
 	}
 	rw.WriteHeader(status)
-	_, _ = rw.Write(body)
+	_, _ = rw.Write(body) //nolint:gosec // the fake answers with the bytes its caller chose
 }
 
 func marshalString(v any) (string, error) {

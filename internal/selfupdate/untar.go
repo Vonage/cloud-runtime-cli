@@ -29,7 +29,7 @@ func extractSingle(archive []byte, dst io.Writer, limit int64) error {
 	if err != nil {
 		return &archiveError{cause: err}
 	}
-	defer zr.Close()
+	defer func() { _ = zr.Close() }()
 
 	tr := tar.NewReader(zr)
 	hdr, err := tr.Next()

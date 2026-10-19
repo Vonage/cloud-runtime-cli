@@ -63,7 +63,7 @@ func writeFileMode(p string, data []byte, mode os.FileMode) error {
 	if err := os.MkdirAll(filepath.Dir(p), dirMode); err != nil {
 		return err
 	}
-	if err := os.WriteFile(p, data, mode); err != nil {
+	if err := os.WriteFile(p, data, mode); err != nil { //nolint:gosec // every caller passes a path that inside() resolved below the sandbox root
 		return err
 	}
 	return os.Chmod(p, mode)
@@ -87,7 +87,7 @@ func (l Layout) materialiseOne(f FileSpec, contractDir string, expand func(strin
 	}
 	mode := fileMode
 	if f.Mode != nil {
-		mode = os.FileMode(*f.Mode).Perm()
+		mode = os.FileMode(*f.Mode & 0o777)
 	}
 	switch {
 	case f.Type == fileTypeDir:

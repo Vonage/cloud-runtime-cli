@@ -3,6 +3,7 @@
 package contract
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -50,7 +51,7 @@ func startPTY(exe string, sc Scenario, l Layout, env []string) (*proc, error) {
 	if err != nil {
 		return nil, err
 	}
-	cmd := exec.Command(exe, sc.Args...)
+	cmd := exec.CommandContext(context.Background(), exe, sc.Args...) //nolint:gosec // the harness starts the binary under test
 	cmd.Dir, cmd.Env = dir, env
 	master, err := pty.StartWithSize(cmd, &pty.Winsize{Rows: termRows, Cols: termCols})
 	if err != nil {

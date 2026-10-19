@@ -37,8 +37,14 @@ func (s routeServer) only(t *testing.T) seen {
 	return reqs[0]
 }
 
-// requireAPIError asserts that err carries a *clierr.APIError of the given status and returns it.
-func requireAPIError(t *testing.T, err error, status int) *clierr.APIError {
+// requireAPIError asserts that err carries a *clierr.APIError of the given status.
+func requireAPIError(t *testing.T, err error, status int) {
+	t.Helper()
+	_ = apiErrorWithStatus(t, err, status)
+}
+
+// apiErrorWithStatus asserts that err carries a *clierr.APIError of the given status and returns it.
+func apiErrorWithStatus(t *testing.T, err error, status int) *clierr.APIError {
 	t.Helper()
 	var apiErr *clierr.APIError
 	require.ErrorAs(t, err, &apiErr)

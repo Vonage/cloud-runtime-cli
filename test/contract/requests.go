@@ -150,7 +150,7 @@ func authOf(r fakeplatform.Request) string {
 func renderRequest(r fakeplatform.Request) string {
 	var b strings.Builder
 	b.WriteString(requestHead(r) + "\n")
-	acct := r.Header.Get("X-Neru-ApiAccountId")
+	acct := r.Header.Get("X-Neru-Apiaccountid")
 	if acct == "" {
 		acct = valueNone
 	}

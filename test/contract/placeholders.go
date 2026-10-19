@@ -73,12 +73,16 @@ const holdAttempts = 20
 func listenEverywhere() ([]net.Listener, int, error) {
 	var lastErr error
 	for attempt := 0; attempt < holdAttempts; attempt++ {
-		loopback, err := net.Listen("tcp", "127.0.0.1:0")
+		loopback, err := listen("tcp", "127.0.0.1:0")
 		if err != nil {
 			return nil, 0, err
 		}
-		port := loopback.Addr().(*net.TCPAddr).Port
-		wildcard, err := net.Listen("tcp", ":"+strconv.Itoa(port))
+		port, err := listenerPort(loopback)
+		if err != nil {
+			_ = loopback.Close()
+			return nil, 0, err
+		}
+		wildcard, err := listen("tcp", ":"+strconv.Itoa(port))
 		if err == nil {
 			return []net.Listener{loopback, wildcard}, port, nil
 		}

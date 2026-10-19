@@ -109,7 +109,7 @@ func vcrignoreContent(fsys fs.FS) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	data, err := io.ReadAll(io.LimitReader(f, maxVcrignoreBytes+1))
 	if err != nil {
 		return nil, err

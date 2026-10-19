@@ -99,9 +99,9 @@ func TestProjectDirStatError(t *testing.T) {
 	locked := filepath.Join(t.TempDir(), "locked")
 	typed := filepath.Join(locked, "inner")
 	require.NoError(t, os.MkdirAll(typed, 0o750))
-	require.NoError(t, os.Chmod(locked, 0)) //nolint:gosec // takes the search permission away
+	require.NoError(t, os.Chmod(locked, 0))
 	t.Cleanup(func() {
-		assert.NoError(t, os.Chmod(locked, 0o700)) //nolint:gosec // a directory needs its search bit back to be removed
+		assert.NoError(t, os.Chmod(locked, 0o700))
 	})
 
 	got, err := manifest.ProjectDir(typed)

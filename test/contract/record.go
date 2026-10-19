@@ -35,7 +35,7 @@ func Record(t *testing.T, c Config) {
 		t.Log("no scenarios selected")
 		return
 	}
-	if err := os.MkdirAll(c.TranscriptsDir, 0o755); err != nil {
+	if err := os.MkdirAll(c.TranscriptsDir, 0o755); err != nil { //nolint:gosec // the transcripts are committed files, so they stay readable
 		t.Fatal(err)
 	}
 	for _, sc := range run {
@@ -53,7 +53,7 @@ func Record(t *testing.T, c Config) {
 			if len(out.Problems) > 0 {
 				return
 			}
-			if err := os.WriteFile(transcriptPath(c, sc.ID), []byte(out.Transcript.Format()), 0o644); err != nil {
+			if err := os.WriteFile(transcriptPath(c, sc.ID), []byte(out.Transcript.Format()), 0o644); err != nil { //nolint:gosec // the transcripts are committed files, so they stay readable
 				t.Fatal(err)
 			}
 		})
@@ -63,13 +63,13 @@ func Record(t *testing.T, c Config) {
 // recordScenario runs a scenario twice with bin and checks what the recording
 // needs: the two runs agree, a fenced scenario hit the fence, the scrape names
 // match the output.
-func recordScenario(t testing.TB, bin string, sc Scenario, c Config, scrapes []Scraped) (RecordOutcome, error) {
-	t.Helper()
-	first, err := RunScenario(t, bin, sc, c)
+func recordScenario(tb testing.TB, bin string, sc Scenario, c Config, scrapes []Scraped) (RecordOutcome, error) {
+	tb.Helper()
+	first, err := RunScenario(tb, bin, sc, c)
 	if err != nil {
 		return RecordOutcome{}, err
 	}
-	second, err := RunScenario(t, bin, sc, c)
+	second, err := RunScenario(tb, bin, sc, c)
 	if err != nil {
 		return RecordOutcome{}, err
 	}
@@ -140,14 +140,14 @@ func RecordRich(t *testing.T, c Config) {
 
 // recordRichScenario runs a scenario twice with bin and checks that the two rich screens, after the normaliser and the
 // removal of durations, are the same.
-func recordRichScenario(t testing.TB, bin string, sc Scenario, c Config) (richRecording, error) {
-	t.Helper()
+func recordRichScenario(tb testing.TB, bin string, sc Scenario, c Config) (richRecording, error) {
+	tb.Helper()
 	c.Rich = true
-	first, err := RunScenario(t, bin, sc, c)
+	first, err := RunScenario(tb, bin, sc, c)
 	if err != nil {
 		return richRecording{}, err
 	}
-	second, err := RunScenario(t, bin, sc, c)
+	second, err := RunScenario(tb, bin, sc, c)
 	if err != nil {
 		return richRecording{}, err
 	}

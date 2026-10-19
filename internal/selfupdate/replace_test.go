@@ -21,11 +21,11 @@ const tempPrefix = ".vcr-upgrade-"
 var errInjected = errors.New("injected failure")
 
 // writeFile creates dir/name with content and mode.
-func writeFile(t testing.TB, dir, name, content string, mode os.FileMode) string {
-	t.Helper()
+func writeFile(tb testing.TB, dir, name, content string, mode os.FileMode) string {
+	tb.Helper()
 	path := filepath.Join(dir, name)
-	require.NoError(t, os.WriteFile(path, []byte(content), mode))
-	require.NoError(t, os.Chmod(path, mode))
+	require.NoError(tb, os.WriteFile(path, []byte(content), mode))
+	require.NoError(tb, os.Chmod(path, mode))
 	return path
 }
 
@@ -37,10 +37,10 @@ func writing(content string) func(io.Writer) error {
 }
 
 // names lists the entries of dir.
-func names(t testing.TB, dir string) []string {
-	t.Helper()
+func names(tb testing.TB, dir string) []string {
+	tb.Helper()
 	entries, err := os.ReadDir(dir)
-	require.NoError(t, err)
+	require.NoError(tb, err)
 	out := make([]string, 0, len(entries))
 	for _, e := range entries {
 		out = append(out, e.Name())
@@ -49,10 +49,10 @@ func names(t testing.TB, dir string) []string {
 	return out
 }
 
-func readFile(t testing.TB, path string) string {
-	t.Helper()
-	data, err := os.ReadFile(path) //nolint:gosec // the tests read files they made
-	require.NoError(t, err)
+func readFile(tb testing.TB, path string) string {
+	tb.Helper()
+	data, err := os.ReadFile(path)
+	require.NoError(tb, err)
 	return string(data)
 }
 
@@ -185,10 +185,10 @@ func TestPermissionsOfKeepsWhatTheFileHas(t *testing.T) {
 	}
 }
 
-func mkdir(t testing.TB, parent, name string) string {
-	t.Helper()
+func mkdir(tb testing.TB, parent, name string) string {
+	tb.Helper()
 	path := filepath.Join(parent, name)
-	require.NoError(t, os.Mkdir(path, 0o750))
+	require.NoError(tb, os.Mkdir(path, 0o750))
 	return path
 }
 

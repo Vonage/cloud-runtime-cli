@@ -36,7 +36,7 @@ type archiver struct {
 
 func (a *archiver) add(e Entry, hdr *tar.Header, f fs.File) error {
 	if f != nil {
-		defer f.Close()
+		defer func() { _ = f.Close() }()
 	}
 	if err := a.tw.WriteHeader(hdr); err != nil {
 		return addError(e.Path, err)

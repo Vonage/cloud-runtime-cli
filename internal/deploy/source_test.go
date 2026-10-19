@@ -20,7 +20,7 @@ const failedToCompress = "failed to compress and upload file: failed to compress
 func writeTgz(t *testing.T, dir, name string) string {
 	t.Helper()
 	path := filepath.Join(dir, "app.tar.gz")
-	f, err := os.Create(path) //nolint:gosec // a path in the test's own directory
+	f, err := os.Create(path)
 	require.NoError(t, err)
 	zw := gzip.NewWriter(f)
 	tw := tar.NewWriter(zw)
@@ -72,12 +72,19 @@ func TestRunTgzPathIsUsedAsTyped(t *testing.T) {
 
 func TestRunTgzErrors(t *testing.T) {
 	notGzip := func(t *testing.T) string {
+		t.Helper()
 		path := filepath.Join(t.TempDir(), "plain.tgz")
 		require.NoError(t, os.WriteFile(path, []byte("hello"), 0o600))
 		return path
 	}
-	missing := func(t *testing.T) string { return filepath.Join(t.TempDir(), "gone.tgz") }
-	valid := func(t *testing.T) string { return writeTgz(t, t.TempDir(), "packed.js") }
+	missing := func(t *testing.T) string {
+		t.Helper()
+		return filepath.Join(t.TempDir(), "gone.tgz")
+	}
+	valid := func(t *testing.T) string {
+		t.Helper()
+		return writeTgz(t, t.TempDir(), "packed.js")
+	}
 
 	tests := []struct {
 		name      string
@@ -95,7 +102,7 @@ func TestRunTgzErrors(t *testing.T) {
 			name: "a file that is not there",
 			path: missing,
 			want: func(path string) string {
-				_, err := os.Open(path) //nolint:gosec // the path is in the test's directory
+				_, err := os.Open(path)
 				return fmt.Sprintf("unable to read compressed file %q: %v", path, err)
 			},
 		},
@@ -190,7 +197,7 @@ func TestRunWarningsAreDroppedWhenCompressFails(t *testing.T) {
 	blocked := filepath.Join(h.plan.ProjectDir, "z-blocked")
 	require.NoError(t, os.Mkdir(blocked, 0o750))
 	require.NoError(t, os.Chmod(blocked, 0))
-	t.Cleanup(func() { _ = os.Chmod(blocked, 0o750) }) //nolint:gosec // a directory needs its search bit back to be removed
+	t.Cleanup(func() { _ = os.Chmod(blocked, 0o750) })
 	tmp := tempDirHolder(t)
 
 	err := h.run()

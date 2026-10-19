@@ -10,12 +10,12 @@ import (
 
 // verifySigned verifies a list that was just signed with the harness's trusted key, so a test can shape
 // checksums.txt freely and only the list can make the verification fail.
-func verifySigned(t testing.TB, list, tag, asset string) (string, error) {
-	t.Helper()
+func verifySigned(tb testing.TB, list, tag, asset string) (string, error) {
+	tb.Helper()
 	priv := harnessTrustedKey()
 	key := trustedKeyOf(priv)
 	data := []byte(list)
-	sig := signVariant(t, priv, validVariant(data))
+	sig := signVariant(tb, priv, validVariant(data))
 	return Verify(data, map[string][]byte{key.ID: sig}, tag, asset, []TrustedKey{key})
 }
 

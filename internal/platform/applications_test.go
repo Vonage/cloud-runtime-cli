@@ -140,7 +140,7 @@ func TestCreateApplicationFailureIsAnAPIError(t *testing.T) {
 
 			_, err := s.client.CreateApplication(t.Context(), "my app", true, true, true)
 
-			apiErr := requireAPIError(t, err, status)
+			apiErr := apiErrorWithStatus(t, err, status)
 			assert.Equal(t, 4001, apiErr.ServerCode)
 			assert.Equal(t, "nope", apiErr.Message)
 			assert.NotErrorIs(t, err, ErrNotFound)

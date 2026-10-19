@@ -33,7 +33,7 @@ func chunked(n int) http.HandlerFunc {
 			if _, err := w.Write(part); err != nil {
 				return
 			}
-			w.(http.Flusher).Flush()
+			_ = http.NewResponseController(w).Flush()
 		}
 	}
 }
@@ -94,7 +94,7 @@ func TestGetEnforcesTheLimitTwice(t *testing.T) {
 		srv, _ := serve(t, func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Length", strconv.Itoa(limit+1))
 			w.WriteHeader(http.StatusOK)
-			w.(http.Flusher).Flush()
+			_ = http.NewResponseController(w).Flush()
 			select {
 			case <-r.Context().Done():
 			case <-time.After(10 * time.Second):

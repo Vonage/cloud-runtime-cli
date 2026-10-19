@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -96,7 +95,7 @@ func startProc(exe string, sc Scenario, l Layout, env []string) (*proc, error) {
 	if err != nil {
 		return nil, err
 	}
-	p := &proc{cmd: exec.Command(exe, sc.Args...), done: make(chan struct{})}
+	p := &proc{cmd: exec.CommandContext(context.Background(), exe, sc.Args...), done: make(chan struct{})} //nolint:gosec // the harness starts the binary under test
 	p.cmd.Dir, p.cmd.Env = dir, env
 	p.cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	p.cmd.Stdout, p.cmd.Stderr = &p.out, &p.err
@@ -213,7 +212,7 @@ func RequirementUnmet(req string) string {
 			return "the scenario needs a user other than root"
 		}
 	case "ipv6":
-		ln, err := net.Listen("tcp6", "[::1]:0")
+		ln, err := listen("tcp6", "[::1]:0")
 		if err != nil {
 			return "the scenario needs an IPv6 loopback address"
 		}
@@ -238,7 +237,7 @@ func copyExecutable(src, dst string) error {
 	if err := os.MkdirAll(filepath.Dir(dst), dirMode); err != nil {
 		return err
 	}
-	out, err := os.OpenFile(dst, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o755)
+	out, err := os.OpenFile(dst, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o755) //nolint:gosec // the copy of the binary under test has to be executable
 	if err != nil {
 		return err
 	}
@@ -249,7 +248,7 @@ func copyExecutable(src, dst string) error {
 	if err := out.Close(); err != nil {
 		return err
 	}
-	return os.Chmod(dst, 0o755)
+	return os.Chmod(dst, 0o755) //nolint:gosec // the copy of the binary under test has to be executable
 }
 
 // unescapeSend turns the escapes of a send step into the bytes they stand for:

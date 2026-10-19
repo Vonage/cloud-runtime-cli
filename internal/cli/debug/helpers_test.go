@@ -210,7 +210,7 @@ func writeProject(t *testing.T, name, manifestText string) string {
 // execute runs `debug <args>` under ctx and returns its error. The streams stay the fixture's.
 func (f *fixture) execute(ctx context.Context, args ...string) error {
 	f.t.Helper()
-	cmd := newCmd(f.env, f.rec.run)
+	cmd := newCmd(f.env, f.rec.run) //nolint:contextcheck // building the command needs no context: cobra hands it one when it runs
 	cmd.SilenceUsage, cmd.SilenceErrors = true, true
 	cmd.SetOut(io.Discard)
 	cmd.SetErr(io.Discard)

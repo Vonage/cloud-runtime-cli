@@ -18,6 +18,7 @@ const settle = 50 * time.Millisecond
 
 func TestWatchBuildCancelEndsBlockedRead(t *testing.T) {
 	forEachTransport(t, func(t *testing.T, useTLS bool) {
+		t.Helper()
 		srv := scriptedWatchServer(t, useTLS, serveThenHold("first"))
 		c, _ := watchClient(t, srv)
 		ctx, cancel := context.WithCancel(t.Context())

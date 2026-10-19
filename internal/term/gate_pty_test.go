@@ -95,7 +95,7 @@ func childEnv(t *testing.T, extra ...string) []string {
 
 func helperCommand(t *testing.T, helper string, env []string) *exec.Cmd {
 	t.Helper()
-	cmd := exec.CommandContext(t.Context(), os.Args[0], "-test.run=^"+helper+"$") //nolint:gosec // the test runs its own binary again
+	cmd := exec.CommandContext(t.Context(), os.Args[0], "-test.run=^"+helper+"$")
 	cmd.Env = env
 	return cmd
 }

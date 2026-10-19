@@ -105,7 +105,7 @@ func writeRichGolden(c Config, id string, g RichGolden) error {
 	if err := os.MkdirAll(c.RichDir, dirMode); err != nil {
 		return err
 	}
-	return os.WriteFile(richGoldenPath(c, id), []byte(g.Format()), 0o644)
+	return os.WriteFile(richGoldenPath(c, id), []byte(g.Format()), 0o644) //nolint:gosec // the goldens are committed files, so they stay readable
 }
 
 // normaliseRichDurations removes every duration token of a resolved line together with the two spaces before it, so
@@ -177,8 +177,8 @@ func (r *richResult) fail(sc Scenario, field, detail string) {
 
 // checkRich replays the rich leg of a scenario with c.Bin and compares the screen and the exit with the golden, and
 // the files, requests and reads with the baseline transcript. The rich leg only exists for the binary under test.
-func checkRich(t testing.TB, c Config, sc Scenario) richResult {
-	t.Helper()
+func checkRich(tb testing.TB, c Config, sc Scenario) richResult {
+	tb.Helper()
 	c.Rich = true
 	out := richResult{Skipped: map[string]string{}}
 	golden, goldenErr := loadRichGolden(c, sc.ID)
@@ -201,7 +201,7 @@ func checkRich(t testing.TB, c Config, sc Scenario) richResult {
 		out.Skipped[richFiles], out.Skipped[richRequests] = why, why
 	}
 
-	res, err := RunScenario(t, c.Bin, sc, c)
+	res, err := RunScenario(tb, c.Bin, sc, c)
 	if err != nil {
 		out.fail(sc, "rich/run", err.Error())
 		return out

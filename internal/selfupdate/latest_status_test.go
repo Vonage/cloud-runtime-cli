@@ -191,7 +191,7 @@ func TestLatestErrorShowsTheTraceIDOfTheAnswer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			srv, _ := serve(t, func(w http.ResponseWriter, _ *http.Request) {
 				for _, v := range tt.header {
-					w.Header().Set("X-Neru-TraceId", v)
+					w.Header().Set("X-Neru-Traceid", v)
 				}
 				w.WriteHeader(http.StatusInternalServerError)
 				_, _ = io.WriteString(w, "unavailable")

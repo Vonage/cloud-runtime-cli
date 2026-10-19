@@ -134,41 +134,44 @@ func serving(w *world, act func()) {
 }
 
 var causeCases = []causeCase{
-	{"Ctrl-C while serving", true, func(t *testing.T, w *world) { serving(w, w.cancel) }},
-	{"Ctrl-C while waiting for the service", true, func(t *testing.T, w *world) {
+	{"Ctrl-C while serving", true, func(_ *testing.T, w *world) { serving(w, w.cancel) }},
+	{"Ctrl-C while waiting for the service", true, func(_ *testing.T, w *world) {
 		w.setup.api.ready = []bool{false}
 		w.clk = &cancelingClock{Fake: w.setup.clk, cancel: w.cancel}
 	}},
-	{"Ctrl-C while deploying", false, func(t *testing.T, w *world) {
+	{"Ctrl-C while deploying", false, func(_ *testing.T, w *world) {
 		w.setup.api.onDeploy = func(c deployCall) error {
 			w.cancel()
 			return c.Ctx.Err()
 		}
 	}},
-	{"no entrypoint", false, func(t *testing.T, w *world) { w.setup.cfg.Manifest.Debug.Entrypoint = nil }},
+	{"no entrypoint", false, func(_ *testing.T, w *world) { w.setup.cfg.Manifest.Debug.Entrypoint = nil }},
 	{"an environment variable that is not exported", false, func(t *testing.T, w *world) {
+		t.Helper()
 		t.Setenv(missingSecret, "")
 		w.setup.cfg.Manifest.Debug.Environment = []manifest.Env{{Name: "A", Secret: missingSecret}}
 	}},
 	{"the port of the debugger is taken", false, func(t *testing.T, w *world) {
+		t.Helper()
 		listenOn(t, "tcp4", debuggerAddress(w.setup.cfg))
 	}},
-	{"the deploy call fails", false, func(t *testing.T, w *world) { w.setup.api.deployErr = errors.New("boom") }},
-	{"the service never gets ready", false, func(t *testing.T, w *world) { w.setup.api.readyErr = errors.New("boom") }},
-	{"the host cannot be turned into URLs", false, func(t *testing.T, w *world) {
+	{"the deploy call fails", false, func(_ *testing.T, w *world) { w.setup.api.deployErr = errors.New("boom") }},
+	{"the service never gets ready", false, func(_ *testing.T, w *world) { w.setup.api.readyErr = errors.New("boom") }},
+	{"the host cannot be turned into URLs", false, func(_ *testing.T, w *world) {
 		w.setup.api.region.HostTemplate = "ftp://{{.ServiceName}}.example.test"
 	}},
 	{"the app does not start", false, func(t *testing.T, w *world) {
+		t.Helper()
 		w.setup.cfg.Manifest.Debug.Entrypoint = []string{filepath.Join(t.TempDir(), "no-such-program")}
 	}},
-	{"the tunnel cannot connect", true, func(t *testing.T, w *world) { w.setup.peer.stopListening() }},
-	{"the tunnel is closed normally", true, func(t *testing.T, w *world) {
+	{"the tunnel cannot connect", true, func(_ *testing.T, w *world) { w.setup.peer.stopListening() }},
+	{"the tunnel is closed normally", true, func(_ *testing.T, w *world) {
 		serving(w, func() { w.setup.peer.closeWith(1000, "") })
 	}},
-	{"the tunnel is taken over", true, func(t *testing.T, w *world) {
+	{"the tunnel is taken over", true, func(_ *testing.T, w *world) {
 		serving(w, func() { w.setup.peer.closeWith(1008, "taken over") })
 	}},
-	{"the delete fails after an earlier error", false, func(t *testing.T, w *world) {
+	{"the delete fails after an earlier error", false, func(_ *testing.T, w *world) {
 		w.setup.api.readyErr = errors.New("boom")
 		w.setup.api.deleteErr = errors.New("delete failed")
 	}},

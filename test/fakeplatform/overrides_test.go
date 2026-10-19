@@ -44,7 +44,7 @@ func TestOverrideStatusBodyHeaders(t *testing.T) {
 	assert.JSONEq(t, `{"error":{"code":1001,"message":"boom","containerLogs":"app crashed"}}`, string(r.body))
 	assert.Equal(t, "application/json", r.header.Get("Content-Type"))
 	assert.Equal(t, "yes", r.header.Get("X-Test"))
-	assert.Equal(t, "fake-trace-id", r.header.Get("X-Neru-TraceId"))
+	assert.Equal(t, "fake-trace-id", r.header.Get("X-Neru-Traceid"))
 
 	for _, c := range []struct{ method, rel string }{
 		{http.MethodDelete, "/applications/" + fixtureID(601)},
@@ -135,7 +135,7 @@ func TestOverrideHangEndsWhenClientGivesUp(t *testing.T) {
 func TestOverrideCloseDropsConnection(t *testing.T) {
 	s := started(t, "overrides: [{match: POST /secrets, close: true}]\n")
 	client := &http.Client{Transport: &http.Transport{DisableKeepAlives: true}, Timeout: 5 * time.Second}
-	req, err := http.NewRequest(http.MethodPost, s.DeploymentAPIURL("euw1")+"/v0.3/secrets", strings.NewReader(`{"secrets":[]}`))
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodPost, s.DeploymentAPIURL("euw1")+"/v0.3/secrets", strings.NewReader(`{"secrets":[]}`))
 	require.NoError(t, err)
 	resp, err := client.Do(req)
 	if resp != nil {

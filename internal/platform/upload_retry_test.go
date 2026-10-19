@@ -131,7 +131,7 @@ func TestUploadRetriesWhenTheServerClosesMidBody(t *testing.T) {
 func TestUploadReopensTheFileOnEveryAttempt(t *testing.T) {
 	path, _ := writeArchive(t, 8<<10)
 	replacement, _ := writeArchive(t, 24<<10)
-	newContent, err := os.ReadFile(replacement) //nolint:gosec // the test wrote this file
+	newContent, err := os.ReadFile(replacement)
 	require.NoError(t, err)
 	swapThenHangUp := func(w http.ResponseWriter, r *http.Request) {
 		assert.NoError(t, os.WriteFile(path, newContent, 0o600))
@@ -183,7 +183,7 @@ func TestUploadDoesNotRetryOtherStatuses(t *testing.T) {
 
 			_, err := s.client.UploadSource(t.Context(), path)
 
-			apiErr := requireAPIError(t, err, status)
+			apiErr := apiErrorWithStatus(t, err, status)
 			assert.Equal(t, "no", apiErr.Message)
 			assert.Equal(t, 1, s.rec.count())
 			assert.Empty(t, s.clock.Sleeps())
@@ -198,7 +198,7 @@ func TestUploadGivesUpAfterThreeRetries(t *testing.T) {
 
 	_, err := s.client.UploadSource(t.Context(), path)
 
-	apiErr := requireAPIError(t, err, http.StatusServiceUnavailable)
+	apiErr := apiErrorWithStatus(t, err, http.StatusServiceUnavailable)
 	assert.Equal(t, "busy", apiErr.Message, "the last answer comes back unchanged")
 	assert.Equal(t, 4, s.rec.count())
 	requireDelays(t, s.clock.Sleeps(), time.Second, 2*time.Second, 4*time.Second)

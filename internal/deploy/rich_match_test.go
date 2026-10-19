@@ -109,6 +109,7 @@ func failures() []failure {
 		{
 			name: "nothing to upload",
 			plan: func(t *testing.T, p *Plan) {
+				t.Helper()
 				p.ProjectDir = t.TempDir()
 				writeFile(t, p.ProjectDir, ".vcrignore", "ignored.txt\n")
 				writeFile(t, p.ProjectDir, "ignored.txt", "left out\n")
@@ -129,13 +130,19 @@ func failures() []failure {
 		},
 		{name: "instance deploy", api: func(a *fakeAPI) { a.deployErr = boom }, unresolved: "Instance deployed"},
 		{
-			name:       "tgz is not gzip",
-			plan:       func(t *testing.T, p *Plan) { p.TgzPath = notGzipFile(t) },
+			name: "tgz is not gzip",
+			plan: func(t *testing.T, p *Plan) {
+				t.Helper()
+				p.TgzPath = notGzipFile(t)
+			},
 			unresolved: "Source uploaded",
 		},
 		{
-			name:       "tgz upload fails",
-			plan:       func(t *testing.T, p *Plan) { p.TgzPath = writeTgz(t, t.TempDir(), "packed.js") },
+			name: "tgz upload fails",
+			plan: func(t *testing.T, p *Plan) {
+				t.Helper()
+				p.TgzPath = writeTgz(t, t.TempDir(), "packed.js")
+			},
 			api:        func(a *fakeAPI) { a.uploadErr = boom },
 			unresolved: "Source uploaded",
 		},

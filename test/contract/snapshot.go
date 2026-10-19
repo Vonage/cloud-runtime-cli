@@ -98,7 +98,7 @@ func readFileEntry(p string, e snapEntry) (snapEntry, error) {
 	f, err := os.Open(p)
 	if err != nil {
 		e.sum = "unreadable"
-		return e, nil //nolint:nilerr // a file the run made unreadable is still a file
+		return e, nil // a file the run made unreadable is still a file
 	}
 	defer f.Close()
 	h := sha256.New()

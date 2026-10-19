@@ -114,7 +114,7 @@ func endWithOneNewline(dir string) error {
 			return fmt.Errorf("read page: %w", err)
 		}
 		page := strings.TrimRight(string(raw), "\n") + "\n"
-		if err := os.WriteFile(path, []byte(page), 0o644); err != nil {
+		if err := os.WriteFile(path, []byte(page), 0o644); err != nil { //nolint:gosec // the reference pages are public files in the docs directory
 			return fmt.Errorf("rewrite page: %w", err)
 		}
 	}

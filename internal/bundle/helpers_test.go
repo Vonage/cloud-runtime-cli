@@ -30,7 +30,7 @@ func writeTree(t *testing.T, root string, tree map[string]string) {
 		}
 		require.NoError(t, os.MkdirAll(filepath.Dir(target), 0o750))
 		require.NoError(t, os.WriteFile(target, []byte(content), 0o600))
-		require.NoError(t, os.Chmod(target, 0o644)) //nolint:gosec // the mode a checkout normally gives
+		require.NoError(t, os.Chmod(target, 0o644))
 	}
 }
 
@@ -77,7 +77,7 @@ type archived struct {
 func readArchive(t *testing.T, path string) []archived {
 	t.Helper()
 	zr := openGzip(t, path)
-	defer zr.Close()
+	defer func() { _ = zr.Close() }()
 	tr := tar.NewReader(zr)
 	var entries []archived
 	for {
@@ -96,7 +96,7 @@ func readArchive(t *testing.T, path string) []archived {
 func readTarBytes(t *testing.T, path string) []byte {
 	t.Helper()
 	zr := openGzip(t, path)
-	defer zr.Close()
+	defer func() { _ = zr.Close() }()
 	data, err := io.ReadAll(io.LimitReader(zr, readLimit))
 	require.NoError(t, err)
 	return data
@@ -104,7 +104,7 @@ func readTarBytes(t *testing.T, path string) []byte {
 
 func openGzip(t *testing.T, path string) *gzip.Reader {
 	t.Helper()
-	raw, err := os.ReadFile(path) //nolint:gosec // the path comes from Build
+	raw, err := os.ReadFile(path)
 	require.NoError(t, err)
 	zr, err := gzip.NewReader(bytes.NewReader(raw))
 	require.NoError(t, err)

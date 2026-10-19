@@ -1,0 +1,45 @@
+name: Weekly vulnerability scan
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { persist-credentials: false }
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with: { go-version-file: go.mod, cache: true }
+      - id: scan
+        continue-on-error: true
+        shell: bash # with pipefail, so a failed scan is not hidden by tee
+        run: make vulncheck 2>&1 | tee scan.txt
+      - name: Open or update the issue
+        if: steps.scan.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          {
+            printf 'The weekly scan found vulnerabilities in code this module calls.\n\n'
+            printf 'Run: %s/%s/actions/runs/%s\n\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
+            printf '```\n'
+            head -c 60000 scan.txt
+            printf '\n```\n'
+          } > body.md
+          gh label create security --description "Security findings" 2>/dev/null || true
+          number=$(gh issue list --label security --state open --search 'Weekly vulnerability scan in:title' --json number --jq '.[0].number // empty')
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --body-file body.md
+          else
+            gh issue create --title 'Weekly vulnerability scan' --label security --body-file body.md
+          fi

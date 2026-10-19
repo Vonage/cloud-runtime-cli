@@ -151,7 +151,7 @@ func TestRichUpgradeVerificationFailureShowsOneErrorLine(t *testing.T) {
 	dir := t.TempDir()
 	target := filepath.Join(dir, binaryNameFor(runtime.GOOS))
 	require.NoError(t, os.WriteFile(target, []byte("old"), 0o600))
-	require.NoError(t, os.Chmod(target, 0o755)) //nolint:gosec // the file has to be executable
+	require.NoError(t, os.Chmod(target, 0o755))
 
 	streams, out, errOut := term.TestRich(term.Rich, 100, clocktest.New(time.Time{}))
 	bi := buildinfo.Info{Version: "v2.5.0", Commit: "abc123", Date: "2024-01-15", ReleaseURL: srv.GitHubURL(), UpgradeTestKey: fakeplatform.TestPublicKey()}

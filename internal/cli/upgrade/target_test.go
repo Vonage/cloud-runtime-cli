@@ -15,9 +15,9 @@ import (
 )
 
 // makeInstallDir makes a directory that holds an executable and returns the directory and the executable.
-func makeInstallDir(t testing.TB) (dir, exe string) {
-	t.Helper()
-	exe = goodExecutable(t)
+func makeInstallDir(tb testing.TB) (dir, exe string) {
+	tb.Helper()
+	exe = goodExecutable(tb)
 	return filepath.Dir(exe), exe
 }
 
@@ -57,7 +57,7 @@ func TestUpgradePathFlag(t *testing.T) {
 		require.NoError(t, os.Mkdir(sub, 0o750))
 		exe := filepath.Join(sub, hostBinary())
 		require.NoError(t, os.WriteFile(exe, []byte("x"), 0o600))
-		require.NoError(t, os.Chmod(exe, 0o755)) //nolint:gosec // the file has to be executable
+		require.NoError(t, os.Chmod(exe, 0o755))
 		t.Chdir(dir)
 
 		res := execute(t, setup{}, "--force", "--path", "install")

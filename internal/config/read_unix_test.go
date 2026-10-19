@@ -21,13 +21,13 @@ func TestReadNamedPipe(t *testing.T) {
 
 	// Release the writer if Read fails before it opens the pipe.
 	t.Cleanup(func() {
-		if r, err := os.OpenFile(fifo, os.O_RDONLY|syscall.O_NONBLOCK, 0); err == nil { //nolint:gosec // a pipe the test created
+		if r, err := os.OpenFile(fifo, os.O_RDONLY|syscall.O_NONBLOCK, 0); err == nil {
 			_ = r.Close()
 		}
 	})
 	written := make(chan error, 1)
 	go func() {
-		w, err := os.OpenFile(fifo, os.O_WRONLY, 0) //nolint:gosec // a pipe the test created
+		w, err := os.OpenFile(fifo, os.O_WRONLY, 0)
 		if err != nil {
 			written <- err
 			return

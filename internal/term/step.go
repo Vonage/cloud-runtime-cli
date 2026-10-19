@@ -35,6 +35,7 @@ func (t *IO) StartStep(label string, opts ...StepOption) *Step {
 		if !options.noLive {
 			s.goLive()
 		}
+	case Static:
 	}
 	return s
 }
@@ -102,12 +103,14 @@ func (t *IO) settle(s *Step, kind resolution, line string) {
 
 func (t *IO) resolvedLine(s *Step, kind resolution, line string) string {
 	style := t.Style()
-	icon := style.SuccessIcon()
+	var icon string
 	switch kind {
 	case resolvedWarn:
 		icon = style.WarningIcon()
 	case resolvedFail:
 		icon = style.FailureIcon()
+	case resolvedOK, resolvedStop:
+		icon = style.SuccessIcon()
 	}
 
 	text := icon + " " + line

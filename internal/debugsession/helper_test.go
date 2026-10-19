@@ -108,7 +108,7 @@ func runHelper(mode string, args []string) int {
 // isTerminalFile reports whether f is a terminal, as a program that colours or buffers its output by that test sees it.
 // It asks the terminal driver: /dev/null is a character device too, and is not one.
 func isTerminalFile(f *os.File) bool {
-	return xterm.IsTerminal(int(f.Fd())) //nolint:gosec // a descriptor fits in an int
+	return xterm.IsTerminal(int(f.Fd()))
 }
 
 func TestIsTerminalFileIsNotFooledByDevNull(t *testing.T) {
@@ -135,7 +135,7 @@ func writeHelperFile(path, content string) int {
 // startSleeper starts the helper in sleep mode; attached lets it share the output pipes of the process starting it.
 func startSleeper(attached bool) (*exec.Cmd, error) {
 	spec := helperSpec("sleep")
-	cmd := exec.Command(spec.Entrypoint[0], spec.Entrypoint[1:]...) //nolint:gosec,noctx // re-executes the test binary
+	cmd := exec.Command(spec.Entrypoint[0], spec.Entrypoint[1:]...) //nolint:noctx // re-executes the test binary
 	cmd.Env = spec.Env
 	if attached {
 		cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
@@ -249,7 +249,7 @@ func waitForOutput(t *testing.T, buf *lockedBuffer, want string) {
 
 // pidAlive reports whether a process with the pid is running; a zombie that nothing has reaped yet is not.
 func pidAlive(pid int) bool {
-	p, err := process.NewProcess(int32(pid)) //nolint:gosec // process ids fit in an int32
+	p, err := process.NewProcess(int32(pid))
 	if err != nil {
 		return false
 	}
