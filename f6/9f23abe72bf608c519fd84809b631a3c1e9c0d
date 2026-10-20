@@ -1,0 +1,27 @@
+.github/workflows/ci.yml
+  s_e795896f8279fd::t_f9a985086b274f 57,59-69
+.github/workflows/release-please.yml
+  s_e795896f8279fd::t_1e62d6e6c45c56 35-36,38,40,42-43,45-54,62,73,76-96,99,135,139-149,151-154,158-159,163-164,168,172-173,178-195
+.github/workflows/release.yml
+  s_e795896f8279fd::t_8c055722814f94 81-84,168,172-182,184-187,191-192,196-197,201,205-206,211-228,441-451,453-456,461-478
+.github/workflows/vulncheck-weekly.yml
+  s_e795896f8279fd::t_8fbad9bcc99c92 3-4,12-15,29-39,41,46,55,57,59
+Makefile
+  s_e795896f8279fd::t_1838ccfb114eca 57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f69f23abe72bf608c519fd84809b631a3c1e9c0d",
+  "prompts": {},
+  "sessions": {
+    "s_e795896f8279fd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "97a498cf-7a93-4a02-b45a-e94b7e0b50bf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
