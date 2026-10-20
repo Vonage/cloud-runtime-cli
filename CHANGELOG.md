@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.6.1](https://github.com/Vonage/cloud-runtime-cli/compare/v2.6.0...v2.6.1) (2026-10-20)
+
+
+### 🐛 Bug Fixes
+
+* **deploy:** improve build-watch timeout and cancellation error reporting ([#94](https://github.com/Vonage/cloud-runtime-cli/issues/94)) ([f4b9df0](https://github.com/Vonage/cloud-runtime-cli/commit/f4b9df09e4c6f347dfa4d2637cf122e5a15934f5))
+* security fixes ([#96](https://github.com/Vonage/cloud-runtime-cli/issues/96)) ([0012742](https://github.com/Vonage/cloud-runtime-cli/commit/0012742f03129a120e30194a9a6e39d5d2fbe92c))
+
 ## [2.6.0](https://github.com/Vonage/cloud-runtime-cli/compare/v2.5.0...v2.6.0) (2026-05-21)
 
 
