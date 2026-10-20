@@ -40,7 +40,7 @@ pwsh -Command "iwr https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/ma
 
 ### Verifying a download
 
-From v2.6.1 each release has a `checksums.txt` and a signature of it, `checksums.txt.<keyid>.sig`. The first line of `checksums.txt` is `# vcr <tag>`, followed by one SHA-256 line per archive. The signature is made with `ssh-keygen -Y sign` in the `vcr-release` namespace, and `<keyid>` is the first 8 bytes, in hex, of the SHA-256 of the raw public key. A release can carry one signature file per key; one valid signature is enough. The install scripts check the checksum and the signature for you.
+From v2.6.1 each release has a `checksums.txt` and a signature of it, `checksums.txt.<keyid>.sig`. The first line of `checksums.txt` is `# vcr <tag>`, followed by one SHA-256 line per archive. The signature is made with `ssh-keygen -Y sign` in the `vcr-release` namespace, and `<keyid>` is the first 8 bytes, in hex, of the SHA-256 of the raw public key. A release can carry one signature file per key; one valid signature is enough. `vcr upgrade` and the install scripts check the checksum and the signature for you, and install nothing that does not verify.
 
 To check a download by hand you need OpenSSH 8.0 or newer. Save the release key as `allowed_signers`:
 
@@ -57,7 +57,6 @@ grep ' vcr_linux_amd64.tar.gz$' checksums.txt | sha256sum -c -    # macOS: shasu
 ```
 
 The first command prints `Good "vcr-release" signature` and the second prints `OK`. On Windows, compare `(Get-FileHash vcr_windows_amd64.tar.gz).Hash` with the matching line in `checksums.txt`.
-
 
 ## Project Structure
 
@@ -174,11 +173,13 @@ This project uses [Release Please](https://github.com/googleapis/release-please)
 2. **Release PR**: A "Release PR" is automatically created/updated with:
    - Version bump based on commit types
    - Auto-generated changelog entries
-3. **Publish release**: When the Release PR is merged, a GitHub Release is created
-4. **Build & distribute**: The release triggers the build pipeline which:
+3. **Draft release**: When the Release PR is merged, lint and the tests run, then a draft GitHub Release is created
+4. **Build, sign & publish**: The release triggers the build pipeline which:
    - Cross-compiles binaries for all platforms
    - Code signs and notarizes macOS binaries
-   - Uploads artifacts to the GitHub Release
+   - Signs `checksums.txt` with the release key (see [Verifying a download](#verifying-a-download))
+   - Uploads the archives, the checksums and the signature to the draft, then publishes it
+   - Installs the published release and checks that it reports the new version
 
 ### Manual Release
 
