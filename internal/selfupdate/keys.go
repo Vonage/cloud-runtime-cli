@@ -20,9 +20,30 @@ type TrustedKey struct {
 	Key [32]byte
 }
 
+// releasePublicKeys are the release public keys, one OpenSSH public key line each, as ssh-keygen writes them to a
+// .pub file. The install scripts, both release workflows and the README list the same keys, and a test compares
+// them. With none listed no release verifies.
+var releasePublicKeys = []string{
+	"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB6MAISQBLbNYWna92jPv0bjwWW4uNkeF7cQeJ1PN5FI",
+}
+
 // releaseKeys are the keys whose signatures make a release trustworthy. A release is signed by one or more of
-// them; each entry's ID names its signature file, checksums.txt.<ID>.sig. With none listed no release verifies.
-var releaseKeys = []TrustedKey{}
+// them; each entry's ID names its signature file, checksums.txt.<ID>.sig.
+var releaseKeys = mustParseKeys(releasePublicKeys)
+
+// mustParseKeys parses the compiled-in key lines. A line that does not parse is a mistake in this file, found by
+// the first test run, so it panics instead of trusting fewer keys without saying so.
+func mustParseKeys(lines []string) []TrustedKey {
+	keys := make([]TrustedKey, 0, len(lines))
+	for _, line := range lines {
+		key, err := ParsePublicKey(line)
+		if err != nil {
+			panic("selfupdate: release key " + line + ": " + err.Error())
+		}
+		keys = append(keys, key)
+	}
+	return keys
+}
 
 // KeyID is the id that names a key's signature file: the first 8 bytes of the SHA-256 of the raw key, in lower-case
 // hex.

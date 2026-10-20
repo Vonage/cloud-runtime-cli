@@ -165,8 +165,20 @@ func TestTrustedKeysPutTheTestKeyLast(t *testing.T) {
 	assert.Equal(t, first, compiled[0], "the result does not share memory with the compiled-in keys")
 }
 
+// releaseKeyID is the id of the release key, computed by the tool outside Go:
+//
+//	printf %s AAAAC3NzaC1lZDI1NTE5AAAAIB6MAISQBLbNYWna92jPv0bjwWW4uNkeF7cQeJ1PN5FI | base64 -d | tail -c 32 | shasum -a 256 | cut -c1-16
+const releaseKeyID = "fd1652cb1b7cc0c3"
+
 func TestCompiledKeysAreWellFormed(t *testing.T) {
+	require.NotEmpty(t, releaseKeys, "a release needs at least one key to be verified")
 	assert.Empty(t, keyProblems(releaseKeys))
+
+	ids := make([]string, 0, len(releaseKeys))
+	for _, k := range releaseKeys {
+		ids = append(ids, k.ID)
+	}
+	assert.Contains(t, ids, releaseKeyID)
 }
 
 // TestKeyProblemsFindsWhatIsWrong checks the check itself, so that it cannot pass for a list it should refuse.
