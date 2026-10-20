@@ -1,0 +1,24 @@
+pkg/api/release_test.go
+  s_380e243432693a::t_96da21c8f5789d 171-189
+  s_380e243432693a::t_80a85e0acaacd5 151-170
+pkg/api/error.go
+  s_380e243432693a::t_77a5e62f72cd95 43-50,69-73
+  s_380e243432693a::t_c5a44908c40f39 74-75
+  s_380e243432693a::t_2c29412b813d3d 76-77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4f2db5e6d023e488e4e7eb71d28ffd8c44feb1d8",
+  "prompts": {},
+  "sessions": {
+    "s_380e243432693a": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_90c255c3-726e-4b84-832c-20d0e46011a5",
+        "model": "auto"
+      },
+      "human_author": "Gorka Revilla <gorka.revillafernandez@vonage.com>"
+    }
+  }
+}
