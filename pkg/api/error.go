@@ -40,6 +40,14 @@ type Error struct {
 }
 
 func NewErrorFromHTTPResponse(resp *resty.Response) Error {
+	if isGitHubRateLimited(resp) {
+		return Error{
+			HTTPStatusCode: resp.StatusCode(),
+			Message:        "GitHub API rate limit exceeded while checking for CLI updates. Please retry later.",
+			TraceID:        traceIDFromHTTPResponse(resp),
+		}
+	}
+
 	var result ErrorResponse
 	err := json.Unmarshal(resp.Body(), &result)
 	if err != nil {
@@ -56,6 +64,17 @@ func NewErrorFromHTTPResponse(resp *resty.Response) Error {
 		TraceID:        traceIDFromHTTPResponse(resp),
 		ContainerLogs:  result.Error.ContainerLogs,
 	}
+}
+
+func isGitHubRateLimited(resp *resty.Response) bool {
+	return resp != nil &&
+		resp.StatusCode() == http.StatusForbidden &&
+		resp.Request != nil &&
+		resp.Request.RawRequest != nil &&
+		resp.Request.RawRequest.URL != nil &&
+		strings.EqualFold(resp.Request.RawRequest.URL.Host, "api.github.com") &&
+		(resp.Header().Get("X-RateLimit-Remaining") == "0" ||
+			strings.Contains(strings.ToLower(resp.String()), "rate limit"))
 }
 
 func NewErrorFromGraphqlResponse(resp *resty.Response, message string) Error {
