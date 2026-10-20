@@ -1,42 +1,82 @@
 name: Manual Release
 
-# This workflow is for manual releases only.
-# Automated releases are handled by release-please.yml
+# Manual releases. Automated releases are handled by release-please.yml.
+#
+# From main: build, sign, publish and smoke test a release (environments vcr-cli and vcr-cli-signing).
+# From any other ref: build an unsigned prerelease. The tag must contain a "-" and no environment is used.
 
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Release tag to build (e.g., v2.1.3)'
+        description: 'Release tag to build (e.g., v2.1.3). Outside main it must contain a "-" (e.g., v2.1.3-rc.1)'
         required: true
         type: string
 
-permissions:
-  actions: write
-  checks: write
-  contents: write
-  deployments: read
-  issues: write
-  discussions: write
-  packages: read
-  pages: write
-  pull-requests: write
-  security-events: write
-  statuses: write
+permissions: {}
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  # Public half of every release signing key: one "ssh-ed25519 <base64>" line per key, "#" starts a comment.
+  # Release assets get one signature file per key listed here. While the list is empty, sign and publish refuse to run.
+  # Keep this list identical to the one in release-please.yml.
+  RELEASE_PUBLIC_KEYS: |
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB6MAISQBLbNYWna92jPv0bjwWW4uNkeF7cQeJ1PN5FI
+  RELEASE_ARCHIVES: >-
+    vcr_darwin_amd64.tar.gz
+    vcr_darwin_arm64.tar.gz
+    vcr_linux_amd64.tar.gz
+    vcr_linux_arm64.tar.gz
+    vcr_windows_amd64.tar.gz
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate tag
+        env:
+          TAG: ${{ inputs.tag }}
+          REF: ${{ github.ref }}
+        run: |
+          if [[ $TAG == *$'\n'* ]]; then
+            echo "::error::tag must be a single line"
+            exit 1
+          fi
+          if ! [[ $TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]]; then
+            echo "::error::tag must look like v1.2.3 or v1.2.3-rc.1"
+            exit 1
+          fi
+          if [[ $REF != refs/heads/main && $TAG != *-* ]]; then
+            echo "::error::outside main the tag must contain a '-' (for example v1.2.3-rc.1)"
+            exit 1
+          fi
+
   # Run tests on Ubuntu (fast, native Docker)
   test:
+    needs: validate
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
-          go-version: '1.25.5'
-          cache: true
+          go-version-file: go.mod
+          cache: false
 
       - name: Run unit tests
         run: go test ./...
@@ -50,42 +90,105 @@ jobs:
       - name: Run integration tests
         run: make test-integration
 
-  # Build, sign, notarize, and release (requires macOS for Apple signing)
-  build-and-release:
-    needs: test
+  # The draft is created once; assets are only ever added to it, never overwritten.
+  draft:
+    needs: [validate, test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Refuse to change a published release or a tag that points elsewhere
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          if out=$(gh release view "$TAG" --json isDraft --jq .isDraft 2>&1); then
+            [ "$out" = true ] || { echo "::error::$TAG is already published"; exit 1; }
+          elif [[ $out != *"release not found"* ]]; then
+            echo "::error::release lookup failed: $out"
+            exit 1
+          fi
+
+          if ref=$(gh api "repos/$GH_REPO/git/ref/tags/$TAG" --jq '.object.type + " " + .object.sha' 2>&1); then
+            read -r type sha <<<"$ref"
+            if [ "$type" = tag ]; then
+              sha=$(gh api "repos/$GH_REPO/git/tags/$sha" --jq .object.sha)
+            fi
+            if [ "$sha" != "$GITHUB_SHA" ]; then
+              echo "::error::tag $TAG already points at $sha, not at $GITHUB_SHA"
+              exit 1
+            fi
+          elif [[ $ref != *"HTTP 404"* ]]; then
+            echo "::error::tag lookup failed: $ref"
+            exit 1
+          fi
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
+        with:
+          tag_name: ${{ inputs.tag }}
+          target_commitish: ${{ github.sha }}
+          draft: true
+          prerelease: ${{ contains(inputs.tag, '-') }}
+          make_latest: ${{ contains(inputs.tag, '-') && 'false' || 'true' }}
+
+  # Build, sign and notarize (requires macOS for Apple signing). Only main reaches this job.
+  build:
+    if: github.ref == 'refs/heads/main'
+    needs: draft
     runs-on: macos-latest
-    env:
-      API_VERSION: ${{ vars.API_VERSION }}
+    timeout-minutes: 60
     environment: vcr-cli
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Import codesign cert
-        uses: apple-actions/import-codesign-certs@v3
+        uses: apple-actions/import-codesign-certs@63fff01cd422d4b7b855d40ca1e9d34d2de9427d # v3.0.0
         with:
           p12-file-base64: ${{ secrets.APPLE_CERT_P12_BASE64_ENCODED }}
           p12-password: ${{ secrets.APPLE_CERT_PASSWORD }}
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
-          go-version: '1.25.5'
-          cache: true
+          go-version-file: go.mod
+          cache: false
 
       - name: Store notarization credentials
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_DEV_ID_PASSWORD: ${{ secrets.APPLE_DEV_ID_PASSWORD }}
         run: |
-          xcrun notarytool store-credentials --apple-id ${{ secrets.APPLE_ID }} --team-id ${{ secrets.APPLE_TEAM_ID }} --password ${{ secrets.APPLE_DEV_ID_PASSWORD }} devrel
+          xcrun notarytool store-credentials --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_DEV_ID_PASSWORD" devrel
 
       - name: Cross compile binaries
         env:
-          GO_LDFLAGS: "-s -w -X 'main.apiVersion=${{env.API_VERSION}}' -X 'main.version=${{ inputs.tag }}' -X 'main.buildDate=${{github.event.repository.updated_at}}' -X 'main.commit=${{github.sha}}' -X 'main.releaseURL=https://api.github.com/repos/${{github.repository}}'"
+          API_VERSION: ${{ vars.API_VERSION }}
+          TAG: ${{ inputs.tag }}
+          BUILD_DATE: ${{ github.event.repository.updated_at }}
         run: |
-          GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_darwin_amd64 .
-          GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_darwin_arm64 .
-          GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_linux_arm64 .
-          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_linux_amd64 .
-          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "$GO_LDFLAGS" -o vcr_windows_amd64.exe .
+          : "${API_VERSION:?API_VERSION is empty}"
+          commit=$(git rev-parse HEAD)
+          ldflags="-s -w -X 'main.apiVersion=$API_VERSION' -X 'main.version=$TAG' -X 'main.buildDate=$BUILD_DATE' -X 'main.commit=$commit' -X 'main.releaseURL=https://api.github.com/repos/$GITHUB_REPOSITORY'"
+          case $ldflags in
+            *upgradeTestKey*)
+              echo "::error::release builds must not set upgradeTestKey"
+              exit 1
+              ;;
+          esac
+          GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "$ldflags" -o vcr_darwin_amd64 .
+          GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags "$ldflags" -o vcr_darwin_arm64 .
+          GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags "$ldflags" -o vcr_linux_arm64 .
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "$ldflags" -o vcr_linux_amd64 .
+          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "$ldflags" -o vcr_windows_amd64.exe .
 
       - name: Code sign darwin binaries
         run: |
@@ -110,23 +213,300 @@ jobs:
       - name: Compress binaries
         run: |
           mkdir bin
+          COPYFILE_DISABLE=1 tar --no-xattrs -czf bin/vcr_darwin_amd64.tar.gz ./vcr_darwin_amd64
+          COPYFILE_DISABLE=1 tar --no-xattrs -czf bin/vcr_darwin_arm64.tar.gz ./vcr_darwin_arm64
+          COPYFILE_DISABLE=1 tar --no-xattrs -czf bin/vcr_linux_arm64.tar.gz ./vcr_linux_arm64
+          COPYFILE_DISABLE=1 tar --no-xattrs -czf bin/vcr_linux_amd64.tar.gz ./vcr_linux_amd64
+          COPYFILE_DISABLE=1 tar --no-xattrs -czf bin/vcr_windows_amd64.tar.gz ./vcr_windows_amd64.exe
+
+      - name: Upload archives
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-archives
+          path: bin
+          if-no-files-found: error
+          retention-days: 3
+
+      # Best effort: some of these may not exist if an earlier step failed.
+      - name: Remove signing material
+        if: always()
+        run: |
+          security delete-keychain signing_temp.keychain || true
+          security delete-generic-password -s com.apple.gke.notary.tool.saved-creds.devrel || true
+
+  # The only job with the signing key. It has no checkout; its only action is download-artifact.
+  sign:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: vcr-cli-signing
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ inputs.tag }}
+    steps:
+      - name: Download archives
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: release-archives
+          path: dist
+
+      - name: Write checksums and sign them
+        env:
+          # One or more OpenSSH private keys (unencrypted), one for each key in RELEASE_PUBLIC_KEYS.
+          RELEASE_SIGNING_KEY: ${{ secrets.RELEASE_SIGNING_KEY }}
+        run: |
+          umask 077
+
+          # keyid: first 8 bytes, in hex, of the SHA-256 of the raw 32-byte public key in an "ssh-ed25519 <base64>" line.
+          keyid() {
+            local type blob
+            read -r type blob _ || true
+            if [ "$type" != ssh-ed25519 ] || [ "$(printf %s "$blob" | base64 -d | wc -c)" -ne 51 ]; then
+              echo "not an ssh-ed25519 public key" >&2
+              return 1
+            fi
+            printf %s "$blob" | base64 -d | tail -c 32 | sha256sum | cut -c1-16
+          }
+          listed_keyids() {
+            local line
+            while read -r line; do
+              printf '%s\n' "$line" | keyid || return 1
+            done < <(printf '%s\n' "$RELEASE_PUBLIC_KEYS" | sed -e 's/#.*//' -e '/^[[:space:]]*$/d')
+          }
+
+          want=$(listed_keyids) || { echo "::error::RELEASE_PUBLIC_KEYS has an invalid entry"; exit 1; }
+          if [ -z "$want" ]; then
+            echo "::error::RELEASE_PUBLIC_KEYS is empty. Add the public release signing key to this workflow before releasing."
+            exit 1
+          fi
+
+          if [ -z "$RELEASE_SIGNING_KEY" ]; then
+            echo "::error::the RELEASE_SIGNING_KEY secret is empty"
+            exit 1
+          fi
+
+          read -ra archives <<<"$RELEASE_ARCHIVES"
+          if [ "$(find dist -mindepth 1 -maxdepth 1 -printf '%f\n' | sort)" != "$(printf '%s\n' "${archives[@]}" | sort)" ]; then
+            echo "::error::dist must hold exactly: ${archives[*]}"
+            exit 1
+          fi
+          # The upgrade check expects each archive to hold exactly one regular file.
+          for a in "${archives[@]}"; do
+            listing=$(tar -tvzf "dist/$a")
+            if [ "$(printf '%s\n' "$listing" | wc -l)" -ne 1 ] || [[ $listing != -* ]]; then
+              echo "::error::$a must hold exactly one regular file"
+              exit 1
+            fi
+          done
+          { echo "# vcr $TAG"; (cd dist && sha256sum "${archives[@]}"); } > checksums.txt
+
+          keydir=$(mktemp -d)
+          trap 'rm -rf "$keydir"' EXIT
+          printf '%s\n' "$RELEASE_SIGNING_KEY" | awk -v dir="$keydir" '/^-----BEGIN /{n++; f=dir"/key"n} f{print > f} /^-----END /{close(f); f=""}'
+          shopt -s nullglob
+          for key in "$keydir"/key*; do
+            id=$(ssh-keygen -y -f "$key" | keyid)
+            ssh-keygen -Y sign -f "$key" -n vcr-release checksums.txt
+            mv checksums.txt.sig "checksums.txt.$id.sig"
+            rm -f "$key"
+          done
+          rm -rf "$keydir"
+
+          mapfile -t ids <<<"$want"
+          if [ "$(printf '%s\n' checksums.txt.*.sig | sort)" != "$(printf 'checksums.txt.%s.sig\n' "${ids[@]}" | sort)" ]; then
+            echo "::error::the signing keys do not match RELEASE_PUBLIC_KEYS"
+            exit 1
+          fi
+
+      - name: Upload to the draft release
+        run: gh release upload "$TAG" dist/*.tar.gz checksums.txt checksums.txt.*.sig
+
+  publish:
+    if: github.ref == 'refs/heads/main'
+    needs: sign
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ inputs.tag }}
+    steps:
+      - name: Check the draft holds exactly the expected assets
+        run: |
+          keyid() {
+            local type blob
+            read -r type blob _ || true
+            if [ "$type" != ssh-ed25519 ] || [ "$(printf %s "$blob" | base64 -d | wc -c)" -ne 51 ]; then
+              echo "not an ssh-ed25519 public key" >&2
+              return 1
+            fi
+            printf %s "$blob" | base64 -d | tail -c 32 | sha256sum | cut -c1-16
+          }
+          listed_keyids() {
+            local line
+            while read -r line; do
+              printf '%s\n' "$line" | keyid || return 1
+            done < <(printf '%s\n' "$RELEASE_PUBLIC_KEYS" | sed -e 's/#.*//' -e '/^[[:space:]]*$/d')
+          }
+
+          want=$(listed_keyids) || { echo "::error::RELEASE_PUBLIC_KEYS has an invalid entry"; exit 1; }
+          if [ -z "$want" ]; then
+            echo "::error::RELEASE_PUBLIC_KEYS is empty. Add the public release signing key to this workflow before releasing."
+            exit 1
+          fi
+
+          read -ra archives <<<"$RELEASE_ARCHIVES"
+          mapfile -t ids <<<"$want"
+          expected=$({ printf '%s\n' "${archives[@]}" checksums.txt; printf 'checksums.txt.%s.sig\n' "${ids[@]}"; } | sort)
+          actual=$(gh release view "$TAG" --json assets --jq '.assets[].name' | sort)
+          if [ "$expected" != "$actual" ]; then
+            echo "::error::the draft for $TAG does not hold exactly the expected assets"
+            diff <(echo "$expected") <(echo "$actual") || true
+            exit 1
+          fi
+
+      - name: Publish release
+        run: gh release edit "$TAG" --draft=false
+
+  smoke:
+    if: github.ref == 'refs/heads/main'
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout the released tag
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ inputs.tag }}
+          persist-credentials: false
+
+      - name: Install Cloud Runtime CLI
+        uses: ./
+        with:
+          version: ${{ inputs.tag }}
+
+      - name: Check the installed version
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          out=$(vcr --version)
+          echo "$out"
+          if [[ " $out " != *" $TAG "* ]]; then
+            echo "::error::vcr --version does not report $TAG"
+            exit 1
+          fi
+
+  # Outside main: the same build without Apple signing, and no environment.
+  build-unsigned:
+    if: github.ref != 'refs/heads/main'
+    needs: draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Cross compile binaries
+        env:
+          API_VERSION: ${{ vars.API_VERSION || 'v0.3' }}
+          TAG: ${{ inputs.tag }}
+          BUILD_DATE: ${{ github.event.repository.updated_at }}
+        run: |
+          : "${API_VERSION:?API_VERSION is empty}"
+          commit=$(git rev-parse HEAD)
+          ldflags="-s -w -X 'main.apiVersion=$API_VERSION' -X 'main.version=$TAG' -X 'main.buildDate=$BUILD_DATE' -X 'main.commit=$commit' -X 'main.releaseURL=https://api.github.com/repos/$GITHUB_REPOSITORY'"
+          case $ldflags in
+            *upgradeTestKey*)
+              echo "::error::release builds must not set upgradeTestKey"
+              exit 1
+              ;;
+          esac
+          GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "$ldflags" -o vcr_darwin_amd64 .
+          GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags "$ldflags" -o vcr_darwin_arm64 .
+          GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags "$ldflags" -o vcr_linux_arm64 .
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "$ldflags" -o vcr_linux_amd64 .
+          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "$ldflags" -o vcr_windows_amd64.exe .
+
+      - name: Compress binaries
+        run: |
+          mkdir bin
           tar czf bin/vcr_darwin_amd64.tar.gz ./vcr_darwin_amd64
           tar czf bin/vcr_darwin_arm64.tar.gz ./vcr_darwin_arm64
           tar czf bin/vcr_linux_arm64.tar.gz ./vcr_linux_arm64
           tar czf bin/vcr_linux_amd64.tar.gz ./vcr_linux_amd64
           tar czf bin/vcr_windows_amd64.tar.gz ./vcr_windows_amd64.exe
 
-      - name: Upload release assets
-        uses: softprops/action-gh-release@v2
+      - name: Upload archives
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          tag_name: ${{ inputs.tag }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          files: |
-            bin/vcr_darwin_amd64.tar.gz
-            bin/vcr_darwin_arm64.tar.gz
-            bin/vcr_linux_arm64.tar.gz
-            bin/vcr_linux_amd64.tar.gz
-            bin/vcr_windows_amd64.tar.gz
+          name: release-archives
+          path: bin
+          if-no-files-found: error
+          retention-days: 3
 
-      - name: Test Github Action
-        uses: Vonage/cloud-runtime-cli@main
+  # Outside main: checksums but no signature, published as a prerelease that is never "latest".
+  checksum:
+    if: github.ref != 'refs/heads/main'
+    needs: build-unsigned
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ inputs.tag }}
+    steps:
+      - name: Download archives
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: release-archives
+          path: dist
+
+      - name: Write checksums and upload
+        run: |
+          read -ra archives <<<"$RELEASE_ARCHIVES"
+          if [ "$(find dist -mindepth 1 -maxdepth 1 -printf '%f\n' | sort)" != "$(printf '%s\n' "${archives[@]}" | sort)" ]; then
+            echo "::error::dist must hold exactly: ${archives[*]}"
+            exit 1
+          fi
+          # The upgrade check expects each archive to hold exactly one regular file.
+          for a in "${archives[@]}"; do
+            listing=$(tar -tvzf "dist/$a")
+            if [ "$(printf '%s\n' "$listing" | wc -l)" -ne 1 ] || [[ $listing != -* ]]; then
+              echo "::error::$a must hold exactly one regular file"
+              exit 1
+            fi
+          done
+          { echo "# vcr $TAG"; (cd dist && sha256sum "${archives[@]}"); } > checksums.txt
+          gh release upload "$TAG" dist/*.tar.gz checksums.txt
+
+      - name: Publish prerelease
+        run: |
+          read -ra archives <<<"$RELEASE_ARCHIVES"
+          expected=$(printf '%s\n' "${archives[@]}" checksums.txt | sort)
+          actual=$(gh release view "$TAG" --json assets --jq '.assets[].name' | sort)
+          if [ "$expected" != "$actual" ]; then
+            echo "::error::the draft for $TAG does not hold exactly the expected assets"
+            diff <(echo "$expected") <(echo "$actual") || true
+            exit 1
+          fi
+          gh release edit "$TAG" --draft=false --prerelease --latest=false

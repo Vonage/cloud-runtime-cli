@@ -12,13 +12,27 @@ runs:
   steps:
     - name: Download and Install CLI
       shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
       run: |
-        VERSION="${{ inputs.version }}"
-        if [ "$VERSION" == "main" ]; then
-            curl -L "https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/script/install.sh" | sudo sh
-        else
-            curl -L "https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/script/install.sh" | sudo sh -s -- "${VERSION}"
+        set -euo pipefail
+        if [[ $VERSION == *$'\n'* ]]; then
+            echo "invalid version" >&2
+            exit 1
         fi
-        
+        case "$VERSION" in
+            ""|main|latest)
+                sudo sh "$GITHUB_ACTION_PATH/script/install.sh"
+                ;;
+            *)
+                if ! [[ $VERSION =~ ^v?[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]]; then
+                    echo "invalid version" >&2
+                    exit 1
+                fi
+                VERSION="v${VERSION#v}"
+                sudo sh "$GITHUB_ACTION_PATH/script/install.sh" -v "$VERSION"
+                ;;
+        esac
+
         # Verify installation
         vcr --version

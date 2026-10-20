@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
@@ -147,15 +148,14 @@ func (f *DefaultFactory) Init(ctx context.Context, cfg config.CLIConfig, opts *c
 	}
 	f.assetClient = api.NewAssetClient(region.AssetsAPIURL, f.httpClient)
 	f.deploymentClient = api.NewDeploymentClient(region.DeploymentAPIURL, f.apiVersion, f.httpClient, f.websocketConnectionClient)
-	f.releaseClient = api.NewReleaseClient(f.releaseURL, f.httpClient)
+	f.releaseClient = newReleaseClient(f.releaseURL)
 	f.marketplaceClient = api.NewMarketplaceClient(region.MarketplaceAPIURL, f.httpClient)
 	return nil
 }
 
 func (f *DefaultFactory) InitUpgrade(opts *config.GlobalOptions) {
 	f.globalOpts = opts
-	f.httpClient = GetHTTPClient("", "")
-	f.releaseClient = api.NewReleaseClient(f.releaseURL, f.httpClient)
+	f.releaseClient = newReleaseClient(f.releaseURL)
 }
 
 func (f *DefaultFactory) InitDatastore(cfg config.CLIConfig, opts *config.GlobalOptions) {
@@ -276,6 +276,12 @@ func GetHTTPClient(apiKey, apiSecret string) *resty.Client {
 	return client
 }
 
+// newReleaseClient builds the release client on its own plain HTTP client, so
+// the release host never receives platform credentials or headers.
+func newReleaseClient(releaseURL string) *api.ReleaseClient {
+	return api.NewReleaseClient(releaseURL, resty.New())
+}
+
 func getDatastore(graphQLURL string, httpClient *resty.Client) *api.Datastore {
 	gqlClient := api.NewGraphQLClient(graphQLURL, httpClient)
 	return api.NewDatastore(gqlClient)
@@ -285,7 +291,25 @@ func getWebsocketConnectionClient(apiKey, apiSecret string) *api.WebsocketConnec
 	return api.NewWebsocketConnectionClient(apiKey, apiSecret)
 }
 
+// regionPattern matches the region aliases the platform publishes, such as aws.euw1.
+var regionPattern = regexp.MustCompile(`^aws\.[a-z0-9]+$`)
+
+const (
+	regionPrefix = "aws."
+	// maxRegionNameLen is the longest label a host name can carry.
+	maxRegionNameLen = 63
+)
+
+// IsValidRegion reports whether region is a well-formed region alias.
+func IsValidRegion(region string) bool {
+	return len(region) <= len(regionPrefix)+maxRegionNameLen && regionPattern.MatchString(region)
+}
+
+// makeGraphqlEndpoint returns an empty endpoint for a malformed region, so a
+// region can never choose the host a request goes to.
 func makeGraphqlEndpoint(region string) string {
-	region = region[4:]
-	return fmt.Sprintf("https://graphql.%s.runtime.vonage.cloud/v1/graphql", region)
+	if !IsValidRegion(region) {
+		return ""
+	}
+	return fmt.Sprintf("https://graphql.%s.runtime.vonage.cloud/v1/graphql", region[len(regionPrefix):])
 }

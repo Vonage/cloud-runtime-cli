@@ -1,0 +1,76 @@
+name: govulncheck-weekly
+
+# Report-only: opens or updates one issue with the findings. It never blocks a PR.
+# The govulncheck job in ci.yml is the one that blocks.
+
+on:
+  schedule:
+    - cron: '23 5 * * 1'
+  workflow_dispatch: {}
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  govulncheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@v1.8.0
+
+      - name: Run govulncheck
+        id: scan
+        run: |
+          # Exit status 3 means findings; anything else non-zero is a failure of the tool itself.
+          status=0
+          "$(go env GOPATH)/bin/govulncheck" ./... > report.txt 2>&1 || status=$?
+          cat report.txt
+          case $status in
+            0) ;;
+            3) echo "findings=true" >> "$GITHUB_OUTPUT" ;;
+            *) exit "$status" ;;
+          esac
+
+      - name: Open or update the issue
+        if: steps.scan.outputs.findings == 'true'
+        run: |
+          title="govulncheck findings"
+          {
+            echo "govulncheck reported known issues. Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo
+            echo '```'
+            head -c 60000 report.txt
+            echo '```'
+          } > body.md
+
+          if ! gh label list --limit 200 --json name --jq '.[].name' | grep -x security > /dev/null; then
+            gh label create security --description "Security findings"
+          fi
+
+          number=$(gh issue list --label security --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$number" ]; then
+            gh issue edit "$number" --body-file body.md
+          else
+            gh issue create --title "$title" --label security --body-file body.md
+          fi

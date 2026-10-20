@@ -37,6 +37,26 @@ curl -s -L https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/scrip
 pwsh -Command "iwr https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/script/install.ps1 -useb | iex"
 ```
 
+### Verifying a download
+
+From v2.6.1 each release has a `checksums.txt` and a signature of it, `checksums.txt.<keyid>.sig`. The first line of `checksums.txt` is `# vcr <tag>`, followed by one SHA-256 line per archive. The signature is made with `ssh-keygen -Y sign` in the `vcr-release` namespace, and `<keyid>` is the first 8 bytes, in hex, of the SHA-256 of the raw public key. A release can carry one signature file per key; one valid signature is enough. The install scripts check the checksum and the signature for you.
+
+To check a download by hand you need OpenSSH 8.0 or newer. Save the release key as `allowed_signers`:
+
+```
+# key id fd1652cb1b7cc0c3
+vcr-release namespaces="vcr-release" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB6MAISQBLbNYWna92jPv0bjwWW4uNkeF7cQeJ1PN5FI
+```
+
+Then, next to the downloaded files:
+
+```
+ssh-keygen -Y verify -f allowed_signers -I vcr-release -n vcr-release -s checksums.txt.<keyid>.sig < checksums.txt
+grep ' vcr_linux_amd64.tar.gz$' checksums.txt | sha256sum -c -    # macOS: shasum -a 256 -c -
+```
+
+The first command prints `Good "vcr-release" signature` and the second prints `OK`. On Windows, compare `(Get-FileHash vcr_windows_amd64.tar.gz).Hash` with the matching line in `checksums.txt`.
+
 
 ## Project Structure
 
@@ -50,7 +70,7 @@ Usage examples are in the `docs/` folder - [vcr](docs/vcr.md)
 
 ### Prerequisites
 
-- Go 1.24+
+- Go 1.26+
 - Node.js 18+ (for commitlint)
 - [golangci-lint](https://golangci-lint.run/welcome/install/)
 - [Lefthook](https://github.com/evilmartians/lefthook) (for git hooks)

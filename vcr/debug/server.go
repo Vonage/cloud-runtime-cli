@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"path"
 	"time"
@@ -11,11 +12,15 @@ import (
 
 const (
 	internalServerErrorCode = http.StatusInternalServerError
-	errStreamBufferSize     = 2
 	shutdownTimeoutSeconds  = 5
 )
 
 func startDebugProxyServer(appName, localAppHost, hostAddress, websocketServerURL string, proxyWebsocketServerURL string, port int, done <-chan struct{}) error {
+	listeners, err := listenLoopback(net.Listen, port)
+	if err != nil {
+		return err
+	}
+
 	connClient := NewDebuggerConnectionClient(websocketServerURL, proxyWebsocketServerURL, localAppHost)
 
 	mux := http.NewServeMux()
@@ -46,27 +51,28 @@ func startDebugProxyServer(appName, localAppHost, hostAddress, websocketServerUR
 		w.Write(resp.Payload)
 	})
 
-	server := http.Server{
-		Addr:    fmt.Sprintf(":%v", port),
-		Handler: mux,
-	}
+	server := http.Server{Handler: localOnly(port, mux)}
 
-	errStream := make(chan error, errStreamBufferSize)
+	// One sender per listener and one for the websocket client, so none blocks after this function has returned.
+	errStream := make(chan error, len(listeners)+1)
 	go func() {
 		if err := connClient.run(); err != nil {
 			errStream <- fmt.Errorf("failed to run websocket connection: %w", err)
 		}
 	}()
-	go func() {
-		if err := server.ListenAndServe(); err != nil {
-			errStream <- err
-		}
-	}()
+	for _, ln := range listeners {
+		go func() {
+			if err := server.Serve(ln); err != nil {
+				errStream <- err
+			}
+		}()
+	}
 
 	logIntroMessage(appName, hostAddress)
 
 	select {
 	case err := <-errStream:
+		_ = server.Close()
 		return err
 	case <-done:
 		ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeoutSeconds*time.Second)

@@ -9,7 +9,7 @@ applyTo: "**/*.go"
 When generating code for this repository:
 
 1. **Factory Pattern First**: ALWAYS use the `cmdutil.Factory` interface for dependency injection - never instantiate API clients directly
-2. **Go 1.24 Only**: Use only language features available in Go 1.24.0 - this is our version
+2. **Go 1.26 Only**: Use only language features available in Go 1.26.0 - this is our version
 3. **Error Wrapping**: Always wrap errors with context using `fmt.Errorf("context: %w", err)`
 4. **Context Management**: Create deadline context from `opts.Deadline()` in command RunE functions
 5. **Testing Required**: All code changes must include unit tests
@@ -17,7 +17,7 @@ When generating code for this repository:
 
 ## Technology Stack
 
-**Go Version**: 1.24.0
+**Go Version**: 1.26.0
 
 **Core Dependencies**:
 - `github.com/spf13/cobra` v1.9.1 - CLI framework

@@ -98,19 +98,19 @@ func (e Error) Error() string {
 	containerLogs := fmt.Sprintf("Container logs: %s", e.ContainerLogs)
 	sb.WriteString("API Error Encountered: ( ")
 	if e.HTTPStatusCode != 0 {
-		sb.WriteString(fmt.Sprintf("%s ", httpStatus))
+		fmt.Fprintf(&sb, "%s ", httpStatus)
 	}
 	if e.ServerCode != 0 {
-		sb.WriteString(fmt.Sprintf("%s ", errorCode))
+		fmt.Fprintf(&sb, "%s ", errorCode)
 	}
 	if e.Message != "" {
-		sb.WriteString(fmt.Sprintf("%s ", detailedMessage))
+		fmt.Fprintf(&sb, "%s ", detailedMessage)
 	}
 	if e.TraceID != "" {
-		sb.WriteString(fmt.Sprintf("%s ", traceID))
+		fmt.Fprintf(&sb, "%s ", traceID)
 	}
 	if e.ContainerLogs != "" {
-		sb.WriteString(fmt.Sprintf("%s ", containerLogs))
+		fmt.Fprintf(&sb, "%s ", containerLogs)
 	}
 	sb.WriteString(")")
 	return sb.String()

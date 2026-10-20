@@ -10,7 +10,7 @@ make test           # go test -v ./...
 make test-unit      # alias for test
 make test-integration  # requires Docker; runs docker compose in tests/integration/
 make test-all       # unit + integration
-golangci-lint run   # lint (v2.6.2 — match CI version)
+golangci-lint run   # lint (v2.15.0 — match CI version)
 go generate ./...   # regenerate mocks (see Codegen below)
 ```
 
@@ -52,7 +52,7 @@ Five `ldflags` variables are injected at build time in CI (`main.apiVersion`, `m
 
 ## Linting
 
-Config: `.golangci.yml`, golangci-lint **v2.6.2** (same version as CI — mismatches cause false failures).
+Config: `.golangci.yml`, golangci-lint **v2.15.0** (same version as CI — mismatches cause false failures).
 
 Notable rules:
 - `gocyclo` / `cyclop` max complexity: 25.
