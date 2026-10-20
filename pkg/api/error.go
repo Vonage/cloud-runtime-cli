@@ -67,9 +67,11 @@ func NewErrorFromHTTPResponse(resp *resty.Response) Error {
 }
 
 func isGitHubRateLimited(resp *resty.Response) bool {
-	return resp.StatusCode() == http.StatusForbidden &&
+	return resp != nil &&
+		resp.StatusCode() == http.StatusForbidden &&
 		resp.Request != nil &&
 		resp.Request.RawRequest != nil &&
+		resp.Request.RawRequest.URL != nil &&
 		strings.EqualFold(resp.Request.RawRequest.URL.Host, "api.github.com") &&
 		(resp.Header().Get("X-RateLimit-Remaining") == "0" ||
 			strings.Contains(strings.ToLower(resp.String()), "rate limit"))
