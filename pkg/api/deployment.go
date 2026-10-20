@@ -472,7 +472,10 @@ type MongoInfoResponse struct {
 	ConnectionString string `json:"connectionString"`
 }
 
-const pluginsPath = "/plugins"
+const (
+	pluginsPath = "/plugins"
+	mongoPlugin = "mongo"
+)
 
 func (c *DeploymentClient) CreateMongoDatabase(ctx context.Context, version string) (MongoInfoResponse, error) {
 	var result MongoInfoResponse
@@ -480,7 +483,7 @@ func (c *DeploymentClient) CreateMongoDatabase(ctx context.Context, version stri
 	resp, err := c.httpClient.R().
 		SetContext(ctx).
 		SetResult(&result).
-		SetBody(pluginsRequest{Plugin: "mongo", Version: version, Action: "createDB"}).
+		SetBody(pluginsRequest{Plugin: mongoPlugin, Version: version, Action: "createDB"}).
 		Post(c.baseURL + pluginsPath)
 	if err != nil {
 		return MongoInfoResponse{}, fmt.Errorf("%w: trace_id = %s", err, traceIDFromHTTPResponse(resp))
@@ -498,7 +501,7 @@ func (c *DeploymentClient) CreateMongoDatabase(ctx context.Context, version stri
 func (c *DeploymentClient) DeleteMongoDatabase(ctx context.Context, version, database string) error {
 	resp, err := c.httpClient.R().
 		SetContext(ctx).
-		SetBody(pluginsRequest{Plugin: "mongo", Version: version, Action: "deleteDB", Options: map[string]interface{}{"database": database}}).
+		SetBody(pluginsRequest{Plugin: mongoPlugin, Version: version, Action: "deleteDB", Options: map[string]interface{}{"database": database}}).
 		Post(c.baseURL + pluginsPath)
 	if err != nil {
 		return fmt.Errorf("%w: trace_id = %s", err, traceIDFromHTTPResponse(resp))
@@ -519,7 +522,7 @@ func (c *DeploymentClient) GetMongoDatabase(ctx context.Context, version string,
 	resp, err := c.httpClient.R().
 		SetContext(ctx).
 		SetResult(&result).
-		SetBody(pluginsRequest{Plugin: "mongo", Version: version, Action: "getDB", Options: map[string]interface{}{"database": database}}).
+		SetBody(pluginsRequest{Plugin: mongoPlugin, Version: version, Action: "getDB", Options: map[string]interface{}{"database": database}}).
 		Post(c.baseURL + pluginsPath)
 	if err != nil {
 		return MongoInfoResponse{}, fmt.Errorf("%w: trace_id = %s", err, traceIDFromHTTPResponse(resp))
@@ -576,7 +579,7 @@ func (c *DeploymentClient) ListMongoDatabases(ctx context.Context, version strin
 	resp, err := c.httpClient.R().
 		SetContext(ctx).
 		SetResult(&result).
-		SetBody(pluginsRequest{Plugin: "mongo", Version: version, Action: "listDBs"}).
+		SetBody(pluginsRequest{Plugin: mongoPlugin, Version: version, Action: "listDBs"}).
 		Post(c.baseURL + pluginsPath)
 	if err != nil {
 		return nil, fmt.Errorf("%w: trace_id = %s", err, traceIDFromHTTPResponse(resp))

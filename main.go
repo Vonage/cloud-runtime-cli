@@ -14,6 +14,7 @@ import (
 	"vonage-cloud-runtime-cli/pkg/cmdutil"
 	"vonage-cloud-runtime-cli/pkg/format"
 	"vonage-cloud-runtime-cli/vcr/root"
+	"vonage-cloud-runtime-cli/vcr/upgrade"
 )
 
 var (
@@ -23,9 +24,14 @@ var (
 	buildDate  = "2021-09-01T00:00:00Z"
 	commit     = "0000"
 	releaseURL = "https://api.github.com/repos/Vonage/vonage-cloud-runtime-cli"
+
+	// upgradeTestKey is an ssh-ed25519 public key that test builds add to the keys trusted for upgrades
+	// (-X main.upgradeTestKey=<key>). It is empty in releases.
+	upgradeTestKey = ""
 )
 
 func main() {
+	upgrade.SetTestKey(upgradeTestKey)
 	f := cmdutil.NewDefaultFactory(apiVersion, releaseURL)
 	ctx := context.Background()
 	updateMessageChan := make(chan string)

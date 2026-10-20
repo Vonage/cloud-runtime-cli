@@ -100,6 +100,10 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+			if opts.Region != "" && !cmdutil.IsValidRegion(opts.Region) {
+				close(updateStream)
+				return fmt.Errorf("invalid --region %q: expected aws.<name>", opts.Region)
+			}
 			opts.Deadline = time.Now().Add(opts.Timeout)
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline)
 			defer cancel()

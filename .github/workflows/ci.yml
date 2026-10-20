@@ -5,25 +5,23 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
-permissions:
-  actions: write
-  checks: write
-  contents: read
-  deployments: read
-  issues: write
-  discussions: write
-  packages: read
-  pages: write
-  pull-requests: write
-  security-events: write
-  statuses: write
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test-install-using-action:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
       - name: Install Cloud Runtime CLI
         uses: ./
       - name: Verify installation
@@ -31,9 +29,14 @@ jobs:
 
   test-install-using-script:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
       - name: Install Cloud Runtime CLI
         shell: sh
         run: ./script/install.sh
@@ -42,31 +45,82 @@ jobs:
 
   unit-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
-          go-version: '1.25.5'
+          go-version-file: go.mod
           cache: true
 
       - name: Run unit tests
         run: go test ./...
 
+  # Blocks the PR on known issues in the module graph or the standard library.
+  # The vulncheck-override label accepts the findings of a PR (for example while no fixed release exists yet).
+  govulncheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@v1.8.0
+
+      - name: Run govulncheck
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          # Exit status 3 means findings; anything else non-zero is a failure of the tool itself.
+          status=0
+          "$(go env GOPATH)/bin/govulncheck" ./... || status=$?
+          if [ "$status" -eq 0 ]; then
+            exit 0
+          fi
+          if [ "$status" -eq 3 ] && [ -n "$PR_NUMBER" ] && gh api "repos/$GH_REPO/issues/$PR_NUMBER/labels" --jq '.[].name' | grep -x vulncheck-override > /dev/null; then
+            echo "::warning::findings accepted by the vulncheck-override label"
+            exit 0
+          fi
+          exit "$status"
+
   integration-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
     env:
       API_VERSION: ${{ vars.API_VERSION || 'v0.4' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
-          go-version: '1.25.5'
+          go-version-file: go.mod
           cache: true
 
       - name: Build binaries for integration tests
@@ -75,7 +129,7 @@ jobs:
           GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o tests/integration/bin/mockserver ./tests/integration/mocks/main.go
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
       - name: Run integration tests
         run: |
@@ -83,16 +137,21 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
     env:
       API_VERSION: ${{ vars.API_VERSION || 'v0.4' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
-          go-version: '1.25.5'
+          go-version-file: go.mod
           cache: true
 
       - name: Cross compile binaries

@@ -5,13 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
-	"runtime"
 	"testing"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
 	"github.com/golang/mock/gomock"
 	"github.com/google/shlex"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"vonage-cloud-runtime-cli/pkg/api"
@@ -182,95 +181,91 @@ func TestUpgrade(t *testing.T) {
 	}
 }
 
-func TestUpgradeByAsset(t *testing.T) {
-	filePath := "testdata/vcr"
+func TestUpgradeRefusesADevelopmentBuild(t *testing.T) {
+	for _, version := range []string{"dev", "garbage", "1.2", "v1.2.x", ""} {
+		for _, args := range []string{"", "--force"} {
+			t.Run(fmt.Sprintf("%q %q", version, args), func(t *testing.T) {
+				// no GetLatestRelease expectation: asking GitHub fails the test
+				releaseMock := mocks.NewMockReleaseInterface(gomock.NewController(t))
+				ios, _, _, stderr := iostreams.Test()
+				f := testutil.DefaultFactoryMock(t, ios, nil, releaseMock, nil, nil, nil, nil)
+				cmd := NewCmdUpgrade(f, version)
+				argv, err := shlex.Split(args)
+				require.NoError(t, err)
+				cmd.SetArgs(argv)
+				cmd.SetOut(io.Discard)
+				cmd.SetErr(io.Discard)
 
-	file, err := os.Open(filePath)
-	if err != nil {
-		require.Error(t, err, "should throw open file error")
+				_, err = cmd.ExecuteC()
+
+				require.EqualError(t, err, "Cannot upgrade a development build")
+				assert.Empty(t, stderr.String())
+			})
+		}
 	}
-	defer file.Close()
+}
 
-	byteSlice, err := io.ReadAll(file)
-	if err != nil {
-		require.Error(t, err, "should throw read file error")
-	}
+// runUpgradeCommand runs `vcr upgrade --force --path dir` as version 2.5.0 against r, with keys trusted.
+func runUpgradeCommand(t *testing.T, r *fakeRelease, dir string, keys []trustedKey) (string, error) {
+	t.Helper()
+	releaseMock := mocks.NewMockReleaseInterface(gomock.NewController(t))
+	releaseMock.EXPECT().GetLatestRelease(gomock.Any()).Return(r.release(), nil)
+	releaseMock.EXPECT().GetAsset(gomock.Any(), gomock.Any()).DoAndReturn(r.get).AnyTimes()
+	ios, _, stdout, _ := iostreams.Test()
+	f := testutil.DefaultFactoryMock(t, ios, nil, releaseMock, nil, nil, nil, nil)
+	cmd := newCmdUpgrade(f, "2.5.0", keys)
+	cmd.SetArgs([]string{"--force", "--path", dir})
+	cmd.SetOut(io.Discard)
+	cmd.SetErr(io.Discard)
 
-	type mock struct {
-		UpgradeExePath           string
-		UpgradeRelease           api.Release
-		UpgradeGetAssetTimes     int
-		UpgradeReturnAsset       []byte
-		UpgradeGetAssetReturnErr error
-	}
-	type want struct {
-		errMsg string
-	}
+	_, err := cmd.ExecuteC()
+	return stdout.String(), err
+}
 
-	tests := []struct {
-		name string
-		mock mock
-		want want
-	}{
-		{
-			name: "happy-path",
-			mock: mock{
-				UpgradeExePath: "testdata/vcr",
-				UpgradeRelease: api.Release{
-					TagName: "v0.0.1",
-					Assets:  []api.Asset{{Name: fmt.Sprintf("vcr_%s_%s.tar.gz", runtime.GOOS, runtime.GOARCH), BrowserDownloadURL: "test-DownloadURL"}}},
-				UpgradeGetAssetTimes:     1,
-				UpgradeReturnAsset:       byteSlice,
-				UpgradeGetAssetReturnErr: nil,
-			},
+func TestUpgradeCommandInstallsAVerifiedRelease(t *testing.T) {
+	priv := seededKey("release")
+	dir, _ := installTarget(t)
 
-			want: want{
-				errMsg: "",
-			},
-		},
+	stdout, err := runUpgradeCommand(t, newFakeRelease(t, priv), dir, []trustedKey{trustedKeyOf(priv)})
 
-		{
-			name: "api-error",
-			mock: mock{
-				UpgradeExePath: "testdata/vcr",
-				UpgradeRelease: api.Release{
-					TagName: "v0.0.1",
-					Assets:  []api.Asset{{Name: fmt.Sprintf("vcr_%s_%s.tar.gz", runtime.GOOS, runtime.GOARCH), BrowserDownloadURL: "test-DownloadURL"}}},
-				UpgradeGetAssetTimes:     1,
-				UpgradeReturnAsset:       nil,
-				UpgradeGetAssetReturnErr: errors.New("api error"),
-			},
+	require.NoError(t, err)
+	assert.Contains(t, stdout, "Successfully updated to version 9.9.9")
+	assert.Equal(t, map[string]string{"vcr": fakeBinary(testTag)}, snapshot(t, dir))
+}
 
-			want: want{
-				errMsg: "failed to get release asset: api error",
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+func TestUpgradeCommandChangesNothingWithoutATrustedKey(t *testing.T) {
+	priv := seededKey("release")
+	dir, _ := installTarget(t)
+	before := snapshot(t, dir)
 
-			ctrl := gomock.NewController(t)
+	stdout, err := runUpgradeCommand(t, newFakeRelease(t, priv), dir, nil)
 
-			releaseMock := mocks.NewMockReleaseInterface(ctrl)
-			releaseMock.EXPECT().
-				GetAsset(gomock.Any(), gomock.Any()).
-				Times(tt.mock.UpgradeGetAssetTimes).
-				Return(tt.mock.UpgradeReturnAsset, tt.mock.UpgradeGetAssetReturnErr)
+	require.EqualError(t, err, frame(testTag, reasonNoSignature))
+	assert.NotContains(t, stdout, "Successfully updated")
+	assert.Equal(t, before, snapshot(t, dir))
+}
 
-			f := testutil.DefaultFactoryMock(t, nil, nil, releaseMock, nil, nil, nil, nil)
-			opts := &Options{
-				Factory: f,
-			}
-			err := updateByAsset(t.Context(), opts, tt.mock.UpgradeRelease, tt.mock.UpgradeExePath)
-			if err != nil && tt.want.errMsg != "" {
-				require.Error(t, err, "should throw error")
-				require.Equal(t, tt.want.errMsg, err.Error())
-				return
-			}
+func TestUpgradeCommandUsesTheKeysOfTheBuild(t *testing.T) {
+	priv := seededKey("release")
+	previous := testPublicKey
+	t.Cleanup(func() { testPublicKey = previous })
+	dir, _ := installTarget(t)
+	before := snapshot(t, dir)
 
-			require.NoError(t, err, "should not throw error")
-		})
-	}
+	t.Run("a release signed by a key that is not compiled in is refused", func(t *testing.T) {
+		SetTestKey("")
+		_, err := runUpgradeCommand(t, newFakeRelease(t, priv), dir, trustedKeys())
+
+		require.EqualError(t, err, frame(testTag, reasonNoSignature))
+		assert.Equal(t, before, snapshot(t, dir))
+	})
+	t.Run("the test key of a test build is trusted", func(t *testing.T) {
+		SetTestKey(publicKeyLine(priv))
+		_, err := runUpgradeCommand(t, newFakeRelease(t, priv), dir, trustedKeys())
+
+		require.NoError(t, err)
+		assert.Equal(t, map[string]string{"vcr": fakeBinary(testTag)}, snapshot(t, dir))
+	})
 }
 
 func TestFormat(t *testing.T) {

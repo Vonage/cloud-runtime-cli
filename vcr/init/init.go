@@ -22,7 +22,25 @@ import (
 	"vonage-cloud-runtime-cli/pkg/format"
 )
 
-const defaultRuntime = "nodejs18"
+const (
+	defaultRuntime = "nodejs18"
+
+	projectDirPerm  os.FileMode = 0o755
+	defaultFilePerm os.FileMode = 0o644
+	keptModeBits                = 0o755 // owner rwx and group/other read and execute
+)
+
+var errTemplateTooLarge = api.ErrTemplateTooLarge
+
+// templateLimits bound a template. Past any of them: "template too large".
+type templateLimits struct {
+	maxDownload int64
+	maxUnpacked int64
+	maxEntries  int
+}
+
+// defaultTemplateLimits are 64 MiB downloaded, 256 MiB unpacked and 10,000 entries.
+var defaultTemplateLimits = templateLimits{maxDownload: 64 << 20, maxUnpacked: 256 << 20, maxEntries: 10000}
 
 type Options struct {
 	cmdutil.Factory
@@ -100,7 +118,7 @@ func NewCmdInit(f cmdutil.Factory) *cobra.Command {
 				if !errors.Is(err, config.ErrNotExistedPath) {
 					return fmt.Errorf("failed to get absolute path of %q: %w", opts.cwd, err)
 				}
-				if err := os.Mkdir(absPath, os.ModePerm); err != nil {
+				if err := os.Mkdir(absPath, projectDirPerm); err != nil {
 					return fmt.Errorf("failed to create directory %s: %w", absPath, err)
 				}
 			}
@@ -383,45 +401,155 @@ func getProductTemplatesByLang(productList []api.Product, programmingLang string
 
 // uncompressToDir uncompresses the given tar.gz file bytes to the given directory.
 func uncompressToDir(fileBytes []byte, dest string) error {
+	return uncompressToDirWithLimits(fileBytes, dest, defaultTemplateLimits)
+}
+
+// uncompressToDirWithLimits stops at the first entry that is refused or fails; what was written before it stays.
+// Entries must be local to dest and contain no .git component ("template entry %q is outside the project or
+// inside .git"). Only directories and regular files are extracted. Links and devices are skipped.
+func uncompressToDirWithLimits(fileBytes []byte, dest string, lim templateLimits) error {
+	if int64(len(fileBytes)) > lim.maxDownload {
+		return errTemplateTooLarge
+	}
 	gzr, err := gzip.NewReader(bytes.NewReader(fileBytes))
 	if err != nil {
 		return fmt.Errorf("failed to create a new gzip reader: %w", err)
 	}
 	defer gzr.Close()
 
-	tr := tar.NewReader(gzr)
+	root, err := os.OpenRoot(dest)
+	if err != nil {
+		return fmt.Errorf("failed to open directory %s: %w", dest, err)
+	}
+	defer root.Close()
 
-	for {
+	x := extractor{root: root, dir: dest}
+	return x.extractAll(tar.NewReader(gzr), lim)
+}
+
+// extractor writes template entries below an os.Root, which refuses names and symlinks that lead out of it.
+type extractor struct {
+	root *os.Root
+	dir  string
+}
+
+func (x extractor) extractAll(tr *tar.Reader, lim templateLimits) error {
+	left := budget{remaining: lim.maxUnpacked}
+	for count := 1; ; count++ {
 		header, err := tr.Next()
-		if err == io.EOF {
-			break
+		if errors.Is(err, io.EOF) {
+			return nil
 		}
-		if err != nil {
+		// A reader told to flag non-local names still hands over the header; the check in extractEntry words the refusal.
+		if err != nil && !errors.Is(err, tar.ErrInsecurePath) {
 			return fmt.Errorf("failed to read tar file: %w", err)
 		}
-		target := filepath.Join(dest, header.Name)
-		switch header.Typeflag {
-		case tar.TypeDir:
-			if err := os.MkdirAll(target, os.ModePerm); err != nil {
-				return fmt.Errorf("failed to create directory %s: %w", target, err)
-			}
-		case tar.TypeReg:
-			if err := os.MkdirAll(filepath.Dir(target), os.ModePerm); err != nil {
-				return err
-			}
-			file, err := os.OpenFile(target, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(header.Mode))
-			if err != nil {
-				return fmt.Errorf("failed to open file %s: %w", target, err)
-			}
-			if _, err := io.Copy(file, tr); err != nil {
-				return fmt.Errorf("failed to copy file %s: %w", target, err)
-			}
-			if err := file.Close(); err != nil {
-				return fmt.Errorf("failed to close file %s: %w", target, err)
-			}
+		if count > lim.maxEntries {
+			return errTemplateTooLarge
+		}
+		if err = x.extractEntry(tr, header, &left); err != nil {
+			return err
 		}
 	}
+}
+
+func (x extractor) extractEntry(body io.Reader, header *tar.Header, left *budget) error {
+	name := filepath.Clean(filepath.FromSlash(header.Name))
+	if !filepath.IsLocal(name) || hasGitComponent(name) {
+		return fmt.Errorf("template entry %q is outside the project or inside .git", header.Name)
+	}
+	switch header.Typeflag {
+	case tar.TypeDir:
+		return x.extractDir(name)
+	case tar.TypeReg:
+		return x.extractFile(body, name, fileMode(header), left)
+	default:
+		// The reader still inflates the body of a skipped entry, so it counts against the budget too.
+		return left.spend(header.Size)
+	}
+}
+
+func (x extractor) extractDir(name string) error {
+	if err := x.root.MkdirAll(name, projectDirPerm); err != nil {
+		return fmt.Errorf("failed to create directory %s: %w", filepath.Join(x.dir, name), err)
+	}
 	return nil
+}
+
+func (x extractor) extractFile(body io.Reader, name string, perm os.FileMode, left *budget) error {
+	if err := x.extractDir(filepath.Dir(name)); err != nil {
+		return err
+	}
+	path := filepath.Join(x.dir, name)
+	file, err := x.root.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
+	if err != nil {
+		return fmt.Errorf("failed to open file %s: %w", path, err)
+	}
+	if err = left.copyTo(file, body); err != nil {
+		_ = file.Close()
+		if errors.Is(err, errTemplateTooLarge) {
+			return err
+		}
+		return fmt.Errorf("failed to copy file %s: %w", path, err)
+	}
+	if err = file.Close(); err != nil {
+		return fmt.Errorf("failed to close file %s: %w", path, err)
+	}
+	return nil
+}
+
+// fileMode keeps the owner bits of a header's mode and drops group and other write and setuid, so 0600 stays 0600,
+// 0666 becomes 0644 and 04777 becomes 0755. A mode with none of the kept bits becomes 0644.
+func fileMode(header *tar.Header) os.FileMode {
+	perm := header.FileInfo().Mode().Perm() & keptModeBits
+	if perm == 0 {
+		return defaultFilePerm
+	}
+	return perm
+}
+
+// hasGitComponent reports whether any element of name is .git or its Windows short name, in any case and with the
+// trailing dots and spaces Windows ignores. .gitignore, .github and the like are fine.
+func hasGitComponent(name string) bool {
+	for _, element := range strings.Split(name, string(filepath.Separator)) {
+		switch strings.ToLower(strings.TrimRight(element, ". ")) {
+		case ".git", "git~1":
+			return true
+		}
+	}
+	return false
+}
+
+// budget hands out the bytes a template may still write.
+type budget struct{ remaining int64 }
+
+// spend charges n bytes that are read and dropped. Past what is left it fails with errTemplateTooLarge.
+func (b *budget) spend(n int64) error {
+	if n > b.remaining {
+		return errTemplateTooLarge
+	}
+	b.remaining -= n
+	return nil
+}
+
+// copyTo copies src into dst until src ends, writing no more than the bytes left. When src holds even one byte more it
+// fails with errTemplateTooLarge, and that byte is never written. Only the bytes that arrive count, not the size a
+// header declares.
+func (b *budget) copyTo(dst io.Writer, src io.Reader) error {
+	n, err := io.Copy(dst, io.LimitReader(src, b.remaining))
+	b.remaining -= n
+	if err != nil {
+		return err
+	}
+	var probe [1]byte
+	switch _, err = io.ReadFull(src, probe[:]); {
+	case err == nil:
+		return errTemplateTooLarge
+	case errors.Is(err, io.EOF):
+		return nil
+	default:
+		return err
+	}
 }
 
 func createNewApp(ctx context.Context, opts *Options, question string) (string, error) {
