@@ -54,12 +54,19 @@ jobs:
       - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with: { go-version-file: go.mod, cache: true }
       - id: scan
-        continue-on-error: true
-        run: make vulncheck
-      - name: Fail unless overridden
-        if: steps.scan.outcome == 'failure' && !contains(github.event.pull_request.labels.*.name, 'vulncheck-override')
+        # The command of `make vulncheck` (keep the version in step with GOVULNCHECK_VERSION), run directly because make reports every failure as status 2.
         run: |
-          echo "govulncheck found vulnerabilities. Fix them, or add the vulncheck-override label and say why in a comment."
+          # Status 3 means findings. Any other failure is the tool failing, which no label overrides.
+          status=0
+          go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./... || status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          if [ "$status" -ne 0 ] && [ "$status" -ne 3 ]; then
+            exit "$status"
+          fi
+      - name: Fail on findings unless overridden
+        if: steps.scan.outputs.status == '3' && !contains(github.event.pull_request.labels.*.name, 'vulncheck-override')
+        run: |
+          echo "::error::govulncheck found vulnerabilities. Fix them, or add the vulncheck-override label and say why in a comment."
           exit 1
 
   contract: # ubuntu only: the harness is Unix-only (`//go:build !windows`); macOS is optional

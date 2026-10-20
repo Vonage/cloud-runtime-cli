@@ -16,6 +16,7 @@ VERSION     ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo 
 COMMIT      ?= $(shell git rev-parse HEAD 2>/dev/null || echo 0000)
 BUILD_DATE  ?= $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 API_VERSION ?= v0.3
+GOVULNCHECK_VERSION ?= v1.8.0
 RELEASE_URL ?= https://api.github.com/repos/Vonage/cloud-runtime-cli
 TARGETS     := darwin/amd64 darwin/arm64 linux/amd64 linux/arm64 windows/amd64
 
@@ -54,8 +55,9 @@ lint:
 	rc=$$?; rm -rf "$$bin"; exit $$rc
 
 ## vulncheck: report known vulnerabilities in what the module links
+# ci.yml and vulncheck-weekly.yml run this same command (and version) directly: make reports every failure as status 2, and they need govulncheck's 3.
 vulncheck:
-	$(GO) run golang.org/x/vuln/cmd/govulncheck@latest ./...
+	$(GO) run golang.org/x/vuln/cmd/govulncheck@$(GOVULNCHECK_VERSION) ./...
 
 ## fmt: format every Go file
 fmt:

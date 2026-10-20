@@ -32,7 +32,49 @@ env:
     vcr_windows_amd64.tar.gz
 
 jobs:
+  # No release is cut from a tree that fails these.
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Lint
+        run: make lint
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Run tests
+        run: make test
+
   release-please:
+    needs: [lint, test]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -52,33 +94,9 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
-  # Run tests before building release artifacts
-  test:
-    needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout the release tag
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
-        with:
-          ref: ${{ needs.release-please.outputs.tag_name }}
-          persist-credentials: false
-
-      - name: Set up Go
-        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
-        with:
-          go-version-file: go.mod
-          cache: false
-
-      - name: Run unit tests
-        run: make test
-
   # Build, sign and notarize (requires macOS for Apple signing)
   build:
-    needs: [release-please, test]
+    needs: release-please
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     runs-on: macos-latest
     timeout-minutes: 60
@@ -118,49 +136,65 @@ jobs:
           TAG: ${{ needs.release-please.outputs.tag_name }}
           BUILD_DATE: ${{ github.event.repository.updated_at }}
         run: |
-          : "${API_VERSION:?API_VERSION is empty}"
-          commit=$(git rev-parse HEAD)
-          ldflags="-s -w -X 'main.apiVersion=$API_VERSION' -X 'main.version=$TAG' -X 'main.buildDate=$BUILD_DATE' -X 'main.commit=$commit' -X 'main.releaseURL=https://api.github.com/repos/$GITHUB_REPOSITORY'"
-          case $ldflags in
-            *upgradeTestKey*)
-              echo "::error::release builds must not set upgradeTestKey"
-              exit 1
-              ;;
-          esac
-          GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "$ldflags" -o vcr_darwin_amd64 .
-          GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags "$ldflags" -o vcr_darwin_arm64 .
-          GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags "$ldflags" -o vcr_linux_arm64 .
-          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "$ldflags" -o vcr_linux_amd64 .
-          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "$ldflags" -o vcr_windows_amd64.exe .
+          [ -n "$API_VERSION" ] || { echo "::error::API_VERSION is empty"; exit 1; }
+          make build-all VERSION="$TAG" COMMIT="$(git rev-parse HEAD)" BUILD_DATE="$BUILD_DATE" RELEASE_URL="https://api.github.com/repos/$GITHUB_REPOSITORY"
+
+      - name: Check what was built
+        run: |
+          # The flags live in the Makefile, so inspect the result. -trimpath hides -ldflags from the build info, so
+          # a test key is found in the binary itself: the public keys it embeds must be exactly RELEASE_PUBLIC_KEYS.
+          [ -z "$(go env GOFLAGS)" ] || { echo "::error::GOFLAGS must be empty"; exit 1; }
+          [ "$(find dist -type f | wc -l)" -eq 5 ] || { echo "::error::dist must hold exactly the five binaries"; exit 1; }
+          want=$(printf '%s\n' "$RELEASE_PUBLIC_KEYS" | sed -e 's/#.*//' | awk '$1=="ssh-ed25519"{print $2}' | sort)
+          [ -n "$want" ] || { echo "::error::RELEASE_PUBLIC_KEYS is empty"; exit 1; }
+          for f in dist/vcr_*; do
+            found=$(grep -a -o 'AAAAC3NzaC1lZDI1NTE5AAAAI[A-Za-z0-9+/]\{43\}' "$f" | sort -u) || true
+            [ "$found" = "$want" ] || { echo "::error::$f embeds keys other than RELEASE_PUBLIC_KEYS"; exit 1; }
+            info=$(go version -m "$f")
+            grep -q -e '-trimpath=true' <<<"$info" || { echo "::error::$f was not built with -trimpath"; exit 1; }
+            grep -q 'vcs.modified=false' <<<"$info" || { echo "::error::$f was built from a modified tree"; exit 1; }
+          done
 
       - name: Code sign darwin binaries
         run: |
-          codesign --timestamp --options=runtime -s "Developer ID Application: Nexmo Inc. (7F2B5ZSP8Q)" -v ./vcr_darwin_amd64
-          codesign --timestamp --options=runtime -s "Developer ID Application: Nexmo Inc. (7F2B5ZSP8Q)" -v ./vcr_darwin_arm64
+          codesign --timestamp --options=runtime -s "Developer ID Application: Nexmo Inc. (7F2B5ZSP8Q)" -v dist/vcr_darwin_amd64
+          codesign --timestamp --options=runtime -s "Developer ID Application: Nexmo Inc. (7F2B5ZSP8Q)" -v dist/vcr_darwin_arm64
 
       - name: Verify code signing
         run: |
-          codesign -vvv --deep --strict ./vcr_darwin_amd64
-          codesign -vvv --deep --strict ./vcr_darwin_arm64
+          codesign -vvv --deep --strict dist/vcr_darwin_amd64
+          codesign -vvv --deep --strict dist/vcr_darwin_arm64
 
       - name: Zip darwin binaries for notarization
         run: |
-          zip vcr_darwin_amd64.zip ./vcr_darwin_amd64
-          zip vcr_darwin_arm64.zip ./vcr_darwin_arm64
+          (cd dist && zip vcr_darwin_amd64.zip vcr_darwin_amd64 && zip vcr_darwin_arm64.zip vcr_darwin_arm64)
 
       - name: Notarize darwin binaries
         run: |
-          xcrun notarytool submit vcr_darwin_amd64.zip --keychain-profile "devrel" --wait
-          xcrun notarytool submit vcr_darwin_arm64.zip --keychain-profile "devrel" --wait
+          xcrun notarytool submit dist/vcr_darwin_amd64.zip --keychain-profile "devrel" --wait
+          xcrun notarytool submit dist/vcr_darwin_arm64.zip --keychain-profile "devrel" --wait
 
       - name: Compress binaries
         run: |
           mkdir bin
-          COPYFILE_DISABLE=1 tar --no-xattrs -czf bin/vcr_darwin_amd64.tar.gz ./vcr_darwin_amd64
-          COPYFILE_DISABLE=1 tar --no-xattrs -czf bin/vcr_darwin_arm64.tar.gz ./vcr_darwin_arm64
-          COPYFILE_DISABLE=1 tar --no-xattrs -czf bin/vcr_linux_arm64.tar.gz ./vcr_linux_arm64
-          COPYFILE_DISABLE=1 tar --no-xattrs -czf bin/vcr_linux_amd64.tar.gz ./vcr_linux_amd64
-          COPYFILE_DISABLE=1 tar --no-xattrs -czf bin/vcr_windows_amd64.tar.gz ./vcr_windows_amd64.exe
+          COPYFILE_DISABLE=1 tar --no-xattrs -czf bin/vcr_darwin_amd64.tar.gz -C dist vcr_darwin_amd64
+          COPYFILE_DISABLE=1 tar --no-xattrs -czf bin/vcr_darwin_arm64.tar.gz -C dist vcr_darwin_arm64
+          COPYFILE_DISABLE=1 tar --no-xattrs -czf bin/vcr_linux_arm64.tar.gz -C dist vcr_linux_arm64
+          COPYFILE_DISABLE=1 tar --no-xattrs -czf bin/vcr_linux_amd64.tar.gz -C dist vcr_linux_amd64
+          COPYFILE_DISABLE=1 tar --no-xattrs -czf bin/vcr_windows_amd64.tar.gz -C dist vcr_windows_amd64.exe
+
+      - name: Check the archives
+        run: |
+          # One entry per archive, the bare file name: the client and the installers look for it by that name.
+          for a in bin/*.tar.gz; do
+            want=$(basename "$a" .tar.gz)
+            [ "$want" = vcr_windows_amd64 ] && want=$want.exe
+            entries=$(tar -tzf "$a")
+            if [ "$(printf '%s\n' "$entries" | wc -l)" -ne 1 ] || [ "${entries#./}" != "$want" ]; then
+              echo "::error::$a must hold exactly $want"
+              exit 1
+            fi
+          done
 
       - name: Upload archives
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
