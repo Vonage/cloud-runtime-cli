@@ -148,3 +148,42 @@ func TestGetAsset(t *testing.T) {
 		})
 	}
 }
+
+func TestGetLatestReleaseRateLimited(t *testing.T) {
+	client := resty.New()
+	httpmock.ActivateNonDefault(client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder("GET", "https://api.github.com/repos/Vonage/vonage-cloud-runtime-cli/releases/latest",
+		func(_ *http.Request) (*http.Response, error) {
+			resp := httpmock.NewStringResponse(http.StatusForbidden, `{"message":"API rate limit exceeded"}`)
+			resp.Header.Set("Content-Type", "application/json")
+			resp.Header.Set("X-RateLimit-Remaining", "0")
+			return resp, nil
+		})
+
+	releaseClient := NewReleaseClient("https://api.github.com/repos/Vonage/vonage-cloud-runtime-cli", client)
+
+	_, err := releaseClient.GetLatestRelease(t.Context())
+
+	require.EqualError(t, err, "API Error Encountered: ( HTTP status: 403 Detailed message: GitHub API rate limit exceeded while checking for CLI updates. Please retry later. Trace ID: n/a )")
+}
+
+func TestGetLatestReleaseSecondaryRateLimited(t *testing.T) {
+	client := resty.New()
+	httpmock.ActivateNonDefault(client.GetClient())
+	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder("GET", "https://api.github.com/repos/Vonage/vonage-cloud-runtime-cli/releases/latest",
+		func(_ *http.Request) (*http.Response, error) {
+			resp := httpmock.NewStringResponse(http.StatusForbidden, `{"message":"You have exceeded a secondary rate limit."}`)
+			resp.Header.Set("Content-Type", "application/json")
+			return resp, nil
+		})
+
+	releaseClient := NewReleaseClient("https://api.github.com/repos/Vonage/vonage-cloud-runtime-cli", client)
+
+	_, err := releaseClient.GetLatestRelease(t.Context())
+
+	require.EqualError(t, err, "API Error Encountered: ( HTTP status: 403 Detailed message: GitHub API rate limit exceeded while checking for CLI updates. Please retry later. Trace ID: n/a )")
+}
