@@ -1,0 +1,21 @@
+go.mod
+  s_e795896f8279fd::t_64b96768c8228b 11,20-22,39-42,54-56
+go.sum
+  s_e795896f8279fd::t_3e3c927607d161 11-12,49-50,52-53,55-58,97-98,107-108,112-113,127-128,131-132,137-138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "26197f197c4f2a238da6b6ee2625c0a927153c9d",
+  "prompts": {},
+  "sessions": {
+    "s_e795896f8279fd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "97a498cf-7a93-4a02-b45a-e94b7e0b50bf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
