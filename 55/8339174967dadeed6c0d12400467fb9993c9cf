@@ -1,26 +1,38 @@
 .github/workflows/release-please.yml
-  06b14c060916d729 88-89,118,158,164
+  fa58a4f40ebf0b96 88-89,118,158,164
 .github/workflows/release.yml
-  06b14c060916d729 138,166,206,212
+  fa58a4f40ebf0b96 138,166,206,212
 AGENTS.md
-  06b14c060916d729 82
+  fa58a4f40ebf0b96 82
 README.md
-  06b14c060916d729 201
+  fa58a4f40ebf0b96 201
 openspec/changes/gateway-graphql-endpoint/tasks.md
-  06b14c060916d729 12,16
+  fa58a4f40ebf0b96 12,16
 ---
 {
   "schema_version": "authorship/3.0.0",
   "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "558339174967dadeed6c0d12400467fb9993c9cf",
   "prompts": {
-    "06b14c060916d729": {
+    "fa58a4f40ebf0b96": {
       "agent_id": {
         "tool": "opencode",
-        "id": "13e80e15-1f52-4458-9eaf-2eef3a1bd4fc",
+        "id": "17a6f4cb-7751-4fac-9fb4-5b957be692f8",
         "model": "claude-opus-5.5"
       },
       "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-04T15:14:18.653Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-04T15:14:18.653Z"
+        }
+      ],
       "total_additions": 13,
       "total_deletions": 5,
       "accepted_lines": 13,
