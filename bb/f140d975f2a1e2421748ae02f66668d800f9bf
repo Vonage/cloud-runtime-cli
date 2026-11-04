@@ -1,0 +1,14 @@
+openspec/specs/graphql-endpoint/spec.md
+  h_df1d95ff1e9b8c 1-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bbf140d975f2a1e2421748ae02f66668d800f9bf",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}

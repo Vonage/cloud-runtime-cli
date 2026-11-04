@@ -1,0 +1,30 @@
+.github/workflows/release-please.yml
+  06b14c060916d729 88-89,118,158,164
+.github/workflows/release.yml
+  06b14c060916d729 138,166,206,212
+AGENTS.md
+  06b14c060916d729 82
+README.md
+  06b14c060916d729 201
+openspec/changes/gateway-graphql-endpoint/tasks.md
+  06b14c060916d729 12,16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "558339174967dadeed6c0d12400467fb9993c9cf",
+  "prompts": {
+    "06b14c060916d729": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "13e80e15-1f52-4458-9eaf-2eef3a1bd4fc",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "total_additions": 13,
+      "total_deletions": 5,
+      "accepted_lines": 13,
+      "overriden_lines": 0
+    }
+  }
+}
