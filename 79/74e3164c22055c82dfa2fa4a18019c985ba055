@@ -1,24 +1,44 @@
 openspec/changes/gateway-graphql-endpoint/.openspec.yaml
-  h_df1d95ff1e9b8c 1-2
+  5b871825729345f2 1-2
 openspec/changes/gateway-graphql-endpoint/design.md
-  h_df1d95ff1e9b8c 1-26
+  5b871825729345f2 1-26
 openspec/changes/gateway-graphql-endpoint/proposal.md
-  h_df1d95ff1e9b8c 1-37
+  5b871825729345f2 1-37
 openspec/changes/gateway-graphql-endpoint/specs/graphql-endpoint/spec.md
-  h_df1d95ff1e9b8c 1-55
+  5b871825729345f2 1-55
 openspec/changes/gateway-graphql-endpoint/tasks.md
-  h_df1d95ff1e9b8c 1-16
+  5b871825729345f2 1-16
 openspec/config.yaml
-  h_df1d95ff1e9b8c 1-25
+  5b871825729345f2 1-25
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.7.5",
+  "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "7974e3164c22055c82dfa2fa4a18019c985ba055",
-  "prompts": {},
-  "humans": {
-    "h_df1d95ff1e9b8c": {
-      "author": "Simon Chan <simon.chan@vonage.com>"
+  "prompts": {
+    "5b871825729345f2": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "6accc940-1f4f-467c-aa06-8286758fdda3",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-04T14:55:10.947Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-04T14:55:10.947Z"
+        }
+      ],
+      "total_additions": 161,
+      "total_deletions": 0,
+      "accepted_lines": 161,
+      "overriden_lines": 0
     }
   }
 }
