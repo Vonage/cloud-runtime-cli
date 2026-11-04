@@ -1,14 +1,34 @@
 openspec/specs/graphql-endpoint/spec.md
-  h_df1d95ff1e9b8c 1-54
+  d29ffbea4afd1798 1-54
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.7.5",
+  "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "bbf140d975f2a1e2421748ae02f66668d800f9bf",
-  "prompts": {},
-  "humans": {
-    "h_df1d95ff1e9b8c": {
-      "author": "Simon Chan <simon.chan@vonage.com>"
+  "prompts": {
+    "d29ffbea4afd1798": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "a5e723ee-471a-4d83-9f9f-f9f7ee847655",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-04T15:14:18.181Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-04T15:14:18.181Z"
+        }
+      ],
+      "total_additions": 54,
+      "total_deletions": 0,
+      "accepted_lines": 54,
+      "overriden_lines": 0
     }
   }
 }
