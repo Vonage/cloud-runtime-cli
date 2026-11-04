@@ -9,8 +9,8 @@
 
 ## 2. Release tooling
 
-- [ ] 2.1 In `.github/workflows/release-please.yml` and `.github/workflows/release.yml`, run "Store notarization credentials", "Zip darwin binaries for notarization" and "Notarize darwin binaries" only when `vars.APPLE_NOTARIZE == 'true'`; update the build job comments. Verify: `actionlint` (if installed) or a YAML parse of both files.
+- [x] 2.1 In `.github/workflows/release-please.yml` and `.github/workflows/release.yml`, run "Store notarization credentials", "Zip darwin binaries for notarization" and "Notarize darwin binaries" only when `vars.APPLE_NOTARIZE == 'true'`; update the build job comments. Verify: `actionlint` (if installed) or a YAML parse of both files.
 
 ## 3. Checks
 
-- [ ] 3.1 Run `make test` and `golangci-lint run` (v2.6.2); both pass.
+- [x] 3.1 Run `make test` and `golangci-lint run` (v2.6.2); both pass.
