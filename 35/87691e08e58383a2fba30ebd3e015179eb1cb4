@@ -1,0 +1,32 @@
+.github/workflows/release-please.yml
+  h_df1d95ff1e9b8c 88-89,118,158,164
+.github/workflows/release.yml
+  h_df1d95ff1e9b8c 138,166,206,212
+AGENTS.md
+  h_df1d95ff1e9b8c 82
+README.md
+  h_df1d95ff1e9b8c 201
+openspec/changes/gateway-graphql-endpoint/tasks.md
+  h_df1d95ff1e9b8c 5-8
+pkg/cmdutil/factory.go
+  h_df1d95ff1e9b8c 7-8,295,297-304,306,308-319,322,328-329
+pkg/cmdutil/factory_test.go
+  h_df1d95ff1e9b8c 145-151,170-173
+pkg/config/config.go
+  h_df1d95ff1e9b8c 15
+vcr/root/root.go
+  h_df1d95ff1e9b8c 7,106
+vcr/root/root_test.go
+  h_df1d95ff1e9b8c 124,126-130,189,220,222-223
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3587691e08e58383a2fba30ebd3e015179eb1cb4",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
