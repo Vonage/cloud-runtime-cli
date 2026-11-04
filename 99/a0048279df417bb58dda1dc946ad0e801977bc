@@ -1,0 +1,22 @@
+README.md
+  h_df1d95ff1e9b8c 201
+AGENTS.md
+  h_df1d95ff1e9b8c 82
+.github/workflows/release-please.yml
+  h_df1d95ff1e9b8c 88-89,118,158,164
+.github/workflows/release.yml
+  h_df1d95ff1e9b8c 138,166,206,212
+openspec/changes/gateway-graphql-endpoint/tasks.md
+  h_df1d95ff1e9b8c 12,16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "99a0048279df417bb58dda1dc946ad0e801977bc",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
