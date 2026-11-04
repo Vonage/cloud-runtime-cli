@@ -135,6 +135,7 @@ jobs:
           make_latest: ${{ contains(inputs.tag, '-') && 'false' || 'true' }}
 
   # Build, sign and notarize (requires macOS for Apple signing). Only main reaches this job.
+  # Notarization runs only when the repository variable APPLE_NOTARIZE is "true".
   build:
     if: github.ref == 'refs/heads/main'
     needs: draft
@@ -162,6 +163,7 @@ jobs:
           cache: false
 
       - name: Store notarization credentials
+        if: vars.APPLE_NOTARIZE == 'true'
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -201,11 +203,13 @@ jobs:
           codesign -vvv --deep --strict ./vcr_darwin_arm64
 
       - name: Zip darwin binaries for notarization
+        if: vars.APPLE_NOTARIZE == 'true'
         run: |
           zip vcr_darwin_amd64.zip ./vcr_darwin_amd64
           zip vcr_darwin_arm64.zip ./vcr_darwin_arm64
 
       - name: Notarize darwin binaries
+        if: vars.APPLE_NOTARIZE == 'true'
         run: |
           xcrun notarytool submit vcr_darwin_amd64.zip --keychain-profile "devrel" --wait
           xcrun notarytool submit vcr_darwin_arm64.zip --keychain-profile "devrel" --wait

@@ -79,7 +79,7 @@ Flags > `vcr.yaml` (project manifest) > `~/.vcr-cli` (INI, stores `api_key`, `ap
 ## Release
 
 - Automated via Release Please on merge to `main`.
-- macOS binaries are code-signed ("Developer ID Application: Nexmo Inc.") and notarized — this only runs in GitHub Actions with org secrets. Local builds do not require signing.
+- macOS binaries are code-signed ("Developer ID Application: Nexmo Inc.") and, when the repository variable `APPLE_NOTARIZE` is `true`, notarized — this only runs in GitHub Actions with org secrets. Local builds do not require signing.
 
 ## Reference
 

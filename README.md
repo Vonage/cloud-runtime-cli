@@ -198,7 +198,7 @@ This project uses [Release Please](https://github.com/googleapis/release-please)
 3. **Publish release**: When the Release PR is merged, a GitHub Release is created
 4. **Build & distribute**: The release triggers the build pipeline which:
    - Cross-compiles binaries for all platforms
-   - Code signs and notarizes macOS binaries
+   - Code signs macOS binaries, and notarizes them when the repository variable `APPLE_NOTARIZE` is `true`
    - Uploads artifacts to the GitHub Release
 
 ### Manual Release
