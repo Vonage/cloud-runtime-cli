@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.7.0](https://github.com/Vonage/cloud-runtime-cli/compare/v2.6.1...v2.7.0) (2026-11-04)
+
+
+### 🚀 Features
+
+* use the API gateway for GraphQL endpoints and skip notarization ([#101](https://github.com/Vonage/cloud-runtime-cli/issues/101)) ([5e3aba2](https://github.com/Vonage/cloud-runtime-cli/commit/5e3aba258fc5df9c09be895b9c75d3fe618286e9))
+
 ## [2.6.1](https://github.com/Vonage/cloud-runtime-cli/compare/v2.6.0...v2.6.1) (2026-10-20)
 
 
