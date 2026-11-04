@@ -1,0 +1,24 @@
+openspec/changes/gateway-graphql-endpoint/.openspec.yaml
+  h_df1d95ff1e9b8c 1-2
+openspec/changes/gateway-graphql-endpoint/design.md
+  h_df1d95ff1e9b8c 1-26
+openspec/changes/gateway-graphql-endpoint/proposal.md
+  h_df1d95ff1e9b8c 1-37
+openspec/changes/gateway-graphql-endpoint/specs/graphql-endpoint/spec.md
+  h_df1d95ff1e9b8c 1-55
+openspec/changes/gateway-graphql-endpoint/tasks.md
+  h_df1d95ff1e9b8c 1-16
+openspec/config.yaml
+  h_df1d95ff1e9b8c 1-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7974e3164c22055c82dfa2fa4a18019c985ba055",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
