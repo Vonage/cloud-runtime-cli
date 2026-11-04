@@ -1,0 +1,24 @@
+vcr/root/root.go
+  h_df1d95ff1e9b8c 7,106
+pkg/cmdutil/factory_test.go
+  h_df1d95ff1e9b8c 145-151,170-173
+pkg/cmdutil/factory.go
+  h_df1d95ff1e9b8c 7-8,295,297-304,306,308-319,322,328-329
+pkg/config/config.go
+  h_df1d95ff1e9b8c 15
+vcr/root/root_test.go
+  h_df1d95ff1e9b8c 124,126-130,189,220,222-223
+openspec/changes/gateway-graphql-endpoint/tasks.md
+  h_df1d95ff1e9b8c 5-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d94e1930d791fdc6a30c39de5ead26f4ba944916",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
