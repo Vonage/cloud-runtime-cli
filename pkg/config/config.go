@@ -12,7 +12,7 @@ import (
 var ErrNoConfig = errors.New("config file not found, please use 'vcr configure' to create one")
 
 const (
-	DefaultGraphqlURL = "https://graphql.euw1.runtime.vonage.cloud/v1/graphql"
+	DefaultGraphqlURL = "https://api-eu.vonage.com/v1/vcr/euw1/api/graphql/v1/graphql"
 	DefaultRegion     = "aws.euw1"
 )
 

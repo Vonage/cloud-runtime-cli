@@ -142,7 +142,13 @@ func TestMakeGraphqlEndpoint(t *testing.T) {
 		region string
 		want   string
 	}{
-		{name: "well-formed", region: "aws.euw1", want: "https://graphql.euw1.runtime.vonage.cloud/v1/graphql"},
+		{name: "euw1", region: "aws.euw1", want: "https://api-eu.vonage.com/v1/vcr/euw1/api/graphql/v1/graphql"},
+		{name: "use1", region: "aws.use1", want: "https://api-us.vonage.com/v1/vcr/use1/api/graphql/v1/graphql"},
+		{name: "apse1", region: "aws.apse1", want: "https://api-ap.vonage.com/v1/vcr/apse1/api/graphql/v1/graphql"},
+		{name: "apse2", region: "aws.apse2", want: "https://api-ap.vonage.com/v1/vcr/apse2/api/graphql/v1/graphql"},
+		{name: "standby-euc1", region: "aws.euc1"},
+		{name: "standby-usw2", region: "aws.usw2"},
+		{name: "unknown", region: "aws.mars1"},
 		{name: "empty", region: ""},
 		{name: "shorter-than-prefix", region: "aw"},
 		{name: "prefix-only", region: "aws."},
@@ -159,6 +165,10 @@ func TestMakeGraphqlEndpoint(t *testing.T) {
 			})
 		})
 	}
+}
+
+func TestDefaultGraphqlURLIsDefaultRegionEndpoint(t *testing.T) {
+	require.Equal(t, makeGraphqlEndpoint(config.DefaultRegion), config.DefaultGraphqlURL)
 }
 
 func TestGraphQLURLIgnoresMalformedRegion(t *testing.T) {

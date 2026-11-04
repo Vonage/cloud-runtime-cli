@@ -121,9 +121,13 @@ func TestRegionFlagValidation(t *testing.T) {
 		valid  bool
 	}{
 		{name: "euw1", region: "aws.euw1", valid: true},
+		{name: "use1", region: "aws.use1", valid: true},
 		{name: "apse1", region: "aws.apse1", valid: true},
-		{name: "digits-only-name", region: "aws.123", valid: true},
-		{name: "name-at-length-limit", region: "aws." + strings.Repeat("a", 63), valid: true},
+		{name: "apse2", region: "aws.apse2", valid: true},
+		{name: "standby-euc1", region: "aws.euc1"},
+		{name: "standby-usw2", region: "aws.usw2"},
+		{name: "unknown", region: "aws.mars1"},
+		{name: "digits-only-name", region: "aws.123"},
 		{name: "no-prefix", region: "x"},
 		{name: "prefix-only", region: "aws."},
 		{name: "prefix-without-dot", region: "aws"},
@@ -182,7 +186,7 @@ func TestRegionFlagValidation(t *testing.T) {
 					require.Equal(t, tt.region, seen)
 					return
 				}
-				require.EqualError(t, err, fmt.Sprintf("invalid --region %q: expected aws.<name>", tt.region))
+				require.EqualError(t, err, fmt.Sprintf("invalid --region %q: expected one of %s", tt.region, supportedRegions))
 				select {
 				case _, ok := <-updateStream:
 					require.False(t, ok, "update stream should be closed")
@@ -213,5 +217,7 @@ func TestRegionFlagRejectedBeforeAnyOtherCommandRuns(t *testing.T) {
 
 	_, err := executeRoot(t, f, []string{"secret", "--region", "aws.euw1/x"})
 
-	require.EqualError(t, err, `invalid --region "aws.euw1/x": expected aws.<name>`)
+	require.EqualError(t, err, `invalid --region "aws.euw1/x": expected one of `+supportedRegions)
 }
+
+const supportedRegions = "aws.apse1, aws.apse2, aws.euw1, aws.use1"

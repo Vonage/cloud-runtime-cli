@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/MakeNowJust/heredoc"
@@ -102,7 +103,7 @@ func NewCmdRoot(f cmdutil.Factory, version, buildDate, commit string, updateStre
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			if opts.Region != "" && !cmdutil.IsValidRegion(opts.Region) {
 				close(updateStream)
-				return fmt.Errorf("invalid --region %q: expected aws.<name>", opts.Region)
+				return fmt.Errorf("invalid --region %q: expected one of %s", opts.Region, strings.Join(cmdutil.SupportedRegions(), ", "))
 			}
 			opts.Deadline = time.Now().Add(opts.Timeout)
 			ctx, cancel := context.WithDeadline(context.Background(), opts.Deadline)
