@@ -16,6 +16,7 @@ type API interface {
 	UploadSource(ctx context.Context, path string) (string, error)
 	CreatePackage(ctx context.Context, req platform.PackageRequest) (string, error)
 	WatchBuild(ctx context.Context, packageID string, onLine func(frame string)) error
+	BuildStatus(ctx context.Context, packageID string) (string, error)
 	DeployInstance(ctx context.Context, req platform.DeployRequest) (platform.DeployResult, error)
 }
 

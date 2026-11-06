@@ -219,14 +219,14 @@ func (r *runner) createPackage(ctx context.Context, req platform.PackageRequest)
 	return id, nil
 }
 
-// watchBuild shows the build output as it arrives and returns when the build is over. The platform decides when
-// that is, on the frame as it came; what is shown has the control sequences taken out.
+// watchBuild shows the build output as it arrives and returns when the build status route says the build is over.
+// What is shown has the control sequences taken out.
 func (r *runner) watchBuild(ctx context.Context, packageID string) error {
 	if r.t.Mode() != term.Classic {
 		return r.watchBuildRich(ctx, packageID)
 	}
 	fmt.Fprintf(r.t.Out, "%s Waiting for build to start...\n", r.c.Blue(term.InfoIcon))
-	err := r.api.WatchBuild(ctx, packageID, func(frame string) {
+	err := r.awaitBuild(ctx, packageID, func(frame string) {
 		fmt.Fprintln(r.t.Out, term.SanitizeStream(frame))
 	})
 	if err != nil {

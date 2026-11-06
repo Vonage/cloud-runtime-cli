@@ -35,7 +35,7 @@ Work in the worktree that publishing creates. It must be cut from the rewritten 
 
 ## 4. Deploy: the status poll decides
 
-- [ ] 4.1 Add the poll loop and wire it into the build stage.
+- [x] 4.1 Add the poll loop and wire it into the build stage.
   - Files:
     - `internal/deploy/deploy.go`: add `BuildStatus(ctx context.Context, packageID string) (string, error)` to `API`.
     - New `internal/deploy/build.go`: `awaitBuild`, the constants `pollInterval = 2 * time.Second` and `streamGrace = 5 * time.Second`, and `endedError` moved from `internal/platform/watch.go` with identical texts.

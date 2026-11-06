@@ -139,12 +139,12 @@ func (r *runner) createPackageRich(ctx context.Context, req platform.PackageRequ
 	return id, nil
 }
 
-// watchBuildRich shows the build output under a gutter while the step is live; the platform still decides when the
-// build is over, on the frame as it came.
+// watchBuildRich shows the build output under a gutter while the step is live; the build status route decides when
+// the build is over.
 func (r *runner) watchBuildRich(ctx context.Context, packageID string) error {
 	gutter := r.t.Gutter()
 	step := r.t.StartStep("Building package")
-	err := r.api.WatchBuild(ctx, packageID, func(frame string) {
+	err := r.awaitBuild(ctx, packageID, func(frame string) {
 		fmt.Fprint(gutter, term.SanitizeStream(frame)+"\n")
 	})
 	if err != nil {

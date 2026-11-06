@@ -80,5 +80,5 @@ func run(cmd *cobra.Command, env *cmdenv.Env, f flagValues, args []string) error
 		}
 		return fmt.Errorf("%s: %w", prefix, err)
 	}
-	return stages.Run(cmd.Context(), env.IO, client, buildPlan(f, read, dir, region))
+	return stages.Run(cmd.Context(), env.IO, client, env.Clock, buildPlan(f, read, dir, region))
 }

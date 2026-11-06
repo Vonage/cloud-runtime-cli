@@ -7,6 +7,8 @@ import (
 	"errors"
 	"io"
 	"os"
+	"slices"
+	"sync"
 
 	"vonage-cloud-runtime-cli/internal/platform"
 )
@@ -19,13 +21,15 @@ const (
 	callUploadSource    = "UploadSource"
 	callCreatePackage   = "CreatePackage"
 	callWatchBuild      = "WatchBuild"
+	callBuildStatus     = "BuildStatus"
 	callDeployInstance  = "DeployInstance"
 	maxUploadedBodySize = 1 << 20
 )
 
 // fakeAPI is a hand-written API that records the order of the calls and the requests it received, and answers from
-// its fields.
+// its fields. The build stage calls WatchBuild and BuildStatus from two goroutines, so mu guards what those touch.
 type fakeAPI struct {
+	mu    sync.Mutex
 	calls []string
 
 	// answers
@@ -41,6 +45,10 @@ type fakeAPI struct {
 	packageErr    error
 	frames        []string
 	watchErr      error
+	watchBlocks   bool           // WatchBuild sends its frames, then holds until its context ends
+	watchCtxErr   error          // the error of WatchBuild's context when it returned
+	statuses      []statusAnswer // BuildStatus answers these in order, the last repeating
+	statusCalls   int
 	deployed      platform.DeployResult
 	deployErr     error
 
@@ -58,6 +66,14 @@ type fakeAPI struct {
 	uploadedPath string
 	entries      []string // tar entry names of the archive that was uploaded
 	watchedID    string
+	// the error of WatchBuild's context when DeployInstance was called: non-nil means the stream was closed first
+	deployedAfterWatch error
+}
+
+// statusAnswer is one answer of BuildStatus: a status, or an error.
+type statusAnswer struct {
+	status string
+	err    error
 }
 
 func newFakeAPI() *fakeAPI {
@@ -67,6 +83,7 @@ func newFakeAPI() *fakeAPI {
 		sourceKey:  "source-key-1",
 		packageID:  "pkg-1",
 		frames:     []string{"building", "Status - completed"},
+		statuses:   []statusAnswer{{status: "completed"}},
 		deployed: platform.DeployResult{
 			InstanceID:  "i-1",
 			ServiceName: "my-project-dev",
@@ -77,19 +94,32 @@ func newFakeAPI() *fakeAPI {
 
 // enter records a call and runs the hook before the method does anything else.
 func (f *fakeAPI) enter(name string) {
+	f.mu.Lock()
 	f.calls = append(f.calls, name)
-	if f.onCall != nil {
-		f.onCall(name)
+	hook := f.onCall
+	f.mu.Unlock()
+	if hook != nil {
+		hook(name)
 	}
 }
 
 func (f *fakeAPI) called(name string) bool {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return slices.Contains(f.calls, name)
+}
+
+// count is how many times the named call was made.
+func (f *fakeAPI) count(name string) int {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	n := 0
 	for _, c := range f.calls {
 		if c == name {
-			return true
+			n++
 		}
 	}
-	return false
+	return n
 }
 
 func (f *fakeAPI) GetProject(_ context.Context, name string) (platform.Project, error) {
@@ -142,18 +172,40 @@ func (f *fakeAPI) CreatePackage(_ context.Context, req platform.PackageRequest) 
 	return f.packageID, nil
 }
 
-func (f *fakeAPI) WatchBuild(_ context.Context, packageID string, onLine func(frame string)) error {
+func (f *fakeAPI) WatchBuild(ctx context.Context, packageID string, onLine func(frame string)) error {
 	f.enter(callWatchBuild)
+	f.mu.Lock()
 	f.watchedID = packageID
-	for _, frame := range f.frames {
+	frames, blocks, err := f.frames, f.watchBlocks, f.watchErr
+	f.mu.Unlock()
+	for _, frame := range frames {
 		onLine(frame)
 	}
-	return f.watchErr
+	if blocks {
+		<-ctx.Done()
+		err = ctx.Err()
+	}
+	f.mu.Lock()
+	f.watchCtxErr = ctx.Err()
+	f.mu.Unlock()
+	return err
+}
+
+func (f *fakeAPI) BuildStatus(_ context.Context, _ string) (string, error) {
+	f.enter(callBuildStatus)
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	a := f.statuses[min(f.statusCalls, len(f.statuses)-1)]
+	f.statusCalls++
+	return a.status, a.err
 }
 
 func (f *fakeAPI) DeployInstance(_ context.Context, req platform.DeployRequest) (platform.DeployResult, error) {
 	f.enter(callDeployInstance)
+	f.mu.Lock()
 	f.deployReq = req
+	f.deployedAfterWatch = f.watchCtxErr
+	f.mu.Unlock()
 	if f.deployErr != nil {
 		return platform.DeployResult{}, f.deployErr
 	}

@@ -26,7 +26,8 @@ type richRun struct {
 	t      *testing.T
 	api    *fakeAPI
 	plan   Plan
-	clk    *clocktest.Fake
+	clk    *clocktest.Fake // the clock of the presentation
+	poll   *clocktest.Fake // paces the build status poll, so its sleeps do not move the step durations
 	io     *term.IO
 	stdout *term.TermBuffer
 	stderr *term.TermBuffer
@@ -37,12 +38,14 @@ func newRichRun(t *testing.T, mode term.Mode) *richRun {
 	base := newHarness(t)
 	clk := clocktest.New(richStart)
 	streams, stdout, stderr := term.TestRich(mode, 80, clk)
-	return &richRun{t: t, api: base.api, plan: base.plan, clk: clk, io: streams, stdout: stdout, stderr: stderr}
+	return &richRun{
+		t: t, api: base.api, plan: base.plan, clk: clk, poll: base.poll, io: streams, stdout: stdout, stderr: stderr,
+	}
 }
 
 func (r *richRun) run() error {
 	r.t.Helper()
-	return Run(r.t.Context(), r.io, r.api, r.plan)
+	return Run(r.t.Context(), r.io, r.api, r.poll, r.plan)
 }
 
 // moveClock makes the fake clock pass d inside the named calls of the fake API.
@@ -225,10 +228,8 @@ func TestRichDeployCreatesAMissingProject(t *testing.T) {
 	out := squashed(lines(r.stdout.Screen()))
 	assert.Equal(t, "✓ Project created brand-new", out[0])
 	assert.NotContains(t, r.stdout.Screen(), "Project resolved")
-	assert.Equal(t, []string{
-		callGetProject, callCreateProject, callValidate, callUploadSource, callCreatePackage, callWatchBuild,
-		callDeployInstance,
-	}, r.api.calls)
+	assertBuildCalls(t, r.api,
+		[]string{callGetProject, callCreateProject, callValidate, callUploadSource, callCreatePackage}, 1)
 	assert.Equal(t, "brand-new", r.api.createdName)
 	assert.Equal(t, "p-new", r.api.validateReq.ProjectID)
 	assert.Equal(t, "p-new", r.api.deployReq.ProjectID)

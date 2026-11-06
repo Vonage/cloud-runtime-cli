@@ -52,9 +52,10 @@ func TestDeployAgainstTheFakePlatform(t *testing.T) {
 		"POST /deployments/validate",
 		"POST /packages/source",
 		"POST /packages",
+		"GET /packages/<id>/build/status",
 		"GET /packages/<id>/build/watch",
 		"POST /deployments",
-	}, requestsOf(srv))
+	}, deployRequestsOf(srv))
 	for _, r := range srv.Requests() {
 		assert.Equal(t, testKey, r.User, "%s %s", r.Method, r.Path)
 	}

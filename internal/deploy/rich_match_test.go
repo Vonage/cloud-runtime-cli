@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,7 +31,7 @@ type calls struct {
 
 func callsOf(f *fakeAPI) calls {
 	return calls{
-		Methods: f.calls, ProjectAsked: f.projectAsked, CreatedName: f.createdName, Validate: f.validateReq,
+		Methods: buildStageSorted(f.calls), ProjectAsked: f.projectAsked, CreatedName: f.createdName, Validate: f.validateReq,
 		Package: f.packageReq, Deploy: f.deployReq, WatchedID: f.watchedID, Entries: f.entries,
 	}
 }
@@ -57,11 +58,11 @@ func runIn(t *testing.T, mode term.Mode, plan Plan, configure func(*fakeAPI)) ou
 	)
 	if mode == term.Classic {
 		streams, out, errOut := term.Test("", false)
-		err = Run(t.Context(), streams, api, plan)
+		err = Run(t.Context(), streams, api, clocktest.New(richStart), plan)
 		stdout, stderr = out.String(), errOut.String()
 	} else {
 		streams, out, errOut := term.TestRich(mode, 80, clocktest.New(richStart))
-		err = Run(t.Context(), streams, api, plan)
+		err = Run(t.Context(), streams, api, clocktest.New(richStart), plan)
 		stdout, stderr = out.Screen(), errOut.Screen()
 	}
 	requireEmptyDir(t, tmp)
@@ -124,8 +125,8 @@ func failures() []failure {
 		{name: "empty runtime", plan: func(_ *testing.T, p *Plan) { p.Runtime = "" }, unresolved: "Package created"},
 		{name: "package creation", api: func(a *fakeAPI) { a.packageErr = boom }, unresolved: "Package created"},
 		{
-			name:       "build watch",
-			api:        func(a *fakeAPI) { a.watchErr = errors.New("error while building package pkg-1") },
+			name:       "build fails",
+			api:        func(a *fakeAPI) { a.statuses = []statusAnswer{{status: "failed"}} },
 			unresolved: "Package built",
 		},
 		{name: "instance deploy", api: func(a *fakeAPI) { a.deployErr = boom }, unresolved: "Instance deployed"},
@@ -235,4 +236,19 @@ func TestStaticDeployMatchesRichScreen(t *testing.T) {
 			assert.NotContains(t, buffer.Raw(), sequence)
 		}
 	}
+}
+
+// buildStageSorted sorts the calls the build stage makes from two goroutines, whose order is not fixed.
+func buildStageSorted(in []string) []string {
+	out := slices.Clone(in)
+	start := slices.Index(out, callCreatePackage) + 1
+	if start == 0 {
+		return out
+	}
+	end := len(out)
+	if i := slices.Index(out, callDeployInstance); i >= 0 {
+		end = i
+	}
+	slices.Sort(out[start:end])
+	return out
 }

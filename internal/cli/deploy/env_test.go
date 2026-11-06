@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
 
@@ -106,6 +107,18 @@ func requestsOf(srv *fakeplatform.Server) []string {
 		if r.Kind == kindREST || r.Kind == kindWebsocket {
 			out = append(out, r.Method+" "+fixtureID.ReplaceAllString(r.Rel, "<id>"))
 		}
+	}
+	return out
+}
+
+// deployRequestsOf is requestsOf with the requests of the build stage sorted: it reads the build status and
+// watches the build from two goroutines, so their order is not fixed.
+func deployRequestsOf(srv *fakeplatform.Server) []string {
+	out := requestsOf(srv)
+	start := slices.Index(out, "POST /packages") + 1
+	end := slices.Index(out, "POST /deployments")
+	if start > 0 && end >= start {
+		slices.Sort(out[start:end])
 	}
 	return out
 }

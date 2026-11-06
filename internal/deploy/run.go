@@ -4,20 +4,21 @@ import (
 	"context"
 	"fmt"
 
+	"vonage-cloud-runtime-cli/internal/clock"
 	"vonage-cloud-runtime-cli/internal/manifest"
 	"vonage-cloud-runtime-cli/internal/term"
 )
 
 // Run parses Plan.Capabilities with manifest.ParseCapabilities at the package stage, after the validate and upload
 // requests, as v2.6.1 does ("failed to parse capabilities: %w"). Run executes v2.6.1's stage order — project (GET, then POST on 404), validate, package, upload, create package,
-// build watch (each frame printed through term.SanitizeStream after the raw status check), deploy — and prints the
+// build (the status route polled on clk decides; the watch's frames printed through term.SanitizeStream), deploy — and prints the
 // final block with today's exact lines ("Instance has been deployed!", "Instance id: …", "Instance service name: …",
 // and one "Instance host address: <url>" per host URL, the URL wrapped in term.YellowBold).
-func Run(ctx context.Context, t *term.IO, api API, p Plan) error {
+func Run(ctx context.Context, t *term.IO, api API, clk clock.Clock, p Plan) error {
 	if p.Manifest == nil {
 		p.Manifest = &manifest.Manifest{}
 	}
-	r := &runner{t: t, c: t.Style(), api: api, p: p}
+	r := &runner{t: t, c: t.Style(), api: api, clk: clk, p: p}
 	return r.run(ctx)
 }
 
@@ -27,6 +28,7 @@ type runner struct {
 	t   *term.IO
 	c   term.Style
 	api API
+	clk clock.Clock // paces the build status poll
 	p   Plan
 }
 

@@ -7,12 +7,15 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"vonage-cloud-runtime-cli/internal/clock/clocktest"
 	"vonage-cloud-runtime-cli/internal/manifest"
 	"vonage-cloud-runtime-cli/internal/platform"
 	"vonage-cloud-runtime-cli/internal/term"
@@ -25,6 +28,7 @@ type harness struct {
 	t      *testing.T
 	api    *fakeAPI
 	plan   Plan
+	poll   *clocktest.Fake // paces the build status poll
 	io     *term.IO
 	stdout *bytes.Buffer
 	stderr *bytes.Buffer
@@ -47,6 +51,7 @@ func newHarness(t *testing.T) *harness {
 			Region:       "aws.euw1",
 			AppID:        testAppID,
 		},
+		poll:   clocktest.New(time.Unix(0, 0)),
 		io:     streams,
 		stdout: out,
 		stderr: errOut,
@@ -57,7 +62,7 @@ func (h *harness) run() error { return h.runCtx(context.Background()) }
 
 func (h *harness) runCtx(ctx context.Context) error {
 	h.t.Helper()
-	return Run(ctx, h.io, h.api, h.plan)
+	return Run(ctx, h.io, h.api, h.poll, h.plan)
 }
 
 // tempDirHolder points the temporary directory at an empty one for the test and returns it.
@@ -114,9 +119,7 @@ func TestRunHappyPath(t *testing.T) {
 		wantBlock()
 	assert.Equal(t, want, h.stdout.String())
 	assert.Empty(t, h.stderr.String())
-	assert.Equal(t, []string{
-		callGetProject, callValidate, callUploadSource, callCreatePackage, callWatchBuild, callDeployInstance,
-	}, h.api.calls)
+	assertBuildCalls(t, h.api, []string{callGetProject, callValidate, callUploadSource, callCreatePackage}, 1)
 	assert.Equal(t, "pkg-1", h.api.watchedID)
 	assert.Contains(t, h.stdout.String(), "| Instance host address: \x1b[0;1;33mhttps://one.example.test\x1b[0m\n")
 }
@@ -129,10 +132,8 @@ func TestRunCreatesAMissingProject(t *testing.T) {
 	err := h.run()
 
 	require.NoError(t, err)
-	assert.Equal(t, []string{
-		callGetProject, callCreateProject, callValidate, callUploadSource, callCreatePackage, callWatchBuild,
-		callDeployInstance,
-	}, h.api.calls)
+	assertBuildCalls(t, h.api,
+		[]string{callGetProject, callCreateProject, callValidate, callUploadSource, callCreatePackage}, 1)
 	assert.Equal(t, "my-project", h.api.createdName)
 	assert.Equal(t, "p-new", h.api.validateReq.ProjectID)
 	assert.Equal(t, "p-new", h.api.deployReq.ProjectID)
@@ -292,4 +293,22 @@ func TestRunStopsWhenTheContextEnds(t *testing.T) {
 	assert.False(t, h.api.called(callUploadSource))
 	assert.False(t, h.api.called(callCreatePackage))
 	requireEmptyDir(t, tmp)
+}
+
+// assertBuildCalls checks a deploy that went through the build: the calls before it in order, then the watch once
+// and statuses status reads in any order, then the deploy.
+func assertBuildCalls(t *testing.T, api *fakeAPI, before []string, statuses int) {
+	t.Helper()
+	calls := api.calls
+	require.Greater(t, len(calls), len(before), "calls: %q", calls)
+	assert.Equal(t, before, calls[:len(before)])
+	build := slices.Clone(calls[len(before) : len(calls)-1])
+	slices.Sort(build)
+	want := []string{callWatchBuild}
+	for range statuses {
+		want = append(want, callBuildStatus)
+	}
+	slices.Sort(want)
+	assert.Equal(t, want, build, "the build stage reads the status and watches once, in either order")
+	assert.Equal(t, callDeployInstance, calls[len(calls)-1])
 }

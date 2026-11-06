@@ -60,7 +60,8 @@ func TestRichDeployAgainstTheFakePlatform(t *testing.T) {
 		"POST /deployments/validate",
 		"POST /packages/source",
 		"POST /packages",
+		"GET /packages/<id>/build/status",
 		"GET /packages/<id>/build/watch",
 		"POST /deployments",
-	}, requestsOf(srv), "the requests are the classic ones")
+	}, deployRequestsOf(srv), "the classic requests, and the status read")
 }

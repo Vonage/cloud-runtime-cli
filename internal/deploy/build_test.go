@@ -33,17 +33,17 @@ func TestRunBuildFramesAreSanitised(t *testing.T) {
 	}
 }
 
-func TestRunWatchFailure(t *testing.T) {
+func TestRunWatchFailureOnlyCostsOutput(t *testing.T) {
 	h := newHarness(t)
-	h.api.frames = []string{"building", "failed to watch build logs"}
-	h.api.watchErr = errors.New("error while building package pkg-1")
+	h.api.frames = []string{"building"}
+	h.api.watchErr = errors.New("retried connecting 5 times: refused")
 
 	err := h.run()
 
-	require.EqualError(t, err, `failed to watch deployment for package_id="pkg-1": error while building package pkg-1`)
-	assert.False(t, h.api.called(callDeployInstance))
-	assert.NotContains(t, h.stdout.String(), "built successfully")
-	assert.Contains(t, h.stdout.String(), "building\nfailed to watch build logs\n", "the frames that arrived are printed")
+	require.NoError(t, err)
+	assert.True(t, h.api.called(callDeployInstance))
+	assert.Equal(t, "! build output is unavailable: retried connecting 5 times: refused\n", h.stderr.String())
+	assert.Contains(t, h.stdout.String(), "building\n"+`✓ Package "pkg-1" built successfully`)
 }
 
 func TestRunCreatePackageFailure(t *testing.T) {
