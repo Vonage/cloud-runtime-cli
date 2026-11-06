@@ -1,22 +1,42 @@
 internal/deploy/build.go
-  h_df1d95ff1e9b8c 21,78
+  ed405bb8c100a53a 21,78
 internal/deploy/build_status_test.go
-  h_df1d95ff1e9b8c 16,216-239
+  ed405bb8c100a53a 16,216-239
 internal/deploy/fake_api_test.go
-  h_df1d95ff1e9b8c 48-51,182,187-195,212-218
+  ed405bb8c100a53a 48-51,182,187-195,212-218
 internal/deploy/rich_test.go
-  h_df1d95ff1e9b8c 5,290-310
+  ed405bb8c100a53a 5,290-310
 openspec/changes/build-status-polling/design.md
-  h_df1d95ff1e9b8c 7
+  ed405bb8c100a53a 7
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.7.5",
+  "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "9a4c8ea6334136cdaeb34c10e3db7859e88021bc",
-  "prompts": {},
-  "humans": {
-    "h_df1d95ff1e9b8c": {
-      "author": "Simon Chan <simon.chan@vonage.com>"
+  "prompts": {
+    "ed405bb8c100a53a": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "f943c0bf-141f-463a-8377-7dabb4545d00",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-06T20:04:33.451Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-06T20:04:33.451Z"
+        }
+      ],
+      "total_additions": 71,
+      "total_deletions": 11,
+      "accepted_lines": 71,
+      "overriden_lines": 0
     }
   }
 }
