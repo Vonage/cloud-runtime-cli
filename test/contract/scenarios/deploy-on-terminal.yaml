@@ -20,5 +20,5 @@ fixtures:
         - {send: "Step 1/2 : install dependencies"}
         - {send: "\u001b[35mℹ\u001b[0m Status - completed"}   # the server's real status frame, colour included
 steps: []
-expect-reads: [euw1 GET /regions/aws.euw1, euw1 GET /projects/my-project]
+expect-reads: [euw1 GET /regions/aws.euw1, euw1 GET /projects/my-project, euw1 GET /packages/<uuid>/build/status]
 scrape: [deployed-banner, deployed-host-address]

@@ -24,4 +24,5 @@ fixtures:
 expect-reads:
   - "euw1 GET /regions/aws.euw1"
   - "euw1 GET /projects/my-project"
+  - "euw1 GET /packages/<uuid>/build/status"
 scrape-except: [deployed-banner, deployed-instance-id, deployed-service-name, deployed-host-address, table-lines]

@@ -1,4 +1,4 @@
-description: "the exact line that the build service sends when it cannot watch the build ends the watch"
+description: "the exact failure status line of the build service does not end the build"
 group: deploy
 args: [deploy]
 cwd: work/project
@@ -22,7 +22,9 @@ files:
 fixtures:
   build:
     connections:
-      - [{send: "Starting build"}, {send: "failed to watch build logs"}]
+      - [{send: "Starting build"}, {send: "\x1b[35mℹ\x1b[0m Status - failed"}]
 expect-reads:
   - "euw1 GET /regions/aws.euw1"
   - "euw1 GET /projects/my-project"
+  - "euw1 GET /packages/<uuid>/build/status"
+scrape-except: [deployed-banner, deployed-instance-id, deployed-service-name, deployed-host-address]

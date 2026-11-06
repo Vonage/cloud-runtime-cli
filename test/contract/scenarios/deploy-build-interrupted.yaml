@@ -19,6 +19,7 @@ files:
     content: |
       {"name": "my-project", "version": "1.0.0"}
 fixtures:
+  buildStatus: [{status: building}]
   build:
     connections:
       - [{send: "Starting build"}, {hang: true}]
@@ -28,3 +29,4 @@ steps:
 expect-reads:
   - "euw1 GET /regions/aws.euw1"
   - "euw1 GET /projects/my-project"
+  - "euw1 GET /packages/<uuid>/build/status"

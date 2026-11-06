@@ -138,7 +138,7 @@ deploy-upload-transport-error-once stdout uploads retry on transport errors and 
 deploy-upload-transport-error-once stderr uploads retry on transport errors and 502/503/504 with a stderr notice per retry
 deploy-upload-transport-error-once exit uploads retry on transport errors and 502/503/504 with a stderr notice per retry
 deploy-upload-transport-error-once requests uploads retry on transport errors and 502/503/504 with a stderr notice per retry
-security-build-frame-with-status-word-does-not-end-the-watch stdout only the server's exact status frames end a build watch
+security-build-frame-with-status-word-does-not-end-the-watch stdout the build status route decides the outcome; the build log stream only shows output
 security-escape-build-frames stdout remote text is sanitised before it is printed
 security-redirect-upload-307 stdout credentials go only to platform hosts and redirects of POST requests are refused
 security-redirect-upload-307 stderr credentials go only to platform hosts and redirects of POST requests are refused
@@ -163,3 +163,19 @@ debug-takeover-close-1008 exit a taken-over session ends with exit status 1
 debug-takeover-close-1008 requests the debug service is deleted when the session is taken over, instead of the CLI reconnecting
 security-debug-verbose-hides-authorization stdout verbose output hides the values of authorization and cookie headers
 security-escape-debug-access-log stdout terminal control sequences in the path of a relayed request are removed from the access log
+deploy-build-normal-close-before-completion stdout the build status route decides the outcome; the build log stream only shows output
+deploy-build-normal-close-before-completion stderr the build status route decides the outcome; the build log stream only shows output
+deploy-build-normal-close-before-completion exit the build status route decides the outcome; the build log stream only shows output
+deploy-build-normal-close-before-completion requests the build status route decides the outcome; the build log stream only shows output
+deploy-build-connect-always-rejected stdout the build status route decides the outcome; the build log stream only shows output
+deploy-build-connect-always-rejected stderr the build status route decides the outcome; the build log stream only shows output
+deploy-build-connect-always-rejected exit the build status route decides the outcome; the build log stream only shows output
+deploy-build-connect-always-rejected requests the build status route decides the outcome; the build log stream only shows output
+security-build-frame-failure-line-does-not-end-the-build stdout the build status route decides the outcome; the build log stream only shows output
+security-build-frame-failure-line-does-not-end-the-build stderr the build status route decides the outcome; the build log stream only shows output
+security-build-frame-failure-line-does-not-end-the-build exit the build status route decides the outcome; the build log stream only shows output
+security-build-frame-failure-line-does-not-end-the-build requests the build status route decides the outcome; the build log stream only shows output
+security-build-frame-watch-failure-line-does-not-end-the-build stdout the build status route decides the outcome; the build log stream only shows output
+security-build-frame-watch-failure-line-does-not-end-the-build stderr the build status route decides the outcome; the build log stream only shows output
+security-build-frame-watch-failure-line-does-not-end-the-build exit the build status route decides the outcome; the build log stream only shows output
+security-build-frame-watch-failure-line-does-not-end-the-build requests the build status route decides the outcome; the build log stream only shows output

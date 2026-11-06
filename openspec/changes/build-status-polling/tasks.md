@@ -81,7 +81,7 @@ Work in the worktree that publishing creates. It must be cut from the rewritten 
   - Test first: extend `TestReadsFilterRemovesTheNineRoutes` (rename it `TestReadsFilterRemovesTheReadRoutes`) with `euw1 GET /packages/<uuid>/build/status`, and a case showing `euw1 GET /packages/<uuid>/build/logs` is kept.
   - Verify: `go test ./test/contract/ -run 'TestReadsFilter' -count=1`
   - Done when: the test passes.
-- [ ] 5.2 Update every scenario that reaches the build, and the allowed diffs.
+- [x] 5.2 Update every scenario that reaches the build, and the allowed diffs.
   - Scenarios: every scenario whose transcript in `test/contract/testdata/transcripts/` has a `WS /packages/<uuid>/build/watch` block, found with `grep -l "WS /packages/<uuid>/build/watch" test/contract/testdata/transcripts/*`. That is the `deploy-*` and `security-build-*` ones that build, plus `security-escape-build-frames`, `security-redirect-upload-307`, `security-upload-env-negation-brings-back-env`, `security-upload-git-file-is-kept`, `security-upload-git-negation-brings-back-git`, `security-upload-skips-git-and-env-files` and `security-upload-symlink-outside-project-is-a-link-only`.
   - Changes:
     - Each of those scenarios adds the status GETs it makes to `expect-reads` (`"euw1 GET /packages/<uuid>/build/status"`, once per poll; one in the default case, where the fixture answers `completed`).
