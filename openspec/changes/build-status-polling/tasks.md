@@ -103,7 +103,7 @@ Work in the worktree that publishing creates. It must be cut from the rewritten 
 - [x] 6.1 Run everything.
   - Verify: `make test && make lint && make contract NO_GRAPHQL=1 && make contract-rich`
   - Done when: all pass. Record their output in the PR description.
-- [ ] 6.2 Check by hand against a development environment, with a config whose endpoint points at it:
+- [x] 6.2 Check by hand against a development environment, with a config whose endpoint points at it:
   - `vcr deploy` of a small Node app builds and deploys, the build lines show, and stderr is empty.
   - A deploy whose `build-script` exits 1 fails with `error while building package <id>`.
   - Ctrl-C during the build ends with the canceled message.
