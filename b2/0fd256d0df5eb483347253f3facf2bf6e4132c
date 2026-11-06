@@ -1,14 +1,34 @@
 openspec/changes/build-status-polling/tasks.md
-  h_df1d95ff1e9b8c 106
+  06feffa61d2627ed 106
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.7.5",
+  "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "b20fd256d0df5eb483347253f3facf2bf6e4132c",
-  "prompts": {},
-  "humans": {
-    "h_df1d95ff1e9b8c": {
-      "author": "Simon Chan <simon.chan@vonage.com>"
+  "prompts": {
+    "06feffa61d2627ed": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "530bf30d-a888-47be-8d56-bce102bc206d",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-06T20:04:33.818Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-06T20:04:33.818Z"
+        }
+      ],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
     }
   }
 }
