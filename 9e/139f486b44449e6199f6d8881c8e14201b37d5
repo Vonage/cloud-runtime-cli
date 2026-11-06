@@ -1,0 +1,64 @@
+internal/cli/deploy/deploy.go
+  97f7e8c7dccf4562 83
+internal/cli/deploy/env_test.go
+  97f7e8c7dccf4562 10,114-125
+internal/cli/deploy/fake_test.go
+  97f7e8c7dccf4562 55,58
+internal/cli/deploy/rich_test.go
+  97f7e8c7dccf4562 63,66
+internal/deploy/build.go
+  97f7e8c7dccf4562 1-143
+internal/deploy/build_status_test.go
+  97f7e8c7dccf4562 1-214
+internal/deploy/build_test.go
+  97f7e8c7dccf4562 36,38-39,43-46
+internal/deploy/deploy.go
+  97f7e8c7dccf4562 19
+internal/deploy/deploy_test.go
+  97f7e8c7dccf4562 10,13,18,31,54,65,122,135-136,297-314
+internal/deploy/fake_api_test.go
+  97f7e8c7dccf4562 10-11,24,30,32,48-51,69-76,86,97,99-102,107-116,119,122,175,177,179-181,184-200,205,207-208
+internal/deploy/rich.go
+  97f7e8c7dccf4562 142-143,147
+internal/deploy/rich_match_test.go
+  97f7e8c7dccf4562 7,34,61,65,128-129,240-254
+internal/deploy/rich_test.go
+  97f7e8c7dccf4562 29-30,41-43,48,231-232
+internal/deploy/run.go
+  97f7e8c7dccf4562 7,14,17,21,31
+internal/deploy/stages.go
+  97f7e8c7dccf4562 222-223,229
+openspec/changes/build-status-polling/tasks.md
+  97f7e8c7dccf4562 38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "9e139f486b44449e6199f6d8881c8e14201b37d5",
+  "prompts": {
+    "97f7e8c7dccf4562": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "3a3d2e2b-89b5-42cb-bedb-6844d5621f7e",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-06T18:39:46.961Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-06T18:39:46.961Z"
+        }
+      ],
+      "total_additions": 511,
+      "total_deletions": 48,
+      "accepted_lines": 511,
+      "overriden_lines": 0
+    }
+  }
+}
