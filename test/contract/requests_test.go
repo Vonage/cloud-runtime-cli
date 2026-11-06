@@ -248,6 +248,8 @@ const readsSample = "euw1 GET /regions\n  auth: basic abc123\n\n" +
 	"euw1 GET /projects/my-project/instances/dev\n  auth: basic abc123\n\n" +
 	"euw1 GET /instances/<uuid>/logs?limit=10\n  auth: basic abc123\n\n" +
 	"euw1 GET /instances\n  auth: basic abc123\n\n" +
+	"euw1 GET /packages/<uuid>/build/status\n  auth: basic abc123\n\n" +
+	"euw1 GET /packages/<uuid>/build/logs\n  auth: basic abc123\n\n" +
 	"euw1 POST graphql:Regions\n  auth: basic abc123\n\n" +
 	"euw1 DELETE /instances/<uuid>\n  auth: basic abc123\n\n" +
 	"euw1 GET /secrets\n  auth: basic abc123\n\n" +
@@ -256,15 +258,17 @@ const readsSample = "euw1 GET /regions\n  auth: basic abc123\n\n" +
 	"gh GET /releases/latest\n  auth: none\n\n" +
 	"[peer]\nconnected\n"
 
-func TestReadsFilterRemovesTheNineRoutes(t *testing.T) {
+func TestReadsFilterRemovesTheReadRoutes(t *testing.T) {
 	f := FilterReads(readsSample)
 	assert.Equal(t, 1, f.GraphQL)
 	assert.Equal(t, []string{
 		"euw1 GET /regions", "euw1 GET /regions/aws.euw1", "euw1 GET /runtimes", "euw1 GET /products/templates",
 		"euw1 GET /projects/my-project", "euw1 GET /instances?filter=dev", "euw1 GET /instances/<uuid>",
 		"euw1 GET /projects/my-project/instances/dev", "euw1 GET /instances/<uuid>/logs?limit=10", "euw1 GET /instances",
+		"euw1 GET /packages/<uuid>/build/status",
 	}, f.Reads)
-	wantKept := "euw1 DELETE /instances/<uuid>\n  auth: basic abc123\n\n" +
+	wantKept := "euw1 GET /packages/<uuid>/build/logs\n  auth: basic abc123\n\n" +
+		"euw1 DELETE /instances/<uuid>\n  auth: basic abc123\n\n" +
 		"euw1 GET /secrets\n  auth: basic abc123\n\n" +
 		"euw1 GET /applications\n  auth: basic abc123\n\n" +
 		"euw1 GET /projects/my-project/instances\n  auth: basic abc123\n\n" +

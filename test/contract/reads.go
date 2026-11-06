@@ -41,7 +41,7 @@ func firstLine(block string) string {
 }
 
 // FilterReads removes from a requests section every GraphQL block and every
-// GET of one of the nine read routes that the baseline never calls.
+// GET of one of the read routes that the baseline never calls.
 func FilterReads(section string) Filtered {
 	var f Filtered
 	var kept []string
@@ -65,7 +65,7 @@ func FilterReads(section string) Filtered {
 }
 
 // isReadRoute reports whether target (a rel with its query) is one of the
-// nine read routes.
+// read routes: the nine that replace the GraphQL queries, and the build status.
 func isReadRoute(target string) bool {
 	rel, _, _ := strings.Cut(target, "?")
 	segs := strings.Split(strings.TrimPrefix(rel, "/"), "/")
@@ -76,6 +76,8 @@ func isReadRoute(target string) bool {
 		return segs[0] == "regions" || segs[0] == "projects" || segs[0] == segInstances
 	case len(segs) == 3:
 		return segs[0] == segInstances && segs[2] == "logs" && segs[1] != ""
+	case len(segs) == 4 && segs[0] == "packages":
+		return segs[1] != "" && segs[2] == "build" && segs[3] == "status"
 	case len(segs) == 4:
 		return segs[0] == "projects" && segs[2] == segInstances && segs[1] != "" && segs[3] != ""
 	}

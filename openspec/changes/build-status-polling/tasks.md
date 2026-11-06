@@ -76,7 +76,7 @@ Work in the worktree that publishing creates. It must be cut from the rewritten 
 
 ## 5. Contract harness and scenarios
 
-- [ ] 5.1 Count the status route as a read.
+- [x] 5.1 Count the status route as a read.
   - Files: `test/contract/reads.go` (`isReadRoute` also accepts `/packages/<id>/build/status`; update the "nine read routes" comments to ten), `test/contract/requests_test.go`.
   - Test first: extend `TestReadsFilterRemovesTheNineRoutes` (rename it `TestReadsFilterRemovesTheReadRoutes`) with `euw1 GET /packages/<uuid>/build/status`, and a case showing `euw1 GET /packages/<uuid>/build/logs` is kept.
   - Verify: `go test ./test/contract/ -run 'TestReadsFilter' -count=1`
