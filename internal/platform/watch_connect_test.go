@@ -183,7 +183,7 @@ func TestWatchBuildContextEndsDuringConnectRetries(t *testing.T) {
 
 		err := c.WatchBuild(ctx, testPackageID, func(string) {})
 
-		require.EqualError(t, err, wantCanceled)
+		wantCanceled(t, err)
 		assert.Len(t, srv.seen(), 2)
 		assert.Equal(t, []time.Duration{100 * time.Millisecond}, fake.Sleeps())
 	})
@@ -196,7 +196,7 @@ func TestWatchBuildContextEndsDuringConnectRetries(t *testing.T) {
 
 		err := c.WatchBuild(ctx, testPackageID, func(string) {})
 
-		require.EqualError(t, err, wantTimedOut)
+		wantTimedOut(t, err)
 		assert.Empty(t, srv.seen())
 		assert.Empty(t, fake.Sleeps())
 	})

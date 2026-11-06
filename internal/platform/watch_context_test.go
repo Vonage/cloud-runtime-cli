@@ -36,7 +36,7 @@ func TestWatchBuildCancelEndsBlockedRead(t *testing.T) {
 		cancel()
 
 		res := awaitWatch(t, out)
-		require.EqualError(t, res.err, wantCanceled)
+		wantCanceled(t, res.err)
 		assert.Less(t, time.Since(canceledAt), 2*time.Second)
 		srv.waitForClientToLeave(t, 1)
 	})
@@ -50,7 +50,7 @@ func TestWatchBuildDeadlineEndsBlockedRead(t *testing.T) {
 
 	res := awaitWatch(t, watchInBackground(ctx, c, func(string) {}))
 
-	require.EqualError(t, res.err, wantTimedOut)
+	wantTimedOut(t, res.err)
 	assert.Less(t, res.took, 2*time.Second)
 	srv.waitForClientToLeave(t, 1)
 }
@@ -64,7 +64,7 @@ func TestWatchBuildCancelledBeforeConnecting(t *testing.T) {
 
 	err := c.WatchBuild(ctx, testPackageID, onLine)
 
-	require.EqualError(t, err, wantCanceled)
+	wantCanceled(t, err)
 	assert.Empty(t, srv.seen())
 	assert.Empty(t, got())
 	assert.Empty(t, fake.Sleeps())
@@ -83,7 +83,7 @@ func TestWatchBuildCancelEndsAHandshakeThatIsNeverAnswered(t *testing.T) {
 	cancel()
 
 	res := awaitWatch(t, out)
-	require.EqualError(t, res.err, wantCanceled)
+	wantCanceled(t, res.err)
 	assert.Less(t, res.took, 2*time.Second)
 	assert.Empty(t, fake.Sleeps(), "an attempt that the context cut short is not followed by a wait")
 }
@@ -98,7 +98,7 @@ func TestWatchBuildDeadlineEndsAHandshakeThatIsNeverAnswered(t *testing.T) {
 
 	res := awaitWatch(t, watchInBackground(ctx, c, func(string) {}))
 
-	require.EqualError(t, res.err, wantTimedOut)
+	wantTimedOut(t, res.err)
 	assert.Less(t, res.took, 3*time.Second)
 }
 
@@ -115,31 +115,35 @@ func TestReadFailureOrder(t *testing.T) {
 		ctx       context.Context
 		err       error
 		reconnect bool
-		want      string
+		wantIs    error  // the error returned wraps this
+		want      string // or has exactly this text
 	}{
-		{"an ended context wins over a normal closure", ended, closed(websocket.CloseNormalClosure), false, wantCanceled},
-		{"an ended context wins over the read limit", ended, websocket.ErrReadLimit, false, wantCanceled},
-		{"an ended context wins over a reset", ended, reset, false, wantCanceled},
-		{"a passed deadline wins over a normal closure", late, closed(websocket.CloseNormalClosure), false, wantTimedOut},
-		{"a passed deadline wins over a reset", late, reset, false, wantTimedOut},
-		{"the read limit", t.Context(), websocket.ErrReadLimit, false, "build log message from api.example.test is larger than 16 MiB"},
-		{"a normal closure", t.Context(), closed(websocket.CloseNormalClosure), false, "error while building package pkg-1, normal closure from server"},
-		{"going away", t.Context(), closed(websocket.CloseGoingAway), true, ""},
-		{"an abnormal closure", t.Context(), closed(websocket.CloseAbnormalClosure), true, ""},
-		{"no status received", t.Context(), closed(websocket.CloseNoStatusReceived), true, ""},
-		{"a reset", t.Context(), reset, true, ""},
-		{"an unexpected end of the stream", t.Context(), io.ErrUnexpectedEOF, true, ""},
+		{"an ended context wins over a normal closure", ended, closed(websocket.CloseNormalClosure), false, context.Canceled, ""},
+		{"an ended context wins over the read limit", ended, websocket.ErrReadLimit, false, context.Canceled, ""},
+		{"an ended context wins over a reset", ended, reset, false, context.Canceled, ""},
+		{"a passed deadline wins over a normal closure", late, closed(websocket.CloseNormalClosure), false, context.DeadlineExceeded, ""},
+		{"a passed deadline wins over a reset", late, reset, false, context.DeadlineExceeded, ""},
+		{"the read limit", t.Context(), websocket.ErrReadLimit, false, nil, "build log message from api.example.test is larger than 16 MiB"},
+		{"a normal closure", t.Context(), closed(websocket.CloseNormalClosure), false, nil, ""},
+		{"going away", t.Context(), closed(websocket.CloseGoingAway), true, nil, ""},
+		{"an abnormal closure", t.Context(), closed(websocket.CloseAbnormalClosure), true, nil, ""},
+		{"no status received", t.Context(), closed(websocket.CloseNoStatusReceived), true, nil, ""},
+		{"a reset", t.Context(), reset, true, nil, ""},
+		{"an unexpected end of the stream", t.Context(), io.ErrUnexpectedEOF, true, nil, ""},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			reconnect, err := readFailure(tc.ctx, u, testPackageID, tc.err)
+			reconnect, err := readFailure(tc.ctx, u, tc.err)
 
 			assert.Equal(t, tc.reconnect, reconnect)
-			if tc.want == "" {
+			switch {
+			case tc.wantIs != nil:
+				assert.ErrorIs(t, err, tc.wantIs)
+			case tc.want != "":
+				assert.EqualError(t, err, tc.want)
+			default:
 				assert.NoError(t, err)
-				return
 			}
-			assert.EqualError(t, err, tc.want)
 		})
 	}
 }
@@ -179,8 +183,8 @@ func TestCtxEnded(t *testing.T) {
 func TestWatchErrorCountsAPassedDeadline(t *testing.T) {
 	late := lateTimerContext{Context: t.Context(), deadline: time.Now().Add(-time.Second)}
 
-	assert.EqualError(t, watchError(late, testPackageID, assert.AnError), wantTimedOut)
-	assert.Equal(t, assert.AnError, watchError(t.Context(), testPackageID, assert.AnError))
+	assert.ErrorIs(t, watchError(late, assert.AnError), context.DeadlineExceeded)
+	assert.Equal(t, assert.AnError, watchError(t.Context(), assert.AnError))
 }
 
 func TestIsFinalCountsAPassedDeadline(t *testing.T) {

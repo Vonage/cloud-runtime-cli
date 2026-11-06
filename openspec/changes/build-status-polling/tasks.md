@@ -13,7 +13,7 @@ Work in the worktree that publishing creates. It must be cut from the rewritten 
 
 ## 2. Platform client: the watch only streams
 
-- [ ] 2.1 Stop `WatchBuild` deciding the outcome.
+- [x] 2.1 Stop `WatchBuild` deciding the outcome.
   - Files: `internal/platform/watch.go`, `internal/platform/watch_frames_test.go`, `internal/platform/watch_fake_test.go`, `internal/platform/watch_context_test.go`, `internal/platform/watch_connect_test.go`, `internal/platform/watch_helpers_test.go`.
   - Behaviour: delete `frameStatus`, `statusPrefix`, `statusCompleted`, `statusFailed` and `watchFailed`. `followBuild` passes every frame to `onLine` and never ends on content. A normal close returns `nil`. The read-limit error, connect errors and reconnects after a drop stay as they are. A context end returns `ctxEnded(ctx)` unwrapped (`endedError` moves to task 4.1).
   - Test first:

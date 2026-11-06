@@ -28,11 +28,6 @@ const (
 	envelopeUnavailable  = `{"error":{"code":503,"message":"service unavailable"}}`
 	envelopeUnauthorized = `{"error":{"code":401,"message":"unauthorized"}}`
 
-	// The two ways a watch ends when its context does, for package pkg-1.
-	wantCanceled = "build watch for package pkg-1 was canceled: context canceled"
-	wantTimedOut = "timed out waiting for the build to finish for package pkg-1; the build may still be in progress. " +
-		"Re-run with a longer --timeout (e.g. -t 20m) or check the build logs: context deadline exceeded"
-
 	// waitLimit is how long a test waits for something that takes milliseconds, so that a hang fails the test.
 	waitLimit = 30 * time.Second
 )
@@ -301,4 +296,15 @@ func awaitWatch(t *testing.T, out <-chan watchResult) watchResult {
 		t.Fatal("the build watch did not end")
 		return watchResult{}
 	}
+}
+
+// The two ways a watch ends when its context does: the context's own error, unwrapped.
+func wantCanceled(t *testing.T, err error) {
+	t.Helper()
+	require.ErrorIs(t, err, context.Canceled)
+}
+
+func wantTimedOut(t *testing.T, err error) {
+	t.Helper()
+	require.ErrorIs(t, err, context.DeadlineExceeded)
 }
