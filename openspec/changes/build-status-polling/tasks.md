@@ -93,14 +93,14 @@ Work in the worktree that publishing creates. It must be cut from the rewritten 
   - Test first: run the verify commands below before editing and note the failures. Each must be one of the scenarios listed here.
   - Verify: `make contract NO_GRAPHQL=1 SCENARIO='deploy-*'`, then `make contract NO_GRAPHQL=1 SCENARIO='security-*'`, then `go test ./test/contract/ -run 'TestCoverage|TestScenario|TestAllowed' -count=1`
   - Done when: all three pass.
-- [ ] 5.3 Re-record and review the rich goldens that changed.
+- [x] 5.3 Re-record and review the rich goldens that changed.
   - Files: `test/contract/testdata/rich/deploy-on-terminal.txt` and any other rich golden whose scenario reaches the build.
   - Verify: `make contract-rich-record SCENARIO='deploy-*'`, review `git diff test/contract/testdata/rich/` (only the build stage may change, and the build lines must still appear before `✓ Package built`), then `make contract-rich`
   - Done when: `make contract-rich` passes and the diff has been read.
 
 ## 6. Whole-repo checks
 
-- [ ] 6.1 Run everything.
+- [x] 6.1 Run everything.
   - Verify: `make test && make lint && make contract NO_GRAPHQL=1 && make contract-rich`
   - Done when: all pass. Record their output in the PR description.
 - [ ] 6.2 Check by hand against a development environment, with a config whose endpoint points at it:
