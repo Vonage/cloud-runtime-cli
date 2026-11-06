@@ -146,6 +146,25 @@ func (c *Client) ListLogs(ctx context.Context, instanceID string, limit int, aft
 	return nonNil(out.Logs), nil
 } // GET /instances/<id>/logs?limit=&after=; newest first
 
+// The build states the status route answers.
+var buildStatuses = map[string]bool{"pending": true, "building": true, "completed": true, "failed": true}
+
+func (c *Client) BuildStatus(ctx context.Context, packageID string) (string, error) {
+	if err := checkServerID(fieldPackageID, packageID); err != nil {
+		return "", err
+	}
+	var out struct {
+		Status string `json:"status"`
+	}
+	if err := c.core.read(ctx, routeBuildStatus, endpoint(c.base, "packages", packageID, "build", "status"), &out); err != nil {
+		return "", err
+	}
+	if !buildStatuses[out.Status] {
+		return "", fmt.Errorf("the platform returned an unknown build status %q", dropControls(out.Status))
+	}
+	return out.Status, nil
+} // GET /packages/<id>/build/status
+
 // The fields a server value is checked as, in the error that names it.
 const (
 	fieldInstanceID        = "instance id"
@@ -201,7 +220,7 @@ func (c *core) read(ctx context.Context, rt readRoute, u *url.URL, out any) erro
 	return nil
 }
 
-// readRoute describes one of the nine read routes to readError.
+// readRoute describes one of the read routes to readError.
 type readRoute struct {
 	label    string // names the route in the older-platform message
 	notFound bool   // a 404 with the error envelope means the record is not there
@@ -217,6 +236,7 @@ var (
 	routeInstance       = readRoute{label: "GET /instances/{id}", notFound: true}
 	routeInstanceByName = readRoute{label: "GET /projects/{project}/instances/{instance}", notFound: true}
 	routeLogs           = readRoute{label: "GET /instances/{id}/logs", notFound: true}
+	routeBuildStatus    = readRoute{label: "GET /packages/{id}/build/status"}
 )
 
 const olderPlatformFormat = "this region's platform API is older than this CLI and does not provide %s; " +

@@ -4,7 +4,7 @@ Work in the worktree that publishing creates. It must be cut from the rewritten 
 
 ## 1. Platform client: the status route
 
-- [ ] 1.1 Add `BuildStatus` and `IsTransportError` to the platform client.
+- [x] 1.1 Add `BuildStatus` and `IsTransportError` to the platform client.
   - Files: `internal/platform/reads.go` (new `routeBuildStatus = readRoute{label: "GET /packages/{id}/build/status"}`, `notFound` false, and `func (c *Client) BuildStatus(ctx context.Context, packageID string) (string, error)`), `internal/platform/upload_retry.go` (new exported `IsTransportError(err error) bool`: true for a `*url.Error` that is not a `*policyError` and not `isLocationFailure`, the test `retryReason` already makes; `retryReason` calls it), new test `internal/platform/buildstatus_test.go`.
   - Behaviour: `checkServerID(fieldPackageID, packageID)` first; GET `endpoint(c.base, "packages", packageID, "build", "status")` through `c.core.read`; decode `{"packageId","status"}`; return the status when it is `pending`, `building`, `completed` or `failed`, else an error naming the value.
   - Test first (table, against an `httptest` server as `reads_test.go` does): each of the four statuses comes back; an unknown status is an error; a 404 with the envelope is a `*clierr.APIError` with `HTTPStatus` 404 and `ServerCode` 2006 and is not `ErrNotFound`; a 404 without one carries the older-platform message naming `GET /packages/{id}/build/status`; an unsafe id makes no request. `IsTransportError`: true for a dial error, false for a `*clierr.APIError`, a `policyError`, a decode error and `context.Canceled`.

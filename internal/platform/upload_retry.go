@@ -38,12 +38,20 @@ func retryReason(ctx context.Context, err error) (reason string, again bool) {
 		return "", false
 	}
 
-	var urlErr *url.Error
-	var refusal *policyError
-	if ctxEnded(ctx) != nil || !errors.As(err, &urlErr) || errors.As(err, &refusal) || isLocationFailure(urlErr) {
+	if ctxEnded(ctx) != nil || !IsTransportError(err) {
 		return "", false
 	}
+	var urlErr *url.Error
+	errors.As(err, &urlErr)
 	return term.Sanitize(urlErr.Err.Error()), true
+}
+
+// IsTransportError reports a failure of the network that another attempt may get past: a *url.Error from Go's HTTP
+// client that is neither a policy refusal (a dial or a redirect) nor a redirect net/http could not follow.
+func IsTransportError(err error) bool {
+	var urlErr *url.Error
+	var refusal *policyError
+	return errors.As(err, &urlErr) && !errors.As(err, &refusal) && !isLocationFailure(urlErr)
 }
 
 // isLocationFailure recognises the one redirect failure that net/http reports before the redirect rule runs. It
