@@ -1,0 +1,22 @@
+openspec/changes/build-status-polling/.openspec.yaml
+  h_df1d95ff1e9b8c 1-2
+openspec/changes/build-status-polling/design.md
+  h_df1d95ff1e9b8c 1-38
+openspec/changes/build-status-polling/proposal.md
+  h_df1d95ff1e9b8c 1-48
+openspec/changes/build-status-polling/specs/deploy-build-outcome/spec.md
+  h_df1d95ff1e9b8c 1-83
+openspec/changes/build-status-polling/tasks.md
+  h_df1d95ff1e9b8c 1-110
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f1240a88307511e438fb382f04517ba49bcf80f4",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
