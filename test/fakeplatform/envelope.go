@@ -21,6 +21,7 @@ const (
 	codeRegionNotFound      = 2002
 	codeInstanceNotFound    = 2003
 	codeProjectNotFound     = 2005
+	codePackageNotFound     = 2006
 	codeSecretExists        = 2007
 	codeSecretNotFound      = 2008
 	codeOtherRegion         = 2009
@@ -34,6 +35,7 @@ const (
 	msgRegionNotFound      = "region not found"
 	msgInstanceNotFound    = "instance not found"
 	msgProjectNotFound     = "project not found"
+	msgPackageNotFound     = "package not found"
 	msgSecretExists        = "secret already exists"
 	msgSecretNotFound      = "secret not found"
 	msgOtherRegion         = "instance belongs to a different region"

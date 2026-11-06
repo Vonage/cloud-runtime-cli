@@ -19,6 +19,7 @@ type world struct {
 	created       int            // applications created so far
 	watchAttempts int            // build-watch upgrade attempts so far
 	watchConns    int            // build-watch connections accepted so far
+	buildStatuses int            // build status requests answered so far
 }
 
 func newWorld(f Fixtures) (world, error) {

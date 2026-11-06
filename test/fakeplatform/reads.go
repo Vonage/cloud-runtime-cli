@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"slices"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -25,6 +26,7 @@ var readRoutes = []route{
 	newRoute(http.MethodGet, "/instances/{id}", (*Server).getInstance),
 	newRoute(http.MethodGet, "/projects/{p}/instances/{n}", (*Server).getProjectInstance),
 	newRoute(http.MethodGet, "/instances/{id}/logs", (*Server).listLogs),
+	newRoute(http.MethodGet, "/packages/{id}/build/status", (*Server).buildStatus),
 }
 
 type regionItem struct {
@@ -308,4 +310,30 @@ func logsQuery(q url.Values) (limit int, after *time.Time, ok bool) {
 		after = &t
 	}
 	return limit, after, true
+}
+
+// buildStatus answers the deploy fixture's package with the next answer of
+// the buildStatus fixture, the last repeating. Any other package is unknown.
+func (s *Server) buildStatus(c *call) {
+	id, ok := c.param(paramID)
+	var (
+		answer StatusAnswer
+		known  bool
+	)
+	s.locked(func(w *world) {
+		known = ok && strings.EqualFold(id, w.f.Deploy.PackageID) && len(w.f.BuildStatus) > 0
+		if !known {
+			return
+		}
+		answer = w.f.BuildStatus[min(w.buildStatuses, len(w.f.BuildStatus)-1)]
+		w.buildStatuses++
+	})
+	switch {
+	case !known:
+		writeError(c.rw, http.StatusNotFound, codePackageNotFound, msgPackageNotFound)
+	case answer.HTTP != 0:
+		writeError(c.rw, answer.HTTP, answer.HTTP, statusMessage(answer.HTTP))
+	default:
+		writeJSON(c.rw, http.StatusOK, map[string]string{"packageId": id, "status": answer.Status})
+	}
 }

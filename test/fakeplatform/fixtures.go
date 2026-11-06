@@ -15,21 +15,22 @@ import (
 // Fixtures is the world the fake platform serves. Its strings may hold the
 // placeholders that Server.Expand replaces; Start expands them before serving.
 type Fixtures struct {
-	Account      Account       `yaml:"account"`
-	Regions      []Region      `yaml:"regions"`
-	Runtimes     []Runtime     `yaml:"runtimes"`
-	Products     []Product     `yaml:"products"`
-	Projects     []Project     `yaml:"projects"`
-	Instances    []Instance    `yaml:"instances"`
-	Logs         []LogLine     `yaml:"logs"`
-	LogsFailure  bool          `yaml:"logsFailure"`
-	Applications []Application `yaml:"applications"`
-	Secrets      []string      `yaml:"secrets"`
-	Deploy       Deploy        `yaml:"deploy"`
-	Build        Build         `yaml:"build"`
-	Debug        Debug         `yaml:"debug"`
-	Release      Release       `yaml:"release"`
-	Overrides    []Override    `yaml:"overrides"`
+	Account      Account        `yaml:"account"`
+	Regions      []Region       `yaml:"regions"`
+	Runtimes     []Runtime      `yaml:"runtimes"`
+	Products     []Product      `yaml:"products"`
+	Projects     []Project      `yaml:"projects"`
+	Instances    []Instance     `yaml:"instances"`
+	Logs         []LogLine      `yaml:"logs"`
+	LogsFailure  bool           `yaml:"logsFailure"`
+	Applications []Application  `yaml:"applications"`
+	Secrets      []string       `yaml:"secrets"`
+	Deploy       Deploy         `yaml:"deploy"`
+	Build        Build          `yaml:"build"`
+	BuildStatus  []StatusAnswer `yaml:"buildStatus"`
+	Debug        Debug          `yaml:"debug"`
+	Release      Release        `yaml:"release"`
+	Overrides    []Override     `yaml:"overrides"`
 }
 
 // Account is the one API account the fake accepts.
@@ -129,6 +130,24 @@ type Deploy struct {
 	Validate      Validation `yaml:"validate"`
 }
 
+// StatusAnswer is one answer of the build status route; it sets exactly one
+// field: a Status in the 200 body, or an HTTP error status with the error
+// envelope. The n-th request gets the n-th answer, the last repeating.
+type StatusAnswer struct {
+	Status string `yaml:"status,omitempty"`
+	HTTP   int    `yaml:"http,omitempty"`
+}
+
+func (a StatusAnswer) validate() error {
+	switch {
+	case (a.Status == "") == (a.HTTP == 0):
+		return errors.New("set exactly one of status and http")
+	case a.HTTP != 0 && (a.HTTP < 100 || a.HTTP > 599):
+		return fmt.Errorf("http %d is not an HTTP status", a.HTTP)
+	}
+	return nil
+}
+
 // Validation is the answer to a deployment validation.
 type Validation struct {
 	Valid  bool              `yaml:"valid"`
@@ -152,7 +171,8 @@ func boolPtr(v bool) *bool { return &v }
 // Defaults returns the default world: one account, two regions, two runtimes,
 // a template product, two projects, four instances (one deleted), five log
 // lines, two applications, two secrets, the answers of a deploy, a build
-// watch that completes, a debug service and a signed release v2.6.1.
+// watch and a build status that complete, a debug service and a signed
+// release v2.6.1.
 func Defaults() Fixtures {
 	return Fixtures{
 		Account: Account{Key: "abc123", Secret: "s3cret-for-tests"},
@@ -182,9 +202,10 @@ func Defaults() Fixtures {
 			HostURLs: []string{"https://my-project-dev.euw1.runtime.example.test"},
 			Validate: Validation{Valid: true},
 		},
-		Build:   Build{Connections: [][]WatchAction{defaultWatchScript()}},
-		Debug:   defaultDebug(),
-		Release: Release{Tag: "v2.6.1", Platforms: slices.Clone(releasePlatforms)},
+		Build:       Build{Connections: [][]WatchAction{defaultWatchScript()}},
+		BuildStatus: []StatusAnswer{{Status: "completed"}},
+		Debug:       defaultDebug(),
+		Release:     Release{Tag: "v2.6.1", Platforms: slices.Clone(releasePlatforms)},
 	}
 }
 
@@ -294,6 +315,11 @@ func (f *Fixtures) validate() error {
 	for i := range f.Overrides {
 		if err := f.Overrides[i].validate(); err != nil {
 			errs = append(errs, fmt.Errorf("overrides[%d]: %w", i, err))
+		}
+	}
+	for i, a := range f.BuildStatus {
+		if err := a.validate(); err != nil {
+			errs = append(errs, fmt.Errorf("buildStatus[%d]: %w", i, err))
 		}
 	}
 	errs = appendPrefixed(errs, "build", f.Build.validate())

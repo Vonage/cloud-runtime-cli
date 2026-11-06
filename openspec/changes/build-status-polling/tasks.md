@@ -27,7 +27,7 @@ Work in the worktree that publishing creates. It must be cut from the rewritten 
 
 ## 3. Fake platform: serve the status route
 
-- [ ] 3.1 Add the route and its fixture.
+- [x] 3.1 Add the route and its fixture.
   - Files: `test/fakeplatform/fixtures.go` (new `BuildStatus []StatusAnswer \`yaml:"buildStatus"\`` on `Fixtures`, `StatusAnswer{Status string; HTTP int}`, validation that each sets exactly one, and a default of `[{status: completed}]` in `Defaults()`), `test/fakeplatform/reads.go` (route `GET /packages/{id}/build/status` added to `readRoutes`, answering the n-th request with the n-th answer, the last repeating; an `HTTP` answer uses the error envelope; an id other than the deploy fixture's `PackageID` answers 404 with code 2006 `package not found`), `test/fakeplatform/envelope.go` (`codePackageNotFound = 2006`), `test/fakeplatform/world.go` (a request counter).
   - Test first: `test/fakeplatform/reads_test.go` gains `TestBuildStatusAnswersInOrder` (statuses in order, then the last repeated; an `HTTP: 503` answer uses the error envelope) and `TestBuildStatusUnknownPackage` (404, code 2006). `fixtures_test.go` gains a case where an answer sets both fields or neither.
   - Verify: `go test ./test/fakeplatform/ -count=1`
