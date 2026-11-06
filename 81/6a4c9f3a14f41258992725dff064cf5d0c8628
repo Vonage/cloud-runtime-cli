@@ -1,180 +1,200 @@
 openspec/changes/build-status-polling/tasks.md
-  h_df1d95ff1e9b8c 84
+  c934be8531d5dddf 84
 test/contract/allowed-diffs.txt
-  h_df1d95ff1e9b8c 141,166-181
+  c934be8531d5dddf 141,166-181
 test/contract/scenarios/deploy-app-id-flag.yaml
-  h_df1d95ff1e9b8c 24
+  c934be8531d5dddf 24
 test/contract/scenarios/deploy-bad-default-region-with-valid-manifest-region.yaml
-  h_df1d95ff1e9b8c 31
+  c934be8531d5dddf 31
 test/contract/scenarios/deploy-basic.yaml
-  h_df1d95ff1e9b8c 24
+  c934be8531d5dddf 24
 test/contract/scenarios/deploy-build-connect-always-rejected.yaml
-  h_df1d95ff1e9b8c 27-28
+  c934be8531d5dddf 27-28
 test/contract/scenarios/deploy-build-connect-retries-then-succeeds.yaml
-  h_df1d95ff1e9b8c 27
+  c934be8531d5dddf 27
 test/contract/scenarios/deploy-build-connection-dropped-then-completes.yaml
-  h_df1d95ff1e9b8c 29
+  c934be8531d5dddf 29
 test/contract/scenarios/deploy-build-failed.yaml
-  h_df1d95ff1e9b8c 22,29
+  c934be8531d5dddf 22,29
 test/contract/scenarios/deploy-build-interrupted.yaml
-  h_df1d95ff1e9b8c 22,32
+  c934be8531d5dddf 22,32
 test/contract/scenarios/deploy-build-normal-close-before-completion.yaml
-  h_df1d95ff1e9b8c 1,28-29
+  c934be8531d5dddf 1,28-29
 test/contract/scenarios/deploy-build-timeout.yaml
-  h_df1d95ff1e9b8c 22,29
+  c934be8531d5dddf 22,29
 test/contract/scenarios/deploy-capabilities-flag.yaml
-  h_df1d95ff1e9b8c 24
+  c934be8531d5dddf 24
 test/contract/scenarios/deploy-config-default-region-fills-missing-region.yaml
-  h_df1d95ff1e9b8c 23
+  c934be8531d5dddf 23
 test/contract/scenarios/deploy-corpus-duplicate-capabilities.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-each-capability-messages-v1.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-each-capability-messages.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-each-capability-messaging-v1.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-each-capability-messaging.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-each-capability-network-v1.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-each-capability-network.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-each-capability-rtc-v1.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-each-capability-rtc.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-each-capability-verify-v2.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-each-capability-video-v1.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-each-capability-video.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-each-capability-voice-v1.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-each-capability-voice.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-empty-lists.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-environment-value-types.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-minimal.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-tree.yaml
-  h_df1d95ff1e9b8c 23
+  c934be8531d5dddf 23
 test/contract/scenarios/deploy-corpus-unknown-capability.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-unknown-keys.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-utf8-bom.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-vcr-with-authenticated-security.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-vcr-with-health-check.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-vcr-with-security.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-vcr.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-corpus-vcrignore-1.yaml
-  h_df1d95ff1e9b8c 39
+  c934be8531d5dddf 39
 test/contract/scenarios/deploy-corpus-vcrignore-2.yaml
-  h_df1d95ff1e9b8c 39
+  c934be8531d5dddf 39
 test/contract/scenarios/deploy-corpus-vcrignore-3.yaml
-  h_df1d95ff1e9b8c 39
+  c934be8531d5dddf 39
 test/contract/scenarios/deploy-corpus-vcrignore-4.yaml
-  h_df1d95ff1e9b8c 39
+  c934be8531d5dddf 39
 test/contract/scenarios/deploy-corpus-vcrignore-5.yaml
-  h_df1d95ff1e9b8c 39
+  c934be8531d5dddf 39
 test/contract/scenarios/deploy-corpus-vcrignore-6.yaml
-  h_df1d95ff1e9b8c 39
+  c934be8531d5dddf 39
 test/contract/scenarios/deploy-corpus-vcrignore-7.yaml
-  h_df1d95ff1e9b8c 39
+  c934be8531d5dddf 39
 test/contract/scenarios/deploy-corpus-vcrignore-8.yaml
-  h_df1d95ff1e9b8c 39
+  c934be8531d5dddf 39
 test/contract/scenarios/deploy-corpus-yaml-anchors.yaml
-  h_df1d95ff1e9b8c 10
+  c934be8531d5dddf 10
 test/contract/scenarios/deploy-creates-missing-project.yaml
-  h_df1d95ff1e9b8c 26
+  c934be8531d5dddf 26
 test/contract/scenarios/deploy-deployments-rejected.yaml
-  h_df1d95ff1e9b8c 27
+  c934be8531d5dddf 27
 test/contract/scenarios/deploy-existing-project.yaml
-  h_df1d95ff1e9b8c 27
+  c934be8531d5dddf 27
 test/contract/scenarios/deploy-filename-flag.yaml
-  h_df1d95ff1e9b8c 24
+  c934be8531d5dddf 24
 test/contract/scenarios/deploy-flags-override-manifest.yaml
-  h_df1d95ff1e9b8c 27
+  c934be8531d5dddf 27
 test/contract/scenarios/deploy-instance-name-flag.yaml
-  h_df1d95ff1e9b8c 24
+  c934be8531d5dddf 24
 test/contract/scenarios/deploy-manifest-name-neru-yaml.yaml
-  h_df1d95ff1e9b8c 24
+  c934be8531d5dddf 24
 test/contract/scenarios/deploy-manifest-name-neru-yml.yaml
-  h_df1d95ff1e9b8c 24
+  c934be8531d5dddf 24
 test/contract/scenarios/deploy-manifest-name-vcr-yaml.yaml
-  h_df1d95ff1e9b8c 24
+  c934be8531d5dddf 24
 test/contract/scenarios/deploy-manifest-name-vcr-yml.yaml
-  h_df1d95ff1e9b8c 24
+  c934be8531d5dddf 24
 test/contract/scenarios/deploy-manifest-newest-wins.yaml
-  h_df1d95ff1e9b8c 36
+  c934be8531d5dddf 36
 test/contract/scenarios/deploy-on-terminal.yaml
-  h_df1d95ff1e9b8c 23
+  c934be8531d5dddf 23
 test/contract/scenarios/deploy-package-empty-directory.yaml
-  h_df1d95ff1e9b8c 31
+  c934be8531d5dddf 31
 test/contract/scenarios/deploy-package-ignored-directory-with-negated-file.yaml
-  h_df1d95ff1e9b8c 37
+  c934be8531d5dddf 37
 test/contract/scenarios/deploy-package-jfs-files-always-skipped.yaml
-  h_df1d95ff1e9b8c 45
+  c934be8531d5dddf 45
 test/contract/scenarios/deploy-package-modes-and-nesting.yaml
-  h_df1d95ff1e9b8c 39
+  c934be8531d5dddf 39
 test/contract/scenarios/deploy-package-node-modules-included.yaml
-  h_df1d95ff1e9b8c 33
+  c934be8531d5dddf 33
 test/contract/scenarios/deploy-package-symlinks.yaml
-  h_df1d95ff1e9b8c 38
+  c934be8531d5dddf 38
 test/contract/scenarios/deploy-package-unreadable-file.yaml
-  h_df1d95ff1e9b8c 32
+  c934be8531d5dddf 32
 test/contract/scenarios/deploy-package-vcrignore-negation.yaml
-  h_df1d95ff1e9b8c 37
+  c934be8531d5dddf 37
 test/contract/scenarios/deploy-package-vcrignore.yaml
-  h_df1d95ff1e9b8c 59
+  c934be8531d5dddf 59
 test/contract/scenarios/deploy-path-argument.yaml
-  h_df1d95ff1e9b8c 24
+  c934be8531d5dddf 24
 test/contract/scenarios/deploy-project-name-flag.yaml
-  h_df1d95ff1e9b8c 24
+  c934be8531d5dddf 24
 test/contract/scenarios/deploy-runtime-flag.yaml
-  h_df1d95ff1e9b8c 24
+  c934be8531d5dddf 24
 test/contract/scenarios/deploy-tgz.yaml
-  h_df1d95ff1e9b8c 26
+  c934be8531d5dddf 26
 test/contract/scenarios/deploy-upload-retry-then-succeeds.yaml
-  h_df1d95ff1e9b8c 27
+  c934be8531d5dddf 27
 test/contract/scenarios/deploy-upload-transport-error-once.yaml
-  h_df1d95ff1e9b8c 27
-test/contract/scenarios/security-build-frame-failure-line-does-not-end-the-build.yaml
-  h_df1d95ff1e9b8c 1,29-30
-test/contract/scenarios/security-build-frame-watch-failure-line-does-not-end-the-build.yaml
-  h_df1d95ff1e9b8c 1,29-30
+  c934be8531d5dddf 27
+"test/contract/scenarios/{security-build-frame-exact-failure-line-ends-the-watch.yaml => security-build-frame-failure-line-does-not-end-the-build.yaml}"
+  c934be8531d5dddf 1-3
+"test/contract/scenarios/{security-build-frame-watch-failure-line-ends-the-watch.yaml => security-build-frame-watch-failure-line-does-not-end-the-build.yaml}"
+  c934be8531d5dddf 1-3
 test/contract/scenarios/security-build-frame-with-status-word-does-not-end-the-watch.yaml
-  h_df1d95ff1e9b8c 29
+  c934be8531d5dddf 29
 test/contract/scenarios/security-escape-build-frames.yaml
-  h_df1d95ff1e9b8c 29
+  c934be8531d5dddf 29
 test/contract/scenarios/security-upload-env-negation-brings-back-env.yaml
-  h_df1d95ff1e9b8c 35
+  c934be8531d5dddf 35
 test/contract/scenarios/security-upload-git-file-is-kept.yaml
-  h_df1d95ff1e9b8c 27
+  c934be8531d5dddf 27
 test/contract/scenarios/security-upload-git-negation-brings-back-git.yaml
-  h_df1d95ff1e9b8c 35
+  c934be8531d5dddf 35
 test/contract/scenarios/security-upload-skips-git-and-env-files.yaml
-  h_df1d95ff1e9b8c 34
+  c934be8531d5dddf 34
 test/contract/scenarios/security-upload-symlink-outside-project-is-a-link-only.yaml
-  h_df1d95ff1e9b8c 28
+  c934be8531d5dddf 28
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.7.5",
+  "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "816a4c9f3a14f41258992725dff064cf5d0c8628",
-  "prompts": {},
-  "humans": {
-    "h_df1d95ff1e9b8c": {
-      "author": "Simon Chan <simon.chan@vonage.com>"
+  "prompts": {
+    "c934be8531d5dddf": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "3dad79ce-53a3-4b8b-a1a1-bd918449c49a",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-06T20:04:34.575Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-06T20:04:34.575Z"
+        }
+      ],
+      "total_additions": 110,
+      "total_deletions": 6,
+      "accepted_lines": 110,
+      "overriden_lines": 0
     }
   }
 }
