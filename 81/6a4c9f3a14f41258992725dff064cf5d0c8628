@@ -1,0 +1,200 @@
+openspec/changes/build-status-polling/tasks.md
+  de328d15b497c929 84
+test/contract/allowed-diffs.txt
+  de328d15b497c929 141,166-181
+test/contract/scenarios/deploy-app-id-flag.yaml
+  de328d15b497c929 24
+test/contract/scenarios/deploy-bad-default-region-with-valid-manifest-region.yaml
+  de328d15b497c929 31
+test/contract/scenarios/deploy-basic.yaml
+  de328d15b497c929 24
+test/contract/scenarios/deploy-build-connect-always-rejected.yaml
+  de328d15b497c929 27-28
+test/contract/scenarios/deploy-build-connect-retries-then-succeeds.yaml
+  de328d15b497c929 27
+test/contract/scenarios/deploy-build-connection-dropped-then-completes.yaml
+  de328d15b497c929 29
+test/contract/scenarios/deploy-build-failed.yaml
+  de328d15b497c929 22,29
+test/contract/scenarios/deploy-build-interrupted.yaml
+  de328d15b497c929 22,32
+test/contract/scenarios/deploy-build-normal-close-before-completion.yaml
+  de328d15b497c929 1,28-29
+test/contract/scenarios/deploy-build-timeout.yaml
+  de328d15b497c929 22,29
+test/contract/scenarios/deploy-capabilities-flag.yaml
+  de328d15b497c929 24
+test/contract/scenarios/deploy-config-default-region-fills-missing-region.yaml
+  de328d15b497c929 23
+test/contract/scenarios/deploy-corpus-duplicate-capabilities.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-each-capability-messages-v1.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-each-capability-messages.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-each-capability-messaging-v1.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-each-capability-messaging.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-each-capability-network-v1.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-each-capability-network.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-each-capability-rtc-v1.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-each-capability-rtc.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-each-capability-verify-v2.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-each-capability-video-v1.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-each-capability-video.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-each-capability-voice-v1.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-each-capability-voice.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-empty-lists.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-environment-value-types.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-minimal.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-tree.yaml
+  de328d15b497c929 23
+test/contract/scenarios/deploy-corpus-unknown-capability.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-unknown-keys.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-utf8-bom.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-vcr-with-authenticated-security.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-vcr-with-health-check.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-vcr-with-security.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-vcr.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-corpus-vcrignore-1.yaml
+  de328d15b497c929 39
+test/contract/scenarios/deploy-corpus-vcrignore-2.yaml
+  de328d15b497c929 39
+test/contract/scenarios/deploy-corpus-vcrignore-3.yaml
+  de328d15b497c929 39
+test/contract/scenarios/deploy-corpus-vcrignore-4.yaml
+  de328d15b497c929 39
+test/contract/scenarios/deploy-corpus-vcrignore-5.yaml
+  de328d15b497c929 39
+test/contract/scenarios/deploy-corpus-vcrignore-6.yaml
+  de328d15b497c929 39
+test/contract/scenarios/deploy-corpus-vcrignore-7.yaml
+  de328d15b497c929 39
+test/contract/scenarios/deploy-corpus-vcrignore-8.yaml
+  de328d15b497c929 39
+test/contract/scenarios/deploy-corpus-yaml-anchors.yaml
+  de328d15b497c929 10
+test/contract/scenarios/deploy-creates-missing-project.yaml
+  de328d15b497c929 26
+test/contract/scenarios/deploy-deployments-rejected.yaml
+  de328d15b497c929 27
+test/contract/scenarios/deploy-existing-project.yaml
+  de328d15b497c929 27
+test/contract/scenarios/deploy-filename-flag.yaml
+  de328d15b497c929 24
+test/contract/scenarios/deploy-flags-override-manifest.yaml
+  de328d15b497c929 27
+test/contract/scenarios/deploy-instance-name-flag.yaml
+  de328d15b497c929 24
+test/contract/scenarios/deploy-manifest-name-neru-yaml.yaml
+  de328d15b497c929 24
+test/contract/scenarios/deploy-manifest-name-neru-yml.yaml
+  de328d15b497c929 24
+test/contract/scenarios/deploy-manifest-name-vcr-yaml.yaml
+  de328d15b497c929 24
+test/contract/scenarios/deploy-manifest-name-vcr-yml.yaml
+  de328d15b497c929 24
+test/contract/scenarios/deploy-manifest-newest-wins.yaml
+  de328d15b497c929 36
+test/contract/scenarios/deploy-on-terminal.yaml
+  de328d15b497c929 23
+test/contract/scenarios/deploy-package-empty-directory.yaml
+  de328d15b497c929 31
+test/contract/scenarios/deploy-package-ignored-directory-with-negated-file.yaml
+  de328d15b497c929 37
+test/contract/scenarios/deploy-package-jfs-files-always-skipped.yaml
+  de328d15b497c929 45
+test/contract/scenarios/deploy-package-modes-and-nesting.yaml
+  de328d15b497c929 39
+test/contract/scenarios/deploy-package-node-modules-included.yaml
+  de328d15b497c929 33
+test/contract/scenarios/deploy-package-symlinks.yaml
+  de328d15b497c929 38
+test/contract/scenarios/deploy-package-unreadable-file.yaml
+  de328d15b497c929 32
+test/contract/scenarios/deploy-package-vcrignore-negation.yaml
+  de328d15b497c929 37
+test/contract/scenarios/deploy-package-vcrignore.yaml
+  de328d15b497c929 59
+test/contract/scenarios/deploy-path-argument.yaml
+  de328d15b497c929 24
+test/contract/scenarios/deploy-project-name-flag.yaml
+  de328d15b497c929 24
+test/contract/scenarios/deploy-runtime-flag.yaml
+  de328d15b497c929 24
+test/contract/scenarios/deploy-tgz.yaml
+  de328d15b497c929 26
+test/contract/scenarios/deploy-upload-retry-then-succeeds.yaml
+  de328d15b497c929 27
+test/contract/scenarios/deploy-upload-transport-error-once.yaml
+  de328d15b497c929 27
+"test/contract/scenarios/{security-build-frame-exact-failure-line-ends-the-watch.yaml => security-build-frame-failure-line-does-not-end-the-build.yaml}"
+  de328d15b497c929 1-3
+"test/contract/scenarios/{security-build-frame-watch-failure-line-ends-the-watch.yaml => security-build-frame-watch-failure-line-does-not-end-the-build.yaml}"
+  de328d15b497c929 1-3
+test/contract/scenarios/security-build-frame-with-status-word-does-not-end-the-watch.yaml
+  de328d15b497c929 29
+test/contract/scenarios/security-escape-build-frames.yaml
+  de328d15b497c929 29
+test/contract/scenarios/security-upload-env-negation-brings-back-env.yaml
+  de328d15b497c929 35
+test/contract/scenarios/security-upload-git-file-is-kept.yaml
+  de328d15b497c929 27
+test/contract/scenarios/security-upload-git-negation-brings-back-git.yaml
+  de328d15b497c929 35
+test/contract/scenarios/security-upload-skips-git-and-env-files.yaml
+  de328d15b497c929 34
+test/contract/scenarios/security-upload-symlink-outside-project-is-a-link-only.yaml
+  de328d15b497c929 28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "816a4c9f3a14f41258992725dff064cf5d0c8628",
+  "prompts": {
+    "de328d15b497c929": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "fbb0b067-16c2-4e60-b338-e44fe4a560f1",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-06T18:48:55.619Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-06T18:48:55.619Z"
+        }
+      ],
+      "total_additions": 110,
+      "total_deletions": 6,
+      "accepted_lines": 110,
+      "overriden_lines": 0
+    }
+  }
+}
