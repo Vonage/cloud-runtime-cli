@@ -45,7 +45,10 @@ type fakeAPI struct {
 	packageErr    error
 	frames        []string
 	watchErr      error
-	watchBlocks   bool           // WatchBuild sends its frames, then holds until its context ends
+	watchBlocks   bool          // WatchBuild sends its frames, then holds until its context ends
+	lateFrames    []string      // WatchBuild sends these once BuildStatus has answered a final status
+	finalStatus   chan struct{} // closed when BuildStatus first answers a final status
+	closeFinal    sync.Once
 	watchCtxErr   error          // the error of WatchBuild's context when it returned
 	statuses      []statusAnswer // BuildStatus answers these in order, the last repeating
 	statusCalls   int
@@ -176,10 +179,19 @@ func (f *fakeAPI) WatchBuild(ctx context.Context, packageID string, onLine func(
 	f.enter(callWatchBuild)
 	f.mu.Lock()
 	f.watchedID = packageID
-	frames, blocks, err := f.frames, f.watchBlocks, f.watchErr
+	frames, blocks, err, late, final := f.frames, f.watchBlocks, f.watchErr, f.lateFrames, f.finalStatus
 	f.mu.Unlock()
 	for _, frame := range frames {
 		onLine(frame)
+	}
+	if final != nil {
+		select {
+		case <-final:
+			for _, frame := range late {
+				onLine(frame)
+			}
+		case <-ctx.Done():
+		}
 	}
 	if blocks {
 		<-ctx.Done()
@@ -197,6 +209,13 @@ func (f *fakeAPI) BuildStatus(_ context.Context, _ string) (string, error) {
 	defer f.mu.Unlock()
 	a := f.statuses[min(f.statusCalls, len(f.statuses)-1)]
 	f.statusCalls++
+	if a.status == "completed" || a.status == "failed" {
+		f.closeFinal.Do(func() {
+			if f.finalStatus != nil {
+				close(f.finalStatus)
+			}
+		})
+	}
 	return a.status, a.err
 }
 

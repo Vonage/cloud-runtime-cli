@@ -2,6 +2,7 @@ package deploy
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -283,6 +284,27 @@ func TestFilesLabel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.want, func(t *testing.T) {
 			assert.Equal(t, tt.want, filesLabel(tt.files))
+		})
+	}
+}
+
+func TestRichDeployWarnsOnceWhenTheBuildOutputIsUnavailable(t *testing.T) {
+	for name, mode := range map[string]term.Mode{"rich": term.Rich, "static": term.Static} {
+		t.Run(name, func(t *testing.T) {
+			r := newRichRun(t, mode)
+			r.api.frames = nil
+			r.api.watchErr = errors.New("refused")
+
+			require.NoError(t, r.run())
+
+			warnings := 0
+			for _, line := range lines(r.stderr.Screen()) {
+				if strings.Contains(line, "build output is unavailable: refused") {
+					warnings++
+				}
+			}
+			assert.Equal(t, 1, warnings, "stderr: %q", r.stderr.Screen())
+			assert.Contains(t, r.stdout.Screen(), "Package built")
 		})
 	}
 }

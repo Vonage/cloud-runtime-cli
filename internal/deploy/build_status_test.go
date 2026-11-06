@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"vonage-cloud-runtime-cli/internal/clierr"
+	"vonage-cloud-runtime-cli/internal/clock/clocktest"
 )
 
 const builtLine = `✓ Package "pkg-1" built successfully` + "\n"
@@ -211,4 +212,28 @@ func sleepsOf(all []time.Duration, d time.Duration) []time.Duration {
 		}
 	}
 	return out
+}
+
+// graceHolds is a clock whose grace sleep lasts until its context ends, so only the stream's end can stop the wait.
+type graceHolds struct{ *clocktest.Fake }
+
+func (c graceHolds) Sleep(ctx context.Context, d time.Duration) error {
+	if d == streamGrace {
+		<-ctx.Done()
+		return ctx.Err()
+	}
+	return c.Fake.Sleep(ctx, d)
+}
+
+func TestBuildOutputAfterTheStatusComesBeforeTheBuiltLine(t *testing.T) {
+	h := newHarness(t)
+	h.api.frames = []string{"early"}
+	h.api.lateFrames = []string{"late"}
+	h.api.finalStatus = make(chan struct{})
+	h.api.statuses = statuses("building", "completed")
+
+	require.NoError(t, Run(t.Context(), h.io, h.api, graceHolds{h.poll}, h.plan))
+
+	assert.Contains(t, h.stdout.String(), "early\nlate\n"+builtLine, "the grace waits for the stream to end")
+	assert.NoError(t, h.api.deployedAfterWatch, "the stream ended on its own, not by being closed")
 }

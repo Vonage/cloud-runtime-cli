@@ -4,7 +4,7 @@
 
 Today `deploy.API.WatchBuild` (`internal/platform/watch.go`) both streams build frames and decides the outcome: `frameStatus` matches the server's exact `Status - completed` / `Status - failed` line, and a normal close before that line is an error. Three security scenarios (`security-build-frame-*`) exist to prove that a log line cannot imitate the status line.
 
-The deployment API now serves `GET /packages/:packageID/build/status` on `v0.3`, `v0.4` and `v0.5`. It answers `200 {"packageId","status"}` with `pending`, `building`, `completed` or `failed`, read from the package row, without waiting. Unknown, deleted, other-account and non-UUID ids answer 404 code 2006; a store failure answers 500 code 1001. A Job informer writes the row, with a 5-minute sweep for rows whose Job is gone. The server's watch sends its own status line and then closes with a normal close, before the row is written, so the stream usually ends a moment before the route says `completed`.
+The deployment API is adding `GET /packages/:packageID/build/status` on `v0.3`, `v0.4` and `v0.5`; it runs in the development environment but has not shipped to every region yet (see the rollout gate in the proposal). It answers `200 {"packageId","status"}` with `pending`, `building`, `completed` or `failed`, read from the package row, without waiting. Unknown, deleted, other-account and non-UUID ids answer 404 code 2006; a store failure answers 500 code 1001. A Job informer writes the row, with a 5-minute sweep for rows whose Job is gone. The server's watch sends its own status line and then closes with a normal close, before the row is written, so the stream usually ends a moment before the route says `completed`.
 
 ## Goals / Non-Goals
 

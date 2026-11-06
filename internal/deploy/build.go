@@ -18,10 +18,8 @@ const (
 	maxFailures  = 3               // server or network failures in a row that end the wait
 )
 
-// The build states the status route answers.
+// The final build states; platform.Client.BuildStatus has already refused any status it does not know.
 const (
-	buildPending   = "pending"
-	buildBuilding  = "building"
 	buildCompleted = "completed"
 	buildFailed    = "failed"
 )
@@ -77,12 +75,8 @@ func (r *runner) pollBuild(ctx context.Context, packageID string) (string, error
 		default:
 			return "", err
 		}
-		switch status {
-		case buildCompleted, buildFailed:
+		if status == buildCompleted || status == buildFailed {
 			return status, nil
-		case buildPending, buildBuilding, "":
-		default:
-			return "", fmt.Errorf("unknown build status %q", term.Sanitize(status))
 		}
 		if err := r.clk.Sleep(ctx, pollInterval); err != nil {
 			return "", endedError(packageID, buildEnded(ctx))
