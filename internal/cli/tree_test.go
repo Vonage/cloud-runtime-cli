@@ -132,7 +132,6 @@ func TestContractTreeCarriesEndpoint(t *testing.T) {
 			Type:       "string",
 			Default:    "",
 			Usage:      "Platform API base URL (overrides --graphql-endpoint and the config file)",
-			Hidden:     true,
 			Persistent: true,
 		}, n.LocalFlags[at])
 	}

@@ -45,14 +45,13 @@
         "type": "string",
         "default": "",
         "usage": "Platform API base URL (overrides --graphql-endpoint and the config file)",
-        "hidden": true,
         "persistent": true
       },
       {
         "name": "graphql-endpoint",
         "type": "string",
         "default": "",
-        "usage": "Graphql endpoint used to fetch metadata",
+        "usage": "Deprecated: use --endpoint. GraphQL endpoint used to fetch metadata",
         "persistent": true
       },
       {

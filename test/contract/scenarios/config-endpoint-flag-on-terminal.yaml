@@ -1,0 +1,13 @@
+description: "--endpoint names the deployment API and wins over graphql_endpoint of the configuration file"
+args: [--endpoint, "${FAKE}/v1/vcr/euw1/api/deployment", app, list]
+tty: true
+presentation: rich
+config-file: |
+  graphql_endpoint = ${FAKE}/v1/vcr/use1/api/graphql/v1/graphql
+  default_region   = aws.euw1
+
+  [credentials]
+  api_key    = abc123
+  api_secret = s3cret-for-tests
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

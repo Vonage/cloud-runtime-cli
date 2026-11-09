@@ -58,7 +58,7 @@ Run every command from the repository root. `make test` is `go test -race ./...`
   - Verify: `go test ./internal/cli/configure/ -count=1`
   - Accept: tests pass.
 
-- [ ] 4.2 Show `--endpoint`, mark `--graphql-endpoint` deprecated.
+- [x] 4.2 Show `--endpoint`, mark `--graphql-endpoint` deprecated.
   - Files: `internal/cli/root.go` (`bindGlobalFlags`), `internal/cli/root_test.go`, `internal/cli/tree_test.go` (`TestContractTreeCarriesEndpoint`: `Hidden: false`), `test/contract/testdata/contract-tree.json`, `docs/docs_test.go` (drop `TestGeneratedPagesOmitHiddenFlags`'s `--endpoint` check), `docs/vcr*.md`, the help goldens under `internal/cli/`.
   - Test first: update `root_test.go`'s flag table to `hidden=false` for `endpoint` and the new `graphql-endpoint` usage `Deprecated: use --endpoint. GraphQL endpoint used to fetch metadata`.
   - Verify: `make docs && go test ./internal/cli/... ./docs/ -count=1`

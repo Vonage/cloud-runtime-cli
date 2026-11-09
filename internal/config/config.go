@@ -30,7 +30,7 @@ type Flags struct {
 	APISecret       string
 	Region          string
 	GraphQLEndpoint string
-	Endpoint        string // hidden --endpoint
+	Endpoint        string // --endpoint
 	Timeout         time.Duration
 }
 

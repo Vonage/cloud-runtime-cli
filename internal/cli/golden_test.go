@@ -67,6 +67,18 @@ func goldenHelpFiles(t *testing.T) []string {
 	return files
 }
 
+// baselineGraphQLLine is v2.6.1's help line for --graphql-endpoint. The current help shows --endpoint above it and
+// marks it deprecated; that is the one deliberate difference from the recorded pages.
+const baselineGraphQLLine = "      --graphql-endpoint string   Graphql endpoint used to fetch metadata\n"
+
+const currentEndpointLines = "      --endpoint string           Platform API base URL (overrides --graphql-endpoint and the config file)\n" +
+	"      --graphql-endpoint string   Deprecated: use --endpoint. GraphQL endpoint used to fetch metadata\n"
+
+// withEndpointFlag is a recorded help page as the current CLI prints it.
+func withEndpointFlag(page string) string {
+	return strings.ReplaceAll(page, baselineGraphQLLine, currentEndpointLines)
+}
+
 func portedAll() bool { return os.Getenv("PORTED") == allPortedSelector }
 
 func TestHelpPagesMatchGoldens(t *testing.T) {
@@ -81,7 +93,7 @@ func TestHelpPagesMatchGoldens(t *testing.T) {
 			code := executeTestRoot(t, root, env, want.args)
 
 			assert.Equal(t, want.exit, code)
-			assert.Equal(t, want.stdout, stdout.String())
+			assert.Equal(t, withEndpointFlag(want.stdout), stdout.String())
 			assert.Equal(t, want.stderr, stderr.String())
 		})
 	}
@@ -109,7 +121,7 @@ func TestRealTreeHelpPagesMatchGoldens(t *testing.T) {
 			code := Run(t.Context(), want.args, streams, testBuildInfo("v2.6.1"))
 
 			assert.Equal(t, want.exit, code)
-			assert.Equal(t, want.stdout, stdout.String())
+			assert.Equal(t, withEndpointFlag(want.stdout), stdout.String())
 			assert.Equal(t, want.stderr, stderr.String())
 		})
 	}

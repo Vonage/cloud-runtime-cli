@@ -90,7 +90,7 @@ func TestGlobalFlagsMatchContract(t *testing.T) {
 		hidden     bool
 	}{
 		{"config-file", "", "string", "~/.vcr-cli", "Path to config file (default is $HOME/.vcr-cli)", true, false},
-		{"graphql-endpoint", "", "string", "", "Graphql endpoint used to fetch metadata", true, false},
+		{"graphql-endpoint", "", "string", "", "Deprecated: use --endpoint. GraphQL endpoint used to fetch metadata", true, false},
 		{"region", "", "string", "", "Vonage platform region", true, false},
 		{"api-key", "", "string", "", "Vonage API key", true, false},
 		{"api-secret", "", "string", "", "Vonage API secret", true, false},
@@ -102,7 +102,7 @@ func TestGlobalFlagsMatchContract(t *testing.T) {
 		{"version", "v", "bool", "false", "Show VCR CLI version", false, false},
 		{
 			"endpoint", "", "string", "",
-			"Platform API base URL (overrides --graphql-endpoint and the config file)", true, true,
+			"Platform API base URL (overrides --graphql-endpoint and the config file)", true, false,
 		},
 	}
 	for _, tt := range tests {

@@ -111,9 +111,9 @@ func TestGeneratedPagesEndInOneNewline(t *testing.T) {
 	}
 }
 
-func TestGeneratedPagesOmitHiddenFlags(t *testing.T) {
+func TestGeneratedPagesListTheEndpointFlag(t *testing.T) {
 	for name, page := range generatedPages(t) {
-		assert.NotContains(t, page, "--endpoint", name)
+		assert.Contains(t, page, "--endpoint", name)
 	}
 }
 
