@@ -1,6 +1,7 @@
 package initcmd
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -62,7 +63,7 @@ func TestRunArgumentIsAFile(t *testing.T) {
 
 	err := h.run()
 
-	assert.EqualError(t, err, `failed to get absolute path of "`+h.dir+`": path is not a directory`)
+	assert.EqualError(t, err, fmt.Sprintf("failed to get absolute path of %q: path is not a directory", h.dir))
 	assert.Empty(t, h.api.calls)
 }
 

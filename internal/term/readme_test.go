@@ -21,9 +21,7 @@ func planVocabulary() map[string]*regexp.Regexp {
 }
 
 func TestReadmeDocumentsTerminalOutput(t *testing.T) {
-	raw, err := os.ReadFile("../../README.md")
-	require.NoError(t, err)
-	readme := string(raw)
+	readme := readReadme(t)
 
 	require.Contains(t, readme, "\n## Terminal output\n", "the README has its own section on the terminal output")
 	_, section, _ := strings.Cut(readme, "\n## Terminal output\n")
@@ -38,9 +36,7 @@ func TestReadmeDocumentsTerminalOutput(t *testing.T) {
 }
 
 func TestReadmeTerminalOutputFollowsUsage(t *testing.T) {
-	raw, err := os.ReadFile("../../README.md")
-	require.NoError(t, err)
-	readme := string(raw)
+	readme := readReadme(t)
 
 	usage := strings.Index(readme, "\n## Usage\n")
 	terminal := strings.Index(readme, "\n## Terminal output\n")
@@ -51,4 +47,12 @@ func TestReadmeTerminalOutputFollowsUsage(t *testing.T) {
 	require.GreaterOrEqual(t, development, 0)
 	assert.Less(t, usage, terminal, "the section comes after the usage section")
 	assert.Less(t, terminal, development, "and before the sections for contributors")
+}
+
+// readReadme reads the README with its line endings made LF, as a Windows checkout may have CRLF.
+func readReadme(t *testing.T) string {
+	t.Helper()
+	raw, err := os.ReadFile("../../README.md")
+	require.NoError(t, err)
+	return strings.ReplaceAll(string(raw), "\r\n", "\n")
 }

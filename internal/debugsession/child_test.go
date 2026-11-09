@@ -6,6 +6,8 @@ import (
 	"io/fs"
 	"math"
 	"os"
+	"os/exec"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -209,7 +211,11 @@ func TestStartFailureReturnsError(t *testing.T) {
 	c, err := startChild(spec, exits.record)
 
 	assert.Nil(t, c)
-	require.ErrorIs(t, err, fs.ErrNotExist)
+	if runtime.GOOS == "windows" {
+		require.ErrorIs(t, err, exec.ErrNotFound)
+	} else {
+		require.ErrorIs(t, err, fs.ErrNotExist)
+	}
 	assert.NotContains(t, err.Error(), "failed to run local debug process")
 	assert.Empty(t, exits.all())
 }

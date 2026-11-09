@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -199,7 +200,7 @@ func TestDanglingSymlinkIsSkippedWithWarning(t *testing.T) {
 	paths, warn := mustList(t, root)
 
 	assert.Empty(t, paths)
-	assert.Equal(t, "Skipping file broken due to error: open broken: no such file or directory\n", warn)
+	assert.Equal(t, "Skipping file broken due to error: open broken: "+notFoundText(t)+"\n", warn)
 }
 
 func TestUnreadableFileIsSkippedWithWarning(t *testing.T) {
@@ -292,7 +293,16 @@ func TestWarningsAreWrittenOneLineAtATimeAndTheNoticeComesLast(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, []string{
-		"Skipping file broken due to error: open broken: no such file or directory\n",
+		"Skipping file broken due to error: open broken: " + notFoundText(t) + "\n",
 		noticeOneEnv,
 	}, rec.writes)
+}
+
+// notFoundText is how this operating system describes a file that is not there.
+func notFoundText(t *testing.T) string {
+	t.Helper()
+	_, err := os.Open(filepath.Join(t.TempDir(), "missing"))
+	var pathErr *fs.PathError
+	require.ErrorAs(t, err, &pathErr)
+	return pathErr.Err.Error()
 }

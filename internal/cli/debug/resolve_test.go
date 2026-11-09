@@ -1,6 +1,7 @@
 package debug
 
 import (
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -203,7 +204,7 @@ func TestProjectDirectoryErrors(t *testing.T) {
 
 		err := f.run(file)
 
-		require.EqualError(t, err, `failed to get absolute path of "`+file+`": path is not a directory`)
+		require.EqualError(t, err, fmt.Sprintf("failed to get absolute path of %q: path is not a directory", file))
 		assert.Zero(t, f.rec.count())
 	})
 

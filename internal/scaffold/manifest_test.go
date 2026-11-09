@@ -1,6 +1,7 @@
 package scaffold_test
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -212,7 +213,7 @@ func TestWriteManifestRefusesAPlantedLink(t *testing.T) {
 
 			err := p.WriteManifest(sampleManifest(), vcrYml)
 
-			requirePrefix(t, err, `failed to write manifest to "`+filepath.Join(dir, vcrYml)+`": `)
+			requirePrefix(t, err, fmt.Sprintf("failed to write manifest to %q: ", filepath.Join(dir, vcrYml)))
 			assert.Equal(t, "original", readString(t, victim))
 		})
 	}
@@ -245,5 +246,5 @@ func TestWriteManifestRenameFailureText(t *testing.T) {
 
 	err := p.WriteManifest(sampleManifest(), "neru.yml")
 
-	requirePrefix(t, err, `failed to rename manifest file to "`+filepath.Join(dir, vcrYml)+`" : `)
+	requirePrefix(t, err, fmt.Sprintf("failed to rename manifest file to %q : ", filepath.Join(dir, vcrYml)))
 }

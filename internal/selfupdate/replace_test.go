@@ -131,7 +131,7 @@ func TestReplaceKeepsPermissionsAndSymlink(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotZero(t, info.Mode()&os.ModeSymlink, "the link is still a link")
 		assert.Equal(t, "new", readFile(t, behind))
-		assert.Equal(t, []string{"vcr-1.2.3"}, names(t, filepath.Dir(behind)), "the temporary file is beside the real file")
+		assert.Equal(t, withAside("vcr-1.2.3"), names(t, filepath.Dir(behind)), "the temporary file is beside the real file")
 		assert.Equal(t, []string{"vcr"}, names(t, filepath.Dir(link)), "nothing was added beside the link")
 	})
 	t.Run("a link through a linked directory", func(t *testing.T) {
@@ -145,7 +145,7 @@ func TestReplaceKeepsPermissionsAndSymlink(t *testing.T) {
 		require.NoError(t, replace(filepath.Join(dir, "linked", "vcr"), writing("new")))
 
 		assert.Equal(t, "new", readFile(t, behind))
-		assert.Equal(t, []string{"vcr"}, names(t, realDir))
+		assert.Equal(t, withAside("vcr"), names(t, realDir))
 	})
 }
 
