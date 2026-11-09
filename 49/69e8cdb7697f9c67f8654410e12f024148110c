@@ -1,36 +1,56 @@
 .github/workflows/release-please.yml
-  h_df1d95ff1e9b8c 97-98,127,171,176
+  a91a684ced69373e 97-98,127,171,176
 .github/workflows/release.yml
-  h_df1d95ff1e9b8c 132,160,204,209
+  a91a684ced69373e 132,160,204,209
 .release-please-manifest.json
-  h_df1d95ff1e9b8c 2
+  a91a684ced69373e 2
 CHANGELOG.md
-  h_df1d95ff1e9b8c 3-17
+  a91a684ced69373e 3-17
 README.md
-  h_df1d95ff1e9b8c 179
+  a91a684ced69373e 179
 openspec/changes/archive/2026-11-04-gateway-graphql-endpoint/.openspec.yaml
-  h_df1d95ff1e9b8c 1-2
+  a91a684ced69373e 1-2
 openspec/changes/archive/2026-11-04-gateway-graphql-endpoint/design.md
-  h_df1d95ff1e9b8c 1-26
+  a91a684ced69373e 1-26
 openspec/changes/archive/2026-11-04-gateway-graphql-endpoint/proposal.md
-  h_df1d95ff1e9b8c 1-37
+  a91a684ced69373e 1-37
 openspec/changes/archive/2026-11-04-gateway-graphql-endpoint/specs/graphql-endpoint/spec.md
-  h_df1d95ff1e9b8c 1-55
+  a91a684ced69373e 1-55
 openspec/changes/archive/2026-11-04-gateway-graphql-endpoint/tasks.md
-  h_df1d95ff1e9b8c 1-16
+  a91a684ced69373e 1-16
 openspec/config.yaml
-  h_df1d95ff1e9b8c 1-25
+  a91a684ced69373e 1-25
 openspec/specs/graphql-endpoint/spec.md
-  h_df1d95ff1e9b8c 1-54
+  a91a684ced69373e 1-54
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.7.5",
+  "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "4969e8cdb7697f9c67f8654410e12f024148110c",
-  "prompts": {},
-  "humans": {
-    "h_df1d95ff1e9b8c": {
-      "author": "Simon Chan <simon.chan@vonage.com>"
+  "prompts": {
+    "a91a684ced69373e": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "32c4612d-4b1d-4d52-b7e3-58d97b168728",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T09:53:51.744Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T09:53:51.744Z"
+        }
+      ],
+      "total_additions": 241,
+      "total_deletions": 3,
+      "accepted_lines": 241,
+      "overriden_lines": 0
     }
   }
 }
