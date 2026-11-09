@@ -1,0 +1,34 @@
+README.md
+  80121fc1fdbcc0f2 43,176-177,180-182
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "7ce157f120b0e20f666b94cc94e8c59d05cbdc49",
+  "prompts": {
+    "80121fc1fdbcc0f2": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "1e068b06-1397-4b5d-86b7-0e6b6efb50a5",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:33.170Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:33.170Z"
+        }
+      ],
+      "total_additions": 6,
+      "total_deletions": 5,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    }
+  }
+}
