@@ -1,0 +1,96 @@
+.gitattributes
+  5a298bc019b79d3c 10-12
+Makefile
+  5a298bc019b79d3c 36-39,75
+docs/docs.go
+  5a298bc019b79d3c 1-122
+docs/docs_test.go
+  5a298bc019b79d3c 1-142
+docs/vcr.md
+  5a298bc019b79d3c 8,11-34,39-45,47-48,51-65,77,83-91
+docs/vcr_app.md
+  5a298bc019b79d3c 3,7,9-48,59,65-68
+docs/vcr_app_create.md
+  5a298bc019b79d3c 3-21,30-31,33-43,50-54,66,71
+docs/vcr_app_generate-keys.md
+  5a298bc019b79d3c 3,7,9-21,25,31,33-36,43,55,60
+docs/vcr_app_list.md
+  5a298bc019b79d3c 3-15,24-45,52,64,69
+docs/vcr_app_remove.md
+  5a298bc019b79d3c 1-55
+docs/vcr_completion.md
+  5a298bc019b79d3c 1-29
+docs/vcr_completion_bash.md
+  5a298bc019b79d3c 1-53
+docs/vcr_completion_fish.md
+  5a298bc019b79d3c 1-44
+docs/vcr_completion_powershell.md
+  5a298bc019b79d3c 1-41
+docs/vcr_completion_zsh.md
+  5a298bc019b79d3c 1-55
+docs/vcr_configure.md
+  5a298bc019b79d3c 3,7,9-12,14-27,37,39-45,58
+docs/vcr_debug.md
+  5a298bc019b79d3c 3,7-47,57,59-85,92-100,112,118
+docs/vcr_debug_prune-sessions.md
+  5a298bc019b79d3c 1-27
+docs/vcr_deploy.md
+  5a298bc019b79d3c 3,7-124,134,137-160,166-172,184
+docs/vcr_init.md
+  5a298bc019b79d3c 3,7-31,41,43-56,69
+docs/vcr_instance.md
+  5a298bc019b79d3c 3,7-51,62,68-70
+docs/vcr_instance_list.md
+  5a298bc019b79d3c 1-59
+docs/vcr_instance_log.md
+  5a298bc019b79d3c 3-6,9-35,38,44-47,49-50,52-54,56-57,59-60,62-63,65-66,74,91,96
+docs/vcr_instance_remove.md
+  5a298bc019b79d3c 3-20,23,29-41,48-51,63,68
+docs/vcr_secret.md
+  5a298bc019b79d3c 3-37,42-52,65,72,74
+docs/vcr_secret_create.md
+  5a298bc019b79d3c 7,9-26,36-52,59-61,73,78
+docs/vcr_secret_list.md
+  5a298bc019b79d3c 1-53
+docs/vcr_secret_remove.md
+  5a298bc019b79d3c 5-20,28-36,43,55,60
+docs/vcr_secret_update.md
+  5a298bc019b79d3c 3-26,35-48,55-57,69,74
+docs/vcr_upgrade.md
+  5a298bc019b79d3c 3,7,9-31,38-59,63-64,76
+go.mod
+  5a298bc019b79d3c 32,51,55
+go.sum
+  5a298bc019b79d3c 24-25,83,111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "8a1561b7b58aeacb9dd27de7213812ee5cf228cd",
+  "prompts": {
+    "5a298bc019b79d3c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "1fec4bb9-3c22-4eee-a812-bb913fc79bef",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:37.067Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:37.067Z"
+        }
+      ],
+      "total_additions": 1557,
+      "total_deletions": 335,
+      "accepted_lines": 1557,
+      "overriden_lines": 0
+    }
+  }
+}
