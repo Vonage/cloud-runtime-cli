@@ -66,6 +66,8 @@ The layout of the code, the rules it follows and how to check a change are in [A
 
 Usage examples are in the `docs/` folder - [vcr](docs/vcr.md)
 
+The platform address is set with `endpoint` in `~/.vcr-cli` or with `--endpoint`. They replace `graphql_endpoint` and `--graphql-endpoint`, which still work but are deprecated. When `vcr` finds only `graphql_endpoint` in the config file, it offers to add the `endpoint` key on an interactive terminal, and otherwise prints the line to add. `vcr configure` writes both keys.
+
 ## Terminal output
 
 In an interactive terminal, `vcr` shows live progress that settles into result lines with timings, titled result blocks and compact error messages with hints. Output that is piped, redirected or produced in CI is the same as in earlier releases, so scripts and editor integrations keep working.

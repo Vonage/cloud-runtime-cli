@@ -72,7 +72,7 @@ Run every command from the repository root. `make test` is `go test -race ./...`
   - Verify: `make contract NO_GRAPHQL=1 && make contract-rich`
   - Accept: both pass; `allowed-diffs.txt` grows only by those lines.
 
-- [ ] 5.2 README.
+- [x] 5.2 README.
   - Files: `README.md` (the Usage section).
   - Test first: none (docs only).
   - Verify: `go test ./internal/term/ -run Readme -count=1`
