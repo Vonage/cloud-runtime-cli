@@ -1,20 +1,40 @@
 openspec/changes/endpoint-migration/tasks.md
-  h_df1d95ff1e9b8c 69
+  5a7b49ad9731ea59 69
 test/contract/allowed-diffs.txt
-  h_df1d95ff1e9b8c 182-240
+  5a7b49ad9731ea59 182-240
 test/contract/sandbox.go
-  h_df1d95ff1e9b8c 23-24
+  5a7b49ad9731ea59 23-24
 test/contract/sandbox_test.go
-  h_df1d95ff1e9b8c 51-52
+  5a7b49ad9731ea59 51-52
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.7.5",
+  "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "77d1fa55f8f834667cd35ce423d0fe91bd3f4226",
-  "prompts": {},
-  "humans": {
-    "h_df1d95ff1e9b8c": {
-      "author": "Simon Chan <simon.chan@vonage.com>"
+  "prompts": {
+    "5a7b49ad9731ea59": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "36967418-cd58-480a-96fd-489521be1750",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T16:40:09.624Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T16:40:09.624Z"
+        }
+      ],
+      "total_additions": 64,
+      "total_deletions": 3,
+      "accepted_lines": 64,
+      "overriden_lines": 0
     }
   }
 }
