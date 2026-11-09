@@ -80,6 +80,6 @@ Run every command from the repository root. `make test` is `go test -race ./...`
 
 ## 6. Whole-repo checks
 
-- [ ] 6.1 Run everything.
+- [x] 6.1 Run everything.
   - Verify: `make lint && make test && make contract NO_GRAPHQL=1 && make contract-rich && make vulncheck && GOOS=windows go vet ./...`
   - Accept: all pass. Then by hand, with a config file holding only a gateway `graphql_endpoint`: `vcr app list` on a terminal asks and, after `y`, the file has both keys; `vcr app list | cat` prints the stderr line and asks nothing.

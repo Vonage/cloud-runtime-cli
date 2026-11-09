@@ -27,6 +27,8 @@ func (st *runState) migrateEndpoint() {
 		fmt.Fprintf(env.IO.ErrOut, "%s --graphql-endpoint is deprecated; use --endpoint %s instead\n", warn, choice.URL)
 	case endpoint.SourceGraphQLConfig:
 		st.migrateConfigFile(choice.URL)
+	case endpoint.SourceDefault, endpoint.SourceEndpointFlag, endpoint.SourceRegionFlag, endpoint.SourceConfigEndpoint:
+		// nothing to migrate
 	}
 }
 
