@@ -1,0 +1,20 @@
+openspec/changes/endpoint-migration/tasks.md
+  h_df1d95ff1e9b8c 69
+test/contract/allowed-diffs.txt
+  h_df1d95ff1e9b8c 182-240
+test/contract/sandbox.go
+  h_df1d95ff1e9b8c 23-24
+test/contract/sandbox_test.go
+  h_df1d95ff1e9b8c 51-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "77d1fa55f8f834667cd35ce423d0fe91bd3f4226",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
