@@ -1,0 +1,60 @@
+go.mod
+  5b49eb0d60f29e3c 16
+internal/cli/golden_test.go
+  5b49eb0d60f29e3c 1-113
+internal/cli/help.go
+  5b49eb0d60f29e3c 1-198
+internal/cli/help_test.go
+  5b49eb0d60f29e3c 1-120
+internal/cli/pending.go
+  5b49eb0d60f29e3c 1-57
+internal/cli/root.go
+  5b49eb0d60f29e3c 1-82
+internal/cli/root_test.go
+  5b49eb0d60f29e3c 4,6-7,9,11,15,70-370
+internal/cli/roottext.go
+  5b49eb0d60f29e3c 1-59
+internal/cli/run.go
+  5b49eb0d60f29e3c 1-36
+internal/cli/testtree_test.go
+  5b49eb0d60f29e3c 1-225
+internal/cli/tree_test.go
+  5b49eb0d60f29e3c 1-139
+test/contract/allowed-diffs.txt
+  5b49eb0d60f29e3c 2-12
+test/contract/scenarios/completion-no-config.yaml
+  5b49eb0d60f29e3c 4
+test/contract/testdata/contract-tree.json
+  5b49eb0d60f29e3c 43-50,109,176,205,236,268,287,320,347,374,401,421,507,529,599,618,641,661,697,770,823,843,895,918,950,993,1029
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "14ee6d65b873d5e93f4e6d980ca76ac868703b98",
+  "prompts": {
+    "5b49eb0d60f29e3c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "228b9104-68a3-4faa-8750-b0dd4cfe4bbc",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:45.425Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:45.425Z"
+        }
+      ],
+      "total_additions": 1383,
+      "total_deletions": 51,
+      "accepted_lines": 1383,
+      "overriden_lines": 0
+    }
+  }
+}
