@@ -3,11 +3,13 @@
 package contract
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"regexp"
 	"strconv"
 	"strings"
+	"syscall"
 )
 
 var portPlaceholder = regexp.MustCompile(`\$\{PORT:([A-Za-z0-9_-]+)\}`)
@@ -66,27 +68,31 @@ func AllocatePorts(names, hold []string) (*PortSet, error) {
 // holdAttempts is how many ports listenEverywhere tries before it gives up.
 const holdAttempts = 20
 
-// listenEverywhere binds one free port on the loopback address and on every
-// interface. A program that binds either of the two finds the port in use on
-// every Unix; BSD kernels would otherwise let a wildcard bind and a loopback
-// bind share a port.
+// listenEverywhere binds one free port on every interface and, where the
+// kernel allows it, on the loopback address too, so that a program binding
+// either finds the port in use. Linux refuses the loopback bind while the
+// wildcard listens, which already keeps the port; BSD kernels let the two
+// share a port, so there both are held.
 func listenEverywhere() ([]net.Listener, int, error) {
 	var lastErr error
 	for attempt := 0; attempt < holdAttempts; attempt++ {
-		loopback, err := listen("tcp", "127.0.0.1:0")
+		wildcard, err := listen("tcp", ":0")
 		if err != nil {
 			return nil, 0, err
 		}
-		port, err := listenerPort(loopback)
+		port, err := listenerPort(wildcard)
 		if err != nil {
-			_ = loopback.Close()
+			_ = wildcard.Close()
 			return nil, 0, err
 		}
-		wildcard, err := listen("tcp", ":"+strconv.Itoa(port))
-		if err == nil {
-			return []net.Listener{loopback, wildcard}, port, nil
+		loopback, err := listen("tcp", net.JoinHostPort("127.0.0.1", strconv.Itoa(port)))
+		switch {
+		case err == nil:
+			return []net.Listener{wildcard, loopback}, port, nil
+		case errors.Is(err, syscall.EADDRINUSE):
+			return []net.Listener{wildcard}, port, nil
 		}
-		_ = loopback.Close()
+		_ = wildcard.Close()
 		lastErr = err
 	}
 	return nil, 0, lastErr

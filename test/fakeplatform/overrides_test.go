@@ -113,11 +113,11 @@ func TestOverrideRedirectReachesOtherListener(t *testing.T) {
 
 func TestOverrideHangEndsWhenClientGivesUp(t *testing.T) {
 	s := started(t, "overrides: [{match: GET /secrets, hang: true}]\n")
+	begun := time.Now() // before the timer starts, so the wait is never measured short
 	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.DeploymentAPIURL("euw1")+"/v0.3/secrets", nil)
 	require.NoError(t, err)
-	begun := time.Now()
 	resp, err := testClient.Do(req)
 	if resp != nil {
 		resp.Body.Close()
