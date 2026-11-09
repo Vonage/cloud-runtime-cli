@@ -1,0 +1,14 @@
+internal/cli/configure/endpoint_test.go
+  h_df1d95ff1e9b8c 1-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e4ac9aa2fd227e6ac35b403804175552887a077e",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
