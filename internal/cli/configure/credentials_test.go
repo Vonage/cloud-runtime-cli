@@ -40,7 +40,7 @@ func TestConfigureSecretPromptKeepsTheCurrentSecret(t *testing.T) {
 
 			require.NoError(t, err)
 			assert.Equal(t, cmdtest.Ask{Kind: "password", Message: keepSecretPrompt, Required: false}, script.Asked[1])
-			assertStored(t, r.path, config.File{
+			r.assertWritten(t, config.File{
 				GraphQLEndpoint: euw1Endpoint, DefaultRegion: "aws.euw1", APIKey: account, APISecret: secret,
 			})
 		})
@@ -55,7 +55,7 @@ func TestConfigureSecretFlagWinsOverTheStoredSecret(t *testing.T) {
 	err := r.execute(t)
 
 	require.NoError(t, err)
-	assertStored(t, r.path, config.File{
+	r.assertWritten(t, config.File{
 		GraphQLEndpoint: euw1Endpoint, DefaultRegion: "aws.euw1", APIKey: account, APISecret: secret,
 	})
 }
@@ -127,7 +127,7 @@ func TestConfigureUsesTheEnteredCredentials(t *testing.T) {
 	reqs := r.Requests()
 	require.Len(t, reqs, 1)
 	assert.Equal(t, account, reqs[0].User)
-	assertStored(t, r.path, config.File{
+	r.assertWritten(t, config.File{
 		GraphQLEndpoint: euw1Endpoint, DefaultRegion: "aws.euw1", APIKey: account, APISecret: secret,
 	})
 }

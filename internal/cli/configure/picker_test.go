@@ -54,7 +54,7 @@ func TestConfigureWritesTheChosenRegion(t *testing.T) {
 
 	require.NoError(t, r.execute(t))
 
-	assertStored(t, r.path, config.File{
+	r.assertWritten(t, config.File{
 		GraphQLEndpoint: euw1Endpoint, DefaultRegion: "aws.use1", APIKey: account, APISecret: secret,
 	})
 }
@@ -97,7 +97,7 @@ func TestConfigureShowsRegionNamesWithoutTerminalControlSequences(t *testing.T) 
 	options := script.Asked[2].Options
 	assert.Equal(t, []string{euw1Label, use1Label, label}, options)
 	assert.NotContains(t, r.Stdout.String(), "\x1b")
-	assertStored(t, r.path, config.File{
+	r.assertWritten(t, config.File{
 		GraphQLEndpoint: euw1Endpoint, DefaultRegion: "aws.apse1", APIKey: account, APISecret: secret,
 	})
 }

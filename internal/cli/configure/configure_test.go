@@ -26,6 +26,7 @@ func answers() *cmdtest.Script {
 
 func TestConfigureWritesTheFile(t *testing.T) {
 	r := start(t, setup{script: answers()})
+	fake := r.Env.Flags.Endpoint
 
 	err := r.execute(t)
 
@@ -34,7 +35,7 @@ func TestConfigureWritesTheFile(t *testing.T) {
 	assert.Equal(t, "! Fail to read config file "+r.path+". Creating a new config...\n", r.Stderr.String())
 	assert.Equal(t, []string{"euw1 GET /regions"}, cmdtest.Calls(r.Requests()))
 	assertStored(t, r.path, config.File{
-		GraphQLEndpoint: euw1Endpoint, DefaultRegion: "aws.euw1", APIKey: account, APISecret: secret,
+		GraphQLEndpoint: euw1Endpoint, Endpoint: fake, DefaultRegion: "aws.euw1", APIKey: account, APISecret: secret,
 	})
 	assertPrivate(t, r.path)
 }
@@ -60,7 +61,7 @@ func TestConfigureWarnsForAMalformedFile(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, "! Fail to read config file "+path+". Creating a new config...\n", r.Stderr.String())
-	assertStored(t, path, config.File{
+	r.assertWritten(t, config.File{
 		GraphQLEndpoint: euw1Endpoint, DefaultRegion: "aws.euw1", APIKey: account, APISecret: secret,
 	})
 }
@@ -118,7 +119,7 @@ func TestConfigureKeepsTheGraphqlEndpointOfTheExistingFile(t *testing.T) {
 
 	require.NoError(t, r.execute(t))
 
-	assertStored(t, r.path, config.File{
+	r.assertWritten(t, config.File{
 		GraphQLEndpoint: use1Endpoint, DefaultRegion: "aws.euw1", APIKey: account, APISecret: secret,
 	})
 }
@@ -127,11 +128,12 @@ func TestConfigureWritesTheGraphqlEndpointFlag(t *testing.T) {
 	const flagEndpoint = "https://gateway.example.test/api/graphql/v1/graphql"
 	stored := config.File{GraphQLEndpoint: use1Endpoint, APIKey: account, APISecret: secret}
 	r := start(t, setup{stored: &stored, flags: config.Flags{GraphQLEndpoint: flagEndpoint}, script: answers()})
+	fake := r.Env.Flags.Endpoint
 
 	require.NoError(t, r.execute(t))
 
-	assertStored(t, r.path, config.File{
-		GraphQLEndpoint: flagEndpoint, DefaultRegion: "aws.euw1", APIKey: account, APISecret: secret,
+	r.assertWritten(t, config.File{
+		GraphQLEndpoint: flagEndpoint, Endpoint: fake, DefaultRegion: "aws.euw1", APIKey: account, APISecret: secret,
 	})
 }
 
@@ -143,7 +145,7 @@ func TestConfigureWritesTheEndpointOfTheRegionFlag(t *testing.T) {
 
 	require.NoError(t, r.execute(t))
 
-	assertStored(t, r.path, config.File{
+	r.assertWritten(t, config.File{
 		GraphQLEndpoint: use1Endpoint, DefaultRegion: "aws.use1", APIKey: account, APISecret: secret,
 	})
 }
@@ -258,8 +260,9 @@ func TestRichConfigureLines(t *testing.T) {
 }
 
 func TestRichConfigureWritesTheSameFileAsClassic(t *testing.T) {
-	classic := start(t, setup{script: answers()})
-	rich := start(t, setup{script: answers(), mode: term.Rich})
+	srv := startFake(t)
+	classic := start(t, setup{srv: srv, script: answers()})
+	rich := start(t, setup{srv: srv, script: answers(), mode: term.Rich})
 
 	require.NoError(t, classic.execute(t))
 	require.NoError(t, rich.execute(t))
@@ -333,4 +336,18 @@ func TestRichConfigureAsksTheSameQuestions(t *testing.T) {
 		{Kind: "password", Message: newSecretPrompt, Required: true},
 		{Kind: "select", Message: regionPrompt, Options: []string{euw1Label, use1Label}},
 	}, r.script.Asked)
+}
+
+func TestConfigureWritesTheEndpointItAsked(t *testing.T) {
+	srv := startFake(t)
+	r := start(t, setup{srv: srv, script: answers()})
+	r.Env.Flags.Endpoint = ""
+	r.Env.Flags.GraphQLEndpoint = srv.GatewayGraphQLURL("euw1")
+
+	require.NoError(t, r.execute(t))
+
+	assertStored(t, r.path, config.File{
+		GraphQLEndpoint: srv.GatewayGraphQLURL("euw1"), Endpoint: srv.DeploymentAPIURL("euw1"),
+		DefaultRegion: "aws.euw1", APIKey: account, APISecret: secret,
+	})
 }

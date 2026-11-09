@@ -114,10 +114,13 @@ func currentOf(flags *config.Flags, stored config.File) current {
 	}
 }
 
-// fileToWrite is the new config file: the answers, and the GraphQL endpoint the flags or the stored file name.
+// fileToWrite is the new config file: the answers, the GraphQL endpoint the flags or the stored file name, and the
+// endpoint the regions were listed from. That endpoint was resolved before the regions were listed, so it cannot fail.
 func fileToWrite(flags *config.Flags, stored config.File, key, secret, region string) config.File {
+	url, _ := endpointOf(flags, stored)
 	return config.File{
 		GraphQLEndpoint: graphqlEndpointToWrite(flags.GraphQLEndpoint, flags.Region, stored.GraphQLEndpoint),
+		Endpoint:        url,
 		DefaultRegion:   region,
 		APIKey:          key,
 		APISecret:       secret,
@@ -181,14 +184,7 @@ func fetchRegions(ctx context.Context, env *cmdenv.Env, stored config.File, cred
 // here. The --region flag picks the production default and the stored default_region does not: an endpoint in the
 // file must not be replaced by it.
 func newResolver(env *cmdenv.Env, stored config.File, creds platform.Credentials) (*platform.Resolver, error) {
-	flags := env.Flags
-	bootstrap, err := endpoint.Bootstrap(endpoint.Inputs{
-		Endpoint:       flags.Endpoint,
-		GraphQLFlag:    flags.GraphQLEndpoint,
-		Region:         flags.Region,
-		ConfigEndpoint: stored.Endpoint,
-		GraphQLConfig:  stored.GraphQLEndpoint,
-	})
+	bootstrap, err := endpointOf(env.Flags, stored)
 	if err != nil {
 		return nil, err
 	}
@@ -199,6 +195,17 @@ func newResolver(env *cmdenv.Env, stored config.File, creds platform.Credentials
 		UserAgent:  env.Build.UserAgent(),
 		Clock:      env.Clock,
 		Notices:    env.IO.ErrOut,
+	})
+}
+
+// endpointOf is the deployment API that lists the regions, and the endpoint the new file names.
+func endpointOf(flags *config.Flags, stored config.File) (string, error) {
+	return endpoint.Bootstrap(endpoint.Inputs{
+		Endpoint:       flags.Endpoint,
+		GraphQLFlag:    flags.GraphQLEndpoint,
+		Region:         flags.Region,
+		ConfigEndpoint: stored.Endpoint,
+		GraphQLConfig:  stored.GraphQLEndpoint,
 	})
 }
 

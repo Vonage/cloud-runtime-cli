@@ -118,6 +118,13 @@ func assertStored(t *testing.T, path string, want config.File) {
 	assert.Equal(t, want, got)
 }
 
+// assertWritten checks the file configure wrote: want, plus the endpoint the regions were listed from.
+func (r *run) assertWritten(t *testing.T, want config.File) {
+	t.Helper()
+	want.Endpoint = r.Env.Flags.Endpoint
+	assertStored(t, r.path, want)
+}
+
 // assertPrivate checks that only the owner can read the file. Windows has no such mode.
 func assertPrivate(t *testing.T, path string) {
 	t.Helper()

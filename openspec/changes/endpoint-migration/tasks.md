@@ -52,7 +52,7 @@ Run every command from the repository root. `make test` is `go test -race ./...`
 
 ## 4. Configure and help
 
-- [ ] 4.1 `vcr configure` writes `endpoint`.
+- [x] 4.1 `vcr configure` writes `endpoint`.
   - Files: `internal/cli/configure/configure.go` (`fileToWrite`), `internal/cli/configure/configure_test.go`.
   - Test first: extend `TestConfigureWritesTheFile`, `TestConfigureWritesTheGraphqlEndpointFlag` and `TestConfigureWritesTheEndpointOfTheRegionFlag` to expect `endpoint` equal to the bootstrap URL used, alongside the unchanged `graphql_endpoint`.
   - Verify: `go test ./internal/cli/configure/ -count=1`
