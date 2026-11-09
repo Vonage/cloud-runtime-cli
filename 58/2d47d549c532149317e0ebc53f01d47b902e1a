@@ -1,0 +1,46 @@
+docs/docs_test.go
+  h_df1d95ff1e9b8c 116
+internal/cli/cmdtest/cmdtest.go
+  h_df1d95ff1e9b8c 57,131-132
+internal/cli/cmdtest/cmdtest_test.go
+  h_df1d95ff1e9b8c 95,124
+internal/cli/configure/configure.go
+  h_df1d95ff1e9b8c 186-189
+internal/cli/configure/configure_test.go
+  h_df1d95ff1e9b8c 161,172,183
+internal/cli/harness_test.go
+  h_df1d95ff1e9b8c 97
+internal/cli/prerun.go
+  h_df1d95ff1e9b8c 92-95
+internal/cli/prerun_init_test.go
+  h_df1d95ff1e9b8c 82,98,113,128
+internal/cli/prerun_test.go
+  h_df1d95ff1e9b8c 160
+internal/cli/root.go
+  h_df1d95ff1e9b8c 84-85,93
+internal/cli/root_test.go
+  h_df1d95ff1e9b8c 104-105,139,148,158
+internal/cli/tree_test.go
+  h_df1d95ff1e9b8c 14,114,122,126-127,131,134
+internal/cli/updatecheck_test.go
+  h_df1d95ff1e9b8c 75
+internal/config/config.go
+  h_df1d95ff1e9b8c 26-33
+internal/endpoint/bootstrap.go
+  h_df1d95ff1e9b8c 33-36,41,51,54-55,126
+internal/endpoint/endpoint_test.go
+  h_df1d95ff1e9b8c 21,50-53,59,74
+test/contract/testdata/contract-tree.json
+  h_df1d95ff1e9b8c 44,47,109,176,205,236,268,287,320,347,374,401,421,507,529,599,618,641,661,697,770,823,843,895,918,950,993,1029
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "582d47d549c532149317e0ebc53f01d47b902e1a",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
