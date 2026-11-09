@@ -1,0 +1,490 @@
+docs/docs.go
+  h_df1d95ff1e9b8c 14-18
+go.mod
+  h_df1d95ff1e9b8c 1
+internal/cli/app/app.go
+  h_df1d95ff1e9b8c 10
+internal/cli/app/app_test.go
+  h_df1d95ff1e9b8c 10-13
+internal/cli/app/create.go
+  h_df1d95ff1e9b8c 11-12
+internal/cli/app/create_test.go
+  h_df1d95ff1e9b8c 13-18
+internal/cli/app/generatekeys.go
+  h_df1d95ff1e9b8c 11-12
+internal/cli/app/generatekeys_test.go
+  h_df1d95ff1e9b8c 13-19
+internal/cli/app/helpers_test.go
+  h_df1d95ff1e9b8c 8-10
+internal/cli/app/list.go
+  h_df1d95ff1e9b8c 10-12
+internal/cli/app/list_test.go
+  h_df1d95ff1e9b8c 15-19
+internal/cli/app/remove.go
+  h_df1d95ff1e9b8c 11-13
+internal/cli/app/remove_test.go
+  h_df1d95ff1e9b8c 13-19
+internal/cli/app/rich.go
+  h_df1d95ff1e9b8c 7-8
+internal/cli/app/rich_test.go
+  h_df1d95ff1e9b8c 10-13
+internal/cli/cmdenv/cmdenv.go
+  h_df1d95ff1e9b8c 8-12
+internal/cli/cmdenv/region.go
+  h_df1d95ff1e9b8c 7
+internal/cli/cmdenv/regionclient_test.go
+  h_df1d95ff1e9b8c 14-17
+internal/cli/cmdtest/cmdtest.go
+  h_df1d95ff1e9b8c 14-20
+internal/cli/cmdtest/cmdtest_rich_test.go
+  h_df1d95ff1e9b8c 14-16
+internal/cli/cmdtest/cmdtest_test.go
+  h_df1d95ff1e9b8c 14-18
+internal/cli/cmdtest/rich.go
+  h_df1d95ff1e9b8c 9-10
+internal/cli/cmdtest/script.go
+  h_df1d95ff1e9b8c 8
+internal/cli/configure/configure.go
+  h_df1d95ff1e9b8c 13-17
+internal/cli/configure/configure_test.go
+  h_df1d95ff1e9b8c 14-19
+internal/cli/configure/credentials_test.go
+  h_df1d95ff1e9b8c 11-13
+internal/cli/configure/errors_test.go
+  h_df1d95ff1e9b8c 15-17
+internal/cli/configure/helpers_test.go
+  h_df1d95ff1e9b8c 15-19
+internal/cli/configure/picker_test.go
+  h_df1d95ff1e9b8c 9-10
+internal/cli/configure/regions.go
+  h_df1d95ff1e9b8c 8-9
+internal/cli/configure/regions_test.go
+  h_df1d95ff1e9b8c 8
+internal/cli/configure/rich.go
+  h_df1d95ff1e9b8c 7-9
+internal/cli/debug/ctx_test.go
+  h_df1d95ff1e9b8c 11-12
+internal/cli/debug/debug.go
+  h_df1d95ff1e9b8c 10-13
+internal/cli/debug/debug_test.go
+  h_df1d95ff1e9b8c 10
+internal/cli/debug/helpers_test.go
+  h_df1d95ff1e9b8c 15-22
+internal/cli/debug/prompt_test.go
+  h_df1d95ff1e9b8c 11
+internal/cli/debug/prune.go
+  h_df1d95ff1e9b8c 9-10
+internal/cli/debug/prune_test.go
+  h_df1d95ff1e9b8c 9
+internal/cli/debug/region.go
+  h_df1d95ff1e9b8c 7-8
+internal/cli/debug/region_test.go
+  h_df1d95ff1e9b8c 12-13
+internal/cli/debug/resolve.go
+  h_df1d95ff1e9b8c 10-14
+internal/cli/debug/rich.go
+  h_df1d95ff1e9b8c 7-8
+internal/cli/debug/rich_test.go
+  h_df1d95ff1e9b8c 11-13
+internal/cli/deploy/deploy.go
+  h_df1d95ff1e9b8c 10-12
+internal/cli/deploy/deploy_test.go
+  h_df1d95ff1e9b8c 10-11
+internal/cli/deploy/env_test.go
+  h_df1d95ff1e9b8c 16-22
+internal/cli/deploy/fake_test.go
+  h_df1d95ff1e9b8c 12-13
+internal/cli/deploy/plan.go
+  h_df1d95ff1e9b8c 6-7
+internal/cli/deploy/region_test.go
+  h_df1d95ff1e9b8c 9-11
+internal/cli/deploy/rich_test.go
+  h_df1d95ff1e9b8c 11-13
+internal/cli/golden_test.go
+  h_df1d95ff1e9b8c 15
+internal/cli/harness_test.go
+  h_df1d95ff1e9b8c 15-22
+internal/cli/help.go
+  h_df1d95ff1e9b8c 12-15
+internal/cli/initcmd/apps.go
+  h_df1d95ff1e9b8c 7-8
+internal/cli/initcmd/fakes_test.go
+  h_df1d95ff1e9b8c 17-18
+internal/cli/initcmd/flow.go
+  h_df1d95ff1e9b8c 10-13
+internal/cli/initcmd/flow_test.go
+  h_df1d95ff1e9b8c 11
+internal/cli/initcmd/initcmd.go
+  h_df1d95ff1e9b8c 7
+internal/cli/initcmd/initcmd_test.go
+  h_df1d95ff1e9b8c 16-23
+internal/cli/initcmd/options.go
+  h_df1d95ff1e9b8c 8-9
+internal/cli/initcmd/options_test.go
+  h_df1d95ff1e9b8c 8
+internal/cli/initcmd/rich.go
+  h_df1d95ff1e9b8c 7-9
+internal/cli/initcmd/rich_helpers_test.go
+  h_df1d95ff1e9b8c 15-16
+internal/cli/initcmd/rich_test.go
+  h_df1d95ff1e9b8c 13-16
+internal/cli/initcmd/template.go
+  h_df1d95ff1e9b8c 7-10
+internal/cli/initcmd/template_test.go
+  h_df1d95ff1e9b8c 11-12
+internal/cli/instance/follow.go
+  h_df1d95ff1e9b8c 9-11
+internal/cli/instance/follow_test.go
+  h_df1d95ff1e9b8c 13-15
+internal/cli/instance/helpers_test.go
+  h_df1d95ff1e9b8c 10-12
+internal/cli/instance/instance.go
+  h_df1d95ff1e9b8c 8
+internal/cli/instance/instance_test.go
+  h_df1d95ff1e9b8c 9-11
+internal/cli/instance/list.go
+  h_df1d95ff1e9b8c 10-12
+internal/cli/instance/list_test.go
+  h_df1d95ff1e9b8c 15-20
+internal/cli/instance/log.go
+  h_df1d95ff1e9b8c 11
+internal/cli/instance/log_deadline_test.go
+  h_df1d95ff1e9b8c 13-16
+internal/cli/instance/log_follow_test.go
+  h_df1d95ff1e9b8c 14-19
+internal/cli/instance/log_region_test.go
+  h_df1d95ff1e9b8c 11-15
+internal/cli/instance/log_test.go
+  h_df1d95ff1e9b8c 13-15
+internal/cli/instance/logprint.go
+  h_df1d95ff1e9b8c 6-7
+internal/cli/instance/logprint_test.go
+  h_df1d95ff1e9b8c 9
+internal/cli/instance/region.go
+  h_df1d95ff1e9b8c 7-8
+internal/cli/instance/remove.go
+  h_df1d95ff1e9b8c 10-12
+internal/cli/instance/remove_hostile_test.go
+  h_df1d95ff1e9b8c 11-13
+internal/cli/instance/remove_region_test.go
+  h_df1d95ff1e9b8c 10-15
+internal/cli/instance/remove_test.go
+  h_df1d95ff1e9b8c 13-19
+internal/cli/instance/rich.go
+  h_df1d95ff1e9b8c 7-8
+internal/cli/instance/rich_test.go
+  h_df1d95ff1e9b8c 10-13
+internal/cli/instance/target.go
+  h_df1d95ff1e9b8c 8
+internal/cli/instance/target_test.go
+  h_df1d95ff1e9b8c 12
+internal/cli/prerun.go
+  h_df1d95ff1e9b8c 9-12
+internal/cli/prerun_init_test.go
+  h_df1d95ff1e9b8c 15-16
+internal/cli/prerun_test.go
+  h_df1d95ff1e9b8c 15-20
+internal/cli/rich.go
+  h_df1d95ff1e9b8c 6-7
+internal/cli/root.go
+  h_df1d95ff1e9b8c 9-18
+internal/cli/root_test.go
+  h_df1d95ff1e9b8c 14
+internal/cli/run.go
+  h_df1d95ff1e9b8c 8-14
+internal/cli/run_test.go
+  h_df1d95ff1e9b8c 15-19
+internal/cli/secret/create.go
+  h_df1d95ff1e9b8c 11-13
+internal/cli/secret/create_test.go
+  h_df1d95ff1e9b8c 13-18
+internal/cli/secret/helpers_test.go
+  h_df1d95ff1e9b8c 11-13
+internal/cli/secret/list.go
+  h_df1d95ff1e9b8c 10-11
+internal/cli/secret/list_test.go
+  h_df1d95ff1e9b8c 13-18
+internal/cli/secret/remove.go
+  h_df1d95ff1e9b8c 11-12
+internal/cli/secret/remove_test.go
+  h_df1d95ff1e9b8c 13-18
+internal/cli/secret/rich.go
+  h_df1d95ff1e9b8c 7-8
+internal/cli/secret/rich_test.go
+  h_df1d95ff1e9b8c 10-13
+internal/cli/secret/secret.go
+  h_df1d95ff1e9b8c 10
+internal/cli/secret/secret_test.go
+  h_df1d95ff1e9b8c 11-13
+internal/cli/secret/update.go
+  h_df1d95ff1e9b8c 11-13
+internal/cli/secret/update_test.go
+  h_df1d95ff1e9b8c 13-18
+internal/cli/secret/value.go
+  h_df1d95ff1e9b8c 13
+internal/cli/testtree_test.go
+  h_df1d95ff1e9b8c 14-19
+internal/cli/updatecheck.go
+  h_df1d95ff1e9b8c 7-8
+internal/cli/updatecheck_test.go
+  h_df1d95ff1e9b8c 15-19
+internal/cli/upgrade/helpers_test.go
+  h_df1d95ff1e9b8c 14-19
+internal/cli/upgrade/rich.go
+  h_df1d95ff1e9b8c 6-7
+internal/cli/upgrade/rich_test.go
+  h_df1d95ff1e9b8c 15-23
+internal/cli/upgrade/upgrade.go
+  h_df1d95ff1e9b8c 13-16
+internal/cli/upgrade/upgrade_test.go
+  h_df1d95ff1e9b8c 14-16
+internal/clierr/clierr_test.go
+  h_df1d95ff1e9b8c 10
+internal/clierr/render.go
+  h_df1d95ff1e9b8c 8
+internal/clierr/render_test.go
+  h_df1d95ff1e9b8c 12-13
+internal/clierr/rich.go
+  h_df1d95ff1e9b8c 13
+internal/clierr/rich_test.go
+  h_df1d95ff1e9b8c 14-15
+internal/debugsession/accesslog.go
+  h_df1d95ff1e9b8c 7
+internal/debugsession/accesslog_rich.go
+  h_df1d95ff1e9b8c 7
+internal/debugsession/accesslog_rich_test.go
+  h_df1d95ff1e9b8c 11-12
+internal/debugsession/app_terminal_pty_test.go
+  h_df1d95ff1e9b8c 17-19
+internal/debugsession/child.go
+  h_df1d95ff1e9b8c 12
+internal/debugsession/child_test.go
+  h_df1d95ff1e9b8c 19-20
+internal/debugsession/console.go
+  h_df1d95ff1e9b8c 8
+internal/debugsession/console_test.go
+  h_df1d95ff1e9b8c 12
+internal/debugsession/debugsession.go
+  h_df1d95ff1e9b8c 13-14
+internal/debugsession/env.go
+  h_df1d95ff1e9b8c 10-11
+internal/debugsession/env_test.go
+  h_df1d95ff1e9b8c 12-13
+internal/debugsession/intro.go
+  h_df1d95ff1e9b8c 3
+internal/debugsession/intro_test.go
+  h_df1d95ff1e9b8c 8-9
+internal/debugsession/localapi_self_test.go
+  h_df1d95ff1e9b8c 10-11
+internal/debugsession/localapi_test.go
+  h_df1d95ff1e9b8c 17-21
+internal/debugsession/ready.go
+  h_df1d95ff1e9b8c 8
+internal/debugsession/ready_test.go
+  h_df1d95ff1e9b8c 12
+internal/debugsession/reconnect.go
+  h_df1d95ff1e9b8c 13-14
+internal/debugsession/reconnect_test.go
+  h_df1d95ff1e9b8c 17
+internal/debugsession/rich.go
+  h_df1d95ff1e9b8c 6-7
+internal/debugsession/rich_causes_test.go
+  h_df1d95ff1e9b8c 17-19
+internal/debugsession/rich_helpers_test.go
+  h_df1d95ff1e9b8c 13-14
+internal/debugsession/rich_hold_test.go
+  h_df1d95ff1e9b8c 10-12
+internal/debugsession/rich_test.go
+  h_df1d95ff1e9b8c 13-14
+internal/debugsession/run.go
+  h_df1d95ff1e9b8c 10-13
+internal/debugsession/run_harness_test.go
+  h_df1d95ff1e9b8c 10-15
+internal/debugsession/run_serve_test.go
+  h_df1d95ff1e9b8c 17
+internal/debugsession/run_setup_test.go
+  h_df1d95ff1e9b8c 15-18
+internal/debugsession/run_test.go
+  h_df1d95ff1e9b8c 16-18
+internal/debugsession/teardown.go
+  h_df1d95ff1e9b8c 7
+internal/debugsession/tunnel.go
+  h_df1d95ff1e9b8c 16
+internal/debugsession/tunnel_conn_test.go
+  h_df1d95ff1e9b8c 18
+internal/debugsession/tunnel_harness_test.go
+  h_df1d95ff1e9b8c 12-15
+internal/debugsession/tunnel_shared_test.go
+  h_df1d95ff1e9b8c 13
+internal/debugsession/verbose.go
+  h_df1d95ff1e9b8c 10
+internal/deploy/bodies_test.go
+  h_df1d95ff1e9b8c 9-10
+internal/deploy/build.go
+  h_df1d95ff1e9b8c 10-12
+internal/deploy/build_status_test.go
+  h_df1d95ff1e9b8c 15-16
+internal/deploy/deploy.go
+  h_df1d95ff1e9b8c 7-8
+internal/deploy/deploy_test.go
+  h_df1d95ff1e9b8c 18-21
+internal/deploy/fake_api_test.go
+  h_df1d95ff1e9b8c 13
+internal/deploy/rich.go
+  h_df1d95ff1e9b8c 9-11
+internal/deploy/rich_match_test.go
+  h_df1d95ff1e9b8c 13-16
+internal/deploy/rich_test.go
+  h_df1d95ff1e9b8c 15-17
+internal/deploy/run.go
+  h_df1d95ff1e9b8c 7-9
+internal/deploy/stages.go
+  h_df1d95ff1e9b8c 10-13
+internal/deploy/summary.go
+  h_df1d95ff1e9b8c 7-8
+internal/endpoint/endpoint_test.go
+  h_df1d95ff1e9b8c 11-12
+internal/manifest/capabilities_test.go
+  h_df1d95ff1e9b8c 9
+internal/manifest/find_test.go
+  h_df1d95ff1e9b8c 13
+internal/manifest/helpers_test.go
+  h_df1d95ff1e9b8c 12
+internal/manifest/manifest_test.go
+  h_df1d95ff1e9b8c 12
+internal/manifest/merge_test.go
+  h_df1d95ff1e9b8c 8
+internal/manifest/projectdir_test.go
+  h_df1d95ff1e9b8c 13
+internal/platform/apierror.go
+  h_df1d95ff1e9b8c 13-14
+internal/platform/apierror_test.go
+  h_df1d95ff1e9b8c 9
+internal/platform/buildstatus_test.go
+  h_df1d95ff1e9b8c 13
+internal/platform/conformance_test.go
+  h_df1d95ff1e9b8c 4-6
+internal/platform/core.go
+  h_df1d95ff1e9b8c 17
+internal/platform/debugservices.go
+  h_df1d95ff1e9b8c 9
+internal/platform/debugservices_test.go
+  h_df1d95ff1e9b8c 11
+internal/platform/deployments.go
+  h_df1d95ff1e9b8c 7
+internal/platform/deployments_test.go
+  h_df1d95ff1e9b8c 11
+internal/platform/helpers_test.go
+  h_df1d95ff1e9b8c 19
+internal/platform/options.go
+  h_df1d95ff1e9b8c 7
+internal/platform/reads.go
+  h_df1d95ff1e9b8c 11
+internal/platform/reads_fake_test.go
+  h_df1d95ff1e9b8c 10
+internal/platform/reads_instances_test.go
+  h_df1d95ff1e9b8c 11
+internal/platform/reads_older_test.go
+  h_df1d95ff1e9b8c 12
+internal/platform/reads_test.go
+  h_df1d95ff1e9b8c 12
+internal/platform/request_errors_test.go
+  h_df1d95ff1e9b8c 14
+internal/platform/request_test.go
+  h_df1d95ff1e9b8c 17
+internal/platform/resolver_fake_test.go
+  h_df1d95ff1e9b8c 13-15
+internal/platform/resolver_helpers_test.go
+  h_df1d95ff1e9b8c 16
+internal/platform/resolver_test.go
+  h_df1d95ff1e9b8c 13
+internal/platform/routes_fake_test.go
+  h_df1d95ff1e9b8c 10-11
+internal/platform/routes_helpers_test.go
+  h_df1d95ff1e9b8c 12-13
+internal/platform/status.go
+  h_df1d95ff1e9b8c 6
+internal/platform/template_test.go
+  h_df1d95ff1e9b8c 14
+internal/platform/upload_retry.go
+  h_df1d95ff1e9b8c 14-15
+internal/platform/upload_retry_rules_test.go
+  h_df1d95ff1e9b8c 17
+internal/platform/watch_connect_test.go
+  h_df1d95ff1e9b8c 12
+internal/platform/watch_fake_test.go
+  h_df1d95ff1e9b8c 11-12
+internal/platform/watch_helpers_test.go
+  h_df1d95ff1e9b8c 17
+internal/scaffold/extract_limits_test.go
+  h_df1d95ff1e9b8c 13
+internal/scaffold/extract_links_test.go
+  h_df1d95ff1e9b8c 11
+internal/scaffold/extract_test.go
+  h_df1d95ff1e9b8c 14
+internal/scaffold/helpers_test.go
+  h_df1d95ff1e9b8c 14
+internal/scaffold/manifest.go
+  h_df1d95ff1e9b8c 11
+internal/scaffold/manifest_test.go
+  h_df1d95ff1e9b8c 13
+internal/scaffold/scaffold_test.go
+  h_df1d95ff1e9b8c 11
+internal/selfupdate/keys_test.go
+  h_df1d95ff1e9b8c 13-14
+internal/selfupdate/latest.go
+  h_df1d95ff1e9b8c 19-21
+internal/selfupdate/latest_status_test.go
+  h_df1d95ff1e9b8c 12
+internal/selfupdate/latest_test.go
+  h_df1d95ff1e9b8c 19-20
+internal/selfupdate/notice.go
+  h_df1d95ff1e9b8c 10
+internal/selfupdate/notice_test.go
+  h_df1d95ff1e9b8c 12-13
+internal/selfupdate/upgrade_helpers_test.go
+  h_df1d95ff1e9b8c 16-17
+internal/selfupdate/upgrade_test.go
+  h_df1d95ff1e9b8c 17
+internal/selfupdate/verify_test.go
+  h_df1d95ff1e9b8c 17-18
+internal/term/gate_test.go
+  h_df1d95ff1e9b8c 10
+internal/term/live_test.go
+  h_df1d95ff1e9b8c 15
+internal/term/present_helpers_test.go
+  h_df1d95ff1e9b8c 9
+internal/term/term.go
+  h_df1d95ff1e9b8c 13
+internal/term/testrich.go
+  h_df1d95ff1e9b8c 6
+main.go
+  h_df1d95ff1e9b8c 9-11
+main_test.go
+  h_df1d95ff1e9b8c 8
+test/contract/build.go
+  h_df1d95ff1e9b8c 22
+test/contract/driver.go
+  h_df1d95ff1e9b8c 16
+test/contract/reads.go
+  h_df1d95ff1e9b8c 13
+test/contract/requests.go
+  h_df1d95ff1e9b8c 17
+test/contract/requests_test.go
+  h_df1d95ff1e9b8c 20
+test/contract/run.go
+  h_df1d95ff1e9b8c 16
+test/releasecompat/compat_test.go
+  h_df1d95ff1e9b8c 30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9a61bd1ea53e6e8baed06ca0d721b27a6e347e81",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
