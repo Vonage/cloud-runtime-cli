@@ -108,8 +108,9 @@ func TestInitFailuresAreWrappedAndRenderedOnce(t *testing.T) {
 
 	t.Run("an unknown region", func(t *testing.T) {
 		h := newHarness(t)
+		h.writeConfig(config.File{APIKey: fakeKey, APISecret: fakeSecret, DefaultRegion: "aws.nowhere"})
 
-		got := h.run("full", "--region", "aws.nowhere", "--deployment-api-url", h.srv.DeploymentAPIURL("euw1"))
+		got := h.run("full", "--deployment-api-url", h.srv.DeploymentAPIURL("euw1"))
 
 		assert.Equal(t, 1, got.code)
 		assert.Empty(t, got.stdout)
@@ -146,18 +147,14 @@ func TestInitFailuresAreWrappedAndRenderedOnce(t *testing.T) {
 }
 
 func TestPreRunWrapsMissingRegion(t *testing.T) {
-	for _, extra := range [][]string{nil, {"--region", "aws.nowhere"}} {
-		t.Run(strings.Join(extra, " "), func(t *testing.T) {
-			h := newHarness(t)
-			h.removeConfig()
-			env, _, _ := h.newEnv()
-			root := buildRoot(env, h.probes(env), newRunState(env, h.options(env)))
-			root.SetArgs(append(append([]string{"full"}, h.flags()...), extra...))
+	h := newHarness(t)
+	h.removeConfig()
+	env, _, _ := h.newEnv()
+	root := buildRoot(env, h.probes(env), newRunState(env, h.options(env)))
+	root.SetArgs(append([]string{"full"}, h.flags()...))
 
-			err := root.ExecuteContext(t.Context())
+	err := root.ExecuteContext(t.Context())
 
-			require.ErrorIs(t, err, cmdenv.ErrRegionNotFound)
-			assert.EqualError(t, err, "failed to initialize cli: region does not exist")
-		})
-	}
+	require.ErrorIs(t, err, cmdenv.ErrRegionNotFound)
+	assert.EqualError(t, err, "failed to initialize cli: region does not exist")
 }

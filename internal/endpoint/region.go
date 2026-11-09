@@ -2,16 +2,18 @@ package endpoint
 
 import (
 	"fmt"
-	"regexp"
+	"slices"
+	"strings"
 )
 
-var regionPattern = regexp.MustCompile(`^aws\.[a-z0-9]+$`)
+// supportedRegions are the region aliases clients may use, sorted. Standby regions are deliberately absent.
+var supportedRegions = []string{"aws.apse1", "aws.apse2", "aws.euw1", "aws.use1"}
 
-// ValidateRegion returns `invalid --region "<value>": expected aws.<name>` unless alias matches ^aws\.[a-z0-9]+$
-// An empty alias is valid here (it means "not given").
+// ValidateRegion returns `invalid --region "<value>": expected one of <supported regions>` unless alias is one of
+// the supported regions. An empty alias is valid here (it means "not given").
 func ValidateRegion(alias string) error {
-	if alias == "" || regionPattern.MatchString(alias) {
+	if alias == "" || slices.Contains(supportedRegions, alias) {
 		return nil
 	}
-	return fmt.Errorf("invalid --region %q: expected aws.<name>", alias)
+	return fmt.Errorf("invalid --region %q: expected one of %s", alias, strings.Join(supportedRegions, ", "))
 }

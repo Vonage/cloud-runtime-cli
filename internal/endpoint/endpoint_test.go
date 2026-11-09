@@ -2,6 +2,7 @@ package endpoint_test
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -290,31 +291,19 @@ func TestBootstrapErrorHidesUserinfo(t *testing.T) {
 }
 
 func TestValidateRegion(t *testing.T) {
-	valid := []string{"aws.euw1", "aws.use1", "aws.apse1", "aws.apse2", "aws.a1", ""}
-	for _, alias := range valid {
+	for _, alias := range []string{"aws.euw1", "aws.use1", "aws.apse1", "aws.apse2", ""} {
 		t.Run("valid "+alias, func(t *testing.T) {
 			assert.NoError(t, endpoint.ValidateRegion(alias))
 		})
 	}
 
-	invalid := []struct {
-		alias string
-		want  string
-	}{
-		{"x", `invalid --region "x": expected aws.<name>`},
-		{"aws.", `invalid --region "aws.": expected aws.<name>`},
-		{"aws.EUW1", `invalid --region "aws.EUW1": expected aws.<name>`},
-		{"aws.eu-w1", `invalid --region "aws.eu-w1": expected aws.<name>`},
-		{"aws.euw1.extra", `invalid --region "aws.euw1.extra": expected aws.<name>`},
-		{"aws.euw1/..", `invalid --region "aws.euw1/..": expected aws.<name>`},
-		{"aws.euw1\n", `invalid --region "aws.euw1\n": expected aws.<name>`},
-		{" aws.euw1", `invalid --region " aws.euw1": expected aws.<name>`},
-		{"AWS.euw1", `invalid --region "AWS.euw1": expected aws.<name>`},
-		{"aws.x@other.example.test/", `invalid --region "aws.x@other.example.test/": expected aws.<name>`},
-	}
-	for _, tc := range invalid {
-		t.Run("invalid "+tc.alias, func(t *testing.T) {
-			require.EqualError(t, endpoint.ValidateRegion(tc.alias), tc.want)
+	const want = "expected one of aws.apse1, aws.apse2, aws.euw1, aws.use1"
+	for _, alias := range []string{
+		"x", "aws.", "aws.a1", "aws.euc1", "aws.usw2", "aws.EUW1", "aws.eu-w1", "aws.euw1.extra", "aws.euw1/..",
+		"aws.euw1\n", " aws.euw1", "AWS.euw1", "aws.x@other.example.test/", "aws.euw1@example.com",
+	} {
+		t.Run("invalid "+alias, func(t *testing.T) {
+			require.EqualError(t, endpoint.ValidateRegion(alias), fmt.Sprintf("invalid --region %q: %s", alias, want))
 		})
 	}
 }

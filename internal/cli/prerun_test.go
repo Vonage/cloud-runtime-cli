@@ -115,7 +115,7 @@ func TestOnlyTheRootHasPersistentHooks(t *testing.T) {
 
 func TestRegionValidatedBeforeAnything(t *testing.T) {
 	commands := [][]string{{"plain"}, {"full"}, {"cfgonly"}, {"completion", "bash"}}
-	for _, region := range []string{"x", "aws.", "aws.x@evil.com/", "AWS.euw1"} {
+	for _, region := range []string{"x", "aws.", "aws.x@evil.com/", "AWS.euw1", "aws.euc1", "aws.usw2"} {
 		for _, command := range commands {
 			t.Run(region+" on "+strings.Join(command, " "), func(t *testing.T) {
 				h := newHarness(t)
@@ -124,7 +124,7 @@ func TestRegionValidatedBeforeAnything(t *testing.T) {
 				got := h.run(append(append([]string{}, command...), "--region", region, "-t", "5s")...)
 
 				assert.Equal(t, 1, got.code)
-				assert.Equal(t, `X invalid --region "`+region+`": expected aws.<name>`+"\n", got.stderr)
+				assert.Equal(t, `X invalid --region "`+region+`": expected one of aws.apse1, aws.apse2, aws.euw1, aws.use1`+"\n", got.stderr)
 				assert.Empty(t, got.stdout)
 				assert.Empty(t, h.srv.Requests())
 				assert.Zero(t, h.updates.count())
