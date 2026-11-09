@@ -18,7 +18,7 @@ Run every command from the repository root. `make test` is `go test -race ./...`
 
 ## 2. Bootstrap: precedence and source
 
-- [ ] 2.1 `ConfigEndpoint` input and the reported source.
+- [x] 2.1 `ConfigEndpoint` input and the reported source.
   - Files: `internal/endpoint/bootstrap.go`, `internal/endpoint/endpoint_test.go`.
   - Test first: table cases for the order `Endpoint` > `GraphQLFlag` > `Region` > `ConfigEndpoint` > `GraphQLConfig` > default, using the spec's "Endpoint precedence" scenarios; each case also asserts the returned source, the mapped URL and whether the GraphQL URL was the production form.
   - Verify: `go test ./internal/endpoint/ -count=1`

@@ -30,17 +30,45 @@ var productionLabels = []string{"euw1", "use1", "apse1", "apse2"}
 
 // Inputs are the values that choose the environment, in the order they win.
 type Inputs struct {
-	Endpoint      string // hidden --endpoint: used as-is
-	GraphQLFlag   string // --graphql-endpoint
-	Region        string // --region: when set (and GraphQLFlag is not), selects ProductionDefault
-	GraphQLConfig string // graphql_endpoint from the config file
+	Endpoint       string // --endpoint: used as-is
+	GraphQLFlag    string // --graphql-endpoint
+	Region         string // --region: when set (and neither flag above is), selects ProductionDefault
+	ConfigEndpoint string // endpoint from the config file: used as-is
+	GraphQLConfig  string // graphql_endpoint from the config file
 }
 
-// Bootstrap returns the deployment-api base URL without the version segment:
+// Source says which input decided the URL.
+type Source int
+
+const (
+	SourceDefault Source = iota
+	SourceEndpointFlag
+	SourceGraphQLFlag
+	SourceRegionFlag
+	SourceConfigEndpoint
+	SourceGraphQLConfig
+)
+
+// Choice is the URL Resolve picked and where it came from. Production is true when a GraphQL setting was the
+// production direct form, which needs no endpoint at all.
+type Choice struct {
+	URL        string
+	Source     Source
+	Production bool
+}
+
+// Bootstrap returns Resolve's URL.
+func Bootstrap(in Inputs) (string, error) {
+	c, err := Resolve(in)
+	return c.URL, err
+}
+
+// Resolve returns the deployment-api base URL without the version segment:
 //
 //	Endpoint                                           if set
 //	map(GraphQLFlag)                                   else if set
 //	ProductionDefault                                  else if Region is set
+//	ConfigEndpoint                                     else if set
 //	map(GraphQLConfig)                                 else if set
 //	ProductionDefault                                  otherwise
 //
@@ -49,38 +77,49 @@ type Inputs struct {
 //	map(anything else)                                                   = an error (exit 1, no usage block) naming
 //	                                                                       the value, the two accepted forms and
 //	                                                                       --endpoint
-func Bootstrap(in Inputs) (string, error) {
+func Resolve(in Inputs) (Choice, error) {
 	switch {
 	case in.Endpoint != "":
-		return in.Endpoint, nil
+		return Choice{URL: in.Endpoint, Source: SourceEndpointFlag}, nil
 	case in.GraphQLFlag != "":
-		return mapGraphQL(in.GraphQLFlag, sourceFlag)
+		return mapped(in.GraphQLFlag, sourceFlag, SourceGraphQLFlag)
 	case in.Region != "":
 		// Region is the --region flag only. The configured default region never reaches here: a config that
 		// points at its own endpoint would otherwise be sent to production.
-		return ProductionDefault, nil
+		return Choice{URL: ProductionDefault, Source: SourceRegionFlag}, nil
+	case in.ConfigEndpoint != "":
+		return Choice{URL: in.ConfigEndpoint, Source: SourceConfigEndpoint}, nil
 	case in.GraphQLConfig != "":
-		return mapGraphQL(in.GraphQLConfig, sourceConfig)
+		return mapped(in.GraphQLConfig, sourceConfig, SourceGraphQLConfig)
 	default:
-		return ProductionDefault, nil
+		return Choice{URL: ProductionDefault, Source: SourceDefault}, nil
 	}
+}
+
+func mapped(value, name string, source Source) (Choice, error) {
+	url, production, err := mapGraphQL(value, name)
+	if err != nil {
+		return Choice{}, err
+	}
+	return Choice{URL: url, Source: source, Production: production}, nil
 }
 
 // mapGraphQL turns a legacy GraphQL URL into the deployment API base URL. It accepts the gateway form and the
 // production direct form and nothing else. source names where the value came from, for the error.
-func mapGraphQL(value, source string) (string, error) {
+// production reports the production direct form.
+func mapGraphQL(value, source string) (base string, production bool, err error) {
 	u, err := url.Parse(value)
 	if err != nil {
 		// The parse error quotes the whole value, credentials included, so it is not passed on.
-		return "", unsupported(source, value)
+		return "", false, unsupported(source, value)
 	}
 	if u.User == nil && !strings.ContainsAny(value, "?#") {
 		path := strings.TrimSuffix(u.Path, "/")
 		if base, ok := gatewayBase(u, path); ok {
-			return base, nil
+			return base, false, nil
 		}
 		if isProductionDirect(u, path) {
-			return ProductionDefault, nil
+			return ProductionDefault, true, nil
 		}
 	}
 
@@ -88,7 +127,7 @@ func mapGraphQL(value, source string) (string, error) {
 	if u.User != nil {
 		shown = u.Redacted()
 	}
-	return "", unsupported(source, shown)
+	return "", false, unsupported(source, shown)
 }
 
 // gatewayBase maps "<scheme>://<host><prefix>/api/graphql/v1/graphql" to "<scheme>://<host><prefix>/api/deployment".
