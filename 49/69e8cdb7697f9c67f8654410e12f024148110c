@@ -1,0 +1,36 @@
+.github/workflows/release-please.yml
+  h_df1d95ff1e9b8c 97-98,127,171,176
+.github/workflows/release.yml
+  h_df1d95ff1e9b8c 132,160,204,209
+.release-please-manifest.json
+  h_df1d95ff1e9b8c 2
+CHANGELOG.md
+  h_df1d95ff1e9b8c 3-17
+README.md
+  h_df1d95ff1e9b8c 179
+openspec/changes/archive/2026-11-04-gateway-graphql-endpoint/.openspec.yaml
+  h_df1d95ff1e9b8c 1-2
+openspec/changes/archive/2026-11-04-gateway-graphql-endpoint/design.md
+  h_df1d95ff1e9b8c 1-26
+openspec/changes/archive/2026-11-04-gateway-graphql-endpoint/proposal.md
+  h_df1d95ff1e9b8c 1-37
+openspec/changes/archive/2026-11-04-gateway-graphql-endpoint/specs/graphql-endpoint/spec.md
+  h_df1d95ff1e9b8c 1-55
+openspec/changes/archive/2026-11-04-gateway-graphql-endpoint/tasks.md
+  h_df1d95ff1e9b8c 1-16
+openspec/config.yaml
+  h_df1d95ff1e9b8c 1-25
+openspec/specs/graphql-endpoint/spec.md
+  h_df1d95ff1e9b8c 1-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4969e8cdb7697f9c67f8654410e12f024148110c",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
