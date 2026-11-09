@@ -1,0 +1,56 @@
+internal/cli/initcmd/apps.go
+  ceea3f84eaffe3bb 1-84
+internal/cli/initcmd/fakes_test.go
+  ceea3f84eaffe3bb 1-354
+internal/cli/initcmd/flow.go
+  ceea3f84eaffe3bb 1-241
+internal/cli/initcmd/flow_test.go
+  ceea3f84eaffe3bb 1-347
+internal/cli/initcmd/help.go
+  ceea3f84eaffe3bb 1-48
+internal/cli/initcmd/initcmd.go
+  ceea3f84eaffe3bb 1-33
+internal/cli/initcmd/initcmd_test.go
+  ceea3f84eaffe3bb 1-227
+internal/cli/initcmd/options.go
+  ceea3f84eaffe3bb 1-130
+internal/cli/initcmd/options_test.go
+  ceea3f84eaffe3bb 1-167
+internal/cli/initcmd/template.go
+  ceea3f84eaffe3bb 1-95
+internal/cli/initcmd/template_test.go
+  ceea3f84eaffe3bb 1-211
+internal/cli/root.go
+  ceea3f84eaffe3bb 13,40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "e239613e8ddda31df65e19a9f54205560286abb6",
+  "prompts": {
+    "ceea3f84eaffe3bb": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "137bd1f4-dbd2-4a87-bf77-4c04e0975608",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:40.748Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:40.748Z"
+        }
+      ],
+      "total_additions": 1939,
+      "total_deletions": 0,
+      "accepted_lines": 1939,
+      "overriden_lines": 0
+    }
+  }
+}
