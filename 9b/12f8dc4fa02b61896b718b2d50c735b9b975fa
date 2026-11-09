@@ -1,0 +1,186 @@
+Makefile
+  ab0be6da442e8075 42-47,71
+test/contract/compare.go
+  ab0be6da442e8075 14-16,121
+test/contract/consistency_test.go
+  ab0be6da442e8075 149-152
+test/contract/contract_test.go
+  ab0be6da442e8075 35,55,85-95,109-115
+test/contract/coverage.txt
+  ab0be6da442e8075 36
+test/contract/doc.go
+  ab0be6da442e8075 21-25,56-100,125-131
+test/contract/env.go
+  ab0be6da442e8075 8,16-50,52-57,70,82-93
+test/contract/exec.go
+  ab0be6da442e8075 68
+test/contract/exec_test.go
+  ab0be6da442e8075 31
+test/contract/presentation_test.go
+  ab0be6da442e8075 1-275
+test/contract/pty.go
+  ab0be6da442e8075 79
+test/contract/record.go
+  ab0be6da442e8075 97-162
+test/contract/replay.go
+  ab0be6da442e8075 36-37,40-42,92-100,114-115,135-136,154-155,166,170-184,186-187,215-238
+test/contract/rich.go
+  ab0be6da442e8075 1-247
+test/contract/rich_replay_test.go
+  ab0be6da442e8075 1-294
+test/contract/rich_test.go
+  ab0be6da442e8075 1-143
+test/contract/run.go
+  ab0be6da442e8075 26,37,43-44,47,201,230
+test/contract/scenario.go
+  ab0be6da442e8075 27-32,35-38,110,139,179,257,261-295
+test/contract/scenarios/app-ui-ci-variable-gives-classic-output.yaml
+  ab0be6da442e8075 1-8
+test/contract/scenarios/app-ui-classic-opt-out-on-terminal.yaml
+  ab0be6da442e8075 1-8
+test/contract/scenarios/app-ui-colour-keeps-the-rich-layout.yaml
+  ab0be6da442e8075 1-8
+test/contract/scenarios/app-ui-dumb-terminal-gives-classic-output.yaml
+  ab0be6da442e8075 1-8
+test/contract/scenarios/app-ui-forced-colour-on-pipe-gives-classic-output.yaml
+  ab0be6da442e8075 1-8
+test/contract/scenarios/app-ui-no-colour-keeps-the-rich-layout.yaml
+  ab0be6da442e8075 1-8
+test/contract/stub_test.go
+  ab0be6da442e8075 56-57,337-358
+test/contract/testdata/rich/app-create-confirm-no.txt
+  ab0be6da442e8075 1-6
+test/contract/testdata/rich/app-create-confirm-retries-on-other-input.txt
+  ab0be6da442e8075 1-9
+test/contract/testdata/rich/app-create-confirm-yes.txt
+  ab0be6da442e8075 1-8
+test/contract/testdata/rich/app-create-yes-flag-skips-prompt.txt
+  ab0be6da442e8075 1-7
+test/contract/testdata/rich/app-remove-confirm-no.txt
+  ab0be6da442e8075 1-6
+test/contract/testdata/rich/app-remove-confirm-yes.txt
+  ab0be6da442e8075 1-6
+test/contract/testdata/rich/app-ui-colour-keeps-the-rich-layout.txt
+  ab0be6da442e8075 1-7
+test/contract/testdata/rich/app-ui-no-colour-keeps-the-rich-layout.txt
+  ab0be6da442e8075 1-7
+test/contract/testdata/rich/configure-api-key-flag-is-the-default.txt
+  ab0be6da442e8075 1-8
+test/contract/testdata/rich/configure-config-file-flag.txt
+  ab0be6da442e8075 1-8
+test/contract/testdata/rich/configure-existing-change-region.txt
+  ab0be6da442e8075 1-8
+test/contract/testdata/rich/configure-existing-keep-defaults.txt
+  ab0be6da442e8075 1-8
+test/contract/testdata/rich/configure-fresh.txt
+  ab0be6da442e8075 1-9
+test/contract/testdata/rich/configure-hides-test-regions.txt
+  ab0be6da442e8075 1-9
+test/contract/testdata/rich/configure-interrupt-at-prompt.txt
+  ab0be6da442e8075 1-6
+test/contract/testdata/rich/configure-region-list-server-error.txt
+  ab0be6da442e8075 1-15
+test/contract/testdata/rich/configure-writes-through-symlink.txt
+  ab0be6da442e8075 1-8
+test/contract/testdata/rich/init-alias-i.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/init-create-new-application-for-deployment.txt
+  ab0be6da442e8075 1-13
+test/contract/testdata/rich/init-existing-vcr-yml-is-overwritten.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/init-full-flow.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/init-interrupt-at-prompt.txt
+  ab0be6da442e8075 1-6
+test/contract/testdata/rich/init-invalid-project-name-then-valid.txt
+  ab0be6da442e8075 1-14
+test/contract/testdata/rich/init-no-template-for-runtime.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/init-path-argument.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/init-region-list-server-error.txt
+  ab0be6da442e8075 1-16
+test/contract/testdata/rich/init-runtime-list-empty.txt
+  ab0be6da442e8075 1-7
+test/contract/testdata/rich/init-select-second-runtime.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/init-skip-debug-application.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/init-template-extracts-nested-files-and-modes.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/init-template-with-unparsable-manifest.txt
+  ab0be6da442e8075 1-13
+test/contract/testdata/rich/instance-remove-confirm-no.txt
+  ab0be6da442e8075 1-6
+test/contract/testdata/rich/instance-remove-confirm-yes.txt
+  ab0be6da442e8075 1-6
+test/contract/testdata/rich/secret-create-typed-value-multiline.txt
+  ab0be6da442e8075 1-6
+test/contract/testdata/rich/secret-create-typed-value.txt
+  ab0be6da442e8075 1-6
+test/contract/testdata/rich/secret-update-typed-value.txt
+  ab0be6da442e8075 1-6
+test/contract/testdata/rich/security-escape-region-picker.txt
+  ab0be6da442e8075 1-9
+test/contract/testdata/rich/security-init-template-absolute-path.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/security-init-template-dot-dot-in-the-middle.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/security-init-template-git-directory-entry.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/security-init-template-link-entries-skipped.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/security-init-template-mode-bits.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/security-init-template-parent-traversal.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/security-init-template-planted-vcr-yml-link.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/security-init-template-symlink-then-file.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/security-init-template-too-many-entries.txt
+  ab0be6da442e8075 1-12
+test/contract/testdata/rich/upgrade-prompt-no.txt
+  ab0be6da442e8075 1-7
+test/contract/testdata/rich/upgrade-prompt-yes.txt
+  ab0be6da442e8075 1-8
+test/contract/testdata/transcripts/app-ui-ci-variable-gives-classic-output.txt
+  ab0be6da442e8075 1-32
+test/contract/testdata/transcripts/app-ui-classic-opt-out-on-terminal.txt
+  ab0be6da442e8075 1-32
+test/contract/testdata/transcripts/app-ui-dumb-terminal-gives-classic-output.txt
+  ab0be6da442e8075 1-32
+test/contract/testdata/transcripts/app-ui-forced-colour-on-pipe-gives-classic-output.txt
+  ab0be6da442e8075 1-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "9b12f8dc4fa02b61896b718b2d50c735b9b975fa",
+  "prompts": {
+    "ab0be6da442e8075": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "6505822a-b9d9-46f7-a9a8-82c2eea8048b",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:38.871Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:38.871Z"
+        }
+      ],
+      "total_additions": 1956,
+      "total_deletions": 25,
+      "accepted_lines": 1956,
+      "overriden_lines": 0
+    }
+  }
+}
