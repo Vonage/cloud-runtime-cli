@@ -1,0 +1,22 @@
+openspec/changes/endpoint-migration/.openspec.yaml
+  h_df1d95ff1e9b8c 1-2
+openspec/changes/endpoint-migration/design.md
+  h_df1d95ff1e9b8c 1-82
+openspec/changes/endpoint-migration/proposal.md
+  h_df1d95ff1e9b8c 1-50
+openspec/changes/endpoint-migration/specs/platform-endpoint/spec.md
+  h_df1d95ff1e9b8c 1-109
+openspec/changes/endpoint-migration/tasks.md
+  h_df1d95ff1e9b8c 1-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "19623dbb34e0784bb5806ef327e86f80f6298326",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
