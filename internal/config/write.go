@@ -24,6 +24,11 @@ var inPlaceErrnos = []syscall.Errno{syscall.EACCES, syscall.EROFS, syscall.EBUSY
 func Write(path string, f File) error { return write(defaultOps, path, f) }
 
 func write(o ops, path string, f File) error {
+	return writeWith(o, path, func(target string) ([]byte, error) { return render(target, f) })
+}
+
+// writeWith writes what content makes of the file's real path, with Write's link, mode and fallback rules.
+func writeWith(o ops, path string, content func(target string) ([]byte, error)) error {
 	expanded, err := expandHome(path)
 	if err != nil {
 		return err
@@ -32,7 +37,7 @@ func write(o ops, path string, f File) error {
 	if err != nil {
 		return err
 	}
-	data, err := render(target, f)
+	data, err := content(target)
 	if err != nil {
 		return err
 	}

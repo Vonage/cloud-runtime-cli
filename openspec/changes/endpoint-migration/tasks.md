@@ -10,7 +10,7 @@ Run every command from the repository root. `make test` is `go test -race ./...`
   - Verify: `go test ./internal/config/ -count=1`
   - Accept: the new tests pass and the existing layout tests are untouched.
 
-- [ ] 1.2 `config.AddEndpoint(path, url string) error`.
+- [x] 1.2 `config.AddEndpoint(path, url string) error`.
   - Files: `internal/config/write.go` (or a new `internal/config/endpoint.go`), `internal/config/write_test.go`.
   - Test first: on a file with comments, an extra section and quoted credentials, `AddEndpoint` adds only `endpoint = <url>` and every other byte of the original lines is kept; mode stays 0600; it writes through a symlink to the target; a read-only file returns an error and is unchanged.
   - Verify: `go test ./internal/config/ -count=1`
