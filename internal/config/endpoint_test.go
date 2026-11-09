@@ -108,3 +108,34 @@ func TestAddEndpointMissingFileIsAnError(t *testing.T) {
 	require.Error(t, AddEndpoint(path, testEndpoint))
 	assert.NoFileExists(t, path)
 }
+
+func TestAddEndpointRefusesWhatWouldNotReadBack(t *testing.T) {
+	for name, content := range map[string]string{
+		"a multi-line value holding a section line": "graphql_endpoint = \"\"\"a\n[x]\nb\"\"\"\ndefault_region = aws.euw1\n",
+		"two endpoint lines":                        "endpoint =\nendpoint =\ngraphql_endpoint = https://g.example.test/api/graphql/v1/graphql\n",
+		"a continued value":                         "graphql_endpoint = https://g.example.test/api/graphql/v1/graphql \\\n",
+	} {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			path := filepath.Join(t.TempDir(), "conf")
+			writeFile(t, path, content, 0o600)
+
+			err := AddEndpoint(path, testEndpoint)
+
+			require.Error(t, err)
+			assert.Equal(t, content, readText(t, path))
+		})
+	}
+}
+
+func TestAddEndpointLeavesAReadOnlyFileAlone(t *testing.T) {
+	t.Parallel()
+	path := filepath.Join(t.TempDir(), "conf")
+	writeFile(t, path, fullConfig, 0o400)
+
+	err := AddEndpoint(path, testEndpoint)
+
+	require.ErrorIs(t, err, ErrReadOnly)
+	assert.Equal(t, fullConfig, readText(t, path))
+	assert.Equal(t, os.FileMode(0o400), permOf(t, path))
+}
