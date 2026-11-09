@@ -21,19 +21,23 @@ func (st *runState) preRun(cmd *cobra.Command, _ []string) error {
 	if err := endpoint.ValidateRegion(env.Flags.Region); err != nil {
 		return err
 	}
-	ctx := st.applyDeadline(cmd)
-
 	mode, err := modeOf(cmd)
 	if err != nil {
 		return err
 	}
 	if mode == cmdenv.None {
+		st.applyDeadline(cmd)
 		return nil
 	}
 	if err := st.loadConfig(); err != nil {
 		return err
 	}
-	st.migrateEndpoint()
+	// The migration question comes before the deadline starts, so the time a person takes to answer is not taken
+	// from --timeout; an interrupt still ends it.
+	if err := st.migrateEndpoint(cmd.Context()); err != nil {
+		return err
+	}
+	ctx := st.applyDeadline(cmd)
 	stop := startConnecting(env, cmd, connectingRegion(env, mode))
 	defer stop()
 	if err := st.initPlatform(ctx, mode); err != nil {

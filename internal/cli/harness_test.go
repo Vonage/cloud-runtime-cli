@@ -3,6 +3,7 @@ package cli
 import (
 	"bytes"
 	"context"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -131,10 +132,16 @@ func (h *harness) runRich(mode term.Mode, args ...string) richOutcome {
 // runRichAnswering is runRich with stdin, a terminal, holding the given answers.
 func (h *harness) runRichAnswering(mode term.Mode, stdin string, args ...string) richOutcome {
 	h.t.Helper()
+	return h.runRichReading(h.t.Context(), mode, strings.NewReader(stdin), args...)
+}
+
+// runRichReading is runRich under ctx, with stdin, a terminal, reading from in.
+func (h *harness) runRichReading(ctx context.Context, mode term.Mode, in io.Reader, args ...string) richOutcome {
+	h.t.Helper()
 	streams, out, errOut := term.TestRich(mode, 100, clocktest.New(time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)))
-	streams.In = strings.NewReader(stdin)
+	streams.In = in
 	env := h.envOver(streams)
-	code := run(h.t.Context(), args, env, h.options(env))
+	code := run(ctx, args, env, h.options(env))
 	return richOutcome{code: code, stdout: out, stderr: errOut}
 }
 

@@ -1,10 +1,13 @@
 package cli
 
 import (
+	"context"
+	"io"
 	"os"
 	"runtime"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -203,4 +206,58 @@ func TestEndpointFileProductionFormOffersTheProductionDefault(t *testing.T) {
 	got = h.run("cfgonly", "--api-key", fakeKey, "--api-secret", fakeSecret)
 
 	assert.Contains(t, got.stderr, `add "endpoint = https://api-eu.vonage.com/v1/vcr/euw1/api/deployment" to the file`)
+}
+
+func TestEndpointFileQuestionStopsOnInterrupt(t *testing.T) {
+	h := newHarness(t)
+	before := h.graphqlOnly()
+	ran := false
+	h.bodies["full"] = func(*cobra.Command, *cmdenv.Env) error { ran = true; return nil }
+	stdin, _ := io.Pipe() // nothing is ever typed
+	ctx, interrupt := context.WithCancel(t.Context())
+	time.AfterFunc(50*time.Millisecond, interrupt)
+
+	done := make(chan richOutcome, 1)
+	go func() { done <- h.runRichReading(ctx, term.Rich, stdin, "full") }()
+
+	select {
+	case got := <-done:
+		assert.Equal(t, 1, got.code)
+		assert.False(t, ran)
+		assert.Equal(t, before, h.readConfigText())
+	case <-time.After(5 * time.Second):
+		t.Fatal("the question did not stop on interrupt")
+	}
+}
+
+func TestEndpointFileQuestionTimeIsNotCountedAgainstTimeout(t *testing.T) {
+	h := newHarness(t)
+	h.graphqlOnly()
+	var remaining time.Duration
+	h.bodies["full"] = func(cmd *cobra.Command, _ *cmdenv.Env) error {
+		deadline, _ := cmd.Context().Deadline()
+		remaining = time.Until(deadline)
+		return nil
+	}
+	slow := &slowReader{r: strings.NewReader("n\n"), delay: 1500 * time.Millisecond}
+
+	got := h.runRichReading(t.Context(), term.Rich, slow, "full", "-t", "2s")
+
+	require.Equal(t, 0, got.code, "stderr = %q", got.stderr.Screen())
+	assert.Greater(t, remaining, 1500*time.Millisecond, "the answer took 1.5s of a 2s timeout")
+}
+
+// slowReader waits before its first read, as a person does before answering.
+type slowReader struct {
+	r      io.Reader
+	delay  time.Duration
+	waited bool
+}
+
+func (s *slowReader) Read(p []byte) (int, error) {
+	if !s.waited {
+		time.Sleep(s.delay)
+		s.waited = true
+	}
+	return s.r.Read(p)
 }
