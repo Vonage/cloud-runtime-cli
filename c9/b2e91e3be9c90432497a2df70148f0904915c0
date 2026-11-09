@@ -1,0 +1,70 @@
+internal/cli/golden_test.go
+  4b69db01902aa6f7 6,11,93,101,117-123
+internal/cli/instance/helpers_test.go
+  4b69db01902aa6f7 1-76
+internal/cli/instance/instance.go
+  4b69db01902aa6f7 1-62
+internal/cli/instance/instance_test.go
+  4b69db01902aa6f7 1-57
+internal/cli/instance/list.go
+  4b69db01902aa6f7 1-72
+internal/cli/instance/list_test.go
+  4b69db01902aa6f7 1-188
+internal/cli/instance/region.go
+  4b69db01902aa6f7 1-23
+internal/cli/instance/remove.go
+  4b69db01902aa6f7 1-126
+internal/cli/instance/remove_hostile_test.go
+  4b69db01902aa6f7 1-107
+internal/cli/instance/remove_region_test.go
+  4b69db01902aa6f7 1-117
+internal/cli/instance/remove_test.go
+  4b69db01902aa6f7 1-291
+internal/cli/instance/target.go
+  4b69db01902aa6f7 1-54
+internal/cli/instance/target_test.go
+  4b69db01902aa6f7 1-136
+internal/cli/root.go
+  4b69db01902aa6f7 11,34
+internal/platform/reads.go
+  4b69db01902aa6f7 156-157,166-168
+internal/platform/reads_instances_test.go
+  4b69db01902aa6f7 5,20-38,80-93,154-165
+test/contract/allowed-diffs.txt
+  4b69db01902aa6f7 43-52
+test/contract/scenarios/instance-remove-instance-in-other-region.yaml
+  4b69db01902aa6f7 7
+test/contract/scraped.yaml
+  4b69db01902aa6f7 4-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "c9b2e91e3be9c90432497a2df70148f0904915c0",
+  "prompts": {
+    "4b69db01902aa6f7": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "5d96a0d6-edc2-4f93-9374-8cd34a39f54e",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:42.787Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:42.787Z"
+        }
+      ],
+      "total_additions": 1387,
+      "total_deletions": 4,
+      "accepted_lines": 1387,
+      "overriden_lines": 0
+    }
+  }
+}
