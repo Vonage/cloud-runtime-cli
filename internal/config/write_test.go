@@ -351,3 +351,20 @@ func TestWriteDirectoryTargetIsAnError(t *testing.T) {
 	assert.DirExists(t, path)
 	requireNoTempFiles(t, dir)
 }
+
+func TestWritePutsEndpointAfterDefaultRegion(t *testing.T) {
+	t.Parallel()
+	path := filepath.Join(t.TempDir(), "conf")
+	f := fullFile
+	f.Endpoint = "https://e.example.test/api/deployment"
+
+	require.NoError(t, write(defaultOps, path, f))
+
+	assert.Equal(t, "graphql_endpoint = https://graphql.example.test/v1/graphql\n"+
+		"default_region   = aws.euw1\n"+
+		"endpoint         = https://e.example.test/api/deployment\n"+
+		"\n"+
+		"[credentials]\n"+
+		"api_key    = k\n"+
+		"api_secret = s\n", readText(t, path))
+}

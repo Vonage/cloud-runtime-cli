@@ -13,9 +13,10 @@ var ErrNotFound = errors.New("config file not found")
 // DefaultFlagValue is the --config-file default exactly as v2.6.1 shows it.
 const DefaultFlagValue = "~/.vcr-cli"
 
-// File is the INI content. Keys: graphql_endpoint, default_region, and [credentials] api_key, api_secret.
+// File is the INI content. Keys: graphql_endpoint, default_region, endpoint, and [credentials] api_key, api_secret.
 type File struct {
 	GraphQLEndpoint string
+	Endpoint        string // platform API base URL; written only when set, so a v2.6.1 layout stays as it was
 	DefaultRegion   string
 	APIKey          string
 	APISecret       string

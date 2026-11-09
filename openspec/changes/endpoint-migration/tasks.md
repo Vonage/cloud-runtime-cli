@@ -4,7 +4,7 @@ Run every command from the repository root. `make test` is `go test -race ./...`
 
 ## 1. Config file: the endpoint key
 
-- [ ] 1.1 Read and write `endpoint`.
+- [x] 1.1 Read and write `endpoint`.
   - Files: `internal/config/config.go` (`File.Endpoint`), `internal/config/layout.go` (`keyEndpoint`, `fileFrom`, `applyTo`), `internal/config/read_test.go`, `internal/config/write_test.go`.
   - Test first: `Read` of a file with `endpoint = https://e.example.test/api/deployment` returns it in `File.Endpoint`; `Write` of a `File` with `Endpoint` set puts `endpoint` after `default_region`; `TestWriteLayoutMatchesBaseline` still passes unchanged for a `File` without `Endpoint`.
   - Verify: `go test ./internal/config/ -count=1`

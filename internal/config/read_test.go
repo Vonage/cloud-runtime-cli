@@ -317,3 +317,16 @@ func TestReadDoesNotChmodPrivateFile(t *testing.T) {
 
 	require.NoError(t, err)
 }
+
+func TestReadParsesEndpoint(t *testing.T) {
+	t.Parallel()
+	path := filepath.Join(t.TempDir(), "conf")
+	writeFile(t, path, "endpoint = https://e.example.test/api/deployment\n"+fullConfig, 0o600)
+
+	got, err := Read(path)
+
+	require.NoError(t, err)
+	want := fullFile
+	want.Endpoint = "https://e.example.test/api/deployment"
+	assert.Equal(t, want, got)
+}

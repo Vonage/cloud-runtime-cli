@@ -6,16 +6,18 @@ const (
 	sectionCredentials = "credentials"
 	keyGraphQLEndpoint = "graphql_endpoint"
 	keyDefaultRegion   = "default_region"
+	keyEndpoint        = "endpoint"
 	keyAPIKey          = "api_key"
 	keyAPISecret       = "api_secret"
 )
 
-// fileFrom picks the four known values out of a parsed document. Anything else in it is ignored.
+// fileFrom picks the known values out of a parsed document. Anything else in it is ignored.
 func fileFrom(doc *ini.File) File {
 	top, credentials := doc.Section(""), doc.Section(sectionCredentials)
 	return File{
 		GraphQLEndpoint: valueOf(top, keyGraphQLEndpoint),
 		DefaultRegion:   valueOf(top, keyDefaultRegion),
+		Endpoint:        valueOf(top, keyEndpoint),
 		APIKey:          valueOf(credentials, keyAPIKey),
 		APISecret:       valueOf(credentials, keyAPISecret),
 	}
@@ -30,11 +32,15 @@ func valueOf(section *ini.Section, name string) string {
 	return key.String()
 }
 
-// applyTo sets the four known values, adding the credentials section when the document has none.
+// applyTo sets the known values, adding the credentials section when the document has none. endpoint is set only
+// when f has one, so a file without it keeps v2.6.1's layout.
 func applyTo(doc *ini.File, f File) {
 	top, credentials := doc.Section(""), doc.Section(sectionCredentials)
 	top.Key(keyGraphQLEndpoint).SetValue(f.GraphQLEndpoint)
 	top.Key(keyDefaultRegion).SetValue(f.DefaultRegion)
+	if f.Endpoint != "" {
+		top.Key(keyEndpoint).SetValue(f.Endpoint)
+	}
 	credentials.Key(keyAPIKey).SetValue(f.APIKey)
 	credentials.Key(keyAPISecret).SetValue(f.APISecret)
 }
