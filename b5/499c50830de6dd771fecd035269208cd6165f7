@@ -1,0 +1,100 @@
+.gitattributes
+  1792da14f0036bfd 1-8
+.gitignore
+  1792da14f0036bfd 15-17
+Makefile
+  1792da14f0036bfd 8-15,31-51,53-54,81,85
+test/contract/doc.go
+  1792da14f0036bfd 1-67
+test/contract/scaffold_test.go
+  1792da14f0036bfd 1-167
+test/contract/testdata/contract-tree.json
+  1792da14f0036bfd 1-1002
+test/contract/testdata/golden-help/vcr.txt
+  1792da14f0036bfd 1-88
+test/contract/testdata/golden-help/vcr_app.txt
+  1792da14f0036bfd 1-64
+test/contract/testdata/golden-help/vcr_app_create.txt
+  1792da14f0036bfd 1-58
+test/contract/testdata/golden-help/vcr_app_generate-keys.txt
+  1792da14f0036bfd 1-47
+test/contract/testdata/golden-help/vcr_app_list.txt
+  1792da14f0036bfd 1-56
+test/contract/testdata/golden-help/vcr_app_remove.txt
+  1792da14f0036bfd 1-42
+test/contract/testdata/golden-help/vcr_completion.txt
+  1792da14f0036bfd 1-29
+test/contract/testdata/golden-help/vcr_completion_bash.txt
+  1792da14f0036bfd 1-44
+test/contract/testdata/golden-help/vcr_completion_fish.txt
+  1792da14f0036bfd 1-35
+test/contract/testdata/golden-help/vcr_completion_powershell.txt
+  1792da14f0036bfd 1-32
+test/contract/testdata/golden-help/vcr_completion_zsh.txt
+  1792da14f0036bfd 1-46
+test/contract/testdata/golden-help/vcr_configure.txt
+  1792da14f0036bfd 1-53
+test/contract/testdata/golden-help/vcr_debug.txt
+  1792da14f0036bfd 1-107
+test/contract/testdata/golden-help/vcr_debug_prune-sessions.txt
+  1792da14f0036bfd 1-21
+test/contract/testdata/golden-help/vcr_deploy.txt
+  1792da14f0036bfd 1-176
+test/contract/testdata/golden-help/vcr_help.txt
+  1792da14f0036bfd 1-22
+test/contract/testdata/golden-help/vcr_init.txt
+  1792da14f0036bfd 1-64
+test/contract/testdata/golden-help/vcr_instance.txt
+  1792da14f0036bfd 1-66
+test/contract/testdata/golden-help/vcr_instance_list.txt
+  1792da14f0036bfd 1-46
+test/contract/testdata/golden-help/vcr_instance_log.txt
+  1792da14f0036bfd 1-83
+test/contract/testdata/golden-help/vcr_instance_remove.txt
+  1792da14f0036bfd 1-55
+test/contract/testdata/golden-help/vcr_secret.txt
+  1792da14f0036bfd 1-70
+test/contract/testdata/golden-help/vcr_secret_create.txt
+  1792da14f0036bfd 1-65
+test/contract/testdata/golden-help/vcr_secret_list.txt
+  1792da14f0036bfd 1-43
+test/contract/testdata/golden-help/vcr_secret_remove.txt
+  1792da14f0036bfd 1-47
+test/contract/testdata/golden-help/vcr_secret_update.txt
+  1792da14f0036bfd 1-61
+test/contract/testdata/golden-help/vcr_upgrade.txt
+  1792da14f0036bfd 1-68
+test/contract/testdata/golden-misc.txt
+  1792da14f0036bfd 1-155
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "b5499c50830de6dd771fecd035269208cd6165f7",
+  "prompts": {
+    "1792da14f0036bfd": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "1532de28-8269-4a3c-b725-c2698ad38828",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:55.476Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:55.476Z"
+        }
+      ],
+      "total_additions": 3023,
+      "total_deletions": 5,
+      "accepted_lines": 3023,
+      "overriden_lines": 0
+    }
+  }
+}
