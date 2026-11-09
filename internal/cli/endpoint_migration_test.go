@@ -261,3 +261,21 @@ func (s *slowReader) Read(p []byte) (int, error) {
 	}
 	return s.r.Read(p)
 }
+
+func TestConfigEndpointKeyDecidesTheBootstrap(t *testing.T) {
+	h := newHarness(t)
+	h.writeConfig(config.File{
+		GraphQLEndpoint: "https://unmappable.example.test/v1/graphql",
+		Endpoint:        h.srv.DeploymentAPIURL("euw1"),
+		DefaultRegion:   "aws.euw1",
+		APIKey:          fakeKey,
+		APISecret:       fakeSecret,
+	})
+
+	got := h.run("full")
+
+	require.Equal(t, 0, got.code, "stderr = %q", got.stderr)
+	reqs := h.srv.Requests()
+	require.Len(t, reqs, 1)
+	assert.Equal(t, "/v1/vcr/euw1/api/deployment/v0.3/regions/aws.euw1", reqs[0].Path)
+}
