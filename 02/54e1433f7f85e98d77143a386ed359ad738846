@@ -1,82 +1,102 @@
 docs/docs_test.go
-  h_df1d95ff1e9b8c 114,116
+  ba18df7dcc72feaa 114,116
 docs/vcr.md
-  h_df1d95ff1e9b8c 74-75
+  ba18df7dcc72feaa 74-75
 docs/vcr_app.md
-  h_df1d95ff1e9b8c 56-57
+  ba18df7dcc72feaa 56-57
 docs/vcr_app_create.md
-  h_df1d95ff1e9b8c 63-64
+  ba18df7dcc72feaa 63-64
 docs/vcr_app_generate-keys.md
-  h_df1d95ff1e9b8c 52-53
+  ba18df7dcc72feaa 52-53
 docs/vcr_app_list.md
-  h_df1d95ff1e9b8c 61-62
+  ba18df7dcc72feaa 61-62
 docs/vcr_app_remove.md
-  h_df1d95ff1e9b8c 47-48
+  ba18df7dcc72feaa 47-48
 docs/vcr_completion.md
-  h_df1d95ff1e9b8c 17-18
+  ba18df7dcc72feaa 17-18
 docs/vcr_completion_bash.md
-  h_df1d95ff1e9b8c 45-46
+  ba18df7dcc72feaa 45-46
 docs/vcr_completion_fish.md
-  h_df1d95ff1e9b8c 36-37
+  ba18df7dcc72feaa 36-37
 docs/vcr_completion_powershell.md
-  h_df1d95ff1e9b8c 33-34
+  ba18df7dcc72feaa 33-34
 docs/vcr_completion_zsh.md
-  h_df1d95ff1e9b8c 47-48
+  ba18df7dcc72feaa 47-48
 docs/vcr_configure.md
-  h_df1d95ff1e9b8c 55-56
+  ba18df7dcc72feaa 55-56
 docs/vcr_debug.md
-  h_df1d95ff1e9b8c 109-110
+  ba18df7dcc72feaa 109-110
 docs/vcr_debug_prune-sessions.md
-  h_df1d95ff1e9b8c 19-20
+  ba18df7dcc72feaa 19-20
 docs/vcr_deploy.md
-  h_df1d95ff1e9b8c 181-182
+  ba18df7dcc72feaa 181-182
 docs/vcr_init.md
-  h_df1d95ff1e9b8c 66-67
+  ba18df7dcc72feaa 66-67
 docs/vcr_instance.md
-  h_df1d95ff1e9b8c 59-60
+  ba18df7dcc72feaa 59-60
 docs/vcr_instance_list.md
-  h_df1d95ff1e9b8c 51-52
+  ba18df7dcc72feaa 51-52
 docs/vcr_instance_log.md
-  h_df1d95ff1e9b8c 88-89
+  ba18df7dcc72feaa 88-89
 docs/vcr_instance_remove.md
-  h_df1d95ff1e9b8c 60-61
+  ba18df7dcc72feaa 60-61
 docs/vcr_secret.md
-  h_df1d95ff1e9b8c 62-63
+  ba18df7dcc72feaa 62-63
 docs/vcr_secret_create.md
-  h_df1d95ff1e9b8c 70-71
+  ba18df7dcc72feaa 70-71
 docs/vcr_secret_list.md
-  h_df1d95ff1e9b8c 45-46
+  ba18df7dcc72feaa 45-46
 docs/vcr_secret_remove.md
-  h_df1d95ff1e9b8c 52-53
+  ba18df7dcc72feaa 52-53
 docs/vcr_secret_update.md
-  h_df1d95ff1e9b8c 66-67
+  ba18df7dcc72feaa 66-67
 docs/vcr_upgrade.md
-  h_df1d95ff1e9b8c 73-74
+  ba18df7dcc72feaa 73-74
 internal/cli/golden_test.go
-  h_df1d95ff1e9b8c 70-81,96,124
+  ba18df7dcc72feaa 70-81,96,124
 internal/cli/root.go
-  h_df1d95ff1e9b8c 86-87
+  ba18df7dcc72feaa 86-87
 internal/cli/root_test.go
-  h_df1d95ff1e9b8c 93,105
+  ba18df7dcc72feaa 93,105
 internal/config/config.go
-  h_df1d95ff1e9b8c 33
+  ba18df7dcc72feaa 33
 openspec/changes/endpoint-migration/tasks.md
-  h_df1d95ff1e9b8c 61
+  ba18df7dcc72feaa 61
 test/contract/scenarios/config-endpoint-flag-on-terminal.yaml
-  h_df1d95ff1e9b8c 1-13
+  ba18df7dcc72feaa 1-13
 test/contract/testdata/contract-tree.json
-  h_df1d95ff1e9b8c 54
+  ba18df7dcc72feaa 54
 test/contract/testdata/rich/config-endpoint-flag-on-terminal.txt
-  h_df1d95ff1e9b8c 1-9
+  ba18df7dcc72feaa 1-9
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.7.5",
+  "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "0254e1433f7f85e98d77143a386ed359ad738846",
-  "prompts": {},
-  "humans": {
-    "h_df1d95ff1e9b8c": {
-      "author": "Simon Chan <simon.chan@vonage.com>"
+  "prompts": {
+    "ba18df7dcc72feaa": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "d1b6ddcc-1d4a-46b4-be6e-7eb04c0e5790",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T16:30:51.954Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T16:30:51.954Z"
+        }
+      ],
+      "total_additions": 97,
+      "total_deletions": 39,
+      "accepted_lines": 97,
+      "overriden_lines": 0
     }
   }
 }
