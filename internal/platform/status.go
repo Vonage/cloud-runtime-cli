@@ -3,7 +3,7 @@ package platform
 import (
 	"errors"
 
-	"vonage-cloud-runtime-cli/internal/clierr"
+	"github.com/Vonage/cloud-runtime-cli/internal/clierr"
 )
 
 // hasStatus reports whether err is an API error with the given HTTP status.

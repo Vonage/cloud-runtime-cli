@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"vonage-cloud-runtime-cli/internal/clierr"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/clierr"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // uploadBackoff are the delays before the retries. The upload makes one attempt more than it has delays.

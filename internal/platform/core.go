@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"vonage-cloud-runtime-cli/internal/clock"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock"
 )
 
 const (

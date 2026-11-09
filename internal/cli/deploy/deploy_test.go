@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
-	"vonage-cloud-runtime-cli/internal/manifest"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
+	"github.com/Vonage/cloud-runtime-cli/internal/manifest"
 )
 
 func TestFlagDefinitions(t *testing.T) {

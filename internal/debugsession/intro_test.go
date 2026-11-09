@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"vonage-cloud-runtime-cli/internal/platform"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 func TestIntroBlock(t *testing.T) {

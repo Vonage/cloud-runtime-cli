@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"vonage-cloud-runtime-cli/internal/clock/clocktest"
-	"vonage-cloud-runtime-cli/internal/term"
-	"vonage-cloud-runtime-cli/test/fakeplatform"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock/clocktest"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/test/fakeplatform"
 )
 
 var richStart = time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)

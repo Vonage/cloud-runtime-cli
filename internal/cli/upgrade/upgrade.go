@@ -10,10 +10,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"vonage-cloud-runtime-cli/internal/buildinfo"
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
-	"vonage-cloud-runtime-cli/internal/selfupdate"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/buildinfo"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
+	"github.com/Vonage/cloud-runtime-cli/internal/selfupdate"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 const errDevelopmentBuild = textError("Cannot upgrade a development build")

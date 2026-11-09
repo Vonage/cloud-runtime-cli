@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"vonage-cloud-runtime-cli/internal/scaffold"
+	"github.com/Vonage/cloud-runtime-cli/internal/scaffold"
 )
 
 // newProject opens <temp>/proj. The parent holds nothing else, so a test can tell that nothing was written beside

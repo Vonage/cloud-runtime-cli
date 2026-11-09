@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"vonage-cloud-runtime-cli/internal/manifest"
+	"github.com/Vonage/cloud-runtime-cli/internal/manifest"
 )
 
 const fieldPackageID = "package id"

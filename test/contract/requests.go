@@ -14,7 +14,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"vonage-cloud-runtime-cli/test/fakeplatform"
+	"github.com/Vonage/cloud-runtime-cli/test/fakeplatform"
 )
 
 const (

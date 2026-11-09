@@ -7,7 +7,7 @@ import (
 
 	"golang.org/x/mod/semver"
 
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 const (

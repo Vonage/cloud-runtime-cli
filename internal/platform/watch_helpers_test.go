@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/require"
 
-	"vonage-cloud-runtime-cli/internal/clock/clocktest"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock/clocktest"
 )
 
 const (

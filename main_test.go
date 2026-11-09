@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"vonage-cloud-runtime-cli/internal/buildinfo"
+	"github.com/Vonage/cloud-runtime-cli/internal/buildinfo"
 )
 
 func TestStampVariables(t *testing.T) {

@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"vonage-cloud-runtime-cli/internal/clierr"
+	"github.com/Vonage/cloud-runtime-cli/internal/clierr"
 )
 
 func TestTransportErrorKeepsURLErrorText(t *testing.T) {

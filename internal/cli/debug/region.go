@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
-	"vonage-cloud-runtime-cli/internal/manifest"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
+	"github.com/Vonage/cloud-runtime-cli/internal/manifest"
 )
 
 // regionSource is where the region of the session came from.

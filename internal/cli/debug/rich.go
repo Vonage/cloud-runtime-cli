@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
-	"vonage-cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
 )
 
 // The functions below are what the lookups of the debug command show on a terminal. Each makes the call of the classic

@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // The colours of a status, by the class of the response.

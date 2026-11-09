@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // The commands below are what every command of this group prints on a terminal. They check the name, read the value

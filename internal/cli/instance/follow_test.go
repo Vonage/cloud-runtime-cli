@@ -10,9 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"vonage-cloud-runtime-cli/internal/clock"
-	"vonage-cloud-runtime-cli/internal/clock/clocktest"
-	"vonage-cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock/clocktest"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
 )
 
 const (

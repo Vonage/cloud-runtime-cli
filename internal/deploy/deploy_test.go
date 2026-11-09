@@ -15,10 +15,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"vonage-cloud-runtime-cli/internal/clock/clocktest"
-	"vonage-cloud-runtime-cli/internal/manifest"
-	"vonage-cloud-runtime-cli/internal/platform"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock/clocktest"
+	"github.com/Vonage/cloud-runtime-cli/internal/manifest"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 const testAppID = "00000000-0000-4000-8000-000000000601"

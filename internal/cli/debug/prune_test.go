@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"vonage-cloud-runtime-cli/test/fakeplatform"
+	"github.com/Vonage/cloud-runtime-cli/test/fakeplatform"
 )
 
 // withClient gives the fixture the client of the region that a full command receives from the root.

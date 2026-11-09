@@ -13,7 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 
-	"vonage-cloud-runtime-cli/internal/clock"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock"
 )
 
 // runFailure starts the error of a tunnel that stopped running.

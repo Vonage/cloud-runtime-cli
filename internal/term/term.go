@@ -10,7 +10,7 @@ import (
 
 	"github.com/cli/cli/v2/pkg/iostreams"
 
-	"vonage-cloud-runtime-cli/internal/clock"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock"
 )
 
 // Icons used in v2.6.1 output.

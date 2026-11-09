@@ -11,11 +11,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
 
-	"vonage-cloud-runtime-cli/internal/buildinfo"
-	"vonage-cloud-runtime-cli/internal/cli"
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
-	"vonage-cloud-runtime-cli/internal/config"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/buildinfo"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
+	"github.com/Vonage/cloud-runtime-cli/internal/config"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 const (

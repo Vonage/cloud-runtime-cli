@@ -6,9 +6,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"vonage-cloud-runtime-cli/internal/buildinfo"
-	"vonage-cloud-runtime-cli/internal/cli"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/buildinfo"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // Set at build time with -ldflags "-X main.<name>=<value>"; each build stamps these names.

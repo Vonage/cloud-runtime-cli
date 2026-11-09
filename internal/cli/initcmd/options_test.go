@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"vonage-cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
 )
 
 // dirty is remote text with a colour sequence, a title-setting sequence and a bell around the word red.

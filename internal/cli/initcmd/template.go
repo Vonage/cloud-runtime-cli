@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"vonage-cloud-runtime-cli/internal/manifest"
-	"vonage-cloud-runtime-cli/internal/platform"
-	"vonage-cloud-runtime-cli/internal/scaffold"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/manifest"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/scaffold"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // applyTemplate lets the user pick a template for the runtime and unpacks it into the project. It returns the

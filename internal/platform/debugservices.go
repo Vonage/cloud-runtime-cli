@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"vonage-cloud-runtime-cli/internal/manifest"
+	"github.com/Vonage/cloud-runtime-cli/internal/manifest"
 )
 
 const debugProxyRuntime = "debug-proxy"

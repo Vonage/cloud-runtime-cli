@@ -1,4 +1,4 @@
-module vonage-cloud-runtime-cli
+module github.com/Vonage/cloud-runtime-cli
 
 go 1.27.0
 

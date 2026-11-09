@@ -12,11 +12,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"vonage-cloud-runtime-cli/internal/buildinfo"
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
-	"vonage-cloud-runtime-cli/internal/clierr"
-	"vonage-cloud-runtime-cli/internal/clock/clocktest"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/buildinfo"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
+	"github.com/Vonage/cloud-runtime-cli/internal/clierr"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock/clocktest"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // rendered is what clierr.Render writes for err.

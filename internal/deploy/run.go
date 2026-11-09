@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"vonage-cloud-runtime-cli/internal/clock"
-	"vonage-cloud-runtime-cli/internal/manifest"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock"
+	"github.com/Vonage/cloud-runtime-cli/internal/manifest"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // Run parses Plan.Capabilities with manifest.ParseCapabilities at the package stage, after the validate and upload

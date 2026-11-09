@@ -3,8 +3,8 @@ package debugsession
 import (
 	"fmt"
 
-	"vonage-cloud-runtime-cli/internal/platform"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // forwardingNotice tells the user what the session does from here on, and how to end it.

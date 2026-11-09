@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"vonage-cloud-runtime-cli/test/fakeplatform"
+	"github.com/Vonage/cloud-runtime-cli/test/fakeplatform"
 )
 
 // segInstances is the path segment of the instance routes.

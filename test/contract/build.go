@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"vonage-cloud-runtime-cli/test/fakeplatform"
+	"github.com/Vonage/cloud-runtime-cli/test/fakeplatform"
 )
 
 // The stamp of every binary the harness builds, the same on both sides.

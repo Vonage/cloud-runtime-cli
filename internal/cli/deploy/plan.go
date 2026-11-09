@@ -3,8 +3,8 @@ package deploy
 import (
 	"strings"
 
-	stages "vonage-cloud-runtime-cli/internal/deploy"
-	"vonage-cloud-runtime-cli/internal/manifest"
+	stages "github.com/Vonage/cloud-runtime-cli/internal/deploy"
+	"github.com/Vonage/cloud-runtime-cli/internal/manifest"
 )
 
 // Where the region of a deploy came from.

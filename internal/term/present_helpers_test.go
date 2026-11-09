@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"vonage-cloud-runtime-cli/internal/clock/clocktest"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock/clocktest"
 )
 
 // testFrames is the spinner alphabet the live line uses, spelled out here so the tests do not read it from the code.

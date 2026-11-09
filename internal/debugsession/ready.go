@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"vonage-cloud-runtime-cli/internal/clock"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock"
 )
 
 // readyWaits are the seconds to wait after each answer of "not ready yet": 14 polls over about 50 seconds. The wait

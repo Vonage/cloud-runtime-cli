@@ -4,7 +4,7 @@ package initcmd
 import (
 	"github.com/spf13/cobra"
 
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
 )
 
 // NewCmd returns `vcr init`, annotated cmdenv.Full: the root has resolved the region before RunE runs.

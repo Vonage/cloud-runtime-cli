@@ -13,7 +13,7 @@ import (
 	"syscall"
 	"time"
 
-	"vonage-cloud-runtime-cli/test/fakeplatform"
+	"github.com/Vonage/cloud-runtime-cli/test/fakeplatform"
 )
 
 // maxShownOutput is how much of a stream a failed wait quotes.

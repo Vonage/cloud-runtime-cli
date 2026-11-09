@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"vonage-cloud-runtime-cli/internal/clock/clocktest"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock/clocktest"
 )
 
 // gatedClock is a fake clock whose sleeps wait until the test lets them go, so that a test can look at the state

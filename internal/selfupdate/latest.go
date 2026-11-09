@@ -16,9 +16,9 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"vonage-cloud-runtime-cli/internal/buildinfo"
-	"vonage-cloud-runtime-cli/internal/clierr"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/buildinfo"
+	"github.com/Vonage/cloud-runtime-cli/internal/clierr"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 const (

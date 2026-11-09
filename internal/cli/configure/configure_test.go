@@ -11,12 +11,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
-	"vonage-cloud-runtime-cli/internal/cli/cmdtest"
-	"vonage-cloud-runtime-cli/internal/cli/configure"
-	"vonage-cloud-runtime-cli/internal/config"
-	"vonage-cloud-runtime-cli/internal/term"
-	"vonage-cloud-runtime-cli/test/fakeplatform"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdtest"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/configure"
+	"github.com/Vonage/cloud-runtime-cli/internal/config"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/test/fakeplatform"
 )
 
 // answers is the script of a run that types the account of the fake platform and takes the first region.

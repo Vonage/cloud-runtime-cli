@@ -7,8 +7,8 @@ import (
 	"strings"
 	"syscall"
 
-	"vonage-cloud-runtime-cli/internal/manifest"
-	"vonage-cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/manifest"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
 )
 
 // debugVars are the values behind the fixed variables of the local application's environment.

@@ -10,8 +10,8 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"vonage-cloud-runtime-cli/internal/clock"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 const (

@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"vonage-cloud-runtime-cli/internal/cli/app"
-	"vonage-cloud-runtime-cli/internal/cli/cmdtest"
-	"vonage-cloud-runtime-cli/test/fakeplatform"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/app"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdtest"
+	"github.com/Vonage/cloud-runtime-cli/test/fakeplatform"
 )
 
 const (

@@ -8,9 +8,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"vonage-cloud-runtime-cli/internal/cli/cmdtest"
-	"vonage-cloud-runtime-cli/internal/cli/secret"
-	"vonage-cloud-runtime-cli/test/fakeplatform"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdtest"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/secret"
+	"github.com/Vonage/cloud-runtime-cli/test/fakeplatform"
 )
 
 const (

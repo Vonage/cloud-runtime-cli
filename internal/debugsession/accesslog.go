@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // accessLogLine is the line printed for a request that was forwarded to the local app, in the layout the old client

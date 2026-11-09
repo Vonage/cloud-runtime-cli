@@ -10,7 +10,7 @@ import (
 	"slices"
 	"sync"
 
-	"vonage-cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
 )
 
 // Names of the calls fakeAPI records, in the order Run is expected to make them.

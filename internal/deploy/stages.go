@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"strings"
 
-	"vonage-cloud-runtime-cli/internal/bundle"
-	"vonage-cloud-runtime-cli/internal/manifest"
-	"vonage-cloud-runtime-cli/internal/platform"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/bundle"
+	"github.com/Vonage/cloud-runtime-cli/internal/manifest"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // spin runs fn under a spinner that is gone before anything is printed after it.

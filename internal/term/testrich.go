@@ -3,7 +3,7 @@ package term
 import (
 	"io"
 
-	"vonage-cloud-runtime-cli/internal/clock"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock"
 )
 
 // TestRich returns an IO in Rich (or Static) mode over buffers, with both streams reporting as terminals of the given

@@ -7,7 +7,7 @@ import (
 	"github.com/MakeNowJust/heredoc"
 	"github.com/spf13/cobra"
 
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
 )
 
 // NewCmd returns `vcr app` with create, generate-keys, list and remove, annotated cmdenv.Full.

@@ -5,11 +5,11 @@ package cmdenv
 import (
 	"errors"
 
-	"vonage-cloud-runtime-cli/internal/buildinfo"
-	"vonage-cloud-runtime-cli/internal/clock"
-	"vonage-cloud-runtime-cli/internal/config"
-	"vonage-cloud-runtime-cli/internal/platform"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/buildinfo"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock"
+	"github.com/Vonage/cloud-runtime-cli/internal/config"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // ErrRegionNotFound is the error RegionClient returns for an empty or unknown alias. Its text is v2.6.1's.

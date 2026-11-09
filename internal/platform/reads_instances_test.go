@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"vonage-cloud-runtime-cli/internal/clierr"
+	"github.com/Vonage/cloud-runtime-cli/internal/clierr"
 )
 
 const instanceBody = `{"id":"i-1","name":"dev","serviceName":"my-project-dev","apiApplicationId":"app-1","projectId":"proj-1","regionAlias":"aws.euw1"}`

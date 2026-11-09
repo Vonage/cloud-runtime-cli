@@ -3,8 +3,8 @@ package upgrade
 import (
 	"context"
 
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
-	"vonage-cloud-runtime-cli/internal/selfupdate"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
+	"github.com/Vonage/cloud-runtime-cli/internal/selfupdate"
 )
 
 // runRich is run for a terminal. It prints the version line, checks the path and the build, looks up the release,

@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"testing"
 
-	"vonage-cloud-runtime-cli/internal/clock"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // defaultWidth is the width of the terminal a Rich or Static harness pretends to have unless Options.Width says

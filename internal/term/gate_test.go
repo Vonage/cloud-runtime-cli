@@ -7,7 +7,7 @@ import (
 	"github.com/cli/cli/v2/pkg/iostreams"
 	"github.com/stretchr/testify/assert"
 
-	"vonage-cloud-runtime-cli/internal/clock/clocktest"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock/clocktest"
 )
 
 // gateInput is one decision's input: the gate's environment and the process variables it reads.

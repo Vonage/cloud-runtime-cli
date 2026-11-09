@@ -6,10 +6,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
-	"vonage-cloud-runtime-cli/internal/config"
-	"vonage-cloud-runtime-cli/internal/endpoint"
-	"vonage-cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
+	"github.com/Vonage/cloud-runtime-cli/internal/config"
+	"github.com/Vonage/cloud-runtime-cli/internal/endpoint"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
 )
 
 // preRun is the root's PersistentPreRunE: it sets up what the command runs on, as far as its platform mode asks.

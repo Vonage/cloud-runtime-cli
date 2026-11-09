@@ -3,8 +3,8 @@ package instance
 import (
 	"time"
 
-	"vonage-cloud-runtime-cli/internal/platform"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // levelRanks orders the levels that --log-level knows.

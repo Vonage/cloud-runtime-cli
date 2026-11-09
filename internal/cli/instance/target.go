@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"vonage-cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
 )
 
 // The not-found wording of the names form differs between the commands; the id form is the same for both.

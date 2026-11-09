@@ -1,6 +1,6 @@
 package debugsession
 
-import "vonage-cloud-runtime-cli/internal/term"
+import "github.com/Vonage/cloud-runtime-cli/internal/term"
 
 // introBlock is what the session shows once the proxy is connected, in the layout the old client used. The host is
 // always yellow and bold, also when stdout is not a terminal, as before.

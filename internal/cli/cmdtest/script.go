@@ -5,7 +5,7 @@ import (
 	"sync"
 	"testing"
 
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // The kinds of Ask.

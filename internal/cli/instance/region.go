@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
-	"vonage-cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
 )
 
 // regionClient returns the client of the region inst runs in. The resolver fetches a region record once per

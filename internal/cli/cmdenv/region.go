@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"vonage-cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
 )
 
 // RegionClient resolves alias the way v2.6.1's start-up did. An empty alias first calls Resolver.Regions, so bad

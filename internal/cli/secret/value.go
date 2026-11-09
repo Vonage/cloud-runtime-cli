@@ -10,7 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
 )
 
 var (

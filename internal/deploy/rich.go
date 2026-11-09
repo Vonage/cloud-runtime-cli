@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"vonage-cloud-runtime-cli/internal/bundle"
-	"vonage-cloud-runtime-cli/internal/platform"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/bundle"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // The methods below are the stages as a person at a terminal sees them. Each makes the same call as the classic

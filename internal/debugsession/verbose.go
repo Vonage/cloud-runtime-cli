@@ -7,7 +7,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // The headings of the verbose blocks, as the old client printed them, variation selectors included.

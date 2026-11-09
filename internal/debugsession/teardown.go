@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // cause is how a session ends, and so what its teardown reports.

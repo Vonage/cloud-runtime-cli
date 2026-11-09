@@ -7,10 +7,10 @@ import (
 	"io/fs"
 	"path/filepath"
 
-	"vonage-cloud-runtime-cli/internal/manifest"
-	"vonage-cloud-runtime-cli/internal/platform"
-	"vonage-cloud-runtime-cli/internal/scaffold"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/manifest"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/scaffold"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 const (

@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // console is the only writer of the session's output. Every write takes one mutex, so the lines of the access log, the

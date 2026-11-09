@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
-	"vonage-cloud-runtime-cli/internal/config"
-	"vonage-cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
+	"github.com/Vonage/cloud-runtime-cli/internal/config"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
 )
 
 // runRich is run for a terminal. It reads the file, asks the questions and writes the file as the classic run does,

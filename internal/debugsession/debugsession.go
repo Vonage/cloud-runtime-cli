@@ -10,8 +10,8 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"vonage-cloud-runtime-cli/internal/manifest"
-	"vonage-cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/manifest"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
 )
 
 // API is the part of *platform.Client that a debug session uses.

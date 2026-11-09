@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"vonage-cloud-runtime-cli/internal/manifest"
+	"github.com/Vonage/cloud-runtime-cli/internal/manifest"
 )
 
 const (

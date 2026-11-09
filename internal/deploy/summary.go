@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"vonage-cloud-runtime-cli/internal/platform"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // summary prints the block that closes a deploy. Each piece is yellow on a colour terminal; the host addresses are

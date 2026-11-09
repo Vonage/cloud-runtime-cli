@@ -12,11 +12,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"vonage-cloud-runtime-cli/internal/cli/app"
-	"vonage-cloud-runtime-cli/internal/cli/cmdtest"
-	"vonage-cloud-runtime-cli/internal/config"
-	"vonage-cloud-runtime-cli/internal/term"
-	"vonage-cloud-runtime-cli/test/fakeplatform"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/app"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdtest"
+	"github.com/Vonage/cloud-runtime-cli/internal/config"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/test/fakeplatform"
 )
 
 var listHeaders = []string{"ID", "Name"}

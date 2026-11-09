@@ -6,16 +6,16 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"vonage-cloud-runtime-cli/internal/cli/app"
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
-	"vonage-cloud-runtime-cli/internal/cli/configure"
-	"vonage-cloud-runtime-cli/internal/cli/debug"
-	"vonage-cloud-runtime-cli/internal/cli/deploy"
-	"vonage-cloud-runtime-cli/internal/cli/initcmd"
-	"vonage-cloud-runtime-cli/internal/cli/instance"
-	"vonage-cloud-runtime-cli/internal/cli/secret"
-	"vonage-cloud-runtime-cli/internal/cli/upgrade"
-	"vonage-cloud-runtime-cli/internal/config"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/app"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/configure"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/debug"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/deploy"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/initcmd"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/instance"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/secret"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/upgrade"
+	"github.com/Vonage/cloud-runtime-cli/internal/config"
 )
 
 const (

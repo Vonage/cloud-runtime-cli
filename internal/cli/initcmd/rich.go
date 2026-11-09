@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"vonage-cloud-runtime-cli/internal/platform"
-	"vonage-cloud-runtime-cli/internal/scaffold"
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/platform"
+	"github.com/Vonage/cloud-runtime-cli/internal/scaffold"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 // The methods below are what the lookups of init show on a terminal. Each makes the call of the classic method beside

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"vonage-cloud-runtime-cli/internal/clock"
-	"vonage-cloud-runtime-cli/internal/selfupdate"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock"
+	"github.com/Vonage/cloud-runtime-cli/internal/selfupdate"
 )
 
 // updateWait is how long a finished command waits for the update check before it gives up on the notice.

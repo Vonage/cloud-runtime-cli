@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"vonage-cloud-runtime-cli/internal/clierr"
+	"github.com/Vonage/cloud-runtime-cli/internal/clierr"
 )
 
 // --- read routes that replace the GraphQL queries ---

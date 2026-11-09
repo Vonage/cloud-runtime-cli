@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"vonage-cloud-runtime-cli/internal/manifest"
+	"github.com/Vonage/cloud-runtime-cli/internal/manifest"
 )
 
 // answers is what an override carries: the six values Merge takes, plus keys Merge must leave alone. Each call builds

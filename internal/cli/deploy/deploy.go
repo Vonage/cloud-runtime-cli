@@ -7,9 +7,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"vonage-cloud-runtime-cli/internal/cli/cmdenv"
-	stages "vonage-cloud-runtime-cli/internal/deploy"
-	"vonage-cloud-runtime-cli/internal/manifest"
+	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
+	stages "github.com/Vonage/cloud-runtime-cli/internal/deploy"
+	"github.com/Vonage/cloud-runtime-cli/internal/manifest"
 )
 
 // flagValues are what the seven local flags hold.

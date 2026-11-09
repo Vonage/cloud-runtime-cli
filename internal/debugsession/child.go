@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 const (

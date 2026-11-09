@@ -4,7 +4,7 @@ import (
 	"errors"
 	"io"
 
-	"vonage-cloud-runtime-cli/internal/clock"
+	"github.com/Vonage/cloud-runtime-cli/internal/clock"
 )
 
 // ErrNotFound is returned (wrapped) when a read route answers 404 with the error envelope.

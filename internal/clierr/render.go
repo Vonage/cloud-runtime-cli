@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"vonage-cloud-runtime-cli/internal/term"
+	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
 const (
