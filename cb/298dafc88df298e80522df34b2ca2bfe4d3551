@@ -1,0 +1,18 @@
+test/contract/compare.go
+  h_df1d95ff1e9b8c 80-82
+test/contract/endpoint_migration.go
+  h_df1d95ff1e9b8c 1-35
+test/contract/endpoint_migration_test.go
+  h_df1d95ff1e9b8c 1-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cb298dafc88df298e80522df34b2ca2bfe4d3551",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
