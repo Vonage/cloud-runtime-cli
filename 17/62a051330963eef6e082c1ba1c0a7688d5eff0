@@ -1,0 +1,20 @@
+internal/cli/endpoint_migration.go
+  h_df1d95ff1e9b8c 4,14-16,20,27,31,35,38,45-49,52,56,60-79
+internal/cli/endpoint_migration_test.go
+  h_df1d95ff1e9b8c 4-5,10,210-263
+internal/cli/harness_test.go
+  h_df1d95ff1e9b8c 6,134-139,142,144
+internal/cli/prerun.go
+  h_df1d95ff1e9b8c 29,35-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1762a051330963eef6e082c1ba1c0a7688d5eff0",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
