@@ -1,7 +1,36 @@
+test/contract/placeholders.go
+  93e3fa3d72e29cae 6,12,71-75,79,83,85,88-93,95
+test/fakeplatform/overrides_test.go
+  93e3fa3d72e29cae 116
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.7.5",
+  "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "d378a89860bab2d354e7f128a93653c9517fa0b9",
-  "prompts": {}
+  "prompts": {
+    "93e3fa3d72e29cae": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "4e725c49-7fb4-401f-8215-8a8f60d55c98",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:44:48.425Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:44:48.425Z"
+        }
+      ],
+      "total_additions": 18,
+      "total_deletions": 12,
+      "accepted_lines": 18,
+      "overriden_lines": 0
+    }
+  }
 }
