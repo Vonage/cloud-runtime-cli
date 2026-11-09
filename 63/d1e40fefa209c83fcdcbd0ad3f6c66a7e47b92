@@ -1,0 +1,16 @@
+internal/cli/endpoint_migration.go
+  h_df1d95ff1e9b8c 30-31
+openspec/changes/endpoint-migration/tasks.md
+  h_df1d95ff1e9b8c 83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "63d1e40fefa209c83fcdcbd0ad3f6c66a7e47b92",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
