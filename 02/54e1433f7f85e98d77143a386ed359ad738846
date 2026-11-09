@@ -1,0 +1,82 @@
+docs/docs_test.go
+  h_df1d95ff1e9b8c 114,116
+docs/vcr.md
+  h_df1d95ff1e9b8c 74-75
+docs/vcr_app.md
+  h_df1d95ff1e9b8c 56-57
+docs/vcr_app_create.md
+  h_df1d95ff1e9b8c 63-64
+docs/vcr_app_generate-keys.md
+  h_df1d95ff1e9b8c 52-53
+docs/vcr_app_list.md
+  h_df1d95ff1e9b8c 61-62
+docs/vcr_app_remove.md
+  h_df1d95ff1e9b8c 47-48
+docs/vcr_completion.md
+  h_df1d95ff1e9b8c 17-18
+docs/vcr_completion_bash.md
+  h_df1d95ff1e9b8c 45-46
+docs/vcr_completion_fish.md
+  h_df1d95ff1e9b8c 36-37
+docs/vcr_completion_powershell.md
+  h_df1d95ff1e9b8c 33-34
+docs/vcr_completion_zsh.md
+  h_df1d95ff1e9b8c 47-48
+docs/vcr_configure.md
+  h_df1d95ff1e9b8c 55-56
+docs/vcr_debug.md
+  h_df1d95ff1e9b8c 109-110
+docs/vcr_debug_prune-sessions.md
+  h_df1d95ff1e9b8c 19-20
+docs/vcr_deploy.md
+  h_df1d95ff1e9b8c 181-182
+docs/vcr_init.md
+  h_df1d95ff1e9b8c 66-67
+docs/vcr_instance.md
+  h_df1d95ff1e9b8c 59-60
+docs/vcr_instance_list.md
+  h_df1d95ff1e9b8c 51-52
+docs/vcr_instance_log.md
+  h_df1d95ff1e9b8c 88-89
+docs/vcr_instance_remove.md
+  h_df1d95ff1e9b8c 60-61
+docs/vcr_secret.md
+  h_df1d95ff1e9b8c 62-63
+docs/vcr_secret_create.md
+  h_df1d95ff1e9b8c 70-71
+docs/vcr_secret_list.md
+  h_df1d95ff1e9b8c 45-46
+docs/vcr_secret_remove.md
+  h_df1d95ff1e9b8c 52-53
+docs/vcr_secret_update.md
+  h_df1d95ff1e9b8c 66-67
+docs/vcr_upgrade.md
+  h_df1d95ff1e9b8c 73-74
+internal/cli/golden_test.go
+  h_df1d95ff1e9b8c 70-81,96,124
+internal/cli/root.go
+  h_df1d95ff1e9b8c 86-87
+internal/cli/root_test.go
+  h_df1d95ff1e9b8c 93,105
+internal/config/config.go
+  h_df1d95ff1e9b8c 33
+openspec/changes/endpoint-migration/tasks.md
+  h_df1d95ff1e9b8c 61
+test/contract/scenarios/config-endpoint-flag-on-terminal.yaml
+  h_df1d95ff1e9b8c 1-13
+test/contract/testdata/contract-tree.json
+  h_df1d95ff1e9b8c 54
+test/contract/testdata/rich/config-endpoint-flag-on-terminal.txt
+  h_df1d95ff1e9b8c 1-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0254e1433f7f85e98d77143a386ed359ad738846",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
