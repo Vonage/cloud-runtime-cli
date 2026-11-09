@@ -77,6 +77,9 @@ func (c *comparison) fail(field, detail string) {
 // every difference. A field that an allowed diff names is not compared.
 func Compare(sc Scenario, base Transcript, got Result, o CompareOptions) []Failure {
 	c := &comparison{sc: sc, o: o}
+	if o.NoGraphQL {
+		base, got = relaxEndpointMigration(base, got)
+	}
 	c.diff("exit", base.Exit, got.Exit)
 	c.diff("stdout", base.Stdout, got.Stdout)
 	c.stderr(base, got)
