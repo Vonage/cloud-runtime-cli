@@ -5,6 +5,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -70,6 +71,7 @@ func newHarness(t *testing.T) *harness {
 	}
 	h.writeConfig(config.File{
 		GraphQLEndpoint: srv.GatewayGraphQLURL("euw1"),
+		Endpoint:        srv.DeploymentAPIURL("euw1"),
 		DefaultRegion:   "aws.euw1",
 		APIKey:          fakeKey,
 		APISecret:       fakeSecret,
@@ -123,7 +125,14 @@ type richOutcome struct {
 // runRich is run on a terminal of the given mode, 100 columns wide.
 func (h *harness) runRich(mode term.Mode, args ...string) richOutcome {
 	h.t.Helper()
+	return h.runRichAnswering(mode, "", args...)
+}
+
+// runRichAnswering is runRich with stdin, a terminal, holding the given answers.
+func (h *harness) runRichAnswering(mode term.Mode, stdin string, args ...string) richOutcome {
+	h.t.Helper()
 	streams, out, errOut := term.TestRich(mode, 100, clocktest.New(time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)))
+	streams.In = strings.NewReader(stdin)
 	env := h.envOver(streams)
 	code := run(h.t.Context(), args, env, h.options(env))
 	return richOutcome{code: code, stdout: out, stderr: errOut}

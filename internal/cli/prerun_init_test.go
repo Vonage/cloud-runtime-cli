@@ -37,7 +37,8 @@ func TestConfigWarningsPrintedOnStdout(t *testing.T) {
 		h := newHarness(t)
 		h.removeConfig()
 		require.NoError(t, config.Write(h.path(".neru-cli"), config.File{
-			GraphQLEndpoint: h.srv.GatewayGraphQLURL("euw1"), DefaultRegion: "aws.euw1", APIKey: fakeKey, APISecret: fakeSecret,
+			GraphQLEndpoint: h.srv.GatewayGraphQLURL("euw1"), Endpoint: h.srv.DeploymentAPIURL("euw1"),
+			DefaultRegion: "aws.euw1", APIKey: fakeKey, APISecret: fakeSecret,
 		}))
 
 		got := h.run("full")

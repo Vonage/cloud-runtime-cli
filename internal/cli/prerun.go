@@ -33,6 +33,7 @@ func (st *runState) preRun(cmd *cobra.Command, _ []string) error {
 	if err := st.loadConfig(); err != nil {
 		return err
 	}
+	st.migrateEndpoint()
 	stop := startConnecting(env, cmd, connectingRegion(env, mode))
 	defer stop()
 	if err := st.initPlatform(ctx, mode); err != nil {
@@ -83,18 +84,9 @@ func (st *runState) loadConfig() error {
 }
 
 // initPlatform picks the deployment API to ask, builds the resolver and, for a full command, resolves the region.
-// The region input of the bootstrap is the --region flag only: a default_region in the file must not select the
-// production default over the file's own endpoint.
 func (st *runState) initPlatform(ctx context.Context, mode string) error {
 	env := st.env
-	fl := env.Flags
-	bootstrap, err := endpoint.Bootstrap(endpoint.Inputs{
-		Endpoint:       fl.Endpoint,
-		GraphQLFlag:    fl.GraphQLEndpoint,
-		Region:         fl.Region,
-		ConfigEndpoint: env.Settings.File.Endpoint,
-		GraphQLConfig:  env.Settings.File.GraphQLEndpoint,
-	})
+	bootstrap, err := endpoint.Bootstrap(bootstrapInputs(env.Flags, env.Settings.File))
 	if err != nil {
 		return err
 	}

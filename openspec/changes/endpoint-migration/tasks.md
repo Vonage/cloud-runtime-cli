@@ -32,13 +32,13 @@ Run every command from the repository root. `make test` is `go test -race ./...`
 
 ## 3. Notices and the prompt
 
-- [ ] 3.1 Notice for `--graphql-endpoint`.
+- [x] 3.1 Notice for `--graphql-endpoint`.
   - Files: `internal/cli/prerun.go` (new `migrateEndpoint` step after `loadConfig`, before `startConnecting`), a new `internal/cli/endpoint_migration_test.go`.
   - Test first: with the harness (`newHarness`), `full` with `--graphql-endpoint <gateway form>` prints exactly `! --graphql-endpoint is deprecated; use --endpoint <mapped> instead` on stderr, stdout and exit code equal to the same run with `--endpoint <mapped>`; the production form prints the `--region` line; in `runRich(term.Rich, ...)` nothing is asked; with a config holding only `graphql_endpoint`, only the flag notice appears.
   - Verify: `go test ./internal/cli/ -run Endpoint -count=1`
   - Accept: tests pass; no notice when `--endpoint` or the file's `endpoint` decides the URL.
 
-- [ ] 3.2 Ask or tell for `graphql_endpoint` in the file.
+- [x] 3.2 Ask or tell for `graphql_endpoint` in the file.
   - Files: `internal/cli/prerun.go`, `internal/cli/endpoint_migration_test.go`.
   - Test first:
     - classic (`h.run`): stderr has the `add "endpoint = <url>"` line naming the file; the file is unchanged; stdout and exit code as before.
