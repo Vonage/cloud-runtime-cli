@@ -1,0 +1,18 @@
+internal/endpoint/bootstrap.go
+  h_df1d95ff1e9b8c 33-37,40-66,71,80,83,85,89-91,93,95-102,104,109-110,114,119,122,130
+internal/endpoint/resolve_test.go
+  h_df1d95ff1e9b8c 1-85
+openspec/changes/endpoint-migration/tasks.md
+  h_df1d95ff1e9b8c 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "dc7d23861f3f4ed7a3dcdb9b8e59832dd2506fc3",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
