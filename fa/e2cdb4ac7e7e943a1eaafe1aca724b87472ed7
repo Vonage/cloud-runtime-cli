@@ -1,0 +1,20 @@
+internal/cli/configure/configure.go
+  h_df1d95ff1e9b8c 186-190
+internal/cli/prerun.go
+  h_df1d95ff1e9b8c 92-96
+internal/cli/prerun_test.go
+  h_df1d95ff1e9b8c 397-414
+openspec/changes/endpoint-migration/tasks.md
+  h_df1d95ff1e9b8c 27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fae2cdb4ac7e7e943a1eaafe1aca724b87472ed7",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
