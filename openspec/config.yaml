@@ -1,0 +1,25 @@
+schema: spec-driven
+
+context: |
+  This repository is public. Its changes ship in the same pull request as the code they describe.
+  Never put Jira keys, internal hostnames or URLs, internal repository or consumer names, plan ids, or AI tool names in change ids or artifacts.
+  The change id is a short kebab-case slug, for example gateway-route.
+
+rules:
+  proposal:
+    - Never mention a Jira key or an internal system, repository, host or consumer.
+    - Name sibling changes only by their public repository name.
+    - State the planned branch name (feature/<slug>, no ticket key).
+    - 'Include "## Rollout" and "## Out of scope" sections.'
+  specs:
+    - Describe observable behaviour only, never the implementation.
+  design:
+    - Give one line per rejected alternative, saying why it lost.
+  tasks:
+    - Write bite-sized, test-first steps.
+    - Each task names the files it touches, the failing test to write first, and the exact command that verifies it.
+
+operations:
+  archive:
+    guidance:
+      - 'Archive as the last commit of the pull request, after "openspec validate <id> --strict" passes.'

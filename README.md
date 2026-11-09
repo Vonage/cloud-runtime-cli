@@ -176,7 +176,7 @@ This project uses [Release Please](https://github.com/googleapis/release-please)
 3. **Draft release**: When the Release PR is merged, lint and the tests run, then a draft GitHub Release is created
 4. **Build, sign & publish**: The release triggers the build pipeline which:
    - Cross-compiles binaries for all platforms
-   - Code signs and notarizes macOS binaries
+   - Code signs macOS binaries, and notarizes them when the repository variable `APPLE_NOTARIZE` is `true`
    - Signs `checksums.txt` with the release key (see [Verifying a download](#verifying-a-download))
    - Uploads the archives, the checksums and the signature to the draft, then publishes it
    - Installs the published release and checks that it reports the new version
