@@ -1,0 +1,798 @@
+go.mod
+  c3f1828311c7d548 14
+test/contract/consistency_test.go
+  c3f1828311c7d548 62-67,69-93,98
+test/contract/coverage.txt
+  c3f1828311c7d548 1-35
+test/contract/coverage_test.go
+  c3f1828311c7d548 1-329
+test/contract/doc.go
+  c3f1828311c7d548 29-33,40-49
+test/contract/driver.go
+  c3f1828311c7d548 18-20,90-92,115,128-129,131-151,238-241
+test/contract/driver_test.go
+  c3f1828311c7d548 1-42
+test/contract/exec.go
+  c3f1828311c7d548 17,51-61,63-70,83-90,158-159,166,170-181
+test/contract/pty.go
+  c3f1828311c7d548 1-108
+test/contract/pty_test.go
+  c3f1828311c7d548 1-83
+test/contract/ptyfilter.go
+  c3f1828311c7d548 1-97
+test/contract/ptyfilter_test.go
+  c3f1828311c7d548 1-70
+test/contract/run.go
+  c3f1828311c7d548 197,222
+test/contract/scenarios/app-create-confirm-no.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/app-create-confirm-retries-on-other-input.yaml
+  c3f1828311c7d548 1-11
+test/contract/scenarios/app-create-confirm-yes.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/app-create-yes-flag-skips-prompt.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/app-remove-confirm-no.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/app-remove-confirm-yes.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/config-corpus-bom.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/config-corpus-crlf.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/config-corpus-duplicate-keys.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/config-corpus-empty-values.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/config-corpus-missing-credentials-section.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/config-corpus-mixed-case-section.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/config-corpus-quoted-values.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/config-corpus-trailing-slash-endpoint.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/configure-api-key-flag-is-the-default.yaml
+  c3f1828311c7d548 1-20
+test/contract/scenarios/configure-config-file-flag.yaml
+  c3f1828311c7d548 1-25
+test/contract/scenarios/configure-existing-change-region.yaml
+  c3f1828311c7d548 1-15
+test/contract/scenarios/configure-existing-keep-defaults.yaml
+  c3f1828311c7d548 1-13
+test/contract/scenarios/configure-fresh.yaml
+  c3f1828311c7d548 1-14
+test/contract/scenarios/configure-hides-test-regions.yaml
+  c3f1828311c7d548 1-53
+test/contract/scenarios/configure-interrupt-at-prompt.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/configure-region-list-server-error.yaml
+  c3f1828311c7d548 1-14
+test/contract/scenarios/configure-writes-through-symlink.yaml
+  c3f1828311c7d548 1-28
+test/contract/scenarios/debug-corpus-config-vcr.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/debug-corpus-empty-lists.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/debug-corpus-environment-value-types.yaml
+  c3f1828311c7d548 1-12
+test/contract/scenarios/debug-corpus-unknown-keys.yaml
+  c3f1828311c7d548 1-12
+test/contract/scenarios/debug-corpus-vcr-with-authenticated-security.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/debug-corpus-vcr-with-health-check.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/debug-corpus-vcr-with-security.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/debug-corpus-vcr.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/debug-corpus-yaml-anchors.yaml
+  c3f1828311c7d548 1-12
+test/contract/scenarios/deploy-corpus-bad-value-types.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/deploy-corpus-bad-yaml-syntax.yaml
+  c3f1828311c7d548 1-7
+test/contract/scenarios/deploy-corpus-config-vcr.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/deploy-corpus-duplicate-capabilities.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-each-capability-messages-v1.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-each-capability-messages.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-each-capability-messaging-v1.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-each-capability-messaging.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-each-capability-network-v1.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-each-capability-network.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-each-capability-rtc-v1.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-each-capability-rtc.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-each-capability-verify-v2.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-each-capability-video-v1.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-each-capability-video.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-each-capability-voice-v1.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-each-capability-voice.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-empty-lists.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-environment-value-types.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-minimal.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-tree.yaml
+  c3f1828311c7d548 1-23
+test/contract/scenarios/deploy-corpus-unknown-capability.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-unknown-keys.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-utf8-bom.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-vcr-with-authenticated-security.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-vcr-with-health-check.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-vcr-with-security.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-vcr.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/deploy-corpus-vcrignore-1.yaml
+  c3f1828311c7d548 1-39
+test/contract/scenarios/deploy-corpus-vcrignore-2.yaml
+  c3f1828311c7d548 1-39
+test/contract/scenarios/deploy-corpus-vcrignore-3.yaml
+  c3f1828311c7d548 1-39
+test/contract/scenarios/deploy-corpus-vcrignore-4.yaml
+  c3f1828311c7d548 1-39
+test/contract/scenarios/deploy-corpus-vcrignore-5.yaml
+  c3f1828311c7d548 1-39
+test/contract/scenarios/deploy-corpus-vcrignore-6.yaml
+  c3f1828311c7d548 1-39
+test/contract/scenarios/deploy-corpus-vcrignore-7.yaml
+  c3f1828311c7d548 1-39
+test/contract/scenarios/deploy-corpus-vcrignore-8.yaml
+  c3f1828311c7d548 1-39
+test/contract/scenarios/deploy-corpus-yaml-anchors.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/init-alias-i.yaml
+  c3f1828311c7d548 1-29
+test/contract/scenarios/init-create-new-application-for-deployment.yaml
+  c3f1828311c7d548 1-31
+test/contract/scenarios/init-existing-vcr-yml-is-overwritten.yaml
+  c3f1828311c7d548 1-38
+test/contract/scenarios/init-full-flow.yaml
+  c3f1828311c7d548 1-39
+test/contract/scenarios/init-interrupt-at-prompt.yaml
+  c3f1828311c7d548 1-11
+test/contract/scenarios/init-invalid-project-name-then-valid.yaml
+  c3f1828311c7d548 1-30
+test/contract/scenarios/init-no-template-for-runtime.yaml
+  c3f1828311c7d548 1-27
+test/contract/scenarios/init-path-argument.yaml
+  c3f1828311c7d548 1-25
+test/contract/scenarios/init-region-list-server-error.yaml
+  c3f1828311c7d548 1-22
+test/contract/scenarios/init-runtime-list-empty.yaml
+  c3f1828311c7d548 1-17
+test/contract/scenarios/init-select-second-runtime.yaml
+  c3f1828311c7d548 1-35
+test/contract/scenarios/init-skip-debug-application.yaml
+  c3f1828311c7d548 1-31
+test/contract/scenarios/init-template-extracts-nested-files-and-modes.yaml
+  c3f1828311c7d548 1-47
+test/contract/scenarios/init-template-with-unparsable-manifest.yaml
+  c3f1828311c7d548 1-39
+test/contract/scenarios/instance-remove-confirm-no.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/instance-remove-confirm-yes.yaml
+  c3f1828311c7d548 1-10
+test/contract/scenarios/secret-create-typed-value-multiline.yaml
+  c3f1828311c7d548 1-13
+test/contract/scenarios/secret-create-typed-value.yaml
+  c3f1828311c7d548 1-11
+test/contract/scenarios/secret-update-typed-value.yaml
+  c3f1828311c7d548 1-11
+test/contract/scenarios/security-build-frame-exact-failure-line-ends-the-watch.yaml
+  c3f1828311c7d548 1-28
+test/contract/scenarios/security-build-frame-watch-failure-line-ends-the-watch.yaml
+  c3f1828311c7d548 1-28
+test/contract/scenarios/security-build-frame-with-status-word-does-not-end-the-watch.yaml
+  c3f1828311c7d548 1-29
+test/contract/scenarios/security-debug-host-header-other-than-local-is-refused.yaml
+  c3f1828311c7d548 1-22
+test/contract/scenarios/security-debug-listens-on-ipv6-loopback.yaml
+  c3f1828311c7d548 1-23
+test/contract/scenarios/security-debug-origin-header-is-refused.yaml
+  c3f1828311c7d548 1-22
+test/contract/scenarios/security-debug-sec-fetch-mode-alone-is-allowed.yaml
+  c3f1828311c7d548 1-22
+test/contract/scenarios/security-debug-sec-fetch-site-is-refused.yaml
+  c3f1828311c7d548 1-22
+test/contract/scenarios/security-debug-verbose-hides-authorization.yaml
+  c3f1828311c7d548 1-19
+test/contract/scenarios/security-error-body-contains-api-secret.yaml
+  c3f1828311c7d548 1-8
+test/contract/scenarios/security-error-body-html.yaml
+  c3f1828311c7d548 1-8
+test/contract/scenarios/security-error-body-long-plain-text.yaml
+  c3f1828311c7d548 1-8
+test/contract/scenarios/security-error-trace-id-with-spaces.yaml
+  c3f1828311c7d548 1-8
+test/contract/scenarios/security-escape-app-list.yaml
+  c3f1828311c7d548 1-13
+test/contract/scenarios/security-escape-build-frames.yaml
+  c3f1828311c7d548 1-29
+test/contract/scenarios/security-escape-debug-access-log.yaml
+  c3f1828311c7d548 1-20
+test/contract/scenarios/security-escape-error-message.yaml
+  c3f1828311c7d548 1-11
+test/contract/scenarios/security-escape-instance-list.yaml
+  c3f1828311c7d548 1-12
+test/contract/scenarios/security-escape-log-rows.yaml
+  c3f1828311c7d548 1-15
+test/contract/scenarios/security-escape-region-picker.yaml
+  c3f1828311c7d548 1-19
+test/contract/scenarios/security-escape-secret-list.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-github-requests-carry-no-credentials.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-id-empty.yaml
+  c3f1828311c7d548 1-5
+test/contract/scenarios/security-id-over-256-bytes.yaml
+  c3f1828311c7d548 1-5
+test/contract/scenarios/security-id-with-control-character.yaml
+  c3f1828311c7d548 1-5
+test/contract/scenarios/security-id-with-percent.yaml
+  c3f1828311c7d548 1-5
+test/contract/scenarios/security-init-template-absolute-path.yaml
+  c3f1828311c7d548 1-40
+test/contract/scenarios/security-init-template-dot-dot-in-the-middle.yaml
+  c3f1828311c7d548 1-40
+test/contract/scenarios/security-init-template-git-directory-entry.yaml
+  c3f1828311c7d548 1-42
+test/contract/scenarios/security-init-template-link-entries-skipped.yaml
+  c3f1828311c7d548 1-43
+test/contract/scenarios/security-init-template-mode-bits.yaml
+  c3f1828311c7d548 1-45
+test/contract/scenarios/security-init-template-parent-traversal.yaml
+  c3f1828311c7d548 1-40
+test/contract/scenarios/security-init-template-planted-vcr-yml-link.yaml
+  c3f1828311c7d548 1-40
+test/contract/scenarios/security-init-template-symlink-then-file.yaml
+  c3f1828311c7d548 1-40
+test/contract/scenarios/security-init-template-too-many-entries.yaml
+  c3f1828311c7d548 1-40
+test/contract/scenarios/security-instance-names-with-slash.yaml
+  c3f1828311c7d548 1-5
+test/contract/scenarios/security-redirect-delete-301.yaml
+  c3f1828311c7d548 1-8
+test/contract/scenarios/security-redirect-delete-302.yaml
+  c3f1828311c7d548 1-8
+test/contract/scenarios/security-redirect-delete-303.yaml
+  c3f1828311c7d548 1-8
+test/contract/scenarios/security-redirect-delete-307.yaml
+  c3f1828311c7d548 1-8
+test/contract/scenarios/security-redirect-delete-308.yaml
+  c3f1828311c7d548 1-8
+test/contract/scenarios/security-redirect-get-to-other-host-carries-no-credentials.yaml
+  c3f1828311c7d548 1-8
+test/contract/scenarios/security-redirect-get-to-same-host-other-port.yaml
+  c3f1828311c7d548 1-8
+test/contract/scenarios/security-redirect-patch-301.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-redirect-patch-302.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-redirect-patch-303.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-redirect-patch-307.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-redirect-patch-308.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-redirect-post-301.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-redirect-post-302.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-redirect-post-303.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-redirect-post-307.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-redirect-post-308.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-redirect-upload-307.yaml
+  c3f1828311c7d548 1-27
+test/contract/scenarios/security-region-record-with-insecure-url.yaml
+  c3f1828311c7d548 1-8
+test/contract/scenarios/security-region-record-with-loopback-http-url.yaml
+  c3f1828311c7d548 1-8
+test/contract/scenarios/security-server-service-name-malformed.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-upgrade-missing-checksum-entry.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-upgrade-missing-signature.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-upgrade-signed-by-unknown-key.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-upgrade-tag-mismatch.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-upgrade-tampered-archive.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-upgrade-tampered-checksums.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-upgrade-tampered-signature.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-upgrade-wrong-namespace.yaml
+  c3f1828311c7d548 1-9
+test/contract/scenarios/security-upload-env-negation-brings-back-env.yaml
+  c3f1828311c7d548 1-35
+test/contract/scenarios/security-upload-git-file-is-kept.yaml
+  c3f1828311c7d548 1-27
+test/contract/scenarios/security-upload-git-negation-brings-back-git.yaml
+  c3f1828311c7d548 1-35
+test/contract/scenarios/security-upload-skips-git-and-env-files.yaml
+  c3f1828311c7d548 1-34
+test/contract/scenarios/security-upload-symlink-outside-project-is-a-link-only.yaml
+  c3f1828311c7d548 1-28
+test/contract/scenarios/upgrade-prompt-no.yaml
+  c3f1828311c7d548 1-12
+test/contract/scenarios/upgrade-prompt-yes.yaml
+  c3f1828311c7d548 1-13
+test/contract/stub_test.go
+  c3f1828311c7d548 6,23-24,51-54,261-317
+test/contract/testdata/corpora/config/bom.ini
+  c3f1828311c7d548 1-6
+test/contract/testdata/corpora/config/crlf.ini
+  c3f1828311c7d548 1-6
+test/contract/testdata/corpora/config/duplicate-keys.ini
+  c3f1828311c7d548 1-8
+test/contract/testdata/corpora/config/empty-values.ini
+  c3f1828311c7d548 1-6
+test/contract/testdata/corpora/config/missing-credentials-section.ini
+  c3f1828311c7d548 1-4
+test/contract/testdata/corpora/config/mixed-case-section.ini
+  c3f1828311c7d548 1-6
+test/contract/testdata/corpora/config/quoted-values.ini
+  c3f1828311c7d548 1-6
+test/contract/testdata/corpora/config/trailing-slash-endpoint.ini
+  c3f1828311c7d548 1-6
+test/contract/testdata/corpora/init/vcr.yml
+  c3f1828311c7d548 1-9
+test/contract/testdata/corpora/manifests/bad-value-types.yaml
+  c3f1828311c7d548 1-9
+test/contract/testdata/corpora/manifests/bad-yaml-syntax.yaml
+  c3f1828311c7d548 1-4
+test/contract/testdata/corpora/manifests/config-vcr.yaml
+  c3f1828311c7d548 1-6
+test/contract/testdata/corpora/manifests/duplicate-capabilities.yaml
+  c3f1828311c7d548 1-13
+test/contract/testdata/corpora/manifests/each-capability-messages-v1.yaml
+  c3f1828311c7d548 1-9
+test/contract/testdata/corpora/manifests/each-capability-messages.yaml
+  c3f1828311c7d548 1-9
+test/contract/testdata/corpora/manifests/each-capability-messaging-v1.yaml
+  c3f1828311c7d548 1-9
+test/contract/testdata/corpora/manifests/each-capability-messaging.yaml
+  c3f1828311c7d548 1-9
+test/contract/testdata/corpora/manifests/each-capability-network-v1.yaml
+  c3f1828311c7d548 1-9
+test/contract/testdata/corpora/manifests/each-capability-network.yaml
+  c3f1828311c7d548 1-9
+test/contract/testdata/corpora/manifests/each-capability-rtc-v1.yaml
+  c3f1828311c7d548 1-9
+test/contract/testdata/corpora/manifests/each-capability-rtc.yaml
+  c3f1828311c7d548 1-9
+test/contract/testdata/corpora/manifests/each-capability-verify-v2.yaml
+  c3f1828311c7d548 1-9
+test/contract/testdata/corpora/manifests/each-capability-video-v1.yaml
+  c3f1828311c7d548 1-9
+test/contract/testdata/corpora/manifests/each-capability-video.yaml
+  c3f1828311c7d548 1-9
+test/contract/testdata/corpora/manifests/each-capability-voice-v1.yaml
+  c3f1828311c7d548 1-9
+test/contract/testdata/corpora/manifests/each-capability-voice.yaml
+  c3f1828311c7d548 1-9
+test/contract/testdata/corpora/manifests/empty-lists.yaml
+  c3f1828311c7d548 1-11
+test/contract/testdata/corpora/manifests/environment-value-types.yaml
+  c3f1828311c7d548 1-35
+test/contract/testdata/corpora/manifests/minimal.yaml
+  c3f1828311c7d548 1-7
+test/contract/testdata/corpora/manifests/unknown-capability.yaml
+  c3f1828311c7d548 1-10
+test/contract/testdata/corpora/manifests/unknown-keys.yaml
+  c3f1828311c7d548 1-24
+test/contract/testdata/corpora/manifests/utf8-bom.yaml
+  c3f1828311c7d548 1-7
+test/contract/testdata/corpora/manifests/vcr-with-authenticated-security.yaml
+  c3f1828311c7d548 1-26
+test/contract/testdata/corpora/manifests/vcr-with-health-check.yaml
+  c3f1828311c7d548 1-18
+test/contract/testdata/corpora/manifests/vcr-with-security.yaml
+  c3f1828311c7d548 1-26
+test/contract/testdata/corpora/manifests/vcr.yaml
+  c3f1828311c7d548 1-17
+test/contract/testdata/corpora/manifests/yaml-anchors.yaml
+  c3f1828311c7d548 1-18
+test/contract/testdata/corpora/vcrignore/1.vcrignore
+  c3f1828311c7d548 1-6
+test/contract/testdata/corpora/vcrignore/2.vcrignore
+  c3f1828311c7d548 1-3
+test/contract/testdata/corpora/vcrignore/3.vcrignore
+  c3f1828311c7d548 1-3
+test/contract/testdata/corpora/vcrignore/4.vcrignore
+  c3f1828311c7d548 1-2
+test/contract/testdata/corpora/vcrignore/5.vcrignore
+  c3f1828311c7d548 1-3
+test/contract/testdata/corpora/vcrignore/6.vcrignore
+  c3f1828311c7d548 1-2
+test/contract/testdata/corpora/vcrignore/7.vcrignore
+  c3f1828311c7d548 1-4
+test/contract/testdata/corpora/vcrignore/8.vcrignore
+  c3f1828311c7d548 1-3
+test/contract/testdata/transcripts/app-create-confirm-no.txt
+  c3f1828311c7d548 1-24
+test/contract/testdata/transcripts/app-create-confirm-retries-on-other-input.txt
+  c3f1828311c7d548 1-34
+test/contract/testdata/transcripts/app-create-confirm-yes.txt
+  c3f1828311c7d548 1-33
+test/contract/testdata/transcripts/app-create-yes-flag-skips-prompt.txt
+  c3f1828311c7d548 1-32
+test/contract/testdata/transcripts/app-remove-confirm-no.txt
+  c3f1828311c7d548 1-24
+test/contract/testdata/transcripts/app-remove-confirm-yes.txt
+  c3f1828311c7d548 1-29
+test/contract/testdata/transcripts/config-corpus-bom.txt
+  c3f1828311c7d548 1-33
+test/contract/testdata/transcripts/config-corpus-crlf.txt
+  c3f1828311c7d548 1-33
+test/contract/testdata/transcripts/config-corpus-duplicate-keys.txt
+  c3f1828311c7d548 1-33
+test/contract/testdata/transcripts/config-corpus-empty-values.txt
+  c3f1828311c7d548 1-27
+test/contract/testdata/transcripts/config-corpus-missing-credentials-section.txt
+  c3f1828311c7d548 1-27
+test/contract/testdata/transcripts/config-corpus-mixed-case-section.txt
+  c3f1828311c7d548 1-27
+test/contract/testdata/transcripts/config-corpus-quoted-values.txt
+  c3f1828311c7d548 1-33
+test/contract/testdata/transcripts/config-corpus-trailing-slash-endpoint.txt
+  c3f1828311c7d548 1-33
+test/contract/testdata/transcripts/configure-api-key-flag-is-the-default.txt
+  c3f1828311c7d548 1-28
+test/contract/testdata/transcripts/configure-config-file-flag.txt
+  c3f1828311c7d548 1-28
+test/contract/testdata/transcripts/configure-existing-change-region.txt
+  c3f1828311c7d548 1-28
+test/contract/testdata/transcripts/configure-existing-keep-defaults.txt
+  c3f1828311c7d548 1-21
+test/contract/testdata/transcripts/configure-fresh.txt
+  c3f1828311c7d548 1-29
+test/contract/testdata/transcripts/configure-hides-test-regions.txt
+  c3f1828311c7d548 1-29
+test/contract/testdata/transcripts/configure-interrupt-at-prompt.txt
+  c3f1828311c7d548 1-13
+test/contract/testdata/transcripts/configure-region-list-server-error.txt
+  c3f1828311c7d548 1-28
+test/contract/testdata/transcripts/configure-writes-through-symlink.txt
+  c3f1828311c7d548 1-28
+test/contract/testdata/transcripts/debug-corpus-config-vcr.txt
+  c3f1828311c7d548 1-30
+test/contract/testdata/transcripts/debug-corpus-empty-lists.txt
+  c3f1828311c7d548 1-31
+test/contract/testdata/transcripts/debug-corpus-environment-value-types.txt
+  c3f1828311c7d548 1-107
+test/contract/testdata/transcripts/debug-corpus-unknown-keys.txt
+  c3f1828311c7d548 1-108
+test/contract/testdata/transcripts/debug-corpus-vcr-with-authenticated-security.txt
+  c3f1828311c7d548 1-30
+test/contract/testdata/transcripts/debug-corpus-vcr-with-health-check.txt
+  c3f1828311c7d548 1-30
+test/contract/testdata/transcripts/debug-corpus-vcr-with-security.txt
+  c3f1828311c7d548 1-30
+test/contract/testdata/transcripts/debug-corpus-vcr.txt
+  c3f1828311c7d548 1-30
+test/contract/testdata/transcripts/debug-corpus-yaml-anchors.txt
+  c3f1828311c7d548 1-107
+test/contract/testdata/transcripts/deploy-corpus-bad-value-types.txt
+  c3f1828311c7d548 1-24
+test/contract/testdata/transcripts/deploy-corpus-bad-yaml-syntax.txt
+  c3f1828311c7d548 1-23
+test/contract/testdata/transcripts/deploy-corpus-config-vcr.txt
+  c3f1828311c7d548 1-45
+test/contract/testdata/transcripts/deploy-corpus-duplicate-capabilities.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-each-capability-messages-v1.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-each-capability-messages.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-each-capability-messaging-v1.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-each-capability-messaging.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-each-capability-network-v1.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-each-capability-network.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-each-capability-rtc-v1.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-each-capability-rtc.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-each-capability-verify-v2.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-each-capability-video-v1.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-each-capability-video.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-each-capability-voice-v1.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-each-capability-voice.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-empty-lists.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-environment-value-types.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-minimal.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-tree.txt
+  c3f1828311c7d548 1-107
+test/contract/testdata/transcripts/deploy-corpus-unknown-capability.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-unknown-keys.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-utf8-bom.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-vcr-with-authenticated-security.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-vcr-with-health-check.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-vcr-with-security.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-vcr.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/deploy-corpus-vcrignore-1.txt
+  c3f1828311c7d548 1-118
+test/contract/testdata/transcripts/deploy-corpus-vcrignore-2.txt
+  c3f1828311c7d548 1-120
+test/contract/testdata/transcripts/deploy-corpus-vcrignore-3.txt
+  c3f1828311c7d548 1-118
+test/contract/testdata/transcripts/deploy-corpus-vcrignore-4.txt
+  c3f1828311c7d548 1-120
+test/contract/testdata/transcripts/deploy-corpus-vcrignore-5.txt
+  c3f1828311c7d548 1-117
+test/contract/testdata/transcripts/deploy-corpus-vcrignore-6.txt
+  c3f1828311c7d548 1-119
+test/contract/testdata/transcripts/deploy-corpus-vcrignore-7.txt
+  c3f1828311c7d548 1-119
+test/contract/testdata/transcripts/deploy-corpus-vcrignore-8.txt
+  c3f1828311c7d548 1-120
+test/contract/testdata/transcripts/deploy-corpus-yaml-anchors.txt
+  c3f1828311c7d548 1-94
+test/contract/testdata/transcripts/init-alias-i.txt
+  c3f1828311c7d548 1-86
+test/contract/testdata/transcripts/init-create-new-application-for-deployment.txt
+  c3f1828311c7d548 1-83
+test/contract/testdata/transcripts/init-existing-vcr-yml-is-overwritten.txt
+  c3f1828311c7d548 1-83
+test/contract/testdata/transcripts/init-full-flow.txt
+  c3f1828311c7d548 1-86
+test/contract/testdata/transcripts/init-interrupt-at-prompt.txt
+  c3f1828311c7d548 1-24
+test/contract/testdata/transcripts/init-invalid-project-name-then-valid.txt
+  c3f1828311c7d548 1-77
+test/contract/testdata/transcripts/init-no-template-for-runtime.txt
+  c3f1828311c7d548 1-75
+test/contract/testdata/transcripts/init-path-argument.txt
+  c3f1828311c7d548 1-76
+test/contract/testdata/transcripts/init-region-list-server-error.txt
+  c3f1828311c7d548 1-48
+test/contract/testdata/transcripts/init-runtime-list-empty.txt
+  c3f1828311c7d548 1-32
+test/contract/testdata/transcripts/init-select-second-runtime.txt
+  c3f1828311c7d548 1-86
+test/contract/testdata/transcripts/init-skip-debug-application.txt
+  c3f1828311c7d548 1-75
+test/contract/testdata/transcripts/init-template-extracts-nested-files-and-modes.txt
+  c3f1828311c7d548 1-101
+test/contract/testdata/transcripts/init-template-with-unparsable-manifest.txt
+  c3f1828311c7d548 1-90
+test/contract/testdata/transcripts/instance-remove-confirm-no.txt
+  c3f1828311c7d548 1-31
+test/contract/testdata/transcripts/instance-remove-confirm-yes.txt
+  c3f1828311c7d548 1-36
+test/contract/testdata/transcripts/secret-create-typed-value-multiline.txt
+  c3f1828311c7d548 1-33
+test/contract/testdata/transcripts/secret-create-typed-value.txt
+  c3f1828311c7d548 1-32
+test/contract/testdata/transcripts/secret-update-typed-value.txt
+  c3f1828311c7d548 1-32
+test/contract/testdata/transcripts/security-build-frame-exact-failure-line-ends-the-watch.txt
+  c3f1828311c7d548 1-74
+test/contract/testdata/transcripts/security-build-frame-watch-failure-line-ends-the-watch.txt
+  c3f1828311c7d548 1-74
+test/contract/testdata/transcripts/security-build-frame-with-status-word-does-not-end-the-watch.txt
+  c3f1828311c7d548 1-86
+test/contract/testdata/transcripts/security-debug-host-header-other-than-local-is-refused.txt
+  c3f1828311c7d548 1-111
+test/contract/testdata/transcripts/security-debug-listens-on-ipv6-loopback.txt
+  c3f1828311c7d548 1-111
+test/contract/testdata/transcripts/security-debug-origin-header-is-refused.txt
+  c3f1828311c7d548 1-111
+test/contract/testdata/transcripts/security-debug-sec-fetch-mode-alone-is-allowed.txt
+  c3f1828311c7d548 1-111
+test/contract/testdata/transcripts/security-debug-sec-fetch-site-is-refused.txt
+  c3f1828311c7d548 1-111
+test/contract/testdata/transcripts/security-debug-verbose-hides-authorization.txt
+  c3f1828311c7d548 1-132
+test/contract/testdata/transcripts/security-error-body-contains-api-secret.txt
+  c3f1828311c7d548 1-37
+test/contract/testdata/transcripts/security-error-body-html.txt
+  c3f1828311c7d548 1-37
+test/contract/testdata/transcripts/security-error-body-long-plain-text.txt
+  c3f1828311c7d548 1-37
+test/contract/testdata/transcripts/security-error-trace-id-with-spaces.txt
+  c3f1828311c7d548 1-37
+test/contract/testdata/transcripts/security-escape-app-list.txt
+  c3f1828311c7d548 1-35
+test/contract/testdata/transcripts/security-escape-build-frames.txt
+  c3f1828311c7d548 1-90
+test/contract/testdata/transcripts/security-escape-debug-access-log.txt
+  c3f1828311c7d548 1-109
+test/contract/testdata/transcripts/security-escape-error-message.txt
+  c3f1828311c7d548 1-42
+test/contract/testdata/transcripts/security-escape-instance-list.txt
+  c3f1828311c7d548 1-35
+test/contract/testdata/transcripts/security-escape-log-rows.txt
+  c3f1828311c7d548 1-40
+test/contract/testdata/transcripts/security-escape-region-picker.txt
+  c3f1828311c7d548 1-29
+test/contract/testdata/transcripts/security-escape-secret-list.txt
+  c3f1828311c7d548 1-32
+test/contract/testdata/transcripts/security-github-requests-carry-no-credentials.txt
+  c3f1828311c7d548 1-37
+test/contract/testdata/transcripts/security-id-empty.txt
+  c3f1828311c7d548 1-28
+test/contract/testdata/transcripts/security-id-over-256-bytes.txt
+  c3f1828311c7d548 1-28
+test/contract/testdata/transcripts/security-id-with-control-character.txt
+  c3f1828311c7d548 1-23
+test/contract/testdata/transcripts/security-id-with-percent.txt
+  c3f1828311c7d548 1-28
+test/contract/testdata/transcripts/security-init-template-absolute-path.txt
+  c3f1828311c7d548 1-86
+test/contract/testdata/transcripts/security-init-template-dot-dot-in-the-middle.txt
+  c3f1828311c7d548 1-85
+test/contract/testdata/transcripts/security-init-template-git-directory-entry.txt
+  c3f1828311c7d548 1-95
+test/contract/testdata/transcripts/security-init-template-link-entries-skipped.txt
+  c3f1828311c7d548 1-85
+test/contract/testdata/transcripts/security-init-template-mode-bits.txt
+  c3f1828311c7d548 1-93
+test/contract/testdata/transcripts/security-init-template-parent-traversal.txt
+  c3f1828311c7d548 1-85
+test/contract/testdata/transcripts/security-init-template-planted-vcr-yml-link.txt
+  c3f1828311c7d548 1-83
+test/contract/testdata/transcripts/security-init-template-symlink-then-file.txt
+  c3f1828311c7d548 1-85
+test/contract/testdata/transcripts/security-init-template-too-many-entries.txt
+  c3f1828311c7d548 1-84
+test/contract/testdata/transcripts/security-instance-names-with-slash.txt
+  c3f1828311c7d548 1-30
+test/contract/testdata/transcripts/security-redirect-delete-301.txt
+  c3f1828311c7d548 1-33
+test/contract/testdata/transcripts/security-redirect-delete-302.txt
+  c3f1828311c7d548 1-33
+test/contract/testdata/transcripts/security-redirect-delete-303.txt
+  c3f1828311c7d548 1-33
+test/contract/testdata/transcripts/security-redirect-delete-307.txt
+  c3f1828311c7d548 1-33
+test/contract/testdata/transcripts/security-redirect-delete-308.txt
+  c3f1828311c7d548 1-33
+test/contract/testdata/transcripts/security-redirect-get-to-other-host-carries-no-credentials.txt
+  c3f1828311c7d548 1-35
+test/contract/testdata/transcripts/security-redirect-get-to-same-host-other-port.txt
+  c3f1828311c7d548 1-35
+test/contract/testdata/transcripts/security-redirect-patch-301.txt
+  c3f1828311c7d548 1-35
+test/contract/testdata/transcripts/security-redirect-patch-302.txt
+  c3f1828311c7d548 1-35
+test/contract/testdata/transcripts/security-redirect-patch-303.txt
+  c3f1828311c7d548 1-35
+test/contract/testdata/transcripts/security-redirect-patch-307.txt
+  c3f1828311c7d548 1-37
+test/contract/testdata/transcripts/security-redirect-patch-308.txt
+  c3f1828311c7d548 1-37
+test/contract/testdata/transcripts/security-redirect-post-301.txt
+  c3f1828311c7d548 1-35
+test/contract/testdata/transcripts/security-redirect-post-302.txt
+  c3f1828311c7d548 1-35
+test/contract/testdata/transcripts/security-redirect-post-303.txt
+  c3f1828311c7d548 1-35
+test/contract/testdata/transcripts/security-redirect-post-307.txt
+  c3f1828311c7d548 1-37
+test/contract/testdata/transcripts/security-redirect-post-308.txt
+  c3f1828311c7d548 1-37
+test/contract/testdata/transcripts/security-redirect-upload-307.txt
+  c3f1828311c7d548 1-99
+test/contract/testdata/transcripts/security-region-record-with-insecure-url.txt
+  c3f1828311c7d548 1-23
+test/contract/testdata/transcripts/security-region-record-with-loopback-http-url.txt
+  c3f1828311c7d548 1-33
+test/contract/testdata/transcripts/security-server-service-name-malformed.txt
+  c3f1828311c7d548 1-35
+test/contract/testdata/transcripts/security-upgrade-missing-checksum-entry.txt
+  c3f1828311c7d548 1-26
+test/contract/testdata/transcripts/security-upgrade-missing-signature.txt
+  c3f1828311c7d548 1-26
+test/contract/testdata/transcripts/security-upgrade-signed-by-unknown-key.txt
+  c3f1828311c7d548 1-26
+test/contract/testdata/transcripts/security-upgrade-tag-mismatch.txt
+  c3f1828311c7d548 1-26
+test/contract/testdata/transcripts/security-upgrade-tampered-archive.txt
+  c3f1828311c7d548 1-23
+test/contract/testdata/transcripts/security-upgrade-tampered-checksums.txt
+  c3f1828311c7d548 1-26
+test/contract/testdata/transcripts/security-upgrade-tampered-signature.txt
+  c3f1828311c7d548 1-26
+test/contract/testdata/transcripts/security-upgrade-wrong-namespace.txt
+  c3f1828311c7d548 1-26
+test/contract/testdata/transcripts/security-upload-env-negation-brings-back-env.txt
+  c3f1828311c7d548 1-97
+test/contract/testdata/transcripts/security-upload-git-file-is-kept.txt
+  c3f1828311c7d548 1-90
+test/contract/testdata/transcripts/security-upload-git-negation-brings-back-git.txt
+  c3f1828311c7d548 1-97
+test/contract/testdata/transcripts/security-upload-skips-git-and-env-files.txt
+  c3f1828311c7d548 1-97
+test/contract/testdata/transcripts/security-upload-symlink-outside-project-is-a-link-only.txt
+  c3f1828311c7d548 1-90
+test/contract/testdata/transcripts/upgrade-prompt-no.txt
+  c3f1828311c7d548 1-18
+test/contract/testdata/transcripts/upgrade-prompt-yes.txt
+  c3f1828311c7d548 1-27
+test/contract/vt.go
+  c3f1828311c7d548 1-354
+test/contract/vt_test.go
+  c3f1828311c7d548 1-165
+test/fakeplatform/graphql_test.go
+  c3f1828311c7d548 180-184,195
+test/fakeplatform/router.go
+  c3f1828311c7d548 66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "1ff35099e8cce60190b8e3ba89e007b86bc54e61",
+  "prompts": {
+    "c3f1828311c7d548": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "b3075f58-e1c8-435f-8560-b1bf3e0aa681",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:52.249Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:52.249Z"
+        }
+      ],
+      "total_additions": 14389,
+      "total_deletions": 31,
+      "accepted_lines": 14389,
+      "overriden_lines": 0
+    }
+  }
+}
