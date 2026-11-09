@@ -1,0 +1,14 @@
+internal/cli/endpoint_migration_test.go
+  h_df1d95ff1e9b8c 264-281
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a6d2b226cda69b9e7e303a15ede67993caca30bb",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
