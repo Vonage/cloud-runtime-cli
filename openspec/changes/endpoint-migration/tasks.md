@@ -24,7 +24,7 @@ Run every command from the repository root. `make test` is `go test -race ./...`
   - Verify: `go test ./internal/endpoint/ -count=1`
   - Accept: tests pass; `Bootstrap`'s doc comment shows the new order.
 
-- [ ] 2.2 Pass the file's `endpoint` everywhere `Bootstrap` is called.
+- [x] 2.2 Pass the file's `endpoint` everywhere `Bootstrap` is called.
   - Files: `internal/cli/prerun.go` (`initPlatform`), `internal/cli/configure/configure.go` (`newResolver`), `internal/cli/prerun_test.go`.
   - Test first: in `internal/cli/prerun_test.go`, a `full` probe with a config whose `endpoint` is the fake's deployment URL and whose `graphql_endpoint` is an unmappable URL succeeds and asks the fake.
   - Verify: `go test ./internal/cli/... -count=1`
