@@ -1,0 +1,84 @@
+internal/cli/root.go
+  0c5e20d8e583376d 12,36
+internal/cli/secret/create.go
+  0c5e20d8e583376d 1-96
+internal/cli/secret/create_test.go
+  0c5e20d8e583376d 1-237
+internal/cli/secret/helpers_test.go
+  0c5e20d8e583376d 1-56
+internal/cli/secret/list.go
+  0c5e20d8e583376d 1-70
+internal/cli/secret/list_test.go
+  0c5e20d8e583376d 1-112
+internal/cli/secret/name.go
+  0c5e20d8e583376d 1-19
+internal/cli/secret/name_test.go
+  0c5e20d8e583376d 1-40
+internal/cli/secret/remove.go
+  0c5e20d8e583376d 1-71
+internal/cli/secret/remove_test.go
+  0c5e20d8e583376d 1-162
+internal/cli/secret/secret.go
+  0c5e20d8e583376d 1-75
+internal/cli/secret/secret_test.go
+  0c5e20d8e583376d 1-100
+internal/cli/secret/update.go
+  0c5e20d8e583376d 1-91
+internal/cli/secret/update_test.go
+  0c5e20d8e583376d 1-194
+internal/cli/secret/value.go
+  0c5e20d8e583376d 1-123
+internal/cli/secret/value_test.go
+  0c5e20d8e583376d 1-348
+test/contract/allowed-diffs.txt
+  0c5e20d8e583376d 75-108
+test/contract/coverage_test.go
+  0c5e20d8e583376d 247-264,272-273
+test/contract/doc.go
+  0c5e20d8e583376d 44-50
+test/contract/driver.go
+  0c5e20d8e583376d 73-74,133-146
+test/contract/scenarios/secret-create-typed-value-multiline.yaml
+  0c5e20d8e583376d 5-6
+test/contract/scenarios/secret-create-typed-value.yaml
+  0c5e20d8e583376d 5
+test/contract/scenarios/secret-update-typed-value.yaml
+  0c5e20d8e583376d 5
+test/contract/steps.go
+  0c5e20d8e583376d 8,19,70,113-116,160-163
+test/contract/steps_test.go
+  0c5e20d8e583376d 1-95
+test/contract/stub_test.go
+  0c5e20d8e583376d 52,271-278
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "f4efc631aa5fc00fcc0b3c94867faa805480008a",
+  "prompts": {
+    "0c5e20d8e583376d": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "b8783e12-3b04-40db-8a26-d8d730713d59",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:42.414Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:42.414Z"
+        }
+      ],
+      "total_additions": 1992,
+      "total_deletions": 21,
+      "accepted_lines": 1992,
+      "overriden_lines": 0
+    }
+  }
+}
