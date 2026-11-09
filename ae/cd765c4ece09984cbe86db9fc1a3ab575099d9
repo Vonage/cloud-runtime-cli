@@ -1,0 +1,40 @@
+internal/clierr/clierr.go
+  9ab8b3a6e6684961 6-7,14-15,18,32-51
+internal/clierr/clierr_test.go
+  9ab8b3a6e6684961 1-83
+internal/clierr/render.go
+  9ab8b3a6e6684961 1-80
+internal/clierr/render_test.go
+  9ab8b3a6e6684961 1-240
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "aecd765c4ece09984cbe86db9fc1a3ab575099d9",
+  "prompts": {
+    "9ab8b3a6e6684961": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "c9fd1d87-2f70-4ff5-a056-748c752ddabe",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:50.142Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:50.142Z"
+        }
+      ],
+      "total_additions": 428,
+      "total_deletions": 17,
+      "accepted_lines": 428,
+      "overriden_lines": 0
+    }
+  }
+}
