@@ -1,0 +1,104 @@
+test/contract/allowed.go
+  977df29a8b7eb95e 1-92
+test/contract/allowed_test.go
+  977df29a8b7eb95e 1-92
+test/contract/build.go
+  977df29a8b7eb95e 1-345
+test/contract/compare.go
+  977df29a8b7eb95e 1-118
+test/contract/contract_test.go
+  977df29a8b7eb95e 1-115
+test/contract/driver.go
+  977df29a8b7eb95e 1-213
+test/contract/env.go
+  977df29a8b7eb95e 1-43
+test/contract/exec.go
+  977df29a8b7eb95e 1-264
+test/contract/exec_test.go
+  977df29a8b7eb95e 1-253
+test/contract/normalise.go
+  977df29a8b7eb95e 1-281
+test/contract/normalise_test.go
+  977df29a8b7eb95e 1-195
+test/contract/placeholders.go
+  977df29a8b7eb95e 1-107
+test/contract/placeholders_test.go
+  977df29a8b7eb95e 1-76
+test/contract/reads.go
+  977df29a8b7eb95e 1-241
+test/contract/record.go
+  977df29a8b7eb95e 1-123
+test/contract/replay.go
+  977df29a8b7eb95e 1-183
+test/contract/requests.go
+  977df29a8b7eb95e 1-259
+test/contract/requests_test.go
+  977df29a8b7eb95e 1-395
+test/contract/run.go
+  977df29a8b7eb95e 1-231
+test/contract/runner_test.go
+  977df29a8b7eb95e 1-369
+test/contract/sandbox.go
+  977df29a8b7eb95e 1-153
+test/contract/sandbox_test.go
+  977df29a8b7eb95e 1-251
+test/contract/scenario.go
+  977df29a8b7eb95e 1-336
+test/contract/scenario_test.go
+  977df29a8b7eb95e 1-211
+test/contract/scraped.go
+  977df29a8b7eb95e 1-135
+test/contract/scraped.yaml
+  977df29a8b7eb95e 1-44
+test/contract/scraped_test.go
+  977df29a8b7eb95e 1-125
+test/contract/snapshot.go
+  977df29a8b7eb95e 1-204
+test/contract/steps.go
+  977df29a8b7eb95e 1-183
+test/contract/stub_test.go
+  977df29a8b7eb95e 1-253
+test/contract/testapp/main.go
+  977df29a8b7eb95e 1-128
+test/contract/testapp_test.go
+  977df29a8b7eb95e 1-111
+test/contract/testdata/example/deploy-example.yaml
+  977df29a8b7eb95e 1-37
+test/contract/transcript.go
+  977df29a8b7eb95e 1-235
+test/contract/transcript_test.go
+  977df29a8b7eb95e 1-110
+test/contract/upload.go
+  977df29a8b7eb95e 1-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "c637c78264a45fdc9a519dfb29e3c3af4548cde5",
+  "prompts": {
+    "977df29a8b7eb95e": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "5deb0a7a-6794-4c9b-9fab-a1f856760c9a",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:54.337Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:54.337Z"
+        }
+      ],
+      "total_additions": 6611,
+      "total_deletions": 0,
+      "accepted_lines": 6611,
+      "overriden_lines": 0
+    }
+  }
+}
