@@ -49,7 +49,7 @@ func (st *runState) migrateConfigFile(ctx context.Context, url string) error {
 		return ctx.Err()
 	}
 	if err != nil || !yes {
-		return nil
+		return nil //nolint:nilerr // an unreadable answer is a no: the command still runs
 	}
 	if err := config.AddEndpoint(path, url); err != nil {
 		fmt.Fprintf(env.IO.ErrOut, "%s Could not update %s: %v\n", warn, path, err)
