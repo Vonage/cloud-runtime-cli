@@ -90,7 +90,7 @@ func (st *runState) loadConfig() error {
 // initPlatform picks the deployment API to ask, builds the resolver and, for a full command, resolves the region.
 func (st *runState) initPlatform(ctx context.Context, mode string) error {
 	env := st.env
-	bootstrap, err := endpoint.Bootstrap(bootstrapInputs(env.Flags, env.Settings.File))
+	bootstrap, err := endpoint.Bootstrap(endpoint.InputsOf(env.Flags, env.Settings.File))
 	if err != nil {
 		return err
 	}

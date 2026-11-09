@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+
+	"github.com/Vonage/cloud-runtime-cli/internal/config"
 )
 
 // ProductionDefault is the bootstrap used when nothing else is configured.
@@ -35,6 +37,18 @@ type Inputs struct {
 	Region         string // --region: when set (and neither flag above is), selects ProductionDefault
 	ConfigEndpoint string // endpoint from the config file: used as-is
 	GraphQLConfig  string // graphql_endpoint from the config file
+}
+
+// InputsOf are the inputs the flags and the config file give. The region input is the --region flag only: a
+// default_region in the file must not select the production default over the file's own endpoint.
+func InputsOf(fl *config.Flags, file config.File) Inputs {
+	return Inputs{
+		Endpoint:       fl.Endpoint,
+		GraphQLFlag:    fl.GraphQLEndpoint,
+		Region:         fl.Region,
+		ConfigEndpoint: file.Endpoint,
+		GraphQLConfig:  file.GraphQLEndpoint,
+	}
 }
 
 // Source says which input decided the URL.

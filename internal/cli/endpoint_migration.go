@@ -15,7 +15,7 @@ import (
 // initPlatform to report.
 func (st *runState) migrateEndpoint(ctx context.Context) error {
 	env := st.env
-	choice, err := endpoint.Resolve(bootstrapInputs(env.Flags, env.Settings.File))
+	choice, err := endpoint.Resolve(endpoint.InputsOf(env.Flags, env.Settings.File))
 	if err != nil {
 		return nil //nolint:nilerr // initPlatform reports it
 	}
@@ -76,17 +76,5 @@ func askOrInterrupt(ctx context.Context, p term.Prompter, question string) (bool
 		return a.yes, a.err
 	case <-ctx.Done():
 		return false, ctx.Err()
-	}
-}
-
-// bootstrapInputs are the flags and file values that choose the deployment API. The region input is the --region
-// flag only: a default_region in the file must not select the production default over the file's own endpoint.
-func bootstrapInputs(fl *config.Flags, file config.File) endpoint.Inputs {
-	return endpoint.Inputs{
-		Endpoint:       fl.Endpoint,
-		GraphQLFlag:    fl.GraphQLEndpoint,
-		Region:         fl.Region,
-		ConfigEndpoint: file.Endpoint,
-		GraphQLConfig:  file.GraphQLEndpoint,
 	}
 }

@@ -200,13 +200,7 @@ func newResolver(env *cmdenv.Env, stored config.File, creds platform.Credentials
 
 // endpointOf is the deployment API that lists the regions, and the endpoint the new file names.
 func endpointOf(flags *config.Flags, stored config.File) (string, error) {
-	return endpoint.Bootstrap(endpoint.Inputs{
-		Endpoint:       flags.Endpoint,
-		GraphQLFlag:    flags.GraphQLEndpoint,
-		Region:         flags.Region,
-		ConfigEndpoint: stored.Endpoint,
-		GraphQLConfig:  stored.GraphQLEndpoint,
-	})
+	return endpoint.Bootstrap(endpoint.InputsOf(flags, stored))
 }
 
 // chooseRegion asks which of the regions is the default and returns its alias. The picker starts on the current
