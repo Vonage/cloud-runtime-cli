@@ -72,7 +72,7 @@ func TestNoNoticeWhenTheCommandFailsBeforeTheCheckStarts(t *testing.T) {
 	h := newHarness(t)
 	h.updates.release = selfupdate.Release{TagName: "v2.7.0"}
 
-	got := h.run("full", "--region", "aws.nowhere", "--deployment-api-url", h.srv.DeploymentAPIURL("euw1"))
+	got := h.run("full", "--region", "aws.nowhere", "--endpoint", h.srv.DeploymentAPIURL("euw1"))
 
 	assert.Equal(t, 1, got.code)
 	assert.Empty(t, got.stdout)

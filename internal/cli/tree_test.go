@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const deploymentAPIURLFlag = "deployment-api-url"
+const endpointFlag = "endpoint"
 
 // flagNode describes a flag the way contract-tree.json does.
 func flagNode(f *pflag.Flag, persistent bool) treeFlag {
@@ -111,7 +111,7 @@ func assertMatchesNode(t *testing.T, want treeNode, got *cobra.Command, strict b
 	}
 }
 
-func TestContractTreeCarriesDeploymentAPIURL(t *testing.T) {
+func TestContractTreeCarriesEndpoint(t *testing.T) {
 	nodes := loadContractTree(t)
 
 	for _, n := range nodes {
@@ -119,19 +119,19 @@ func TestContractTreeCarriesDeploymentAPIURL(t *testing.T) {
 			at := slices.Index(n.InheritedFlags, "config-file")
 			require.GreaterOrEqual(t, at, 0, "%s has no inherited config-file", n.Path)
 			require.Less(t, at+1, len(n.InheritedFlags), "%s lists nothing after config-file", n.Path)
-			assert.Equal(t, deploymentAPIURLFlag, n.InheritedFlags[at+1], "%s", n.Path)
+			assert.Equal(t, endpointFlag, n.InheritedFlags[at+1], "%s", n.Path)
 			continue
 		}
 
-		at := slices.IndexFunc(n.LocalFlags, func(f treeFlag) bool { return f.Name == deploymentAPIURLFlag })
-		require.GreaterOrEqual(t, at, 0, "the root node has no %s flag", deploymentAPIURLFlag)
+		at := slices.IndexFunc(n.LocalFlags, func(f treeFlag) bool { return f.Name == endpointFlag })
+		require.GreaterOrEqual(t, at, 0, "the root node has no %s flag", endpointFlag)
 		assert.Equal(t, "config-file", n.LocalFlags[at-1].Name)
 		assert.Equal(t, "graphql-endpoint", n.LocalFlags[at+1].Name)
 		assert.Equal(t, treeFlag{
-			Name:       deploymentAPIURLFlag,
+			Name:       endpointFlag,
 			Type:       "string",
 			Default:    "",
-			Usage:      "Deployment API base URL (overrides --graphql-endpoint and the config file)",
+			Usage:      "Platform API base URL (overrides --graphql-endpoint and the config file)",
 			Hidden:     true,
 			Persistent: true,
 		}, n.LocalFlags[at])

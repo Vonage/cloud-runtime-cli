@@ -54,7 +54,7 @@ type Options struct {
 	// Flags are the global flags. A zero APIKey and APISecret become the account of the fake platform, a zero
 	// Timeout ten minutes.
 	Flags config.Flags
-	// NoPlatform leaves Env.Resolver and Env.Client nil and sets Flags.DeploymentAPIURL instead, for commands that
+	// NoPlatform leaves Env.Resolver and Env.Client nil and sets Flags.Endpoint instead, for commands that
 	// build their own platform access.
 	NoPlatform bool
 	// NoCredentials leaves the flags and Env.Settings without credentials. It needs NoPlatform, because the fake
@@ -128,8 +128,8 @@ func flagsFor(srv *fakeplatform.Server, o Options) config.Flags {
 	if f.Timeout == 0 {
 		f.Timeout = defaultTimeout
 	}
-	if o.NoPlatform && f.DeploymentAPIURL == "" {
-		f.DeploymentAPIURL = srv.DeploymentAPIURL(bootstrapSlug)
+	if o.NoPlatform && f.Endpoint == "" {
+		f.Endpoint = srv.DeploymentAPIURL(bootstrapSlug)
 	}
 	return f
 }

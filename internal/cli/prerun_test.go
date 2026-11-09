@@ -157,7 +157,7 @@ func TestNoneCommandsNeverReadConfigOrUseNetwork(t *testing.T) {
 			h := newHarness(t)
 			missing := filepath.Join(h.home, "missing")
 
-			flags := []string{"--config-file", missing, "--deployment-api-url", "http://127.0.0.1:1"}
+			flags := []string{"--config-file", missing, "--endpoint", "http://127.0.0.1:1"}
 
 			got := h.run(append(flags, args...)...)
 

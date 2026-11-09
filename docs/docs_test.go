@@ -113,7 +113,7 @@ func TestGeneratedPagesEndInOneNewline(t *testing.T) {
 
 func TestGeneratedPagesOmitHiddenFlags(t *testing.T) {
 	for name, page := range generatedPages(t) {
-		assert.NotContains(t, page, "deployment-api-url", name)
+		assert.NotContains(t, page, "--endpoint", name)
 	}
 }
 

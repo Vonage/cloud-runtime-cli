@@ -92,7 +92,7 @@ func TestNewFillsTheFlagDefaults(t *testing.T) {
 	assert.Equal(t, fakeKey, h.Env.Flags.APIKey)
 	assert.Equal(t, fakeSecret, h.Env.Flags.APISecret)
 	assert.Equal(t, 10*time.Minute, h.Env.Flags.Timeout)
-	assert.Empty(t, h.Env.Flags.DeploymentAPIURL)
+	assert.Empty(t, h.Env.Flags.Endpoint)
 }
 
 func TestNewSetsTheTerminalState(t *testing.T) {
@@ -121,7 +121,7 @@ func TestNoPlatformLeavesResolverNil(t *testing.T) {
 
 	assert.Nil(t, h.Env.Resolver)
 	assert.Nil(t, h.Env.Client)
-	assert.Equal(t, srv.DeploymentAPIURL("euw1"), h.Env.Flags.DeploymentAPIURL)
+	assert.Equal(t, srv.DeploymentAPIURL("euw1"), h.Env.Flags.Endpoint)
 	assert.Empty(t, h.Requests())
 }
 

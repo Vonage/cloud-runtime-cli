@@ -81,8 +81,8 @@ func buildRoot(env *cmdenv.Env, groups []*cobra.Command, st *runState) *cobra.Co
 func bindGlobalFlags(root *cobra.Command, f *config.Flags) {
 	flags := root.PersistentFlags()
 	flags.StringVar(&f.ConfigFile, "config-file", config.DefaultFlagValue, "Path to config file (default is $HOME/.vcr-cli)")
-	flags.StringVar(&f.DeploymentAPIURL, "deployment-api-url", "",
-		"Deployment API base URL (overrides --graphql-endpoint and the config file)")
+	flags.StringVar(&f.Endpoint, "endpoint", "",
+		"Platform API base URL (overrides --graphql-endpoint and the config file)")
 	flags.StringVar(&f.GraphQLEndpoint, "graphql-endpoint", "", "Graphql endpoint used to fetch metadata")
 	flags.StringVar(&f.Region, "region", "", "Vonage platform region")
 	flags.StringVar(&f.APIKey, "api-key", "", "Vonage API key")
@@ -90,7 +90,7 @@ func bindGlobalFlags(root *cobra.Command, f *config.Flags) {
 	flags.DurationVarP(&f.Timeout, "timeout", "t", defaultTimeout,
 		"Overall deadline for the command, including waiting for a build to finish (e.g. 20m)")
 	flags.Bool("help", false, "Show help for command")
-	flags.Lookup("deployment-api-url").Hidden = true
+	flags.Lookup("endpoint").Hidden = true
 
 	root.Flags().BoolP("version", "v", false, "Show VCR CLI version")
 }

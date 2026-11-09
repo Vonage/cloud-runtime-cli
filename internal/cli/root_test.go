@@ -101,8 +101,8 @@ func TestGlobalFlagsMatchContract(t *testing.T) {
 		{"help", "", "bool", "false", "Show help for command", true, false},
 		{"version", "v", "bool", "false", "Show VCR CLI version", false, false},
 		{
-			"deployment-api-url", "", "string", "",
-			"Deployment API base URL (overrides --graphql-endpoint and the config file)", true, true,
+			"endpoint", "", "string", "",
+			"Platform API base URL (overrides --graphql-endpoint and the config file)", true, true,
 		},
 	}
 	for _, tt := range tests {
@@ -136,7 +136,7 @@ func TestGlobalFlagsBindIntoEnvFlags(t *testing.T) {
 		assert.Equal(t, "~/.vcr-cli", env.Flags.ConfigFile)
 		assert.Equal(t, 10*time.Minute, env.Flags.Timeout)
 		assert.Empty(t, env.Flags.APIKey)
-		assert.Empty(t, env.Flags.DeploymentAPIURL)
+		assert.Empty(t, env.Flags.Endpoint)
 	})
 
 	t.Run("values", func(t *testing.T) {
@@ -145,7 +145,7 @@ func TestGlobalFlagsBindIntoEnvFlags(t *testing.T) {
 		root.SetArgs([]string{
 			"completion", "bash",
 			"--api-key", "k", "--api-secret", "s", "--region", "aws.euw1", "--graphql-endpoint", "g",
-			"--config-file", "c", "-t", "5s", "--deployment-api-url", "u",
+			"--config-file", "c", "-t", "5s", "--endpoint", "u",
 		})
 
 		require.NoError(t, root.ExecuteContext(t.Context()))
@@ -155,7 +155,7 @@ func TestGlobalFlagsBindIntoEnvFlags(t *testing.T) {
 		assert.Equal(t, "s", env.Flags.APISecret)
 		assert.Equal(t, "aws.euw1", env.Flags.Region)
 		assert.Equal(t, "g", env.Flags.GraphQLEndpoint)
-		assert.Equal(t, "u", env.Flags.DeploymentAPIURL)
+		assert.Equal(t, "u", env.Flags.Endpoint)
 		assert.Equal(t, 5*time.Second, env.Flags.Timeout)
 		assert.True(t, env.Flags.ConfigFileSet)
 	})

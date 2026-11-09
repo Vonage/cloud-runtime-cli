@@ -30,15 +30,15 @@ var productionLabels = []string{"euw1", "use1", "apse1", "apse2"}
 
 // Inputs are the values that choose the environment, in the order they win.
 type Inputs struct {
-	DeploymentAPIURL string // hidden --deployment-api-url: used as-is
-	GraphQLFlag      string // --graphql-endpoint
-	Region           string // --region: when set (and GraphQLFlag is not), selects ProductionDefault
-	GraphQLConfig    string // graphql_endpoint from the config file
+	Endpoint      string // hidden --endpoint: used as-is
+	GraphQLFlag   string // --graphql-endpoint
+	Region        string // --region: when set (and GraphQLFlag is not), selects ProductionDefault
+	GraphQLConfig string // graphql_endpoint from the config file
 }
 
 // Bootstrap returns the deployment-api base URL without the version segment:
 //
-//	DeploymentAPIURL                                   if set
+//	Endpoint                                           if set
 //	map(GraphQLFlag)                                   else if set
 //	ProductionDefault                                  else if Region is set
 //	map(GraphQLConfig)                                 else if set
@@ -48,11 +48,11 @@ type Inputs struct {
 //	map("https://graphql.<euw1|use1|apse1|apse2>.runtime.vonage.cloud/v1/graphql") = ProductionDefault
 //	map(anything else)                                                   = an error (exit 1, no usage block) naming
 //	                                                                       the value, the two accepted forms and
-//	                                                                       --deployment-api-url
+//	                                                                       --endpoint
 func Bootstrap(in Inputs) (string, error) {
 	switch {
-	case in.DeploymentAPIURL != "":
-		return in.DeploymentAPIURL, nil
+	case in.Endpoint != "":
+		return in.Endpoint, nil
 	case in.GraphQLFlag != "":
 		return mapGraphQL(in.GraphQLFlag, sourceFlag)
 	case in.Region != "":
@@ -123,6 +123,6 @@ func isProductionDirect(u *url.URL, path string) bool {
 
 func unsupported(source, value string) error {
 	return fmt.Errorf("unsupported %s %q: expected a URL ending in /api/graphql/v1/graphql, "+
-		"or https://graphql.<%s>.runtime.vonage.cloud/v1/graphql; alternatively pass --deployment-api-url",
+		"or https://graphql.<%s>.runtime.vonage.cloud/v1/graphql; alternatively pass --endpoint",
 		source, value, strings.Join(productionLabels, "|"))
 }

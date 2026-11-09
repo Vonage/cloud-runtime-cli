@@ -89,10 +89,10 @@ func (st *runState) initPlatform(ctx context.Context, mode string) error {
 	env := st.env
 	fl := env.Flags
 	bootstrap, err := endpoint.Bootstrap(endpoint.Inputs{
-		DeploymentAPIURL: fl.DeploymentAPIURL,
-		GraphQLFlag:      fl.GraphQLEndpoint,
-		Region:           fl.Region,
-		GraphQLConfig:    env.Settings.File.GraphQLEndpoint,
+		Endpoint:      fl.Endpoint,
+		GraphQLFlag:   fl.GraphQLEndpoint,
+		Region:        fl.Region,
+		GraphQLConfig: env.Settings.File.GraphQLEndpoint,
 	})
 	if err != nil {
 		return err

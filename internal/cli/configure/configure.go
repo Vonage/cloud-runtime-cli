@@ -183,10 +183,10 @@ func fetchRegions(ctx context.Context, env *cmdenv.Env, stored config.File, cred
 func newResolver(env *cmdenv.Env, stored config.File, creds platform.Credentials) (*platform.Resolver, error) {
 	flags := env.Flags
 	bootstrap, err := endpoint.Bootstrap(endpoint.Inputs{
-		DeploymentAPIURL: flags.DeploymentAPIURL,
-		GraphQLFlag:      flags.GraphQLEndpoint,
-		Region:           flags.Region,
-		GraphQLConfig:    stored.GraphQLEndpoint,
+		Endpoint:      flags.Endpoint,
+		GraphQLFlag:   flags.GraphQLEndpoint,
+		Region:        flags.Region,
+		GraphQLConfig: stored.GraphQLEndpoint,
 	})
 	if err != nil {
 		return nil, err

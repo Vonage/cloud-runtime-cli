@@ -158,7 +158,7 @@ func TestConfigureAsksTheDeploymentAPIOfTheStoredEndpoint(t *testing.T) {
 	r := start(t, setup{srv: srv, stored: &stored, script: &cmdtest.Script{
 		Inputs: []string{account}, Passwords: []string{""}, Selects: []string{use1Label},
 	}})
-	r.Env.Flags.DeploymentAPIURL = ""
+	r.Env.Flags.Endpoint = ""
 
 	err := r.execute(t)
 
@@ -169,7 +169,7 @@ func TestConfigureAsksTheDeploymentAPIOfTheStoredEndpoint(t *testing.T) {
 func TestConfigureAsksTheDeploymentAPIOfTheEndpointFlag(t *testing.T) {
 	srv := startFake(t)
 	r := start(t, setup{srv: srv, script: answers()})
-	r.Env.Flags.DeploymentAPIURL = ""
+	r.Env.Flags.Endpoint = ""
 	r.Env.Flags.GraphQLEndpoint = srv.Expand("${FAKE}/v1/vcr/euw1/api/graphql/v1/graphql")
 
 	err := r.execute(t)
@@ -180,7 +180,7 @@ func TestConfigureAsksTheDeploymentAPIOfTheEndpointFlag(t *testing.T) {
 
 func TestConfigureRefusesAnEndpointItCannotUse(t *testing.T) {
 	r := start(t, setup{script: answers()})
-	r.Env.Flags.DeploymentAPIURL = ""
+	r.Env.Flags.Endpoint = ""
 	r.Env.Flags.GraphQLEndpoint = "https://graphql.example.test/v1/graphql"
 
 	err := r.execute(t)

@@ -79,7 +79,7 @@ func TestInitFailuresAreWrappedAndRenderedOnce(t *testing.T) {
 		h := newHarness(t)
 		h.writeConfig(config.File{APIKey: fakeKey, APISecret: fakeSecret})
 
-		got := h.run("full", "--deployment-api-url", h.srv.DeploymentAPIURL("euw1"))
+		got := h.run("full", "--endpoint", h.srv.DeploymentAPIURL("euw1"))
 
 		assert.Equal(t, 1, got.code)
 		assert.Empty(t, got.stdout)
@@ -95,7 +95,7 @@ func TestInitFailuresAreWrappedAndRenderedOnce(t *testing.T) {
 		h := newHarness(t)
 		h.writeConfig(config.File{APIKey: fakeKey, APISecret: "wrong"})
 
-		got := h.run("full", "--deployment-api-url", h.srv.DeploymentAPIURL("euw1"))
+		got := h.run("full", "--endpoint", h.srv.DeploymentAPIURL("euw1"))
 
 		assert.Equal(t, 1, got.code)
 		assert.Equal(t, separatorLine+separatorLine, got.stdout)
@@ -110,7 +110,7 @@ func TestInitFailuresAreWrappedAndRenderedOnce(t *testing.T) {
 		h := newHarness(t)
 		h.writeConfig(config.File{APIKey: fakeKey, APISecret: fakeSecret, DefaultRegion: "aws.nowhere"})
 
-		got := h.run("full", "--deployment-api-url", h.srv.DeploymentAPIURL("euw1"))
+		got := h.run("full", "--endpoint", h.srv.DeploymentAPIURL("euw1"))
 
 		assert.Equal(t, 1, got.code)
 		assert.Empty(t, got.stdout)
@@ -125,7 +125,7 @@ func TestInitFailuresAreWrappedAndRenderedOnce(t *testing.T) {
 		assert.Equal(t, 1, got.code)
 		assert.Empty(t, got.stdout)
 		assert.True(t, strings.HasPrefix(got.stderr, "X failed to initialize cli: unsupported --graphql-endpoint "), "stderr = %q", got.stderr)
-		assert.Contains(t, got.stderr, "--deployment-api-url")
+		assert.Contains(t, got.stderr, "--endpoint")
 		assert.Equal(t, 1, strings.Count(got.stderr, "\n"), "one line and no usage block")
 		assert.Empty(t, h.srv.Requests())
 	})

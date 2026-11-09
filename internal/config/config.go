@@ -23,14 +23,14 @@ type File struct {
 
 // Flags are the raw global flag values.
 type Flags struct {
-	ConfigFile       string
-	ConfigFileSet    bool // cmd.Flags().Changed("config-file")
-	APIKey           string
-	APISecret        string
-	Region           string
-	GraphQLEndpoint  string
-	DeploymentAPIURL string // hidden --deployment-api-url
-	Timeout          time.Duration
+	ConfigFile      string
+	ConfigFileSet   bool // cmd.Flags().Changed("config-file")
+	APIKey          string
+	APISecret       string
+	Region          string
+	GraphQLEndpoint string
+	Endpoint        string // hidden --endpoint
+	Timeout         time.Duration
 }
 
 // Settings are the resolved inputs every platform command uses.

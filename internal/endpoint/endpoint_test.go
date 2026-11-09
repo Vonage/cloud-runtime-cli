@@ -18,7 +18,7 @@ const (
 
 	unsupportedTail = `: expected a URL ending in /api/graphql/v1/graphql, ` +
 		`or https://graphql.<euw1|use1|apse1|apse2>.runtime.vonage.cloud/v1/graphql; ` +
-		`alternatively pass --deployment-api-url`
+		`alternatively pass --endpoint`
 )
 
 // fromEitherSource runs value as the --graphql-endpoint flag and as the config file's graphql_endpoint, so
@@ -47,16 +47,16 @@ func TestBootstrapPrecedence(t *testing.T) {
 		{
 			name: "hidden URL wins over everything and is returned unchanged",
 			in: endpoint.Inputs{
-				DeploymentAPIURL: hiddenURL,
-				GraphQLFlag:      flagGateway,
-				Region:           "aws.euw1",
-				GraphQLConfig:    configGateway,
+				Endpoint:      hiddenURL,
+				GraphQLFlag:   flagGateway,
+				Region:        "aws.euw1",
+				GraphQLConfig: configGateway,
 			},
 			want: hiddenURL,
 		},
 		{
 			name: "hidden URL is neither parsed nor validated",
-			in:   endpoint.Inputs{DeploymentAPIURL: "not a url"},
+			in:   endpoint.Inputs{Endpoint: "not a url"},
 			want: "not a url",
 		},
 		{
@@ -71,7 +71,7 @@ func TestBootstrapPrecedence(t *testing.T) {
 		},
 		{
 			name: "a bad flag is not consulted when the hidden URL is set",
-			in:   endpoint.Inputs{DeploymentAPIURL: hiddenURL, GraphQLFlag: badEndpoint},
+			in:   endpoint.Inputs{Endpoint: hiddenURL, GraphQLFlag: badEndpoint},
 			want: hiddenURL,
 		},
 		{

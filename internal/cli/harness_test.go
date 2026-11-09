@@ -94,7 +94,7 @@ func (h *harness) removeConfig() {
 func (h *harness) flags() []string {
 	return []string{
 		"--api-key", fakeKey, "--api-secret", fakeSecret,
-		"--deployment-api-url", h.srv.DeploymentAPIURL("euw1"),
+		"--endpoint", h.srv.DeploymentAPIURL("euw1"),
 	}
 }
 
