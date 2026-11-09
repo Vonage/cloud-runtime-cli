@@ -1,0 +1,60 @@
+internal/platform/reads.go
+  484ccf2e4857fa0c 1-249
+internal/platform/reads_fake_test.go
+  484ccf2e4857fa0c 1-186
+internal/platform/reads_helpers_test.go
+  484ccf2e4857fa0c 1-66
+internal/platform/reads_instances_test.go
+  484ccf2e4857fa0c 1-218
+internal/platform/reads_older_test.go
+  484ccf2e4857fa0c 1-130
+internal/platform/reads_test.go
+  484ccf2e4857fa0c 1-290
+internal/platform/resolver.go
+  484ccf2e4857fa0c 1-163
+internal/platform/resolver_fake_test.go
+  484ccf2e4857fa0c 1-107
+internal/platform/resolver_helpers_test.go
+  484ccf2e4857fa0c 1-119
+internal/platform/resolver_records_test.go
+  484ccf2e4857fa0c 1-217
+internal/platform/resolver_test.go
+  484ccf2e4857fa0c 1-305
+internal/platform/segment.go
+  484ccf2e4857fa0c 71-77
+internal/platform/template.go
+  484ccf2e4857fa0c 1-44
+internal/platform/template_test.go
+  484ccf2e4857fa0c 1-206
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "9aff6851f72823b21294e148417613f2339fa579",
+  "prompts": {
+    "484ccf2e4857fa0c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "24d19a1c-b765-4e86-ab23-25c87dad8560",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:48.259Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:48.259Z"
+        }
+      ],
+      "total_additions": 2307,
+      "total_deletions": 99,
+      "accepted_lines": 2307,
+      "overriden_lines": 0
+    }
+  }
+}
