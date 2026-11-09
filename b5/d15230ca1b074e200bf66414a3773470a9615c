@@ -1,0 +1,24 @@
+internal/cli/configure/configure.go
+  h_df1d95ff1e9b8c 117-118,120,123,187,201-211
+internal/cli/configure/configure_test.go
+  h_df1d95ff1e9b8c 29,38,64,122,131,135-136,148,263-265,340-353
+internal/cli/configure/credentials_test.go
+  h_df1d95ff1e9b8c 43,58,130
+internal/cli/configure/helpers_test.go
+  h_df1d95ff1e9b8c 121-127
+internal/cli/configure/picker_test.go
+  h_df1d95ff1e9b8c 57,100
+openspec/changes/endpoint-migration/tasks.md
+  h_df1d95ff1e9b8c 55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b5d15230ca1b074e200bf66414a3773470a9615c",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
