@@ -20,7 +20,8 @@ const (
 	configFileName             = ".vcr-cli"
 	maxCorpusBytes             = 16 << 20
 	defaultConfig              = "graphql_endpoint = ${FAKE}/v1/vcr/euw1/api/graphql/v1/graphql\n" +
-		"default_region   = aws.euw1\n\n" +
+		"default_region   = aws.euw1\n" +
+		"endpoint         = ${FAKE}/v1/vcr/euw1/api/deployment\n\n" +
 		"[credentials]\n" +
 		"api_key    = abc123\n" +
 		"api_secret = s3cret-for-tests\n"

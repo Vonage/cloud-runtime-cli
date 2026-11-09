@@ -66,7 +66,7 @@ Run every command from the repository root. `make test` is `go test -race ./...`
 
 ## 5. Contract suite and docs
 
-- [ ] 5.1 Keep unrelated scenarios identical, allow the intended diffs.
+- [x] 5.1 Keep unrelated scenarios identical, allow the intended diffs.
   - Files: `test/contract/sandbox.go` (`defaultConfig` gains `endpoint = ${FAKE}/v1/vcr/euw1/api/deployment`), `test/contract/allowed-diffs.txt`.
   - Test first: run `make contract NO_GRAPHQL=1` and list the failing scenarios; each must be a help scenario, a `--graphql-endpoint` scenario, a scenario with its own `config-file` holding only `graphql_endpoint`, or a `configure-*` scenario. Add one line per scenario and field with the reason "the CLI moves users from the GraphQL settings to endpoint". Any other failure is a bug to fix, not to allow.
   - Verify: `make contract NO_GRAPHQL=1 && make contract-rich`

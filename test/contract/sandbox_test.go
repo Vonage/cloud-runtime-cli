@@ -48,7 +48,8 @@ func TestSandboxLayoutAndDefaultConfig(t *testing.T) {
 	got, err := os.ReadFile(filepath.Join(l.Home, ".vcr-cli"))
 	require.NoError(t, err)
 	want := "graphql_endpoint = ${FAKE}/v1/vcr/euw1/api/graphql/v1/graphql\n" +
-		"default_region   = aws.euw1\n\n" +
+		"default_region   = aws.euw1\n" +
+		"endpoint         = ${FAKE}/v1/vcr/euw1/api/deployment\n\n" +
 		"[credentials]\n" +
 		"api_key    = abc123\n" +
 		"api_secret = s3cret-for-tests\n"
