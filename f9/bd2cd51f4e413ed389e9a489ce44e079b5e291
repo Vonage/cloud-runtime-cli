@@ -1,0 +1,20 @@
+internal/cli/configure/configure.go
+  h_df1d95ff1e9b8c 203
+internal/cli/endpoint_migration.go
+  h_df1d95ff1e9b8c 18
+internal/cli/prerun.go
+  h_df1d95ff1e9b8c 93
+internal/endpoint/bootstrap.go
+  h_df1d95ff1e9b8c 8-9,42-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f9bd2cd51f4e413ed389e9a489ce44e079b5e291",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
