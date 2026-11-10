@@ -1,0 +1,40 @@
+internal/config/endpoint.go
+  016aaab86036ceb3 1-65
+internal/config/endpoint_test.go
+  016aaab86036ceb3 1-110
+internal/config/write.go
+  016aaab86036ceb3 27-31,40
+openspec/changes/endpoint-migration/tasks.md
+  016aaab86036ceb3 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "5ae0d664826c90f25b494dde7d32d8a4152d2680",
+  "prompts": {
+    "016aaab86036ceb3": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "3d55c967-cd0a-428c-8264-c8f53f7bbbeb",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T16:15:56.283Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T16:15:56.283Z"
+        }
+      ],
+      "total_additions": 182,
+      "total_deletions": 2,
+      "accepted_lines": 182,
+      "overriden_lines": 0
+    }
+  }
+}
