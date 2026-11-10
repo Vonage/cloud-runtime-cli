@@ -1,0 +1,510 @@
+docs/docs.go
+  a7295a3a19c47adf 14-18
+go.mod
+  a7295a3a19c47adf 1
+internal/cli/app/app.go
+  a7295a3a19c47adf 10
+internal/cli/app/app_test.go
+  a7295a3a19c47adf 10-13
+internal/cli/app/create.go
+  a7295a3a19c47adf 11-12
+internal/cli/app/create_test.go
+  a7295a3a19c47adf 13-18
+internal/cli/app/generatekeys.go
+  a7295a3a19c47adf 11-12
+internal/cli/app/generatekeys_test.go
+  a7295a3a19c47adf 13-19
+internal/cli/app/helpers_test.go
+  a7295a3a19c47adf 8-10
+internal/cli/app/list.go
+  a7295a3a19c47adf 10-12
+internal/cli/app/list_test.go
+  a7295a3a19c47adf 15-19
+internal/cli/app/remove.go
+  a7295a3a19c47adf 11-13
+internal/cli/app/remove_test.go
+  a7295a3a19c47adf 13-19
+internal/cli/app/rich.go
+  a7295a3a19c47adf 7-8
+internal/cli/app/rich_test.go
+  a7295a3a19c47adf 10-13
+internal/cli/cmdenv/cmdenv.go
+  a7295a3a19c47adf 8-12
+internal/cli/cmdenv/region.go
+  a7295a3a19c47adf 7
+internal/cli/cmdenv/regionclient_test.go
+  a7295a3a19c47adf 14-17
+internal/cli/cmdtest/cmdtest.go
+  a7295a3a19c47adf 14-20
+internal/cli/cmdtest/cmdtest_rich_test.go
+  a7295a3a19c47adf 14-16
+internal/cli/cmdtest/cmdtest_test.go
+  a7295a3a19c47adf 14-18
+internal/cli/cmdtest/rich.go
+  a7295a3a19c47adf 9-10
+internal/cli/cmdtest/script.go
+  a7295a3a19c47adf 8
+internal/cli/configure/configure.go
+  a7295a3a19c47adf 13-17
+internal/cli/configure/configure_test.go
+  a7295a3a19c47adf 14-19
+internal/cli/configure/credentials_test.go
+  a7295a3a19c47adf 11-13
+internal/cli/configure/errors_test.go
+  a7295a3a19c47adf 15-17
+internal/cli/configure/helpers_test.go
+  a7295a3a19c47adf 15-19
+internal/cli/configure/picker_test.go
+  a7295a3a19c47adf 9-10
+internal/cli/configure/regions.go
+  a7295a3a19c47adf 8-9
+internal/cli/configure/regions_test.go
+  a7295a3a19c47adf 8
+internal/cli/configure/rich.go
+  a7295a3a19c47adf 7-9
+internal/cli/debug/ctx_test.go
+  a7295a3a19c47adf 11-12
+internal/cli/debug/debug.go
+  a7295a3a19c47adf 10-13
+internal/cli/debug/debug_test.go
+  a7295a3a19c47adf 10
+internal/cli/debug/helpers_test.go
+  a7295a3a19c47adf 15-22
+internal/cli/debug/prompt_test.go
+  a7295a3a19c47adf 11
+internal/cli/debug/prune.go
+  a7295a3a19c47adf 9-10
+internal/cli/debug/prune_test.go
+  a7295a3a19c47adf 9
+internal/cli/debug/region.go
+  a7295a3a19c47adf 7-8
+internal/cli/debug/region_test.go
+  a7295a3a19c47adf 12-13
+internal/cli/debug/resolve.go
+  a7295a3a19c47adf 10-14
+internal/cli/debug/rich.go
+  a7295a3a19c47adf 7-8
+internal/cli/debug/rich_test.go
+  a7295a3a19c47adf 11-13
+internal/cli/deploy/deploy.go
+  a7295a3a19c47adf 10-12
+internal/cli/deploy/deploy_test.go
+  a7295a3a19c47adf 10-11
+internal/cli/deploy/env_test.go
+  a7295a3a19c47adf 16-22
+internal/cli/deploy/fake_test.go
+  a7295a3a19c47adf 12-13
+internal/cli/deploy/plan.go
+  a7295a3a19c47adf 6-7
+internal/cli/deploy/region_test.go
+  a7295a3a19c47adf 9-11
+internal/cli/deploy/rich_test.go
+  a7295a3a19c47adf 11-13
+internal/cli/golden_test.go
+  a7295a3a19c47adf 15
+internal/cli/harness_test.go
+  a7295a3a19c47adf 15-22
+internal/cli/help.go
+  a7295a3a19c47adf 12-15
+internal/cli/initcmd/apps.go
+  a7295a3a19c47adf 7-8
+internal/cli/initcmd/fakes_test.go
+  a7295a3a19c47adf 17-18
+internal/cli/initcmd/flow.go
+  a7295a3a19c47adf 10-13
+internal/cli/initcmd/flow_test.go
+  a7295a3a19c47adf 11
+internal/cli/initcmd/initcmd.go
+  a7295a3a19c47adf 7
+internal/cli/initcmd/initcmd_test.go
+  a7295a3a19c47adf 16-23
+internal/cli/initcmd/options.go
+  a7295a3a19c47adf 8-9
+internal/cli/initcmd/options_test.go
+  a7295a3a19c47adf 8
+internal/cli/initcmd/rich.go
+  a7295a3a19c47adf 7-9
+internal/cli/initcmd/rich_helpers_test.go
+  a7295a3a19c47adf 15-16
+internal/cli/initcmd/rich_test.go
+  a7295a3a19c47adf 13-16
+internal/cli/initcmd/template.go
+  a7295a3a19c47adf 7-10
+internal/cli/initcmd/template_test.go
+  a7295a3a19c47adf 11-12
+internal/cli/instance/follow.go
+  a7295a3a19c47adf 9-11
+internal/cli/instance/follow_test.go
+  a7295a3a19c47adf 13-15
+internal/cli/instance/helpers_test.go
+  a7295a3a19c47adf 10-12
+internal/cli/instance/instance.go
+  a7295a3a19c47adf 8
+internal/cli/instance/instance_test.go
+  a7295a3a19c47adf 9-11
+internal/cli/instance/list.go
+  a7295a3a19c47adf 10-12
+internal/cli/instance/list_test.go
+  a7295a3a19c47adf 15-20
+internal/cli/instance/log.go
+  a7295a3a19c47adf 11
+internal/cli/instance/log_deadline_test.go
+  a7295a3a19c47adf 13-16
+internal/cli/instance/log_follow_test.go
+  a7295a3a19c47adf 14-19
+internal/cli/instance/log_region_test.go
+  a7295a3a19c47adf 11-15
+internal/cli/instance/log_test.go
+  a7295a3a19c47adf 13-15
+internal/cli/instance/logprint.go
+  a7295a3a19c47adf 6-7
+internal/cli/instance/logprint_test.go
+  a7295a3a19c47adf 9
+internal/cli/instance/region.go
+  a7295a3a19c47adf 7-8
+internal/cli/instance/remove.go
+  a7295a3a19c47adf 10-12
+internal/cli/instance/remove_hostile_test.go
+  a7295a3a19c47adf 11-13
+internal/cli/instance/remove_region_test.go
+  a7295a3a19c47adf 10-15
+internal/cli/instance/remove_test.go
+  a7295a3a19c47adf 13-19
+internal/cli/instance/rich.go
+  a7295a3a19c47adf 7-8
+internal/cli/instance/rich_test.go
+  a7295a3a19c47adf 10-13
+internal/cli/instance/target.go
+  a7295a3a19c47adf 8
+internal/cli/instance/target_test.go
+  a7295a3a19c47adf 12
+internal/cli/prerun.go
+  a7295a3a19c47adf 9-12
+internal/cli/prerun_init_test.go
+  a7295a3a19c47adf 15-16
+internal/cli/prerun_test.go
+  a7295a3a19c47adf 15-20
+internal/cli/rich.go
+  a7295a3a19c47adf 6-7
+internal/cli/root.go
+  a7295a3a19c47adf 9-18
+internal/cli/root_test.go
+  a7295a3a19c47adf 14
+internal/cli/run.go
+  a7295a3a19c47adf 8-14
+internal/cli/run_test.go
+  a7295a3a19c47adf 15-19
+internal/cli/secret/create.go
+  a7295a3a19c47adf 11-13
+internal/cli/secret/create_test.go
+  a7295a3a19c47adf 13-18
+internal/cli/secret/helpers_test.go
+  a7295a3a19c47adf 11-13
+internal/cli/secret/list.go
+  a7295a3a19c47adf 10-11
+internal/cli/secret/list_test.go
+  a7295a3a19c47adf 13-18
+internal/cli/secret/remove.go
+  a7295a3a19c47adf 11-12
+internal/cli/secret/remove_test.go
+  a7295a3a19c47adf 13-18
+internal/cli/secret/rich.go
+  a7295a3a19c47adf 7-8
+internal/cli/secret/rich_test.go
+  a7295a3a19c47adf 10-13
+internal/cli/secret/secret.go
+  a7295a3a19c47adf 10
+internal/cli/secret/secret_test.go
+  a7295a3a19c47adf 11-13
+internal/cli/secret/update.go
+  a7295a3a19c47adf 11-13
+internal/cli/secret/update_test.go
+  a7295a3a19c47adf 13-18
+internal/cli/secret/value.go
+  a7295a3a19c47adf 13
+internal/cli/testtree_test.go
+  a7295a3a19c47adf 14-19
+internal/cli/updatecheck.go
+  a7295a3a19c47adf 7-8
+internal/cli/updatecheck_test.go
+  a7295a3a19c47adf 15-19
+internal/cli/upgrade/helpers_test.go
+  a7295a3a19c47adf 14-19
+internal/cli/upgrade/rich.go
+  a7295a3a19c47adf 6-7
+internal/cli/upgrade/rich_test.go
+  a7295a3a19c47adf 15-23
+internal/cli/upgrade/upgrade.go
+  a7295a3a19c47adf 13-16
+internal/cli/upgrade/upgrade_test.go
+  a7295a3a19c47adf 14-16
+internal/clierr/clierr_test.go
+  a7295a3a19c47adf 10
+internal/clierr/render.go
+  a7295a3a19c47adf 8
+internal/clierr/render_test.go
+  a7295a3a19c47adf 12-13
+internal/clierr/rich.go
+  a7295a3a19c47adf 13
+internal/clierr/rich_test.go
+  a7295a3a19c47adf 14-15
+internal/debugsession/accesslog.go
+  a7295a3a19c47adf 7
+internal/debugsession/accesslog_rich.go
+  a7295a3a19c47adf 7
+internal/debugsession/accesslog_rich_test.go
+  a7295a3a19c47adf 11-12
+internal/debugsession/app_terminal_pty_test.go
+  a7295a3a19c47adf 17-19
+internal/debugsession/child.go
+  a7295a3a19c47adf 12
+internal/debugsession/child_test.go
+  a7295a3a19c47adf 19-20
+internal/debugsession/console.go
+  a7295a3a19c47adf 8
+internal/debugsession/console_test.go
+  a7295a3a19c47adf 12
+internal/debugsession/debugsession.go
+  a7295a3a19c47adf 13-14
+internal/debugsession/env.go
+  a7295a3a19c47adf 10-11
+internal/debugsession/env_test.go
+  a7295a3a19c47adf 12-13
+internal/debugsession/intro.go
+  a7295a3a19c47adf 3
+internal/debugsession/intro_test.go
+  a7295a3a19c47adf 8-9
+internal/debugsession/localapi_self_test.go
+  a7295a3a19c47adf 10-11
+internal/debugsession/localapi_test.go
+  a7295a3a19c47adf 17-21
+internal/debugsession/ready.go
+  a7295a3a19c47adf 8
+internal/debugsession/ready_test.go
+  a7295a3a19c47adf 12
+internal/debugsession/reconnect.go
+  a7295a3a19c47adf 13-14
+internal/debugsession/reconnect_test.go
+  a7295a3a19c47adf 17
+internal/debugsession/rich.go
+  a7295a3a19c47adf 6-7
+internal/debugsession/rich_causes_test.go
+  a7295a3a19c47adf 17-19
+internal/debugsession/rich_helpers_test.go
+  a7295a3a19c47adf 13-14
+internal/debugsession/rich_hold_test.go
+  a7295a3a19c47adf 10-12
+internal/debugsession/rich_test.go
+  a7295a3a19c47adf 13-14
+internal/debugsession/run.go
+  a7295a3a19c47adf 10-13
+internal/debugsession/run_harness_test.go
+  a7295a3a19c47adf 10-15
+internal/debugsession/run_serve_test.go
+  a7295a3a19c47adf 17
+internal/debugsession/run_setup_test.go
+  a7295a3a19c47adf 15-18
+internal/debugsession/run_test.go
+  a7295a3a19c47adf 16-18
+internal/debugsession/teardown.go
+  a7295a3a19c47adf 7
+internal/debugsession/tunnel.go
+  a7295a3a19c47adf 16
+internal/debugsession/tunnel_conn_test.go
+  a7295a3a19c47adf 18
+internal/debugsession/tunnel_harness_test.go
+  a7295a3a19c47adf 12-15
+internal/debugsession/tunnel_shared_test.go
+  a7295a3a19c47adf 13
+internal/debugsession/verbose.go
+  a7295a3a19c47adf 10
+internal/deploy/bodies_test.go
+  a7295a3a19c47adf 9-10
+internal/deploy/build.go
+  a7295a3a19c47adf 10-12
+internal/deploy/build_status_test.go
+  a7295a3a19c47adf 15-16
+internal/deploy/deploy.go
+  a7295a3a19c47adf 7-8
+internal/deploy/deploy_test.go
+  a7295a3a19c47adf 18-21
+internal/deploy/fake_api_test.go
+  a7295a3a19c47adf 13
+internal/deploy/rich.go
+  a7295a3a19c47adf 9-11
+internal/deploy/rich_match_test.go
+  a7295a3a19c47adf 13-16
+internal/deploy/rich_test.go
+  a7295a3a19c47adf 15-17
+internal/deploy/run.go
+  a7295a3a19c47adf 7-9
+internal/deploy/stages.go
+  a7295a3a19c47adf 10-13
+internal/deploy/summary.go
+  a7295a3a19c47adf 7-8
+internal/endpoint/endpoint_test.go
+  a7295a3a19c47adf 11-12
+internal/manifest/capabilities_test.go
+  a7295a3a19c47adf 9
+internal/manifest/find_test.go
+  a7295a3a19c47adf 13
+internal/manifest/helpers_test.go
+  a7295a3a19c47adf 12
+internal/manifest/manifest_test.go
+  a7295a3a19c47adf 12
+internal/manifest/merge_test.go
+  a7295a3a19c47adf 8
+internal/manifest/projectdir_test.go
+  a7295a3a19c47adf 13
+internal/platform/apierror.go
+  a7295a3a19c47adf 13-14
+internal/platform/apierror_test.go
+  a7295a3a19c47adf 9
+internal/platform/buildstatus_test.go
+  a7295a3a19c47adf 13
+internal/platform/conformance_test.go
+  a7295a3a19c47adf 4-6
+internal/platform/core.go
+  a7295a3a19c47adf 17
+internal/platform/debugservices.go
+  a7295a3a19c47adf 9
+internal/platform/debugservices_test.go
+  a7295a3a19c47adf 11
+internal/platform/deployments.go
+  a7295a3a19c47adf 7
+internal/platform/deployments_test.go
+  a7295a3a19c47adf 11
+internal/platform/helpers_test.go
+  a7295a3a19c47adf 19
+internal/platform/options.go
+  a7295a3a19c47adf 7
+internal/platform/reads.go
+  a7295a3a19c47adf 11
+internal/platform/reads_fake_test.go
+  a7295a3a19c47adf 10
+internal/platform/reads_instances_test.go
+  a7295a3a19c47adf 11
+internal/platform/reads_older_test.go
+  a7295a3a19c47adf 12
+internal/platform/reads_test.go
+  a7295a3a19c47adf 12
+internal/platform/request_errors_test.go
+  a7295a3a19c47adf 14
+internal/platform/request_test.go
+  a7295a3a19c47adf 17
+internal/platform/resolver_fake_test.go
+  a7295a3a19c47adf 13-15
+internal/platform/resolver_helpers_test.go
+  a7295a3a19c47adf 16
+internal/platform/resolver_test.go
+  a7295a3a19c47adf 13
+internal/platform/routes_fake_test.go
+  a7295a3a19c47adf 10-11
+internal/platform/routes_helpers_test.go
+  a7295a3a19c47adf 12-13
+internal/platform/status.go
+  a7295a3a19c47adf 6
+internal/platform/template_test.go
+  a7295a3a19c47adf 14
+internal/platform/upload_retry.go
+  a7295a3a19c47adf 14-15
+internal/platform/upload_retry_rules_test.go
+  a7295a3a19c47adf 17
+internal/platform/watch_connect_test.go
+  a7295a3a19c47adf 12
+internal/platform/watch_fake_test.go
+  a7295a3a19c47adf 11-12
+internal/platform/watch_helpers_test.go
+  a7295a3a19c47adf 17
+internal/scaffold/extract_limits_test.go
+  a7295a3a19c47adf 13
+internal/scaffold/extract_links_test.go
+  a7295a3a19c47adf 11
+internal/scaffold/extract_test.go
+  a7295a3a19c47adf 14
+internal/scaffold/helpers_test.go
+  a7295a3a19c47adf 14
+internal/scaffold/manifest.go
+  a7295a3a19c47adf 11
+internal/scaffold/manifest_test.go
+  a7295a3a19c47adf 13
+internal/scaffold/scaffold_test.go
+  a7295a3a19c47adf 11
+internal/selfupdate/keys_test.go
+  a7295a3a19c47adf 13-14
+internal/selfupdate/latest.go
+  a7295a3a19c47adf 19-21
+internal/selfupdate/latest_status_test.go
+  a7295a3a19c47adf 12
+internal/selfupdate/latest_test.go
+  a7295a3a19c47adf 19-20
+internal/selfupdate/notice.go
+  a7295a3a19c47adf 10
+internal/selfupdate/notice_test.go
+  a7295a3a19c47adf 12-13
+internal/selfupdate/upgrade_helpers_test.go
+  a7295a3a19c47adf 16-17
+internal/selfupdate/upgrade_test.go
+  a7295a3a19c47adf 17
+internal/selfupdate/verify_test.go
+  a7295a3a19c47adf 17-18
+internal/term/gate_test.go
+  a7295a3a19c47adf 10
+internal/term/live_test.go
+  a7295a3a19c47adf 15
+internal/term/present_helpers_test.go
+  a7295a3a19c47adf 9
+internal/term/term.go
+  a7295a3a19c47adf 13
+internal/term/testrich.go
+  a7295a3a19c47adf 6
+main.go
+  a7295a3a19c47adf 9-11
+main_test.go
+  a7295a3a19c47adf 8
+test/contract/build.go
+  a7295a3a19c47adf 22
+test/contract/driver.go
+  a7295a3a19c47adf 16
+test/contract/reads.go
+  a7295a3a19c47adf 13
+test/contract/requests.go
+  a7295a3a19c47adf 17
+test/contract/requests_test.go
+  a7295a3a19c47adf 20
+test/contract/run.go
+  a7295a3a19c47adf 16
+test/releasecompat/compat_test.go
+  a7295a3a19c47adf 30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "9a61bd1ea53e6e8baed06ca0d721b27a6e347e81",
+  "prompts": {
+    "a7295a3a19c47adf": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "c9f564f0-75b6-4314-a961-133845f2f0c4",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T12:00:14.035Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T12:00:14.035Z"
+        }
+      ],
+      "total_additions": 610,
+      "total_deletions": 610,
+      "accepted_lines": 610,
+      "overriden_lines": 0
+    }
+  }
+}
