@@ -2,7 +2,7 @@
 
 ## Context
 
-- `main.apiVersion` is stamped at build time (`Makefile` `API_VERSION ?= v0.3`; the CI and release workflows use `vars.API_VERSION || 'v0.3'`). `internal/platform` uses it only to build the base URL, `<deployment API URL>/<version>`.
+- `main.apiVersion` defaults to `v0.3` in `main.go` and is stamped at build time: `Makefile` `API_VERSION ?= v0.3`; `ci.yml` and the unsigned build in `release.yml` use `vars.API_VERSION || 'v0.3'`; the signed build in `release.yml` and the build in `release-please.yml` use `vars.API_VERSION` alone. `internal/platform` uses it only to build the base URL, `<deployment API URL>/<version>`.
 - `POST /packages` is `platform.Client.CreatePackage(ctx, PackageRequest)`. `internal/deploy/stages.go` `packageRequest` builds the request; the runner already has `Plan.ProjectName` and `Plan.InstanceName`, with flags applied over the manifest.
 - On `v0.5` the server requires `name` and builds the image as `<cleaned name>:<latest version of that name + 1>`. On `v0.3` and `v0.4` it ignores fields it does not know, and names the image `<packageId>:1`.
 - The contract harness (`test/contract/build.go`) stamps `v0.3` on both the v2.6.1 baseline and the binary under test.
@@ -25,7 +25,7 @@
 
 ### The workflows stop reading the repository variable
 
-`ci.yml` and `release.yml` set `API_VERSION: v0.5` directly. Changing the repository variable would also change releases cut from `main`, whose CLI does not send `name`.
+Every build in `ci.yml`, `release.yml` and `release-please.yml` sets `API_VERSION: v0.5` directly, and `main.go` defaults to `v0.5` for a plain `go build`. `main` runs its own copies of these workflows, so its releases keep reading the variable until the rewrite merges. Changing the repository variable would also change releases cut from `main`, whose CLI does not send `name`.
 
 ### Docs and fixtures
 

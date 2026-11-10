@@ -16,7 +16,7 @@ var (
 	version        = "dev"
 	commit         = "0000"
 	buildDate      = "2021-09-01T00:00:00Z"
-	apiVersion     = "v0.3"
+	apiVersion     = "v0.5"
 	releaseURL     = "https://api.github.com/repos/Vonage/cloud-runtime-cli"
 	upgradeTestKey = ""
 )

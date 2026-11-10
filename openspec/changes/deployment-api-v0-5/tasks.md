@@ -23,3 +23,9 @@ Run every command from the repository root. `make test` is `go test -race ./...`
   - Test first: none; run `make build && ./dist/vcr --version` and check that `strings dist/vcr | grep -c '^v0.5$'` is at least 1.
   - Verify: `make build test lint docs` and `make contract`
   - Accept: everything passes; `grep -rn "v0\.3" Makefile .github/workflows docs/docs.go AGENTS.md` prints nothing.
+
+- [x] 2.2 Pin every release build and the source default to `v0.5`.
+  - Files: `.github/workflows/release.yml` (the signed `build` job), `.github/workflows/release-please.yml`, `main.go`.
+  - Test first: none; `grep -rn 'vars.API_VERSION\|v0\.3' .github/workflows main.go` prints nothing, and `go build -o /tmp/vcr-plain . && /tmp/vcr-plain --version` builds.
+  - Verify: `make build test lint` and `make contract`
+  - Accept: everything passes; no workflow reads the `API_VERSION` repository variable.

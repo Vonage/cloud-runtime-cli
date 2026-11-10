@@ -12,7 +12,7 @@ func TestStampVariables(t *testing.T) {
 	assert.Equal(t, "dev", version)
 	assert.Equal(t, "0000", commit)
 	assert.Equal(t, "2021-09-01T00:00:00Z", buildDate)
-	assert.Equal(t, "v0.3", apiVersion)
+	assert.Equal(t, "v0.5", apiVersion)
 	assert.Equal(t, "https://api.github.com/repos/Vonage/cloud-runtime-cli", releaseURL)
 	assert.Empty(t, upgradeTestKey)
 

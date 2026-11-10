@@ -134,7 +134,7 @@ jobs:
 
       - name: Cross compile binaries
         env:
-          API_VERSION: ${{ vars.API_VERSION }}
+          API_VERSION: v0.5
           TAG: ${{ needs.release-please.outputs.tag_name }}
           BUILD_DATE: ${{ github.event.repository.updated_at }}
         run: |

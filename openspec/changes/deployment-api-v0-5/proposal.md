@@ -8,8 +8,8 @@ The CLI calls version `v0.3` of the deployment API. Version `v0.5` is served in 
 
 - Releases and CI builds call `/v0.5/...` on the deployment API in place of `/v0.3/...`.
 - On `v0.5` and later, `vcr deploy` sends `name` in `POST /packages`: `<project name>-<instance name>` from the manifest or the flags, sanitised to lowercase letters, digits and `-`, a valid Docker image name. On `v0.3` and `v0.4` the body is unchanged.
-- A project and instance name that sanitise to nothing end the deploy with exit code 1 before the package is created.
-- Every other request, and the output and exit code of every command, is unchanged.
+- A project and instance name that sanitise to nothing end the deploy with exit code 1 before the package is created. This check runs on every API version, though only `v0.5` sends the name.
+- Every other request, and the output and exit code of every other command, is unchanged.
 
 ## Capabilities
 
@@ -24,7 +24,7 @@ None.
 ## Impact
 
 - Code: the platform client's package request, the deploy request builder.
-- Build: the default `API_VERSION` in the `Makefile` and the release and CI workflows, which stop reading the repository variable.
+- Build: the default API version in `main.go`, the `Makefile`, and every build in the CI and release workflows, which stop reading the repository variable.
 - Tests: none of the contract transcripts change, because the harness stamps `v0.3` on both sides; unit tests cover `v0.5`.
 
 ## Branch
