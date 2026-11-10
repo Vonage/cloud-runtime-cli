@@ -1,0 +1,34 @@
+internal/config/rename_windows.go
+  d71c397482e18b50 14-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "ac3ae59f422ac241ea537c1810040ef3b4c809dc",
+  "prompts": {
+    "d71c397482e18b50": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "7dab5c1e-8bc6-4510-9b96-efe073e8fe1f",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:47.592Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:47.592Z"
+        }
+      ],
+      "total_additions": 2,
+      "total_deletions": 2,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
