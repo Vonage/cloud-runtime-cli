@@ -1,0 +1,90 @@
+test/fakeplatform/envelope.go
+  014919e5e172a57b 1-134
+test/fakeplatform/fixtures.go
+  014919e5e172a57b 1-288
+test/fakeplatform/fixtures_test.go
+  014919e5e172a57b 1-140
+test/fakeplatform/graphql.go
+  014919e5e172a57b 1-326
+test/fakeplatform/graphql_test.go
+  014919e5e172a57b 1-207
+test/fakeplatform/helpers_test.go
+  014919e5e172a57b 1-161
+test/fakeplatform/like.go
+  014919e5e172a57b 1-30
+test/fakeplatform/overrides.go
+  014919e5e172a57b 1-266
+test/fakeplatform/overrides_test.go
+  014919e5e172a57b 1-161
+test/fakeplatform/reads.go
+  014919e5e172a57b 1-311
+test/fakeplatform/reads_test.go
+  014919e5e172a57b 1-303
+test/fakeplatform/requestlog.go
+  014919e5e172a57b 1-92
+test/fakeplatform/rest.go
+  014919e5e172a57b 1-316
+test/fakeplatform/rest_test.go
+  014919e5e172a57b 1-239
+test/fakeplatform/router.go
+  014919e5e172a57b 1-161
+test/fakeplatform/server.go
+  014919e5e172a57b 1-264
+test/fakeplatform/server_test.go
+  014919e5e172a57b 1-192
+test/fakeplatform/testdata/graphql/InstanceByID.graphql
+  014919e5e172a57b 1-7
+test/fakeplatform/testdata/graphql/InstanceByNames.graphql
+  014919e5e172a57b 1-7
+test/fakeplatform/testdata/graphql/Instances.graphql
+  014919e5e172a57b 1-9
+test/fakeplatform/testdata/graphql/InstancesFiltered.graphql
+  014919e5e172a57b 1-9
+test/fakeplatform/testdata/graphql/Logs.graphql
+  014919e5e172a57b 1-9
+test/fakeplatform/testdata/graphql/ProductVersion.graphql
+  014919e5e172a57b 1-6
+test/fakeplatform/testdata/graphql/Products.graphql
+  014919e5e172a57b 1-8
+test/fakeplatform/testdata/graphql/Project.graphql
+  014919e5e172a57b 1-10
+test/fakeplatform/testdata/graphql/Region.graphql
+  014919e5e172a57b 1-13
+test/fakeplatform/testdata/graphql/Regions.graphql
+  014919e5e172a57b 1-11
+test/fakeplatform/testdata/graphql/Runtimes.graphql
+  014919e5e172a57b 1-9
+test/fakeplatform/world.go
+  014919e5e172a57b 1-195
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "0c5342268ae26ccf3f3f851668def9f01f4d4ca7",
+  "prompts": {
+    "014919e5e172a57b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "cca02d36-8f7c-4194-ba7e-bf6d36b0fa18",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:55.097Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:55.097Z"
+        }
+      ],
+      "total_additions": 3884,
+      "total_deletions": 0,
+      "accepted_lines": 3884,
+      "overriden_lines": 0
+    }
+  }
+}
