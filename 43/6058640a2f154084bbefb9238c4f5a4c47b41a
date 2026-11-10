@@ -1,19 +1,34 @@
 internal/config/endpoint_test.go
-  s_5481395ded4513::t_6195c9308aef34 140
+  86f3c728c0c4b60b 140
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.7.5",
+  "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "436058640a2f154084bbefb9238c4f5a4c47b41a",
-  "prompts": {},
-  "sessions": {
-    "s_5481395ded4513": {
+  "prompts": {
+    "86f3c728c0c4b60b": {
       "agent_id": {
         "tool": "kiro",
-        "id": "sess_9cf33872-1607-4ff8-8b4a-27f03350570c",
-        "model": "auto"
+        "id": "11efdb30-bb85-4620-9475-04da292edc73",
+        "model": "claude-opus-5.5"
       },
-      "human_author": "Simon Chan <simon.chan@vonage.com>"
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-10T16:06:19.880Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
+          "timestamp": "2026-11-10T16:06:19.880Z"
+        }
+      ],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
     }
   }
 }
