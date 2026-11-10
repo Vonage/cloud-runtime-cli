@@ -1,0 +1,66 @@
+docs/docs_test.go
+  dc441f190e4329c8 116
+internal/cli/cmdtest/cmdtest.go
+  dc441f190e4329c8 57,131-132
+internal/cli/cmdtest/cmdtest_test.go
+  dc441f190e4329c8 95,124
+internal/cli/configure/configure.go
+  dc441f190e4329c8 186-189
+internal/cli/configure/configure_test.go
+  dc441f190e4329c8 161,172,183
+internal/cli/harness_test.go
+  dc441f190e4329c8 97
+internal/cli/prerun.go
+  dc441f190e4329c8 92-95
+internal/cli/prerun_init_test.go
+  dc441f190e4329c8 82,98,113,128
+internal/cli/prerun_test.go
+  dc441f190e4329c8 160
+internal/cli/root.go
+  dc441f190e4329c8 84-85,93
+internal/cli/root_test.go
+  dc441f190e4329c8 104-105,139,148,158
+internal/cli/tree_test.go
+  dc441f190e4329c8 14,114,122,126-127,131,134
+internal/cli/updatecheck_test.go
+  dc441f190e4329c8 75
+internal/config/config.go
+  dc441f190e4329c8 26-33
+internal/endpoint/bootstrap.go
+  dc441f190e4329c8 33-36,41,51,54-55,126
+internal/endpoint/endpoint_test.go
+  dc441f190e4329c8 21,50-53,59,74
+test/contract/testdata/contract-tree.json
+  dc441f190e4329c8 44,47,109,176,205,236,268,287,320,347,374,401,421,507,529,599,618,641,661,697,770,823,843,895,918,950,993,1029
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "582d47d549c532149317e0ebc53f01d47b902e1a",
+  "prompts": {
+    "dc441f190e4329c8": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "51eeb9b4-6ad5-401e-a8c3-bf372947e2b5",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T14:29:36.850Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T14:29:36.850Z"
+        }
+      ],
+      "total_additions": 91,
+      "total_deletions": 91,
+      "accepted_lines": 91,
+      "overriden_lines": 0
+    }
+  }
+}
