@@ -1,0 +1,56 @@
+internal/scaffold/extract.go
+  cecdbc755b3ecd51 1-146
+internal/scaffold/extract_limits_test.go
+  cecdbc755b3ecd51 1-203
+internal/scaffold/extract_links_test.go
+  cecdbc755b3ecd51 1-80
+internal/scaffold/extract_test.go
+  cecdbc755b3ecd51 1-227
+internal/scaffold/helpers_test.go
+  cecdbc755b3ecd51 1-129
+internal/scaffold/manifest.go
+  cecdbc755b3ecd51 1-85
+internal/scaffold/manifest_test.go
+  cecdbc755b3ecd51 1-249
+internal/scaffold/project.go
+  cecdbc755b3ecd51 1-31
+internal/scaffold/scaffold_test.go
+  cecdbc755b3ecd51 1-74
+internal/scaffold/tarball_test.go
+  cecdbc755b3ecd51 1-90
+internal/scaffold/umask_other_test.go
+  cecdbc755b3ecd51 1-5
+internal/scaffold/umask_unix_test.go
+  cecdbc755b3ecd51 1-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "5859a7459d8eb934ea663a08e6a0ca10162c65c4",
+  "prompts": {
+    "cecdbc755b3ecd51": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "bf1935bc-cfd2-4ef9-a030-d2a0cfeae08b",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:46.560Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:46.560Z"
+        }
+      ],
+      "total_additions": 1326,
+      "total_deletions": 31,
+      "accepted_lines": 1326,
+      "overriden_lines": 0
+    }
+  }
+}
