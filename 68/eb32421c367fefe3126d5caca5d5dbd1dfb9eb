@@ -1,0 +1,56 @@
+internal/cli/configure/configure.go
+  c40ee4684a49cb82 1-196
+internal/cli/configure/configure_test.go
+  c40ee4684a49cb82 1-238
+internal/cli/configure/credentials_test.go
+  c40ee4684a49cb82 1-150
+internal/cli/configure/errors_test.go
+  c40ee4684a49cb82 1-113
+internal/cli/configure/helpers_test.go
+  c40ee4684a49cb82 1-157
+internal/cli/configure/picker_test.go
+  c40ee4684a49cb82 1-103
+internal/cli/configure/regions.go
+  c40ee4684a49cb82 1-59
+internal/cli/configure/regions_test.go
+  c40ee4684a49cb82 1-102
+internal/cli/root.go
+  c40ee4684a49cb82 11,37
+test/contract/allowed-diffs.txt
+  c40ee4684a49cb82 28,81-89
+test/contract/consistency_test.go
+  c40ee4684a49cb82 76
+test/contract/scenarios/security-escape-region-picker.yaml
+  c40ee4684a49cb82 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "7d8427b78669e0528caec72e2251eff1869abeef",
+  "prompts": {
+    "c40ee4684a49cb82": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "c9c3f136-2586-4dc9-b445-aa1ef6a6cbbb",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:41.194Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:41.194Z"
+        }
+      ],
+      "total_additions": 1132,
+      "total_deletions": 0,
+      "accepted_lines": 1132,
+      "overriden_lines": 0
+    }
+  }
+}
