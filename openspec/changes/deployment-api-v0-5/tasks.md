@@ -4,7 +4,7 @@ Run every command from the repository root. `make test` is `go test -race ./...`
 
 ## 1. Send the package name on v0.5
 
-- [ ] 1.1 `PackageRequest.Name`, sent only from `v0.5`.
+- [x] 1.1 `PackageRequest.Name`, sent only from `v0.5`.
   - Files: `internal/platform/deployments.go`, `internal/platform/deployments_test.go` (or the existing test file for `CreatePackage`).
   - Test first: with a client built for `v0.5`, `CreatePackage` with `Name: "shop-dev"` sends a body with `"name":"shop-dev"`; with a client built for `v0.3` or `v0.4`, the same call sends a body with no `name` key.
   - Verify: `go test ./internal/platform/ -count=1`

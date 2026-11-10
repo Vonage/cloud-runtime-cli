@@ -39,6 +39,7 @@ const (
 // core is what every request of one run shares: the credentials, the platform host set and the one http.Client.
 // It is safe for concurrent use.
 type core struct {
+	apiVersion   string
 	creds        Credentials
 	userAgent    string
 	clock        clock.Clock
@@ -68,6 +69,7 @@ func newCore(o Options, tlsCfg *tls.Config) (*core, error) {
 	}
 
 	c := &core{
+		apiVersion:   o.APIVersion,
 		creds:        o.Creds,
 		userAgent:    o.UserAgent,
 		clock:        o.Clock,

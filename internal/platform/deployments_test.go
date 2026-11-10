@@ -84,6 +84,29 @@ func TestCreatePackageBodyAndID(t *testing.T) {
 	}
 }
 
+func TestCreatePackageSendsTheNameFromV05(t *testing.T) {
+	tests := []struct {
+		version  string
+		wantBody string
+	}{
+		{"v0.3", `{"sourceCodeKey":"k1","entrypoint":null,"capabilities":{},"buildScriptPath":"","runtime":"nodejs18"}`},
+		{"v0.4", `{"sourceCodeKey":"k1","entrypoint":null,"capabilities":{},"buildScriptPath":"","runtime":"nodejs18"}`},
+		{"v0.5", `{"sourceCodeKey":"k1","entrypoint":null,"capabilities":{},"buildScriptPath":"","runtime":"nodejs18","name":"shop-dev"}`},
+	}
+	for _, tc := range tests {
+		t.Run(tc.version, func(t *testing.T) {
+			s := newRouteServerAt(t, tc.version, answerJSON(http.StatusOK, `{"packageId":"pkg-1"}`))
+
+			_, err := s.client.CreatePackage(t.Context(), PackageRequest{SourceCodeKey: "k1", Runtime: "nodejs18", Name: "shop-dev"})
+
+			require.NoError(t, err)
+			req := s.only(t)
+			assert.Equal(t, "/"+tc.version+"/packages", req.RawPath)
+			assert.Equal(t, tc.wantBody, string(req.Body))
+		})
+	}
+}
+
 func TestCreatePackageChecksTheReturnedID(t *testing.T) {
 	for _, id := range []string{"../x", "", "a b", "a/b"} {
 		t.Run(id, func(t *testing.T) {

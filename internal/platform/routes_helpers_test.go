@@ -24,8 +24,14 @@ type routeServer struct {
 // newRouteServer starts a server that answers with handler (a bare 200 when nil) and returns a client of it.
 func newRouteServer(t *testing.T, handler func(http.ResponseWriter, *http.Request)) routeServer {
 	t.Helper()
+	return newRouteServerAt(t, "v0.3", handler)
+}
+
+// newRouteServerAt is newRouteServer with a client built for apiVersion.
+func newRouteServerAt(t *testing.T, apiVersion string, handler func(http.ResponseWriter, *http.Request)) routeServer {
+	t.Helper()
 	rec := newRecorder(handler)
-	c, fake, notices := newTestClient(t, startPlain(t, rec))
+	c, fake, notices := newTestClientAt(t, startPlain(t, rec), apiVersion)
 	return routeServer{client: c, rec: rec, clock: fake, notices: notices}
 }
 

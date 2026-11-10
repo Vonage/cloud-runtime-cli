@@ -129,11 +129,17 @@ func newTestCore(t *testing.T, bootstrap string, tlsCfg *tls.Config) *core {
 // the test credentials, and the fake clock and notices buffer it was built with. The marketplace URL is unset.
 func newTestClient(t *testing.T, srv *httptest.Server) (*Client, *clocktest.Fake, *bytes.Buffer) {
 	t.Helper()
+	return newTestClientAt(t, srv, "v0.3")
+}
+
+// newTestClientAt is newTestClient with API version apiVersion.
+func newTestClientAt(t *testing.T, srv *httptest.Server, apiVersion string) (*Client, *clocktest.Fake, *bytes.Buffer) {
+	t.Helper()
 	fake := clocktest.New(time.Unix(0, 0))
 	notices := &bytes.Buffer{}
 	c, err := newCore(Options{
 		Bootstrap:  srv.URL,
-		APIVersion: "v0.3",
+		APIVersion: apiVersion,
 		Creds:      testCreds,
 		UserAgent:  testUserAgent,
 		Clock:      fake,
@@ -141,7 +147,7 @@ func newTestClient(t *testing.T, srv *httptest.Server) (*Client, *clocktest.Fake
 	}, nil)
 	require.NoError(t, err)
 	region := Region{Alias: "aws.euw1", DeploymentAPIURL: srv.URL}
-	return newClient(c, endpoint(mustURL(t, srv.URL), "v0.3"), nil, region), fake, notices
+	return newClient(c, endpoint(mustURL(t, srv.URL), apiVersion), nil, region), fake, notices
 }
 
 // getStatus sends a GET and returns its error, closing the body of a successful answer.

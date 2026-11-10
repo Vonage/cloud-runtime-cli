@@ -4,10 +4,15 @@ import (
 	"context"
 	"net/http"
 
+	"golang.org/x/mod/semver"
+
 	"github.com/Vonage/cloud-runtime-cli/internal/manifest"
 )
 
-const fieldPackageID = "package id"
+const (
+	fieldPackageID     = "package id"
+	namedPackagesSince = "v0.5"
+)
 
 // CreateProject is POST /projects {"name":<name>,"origin":"owner"} and returns the new project id.
 func (c *Client) CreateProject(ctx context.Context, name string) (string, error) {
@@ -30,10 +35,15 @@ type PackageRequest struct {
 	Capabilities    manifest.Capabilities `json:"capabilities"`
 	BuildScriptPath string                `json:"buildScriptPath"`
 	Runtime         string                `json:"runtime"`
+	Name            string                `json:"name,omitempty"` // sent from v0.5 only
 }
 
-// CreatePackage is POST /packages and returns the package id. Never retried.
+// CreatePackage is POST /packages and returns the package id. Never retried. Before v0.5 the name is left out,
+// so those versions get the body they always had.
 func (c *Client) CreatePackage(ctx context.Context, req PackageRequest) (packageID string, err error) {
+	if semver.Compare(c.core.apiVersion, namedPackagesSince) < 0 {
+		req.Name = ""
+	}
 	var out struct {
 		PackageID string `json:"packageId"`
 	}
