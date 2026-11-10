@@ -1,0 +1,19 @@
+internal/config/endpoint_test.go
+  s_5481395ded4513::t_6195c9308aef34 140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "436058640a2f154084bbefb9238c4f5a4c47b41a",
+  "prompts": {},
+  "sessions": {
+    "s_5481395ded4513": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_9cf33872-1607-4ff8-8b4a-27f03350570c",
+        "model": "auto"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
