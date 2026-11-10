@@ -1,38 +1,42 @@
+openspec/changes/deployment-api-v0-5/.openspec.yaml
+  333771e758fa1e5a 1-2
 openspec/changes/deployment-api-v0-5/design.md
-  s_5481395ded4513::t_e527dfc45b1ea4 21-24
-  s_5481395ded4513::t_1ff81c11f9a330 14
-  s_5481395ded4513::t_83a201f31bd287 11-13
-  s_5481395ded4513::t_90c7d1be00f78d 15-20
-  s_5481395ded4513::t_e8d2e631526823 25-27
-openspec/changes/deployment-api-v0-5/specs/package-naming/spec.md
-  s_5481395ded4513::t_536b13681a1dfe 17-18
-  s_5481395ded4513::t_acc415e3986ccf 30-31,33-35,37,39
-  s_5481395ded4513::t_ca4d04eed1d6bd 32,36,38,40-44
-  s_5481395ded4513::t_ec5ad3230ff1ab 14-16
-  s_5481395ded4513::t_8570570255d996 19-21,27-29
-openspec/changes/deployment-api-v0-5/tasks.md
-  s_5481395ded4513::t_50e3989282d2f6 1-12,16-25
-  s_5481395ded4513::t_71962f4dccf88e 13-14
-  s_5481395ded4513::t_684c863eefc6d8 15
+  333771e758fa1e5a 1-32
 openspec/changes/deployment-api-v0-5/proposal.md
-  s_5481395ded4513::t_26aea93f2e32da 11
-  s_5481395ded4513::t_d357ae317dc6f9 10
-  s_5481395ded4513::t_b7edecb4669063 7-9
-  s_5481395ded4513::t_9b41d4d2b2eeee 12-14
+  333771e758fa1e5a 1-43
+openspec/changes/deployment-api-v0-5/specs/package-naming/spec.md
+  333771e758fa1e5a 1-44
+openspec/changes/deployment-api-v0-5/tasks.md
+  333771e758fa1e5a 1-25
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.7.5",
+  "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "fff6f57913e0ab79b2c45a4cf59a6929ae1a2016",
-  "prompts": {},
-  "sessions": {
-    "s_5481395ded4513": {
+  "prompts": {
+    "333771e758fa1e5a": {
       "agent_id": {
         "tool": "kiro",
-        "id": "sess_9cf33872-1607-4ff8-8b4a-27f03350570c",
-        "model": "auto"
+        "id": "a7c426e4-72ee-462f-a9ed-d2795f97e312",
+        "model": "claude-opus-5.5"
       },
-      "human_author": "Simon Chan <simon.chan@vonage.com>"
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-10T14:18:34.010Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
+          "timestamp": "2026-11-10T14:18:34.010Z"
+        }
+      ],
+      "total_additions": 146,
+      "total_deletions": 0,
+      "accepted_lines": 146,
+      "overriden_lines": 0
     }
   }
 }
