@@ -1,0 +1,8 @@
+description: "-p is the short form of --path"
+args: [upgrade, -f, -p, "${BIN}"]
+exe: copy
+requires-hotfix: true
+fixtures:
+  release: {tag: v9.9.9}
+expect-reads: []
+scrape: [version-line, upgrade-success]

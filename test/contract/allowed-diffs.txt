@@ -1,0 +1,182 @@
+# <scenario-glob> <field> <reason>; fields: stdout stderr exit files requests
+completion-bash requests help and completion no longer read the config file or use the network
+completion-bash-no-descriptions requests help and completion no longer read the config file or use the network
+completion-complete-flags requests help and completion no longer read the config file or use the network
+completion-fish requests help and completion no longer read the config file or use the network
+completion-fish-no-descriptions requests help and completion no longer read the config file or use the network
+completion-no-config stdout help and completion no longer read the config file or use the network
+completion-no-config stderr help and completion no longer read the config file or use the network
+completion-no-config exit help and completion no longer read the config file or use the network
+completion-powershell requests help and completion no longer read the config file or use the network
+completion-powershell-no-descriptions requests help and completion no longer read the config file or use the network
+completion-zsh requests help and completion no longer read the config file or use the network
+completion-zsh-no-descriptions requests help and completion no longer read the config file or use the network
+help-command-form requests help and completion no longer read the config file or use the network
+completion-complete-command requests help and completion no longer read the config file or use the network
+security-redirect-get-to-other-host-carries-no-credentials stdout credentials are not sent to another host or port after a redirect
+security-redirect-get-to-other-host-carries-no-credentials stderr credentials are not sent to another host or port after a redirect
+security-redirect-get-to-other-host-carries-no-credentials exit credentials are not sent to another host or port after a redirect
+security-redirect-get-to-other-host-carries-no-credentials requests credentials are not sent to another host or port after a redirect
+security-redirect-get-to-same-host-other-port stdout credentials are not sent to another host or port after a redirect
+security-redirect-get-to-same-host-other-port stderr credentials are not sent to another host or port after a redirect
+security-redirect-get-to-same-host-other-port exit credentials are not sent to another host or port after a redirect
+security-redirect-get-to-same-host-other-port requests credentials are not sent to another host or port after a redirect
+security-region-record-with-insecure-url stderr a region record with a plain http URL is refused before any request
+security-region-record-with-insecure-url requests a region record with a plain http URL is refused before any request
+security-escape-app-list stdout terminal control sequences in platform-supplied names are removed
+security-escape-error-message stderr terminal control sequences in platform-supplied error text are removed
+security-escape-region-picker stdout terminal control sequences in platform-supplied region names are removed
+security-error-body-html stderr long or HTML error bodies are summarised and truncated, the API secret is redacted and an invalid trace id is replaced
+security-error-body-long-plain-text stderr long or HTML error bodies are summarised and truncated, the API secret is redacted and an invalid trace id is replaced
+security-error-body-contains-api-secret stderr long or HTML error bodies are summarised and truncated, the API secret is redacted and an invalid trace id is replaced
+security-error-trace-id-with-spaces stderr long or HTML error bodies are summarised and truncated, the API secret is redacted and an invalid trace id is replaced
+app-remove-id-with-slash stderr ids with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+app-remove-id-with-slash requests ids with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+security-id-over-256-bytes stderr ids with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+security-id-over-256-bytes requests ids with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+security-id-with-percent stderr ids with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+security-id-with-percent requests ids with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+security-id-empty stderr ids with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+security-id-empty requests ids with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+app-generate-keys-id-dotdot stdout ids with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+app-generate-keys-id-dotdot stderr ids with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+app-generate-keys-id-dotdot requests ids with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+security-id-with-control-character stderr ids with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+instance-remove-instance-in-other-region stdout instance remove goes to the region the instance runs in
+instance-remove-instance-in-other-region stderr instance remove goes to the region the instance runs in
+instance-remove-instance-in-other-region exit instance remove goes to the region the instance runs in
+instance-remove-instance-in-other-region requests instance remove goes to the region the instance runs in
+instance-log-backend-failure stdout a failing logs backend is reported as an error instead of empty logs
+instance-log-backend-failure stderr a failing logs backend is reported as an error instead of empty logs
+instance-log-backend-failure exit a failing logs backend is reported as an error instead of empty logs
+security-escape-instance-list stdout terminal control sequences in platform-supplied names are removed
+security-escape-log-rows stdout terminal control sequences in platform-supplied log lines are removed
+security-instance-names-with-slash stderr ids and names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+security-server-service-name-malformed stdout ids and service names returned by the platform with path separators, dot segments, control characters or other unsafe characters are rejected before they are used
+security-server-service-name-malformed stderr ids and service names returned by the platform with path separators, dot segments, control characters or other unsafe characters are rejected before they are used
+security-server-service-name-malformed exit ids and service names returned by the platform with path separators, dot segments, control characters or other unsafe characters are rejected before they are used
+security-server-service-name-malformed requests ids and service names returned by the platform with path separators, dot segments, control characters or other unsafe characters are rejected before they are used
+bootstrap-unmappable-flag-endpoint stdout an unrecognised graphql endpoint is an error because the CLI no longer calls a graphql server
+bootstrap-unmappable-flag-endpoint stderr an unrecognised graphql endpoint is an error because the CLI no longer calls a graphql server
+bootstrap-unmappable-flag-endpoint exit an unrecognised graphql endpoint is an error because the CLI no longer calls a graphql server
+bootstrap-unmappable-flag-endpoint requests an unrecognised graphql endpoint is an error because the CLI no longer calls a graphql server
+bootstrap-unmappable-config-endpoint stdout an unrecognised graphql endpoint is an error because the CLI no longer calls a graphql server
+bootstrap-unmappable-config-endpoint stderr an unrecognised graphql endpoint is an error because the CLI no longer calls a graphql server
+bootstrap-unmappable-config-endpoint exit an unrecognised graphql endpoint is an error because the CLI no longer calls a graphql server
+bootstrap-unmappable-config-endpoint requests an unrecognised graphql endpoint is an error because the CLI no longer calls a graphql server
+bootstrap-region-lookup-unauthorised stderr a failed region lookup may report 401 where it reported 403
+config-explicit-file-missing-falls-back stdout an explicit config file that does not exist is an error instead of a silent fallback
+config-explicit-file-missing-falls-back stderr an explicit config file that does not exist is an error instead of a silent fallback
+config-explicit-file-missing-falls-back exit an explicit config file that does not exist is an error instead of a silent fallback
+config-explicit-file-missing-falls-back requests an explicit config file that does not exist is an error instead of a silent fallback
+config-explicit-broken-symlink stdout an explicit config file that does not exist is an error instead of a silent fallback
+config-explicit-broken-symlink stderr an explicit config file that does not exist is an error instead of a silent fallback
+config-explicit-broken-symlink exit an explicit config file that does not exist is an error instead of a silent fallback
+config-explicit-broken-symlink requests an explicit config file that does not exist is an error instead of a silent fallback
+config-broken-symlink-config stdout an explicit config file that does not exist is an error instead of a silent fallback
+config-broken-symlink-config stderr an explicit config file that does not exist is an error instead of a silent fallback
+config-parse-error stderr a malformed config file's error no longer quotes the file content
+config-parse-error-with-secret-line stderr a malformed config file's error no longer quotes the file content
+root-no-config-no-flags stderr without any configured endpoint the CLI uses the production default instead of failing on an empty URL
+configure-fresh stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+configure-existing-keep-defaults stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+configure-existing-change-region stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+configure-hides-test-regions stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+configure-config-file-flag stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+configure-api-key-flag-is-the-default stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+configure-writes-through-symlink stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+configure-region-list-server-error stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+security-escape-region-picker stdout the api secret prompt is masked, never shows the stored secret, and says a blank answer keeps it
+security-redirect-post-* stdout redirects of POST, PATCH and DELETE requests are refused
+security-redirect-post-* stderr redirects of POST, PATCH and DELETE requests are refused
+security-redirect-post-* exit redirects of POST, PATCH and DELETE requests are refused
+security-redirect-post-* requests redirects of POST, PATCH and DELETE requests are refused
+security-redirect-patch-* stdout redirects of POST, PATCH and DELETE requests are refused
+security-redirect-patch-* stderr redirects of POST, PATCH and DELETE requests are refused
+security-redirect-patch-* exit redirects of POST, PATCH and DELETE requests are refused
+security-redirect-patch-* requests redirects of POST, PATCH and DELETE requests are refused
+security-redirect-delete-* stdout redirects of POST, PATCH and DELETE requests are refused
+security-redirect-delete-* stderr redirects of POST, PATCH and DELETE requests are refused
+security-redirect-delete-* exit redirects of POST, PATCH and DELETE requests are refused
+security-redirect-delete-* requests redirects of POST, PATCH and DELETE requests are refused
+secret-create-typed-value stdout a value typed on a terminal is read with echo off behind a prompt on stderr and no longer ends with a newline
+secret-create-typed-value requests a value typed on a terminal is read with echo off behind a prompt on stderr and no longer ends with a newline
+secret-create-typed-value-multiline stdout a value typed on a terminal is read with echo off behind a prompt on stderr and no longer ends with a newline
+secret-create-typed-value-multiline requests a value typed on a terminal is read with echo off behind a prompt on stderr and no longer ends with a newline
+secret-update-typed-value stdout a value typed on a terminal is read with echo off behind a prompt on stderr and no longer ends with a newline
+secret-update-typed-value requests a value typed on a terminal is read with echo off behind a prompt on stderr and no longer ends with a newline
+secret-create-value stderr --value prints a warning on stderr
+secret-create-alias-add stderr --value prints a warning on stderr
+secret-create-short-flags stderr --value prints a warning on stderr
+secret-create-value-wins-over-filename stderr --value prints a warning on stderr
+secret-create-already-exists stderr --value prints a warning on stderr
+secret-update-value stderr --value prints a warning on stderr
+secret-update-missing-secret stderr --value prints a warning on stderr
+security-escape-secret-list stdout terminal control sequences in platform-supplied names are removed
+secret-remove-invalid-name stdout names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+secret-remove-invalid-name stderr names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+secret-remove-invalid-name exit names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+secret-remove-invalid-name requests names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+secret-remove-name-with-dotdot stdout names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+secret-remove-name-with-dotdot stderr names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+secret-remove-name-with-dotdot exit names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+secret-remove-name-with-dotdot requests names with path separators, percent signs, dot segments, control characters or over 256 bytes are rejected before any request
+deploy-bad-default-region-with-valid-manifest-region stdout a bad default region no longer blocks deploy when the manifest names a valid region
+deploy-bad-default-region-with-valid-manifest-region stderr a bad default region no longer blocks deploy when the manifest names a valid region
+deploy-bad-default-region-with-valid-manifest-region exit a bad default region no longer blocks deploy when the manifest names a valid region
+deploy-bad-default-region-with-valid-manifest-region requests a bad default region no longer blocks deploy when the manifest names a valid region
+deploy-build-interrupted stderr --timeout and Ctrl-C end a blocked build watch on time
+deploy-build-interrupted exit --timeout and Ctrl-C end a blocked build watch on time
+deploy-build-timeout stdout --timeout and Ctrl-C end a blocked build watch on time
+deploy-upload-fails-502 stderr uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-fails-502 requests uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-retry-then-succeeds stdout uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-retry-then-succeeds stderr uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-retry-then-succeeds exit uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-retry-then-succeeds requests uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-transport-error-once stdout uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-transport-error-once stderr uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-transport-error-once exit uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+deploy-upload-transport-error-once requests uploads retry on transport errors and 502/503/504 with a stderr notice per retry
+security-build-frame-with-status-word-does-not-end-the-watch stdout the build status route decides the outcome; the build log stream only shows output
+security-escape-build-frames stdout remote text is sanitised before it is printed
+security-redirect-upload-307 stdout credentials go only to platform hosts and redirects of POST requests are refused
+security-redirect-upload-307 stderr credentials go only to platform hosts and redirects of POST requests are refused
+security-redirect-upload-307 exit credentials go only to platform hosts and redirects of POST requests are refused
+security-redirect-upload-307 requests credentials go only to platform hosts and redirects of POST requests are refused
+security-upload-env-negation-brings-back-env stderr uploads leave out .git/ and local .env files, with one stderr notice
+security-upload-env-negation-brings-back-env requests uploads leave out .git/ and local .env files, with one stderr notice
+security-upload-git-negation-brings-back-git stderr uploads leave out .git/ and local .env files, with one stderr notice
+security-upload-git-negation-brings-back-git requests uploads leave out .git/ and local .env files, with one stderr notice
+security-upload-skips-git-and-env-files stderr uploads leave out .git/ and local .env files, with one stderr notice
+security-upload-skips-git-and-env-files requests uploads leave out .git/ and local .env files, with one stderr notice
+debug-app-exits-early stderr a warning is printed when the local application exits
+debug-debugger-port-in-use requests the local debugger port is bound before the debug service is deployed
+debug-debugger-port-in-use stdout the local debugger port is bound before the debug service is deployed, so nothing is printed
+debug-debugger-port-in-use stderr the local debugger port is bound before the debug service is deployed, so the error names the local debugger
+debug-debugger-port-in-use exit a local debugger port that is already in use ends the command with exit status 1
+debug-interrupt-during-setup requests the debug service is deleted when interrupted during setup
+debug-interrupt-during-setup stdout the output ends with the removal of the debug service when interrupted during setup
+debug-interrupt-during-setup exit interrupting the command during setup ends it with exit status 0
+debug-takeover-close-1008 stderr a message is printed when the session is taken over by another connection
+debug-takeover-close-1008 exit a taken-over session ends with exit status 1
+debug-takeover-close-1008 requests the debug service is deleted when the session is taken over, instead of the CLI reconnecting
+security-debug-verbose-hides-authorization stdout verbose output hides the values of authorization and cookie headers
+security-escape-debug-access-log stdout terminal control sequences in the path of a relayed request are removed from the access log
+deploy-build-normal-close-before-completion stdout the build status route decides the outcome; the build log stream only shows output
+deploy-build-normal-close-before-completion stderr the build status route decides the outcome; the build log stream only shows output
+deploy-build-normal-close-before-completion exit the build status route decides the outcome; the build log stream only shows output
+deploy-build-normal-close-before-completion requests the build status route decides the outcome; the build log stream only shows output
+deploy-build-connect-always-rejected stdout the build status route decides the outcome; the build log stream only shows output
+deploy-build-connect-always-rejected stderr the build status route decides the outcome; the build log stream only shows output
+deploy-build-connect-always-rejected exit the build status route decides the outcome; the build log stream only shows output
+deploy-build-connect-always-rejected requests the build status route decides the outcome; the build log stream only shows output
+security-build-frame-failure-line-does-not-end-the-build stdout the build status route decides the outcome; the build log stream only shows output
+security-build-frame-failure-line-does-not-end-the-build stderr the build status route decides the outcome; the build log stream only shows output
+security-build-frame-failure-line-does-not-end-the-build exit the build status route decides the outcome; the build log stream only shows output
+security-build-frame-failure-line-does-not-end-the-build requests the build status route decides the outcome; the build log stream only shows output
+security-build-frame-watch-failure-line-does-not-end-the-build stdout the build status route decides the outcome; the build log stream only shows output
+security-build-frame-watch-failure-line-does-not-end-the-build stderr the build status route decides the outcome; the build log stream only shows output
+security-build-frame-watch-failure-line-does-not-end-the-build exit the build status route decides the outcome; the build log stream only shows output
+security-build-frame-watch-failure-line-does-not-end-the-build requests the build status route decides the outcome; the build log stream only shows output
+

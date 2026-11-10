@@ -1,0 +1,12 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 1
+@@ stdout 0
+
+@@ stderr 31
+X accepts 1 arg(s), received 0
+
+@@ files 0
+
+@@ requests 0
+

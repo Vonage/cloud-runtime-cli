@@ -1,0 +1,12 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 1
+@@ stdout 125
+\x1b[0G\x1b[2K? Enter your Vonage api key: (abc123) \x1b[?25l\x1b[?25l\x1b7\x1b[999;999f\x1b[6n\x1b8\x1b[?25h\x1b[6n\x1b[?25h
+@@ stderr 30
+X failed to read api key: EOF
+
+@@ files 0
+
+@@ requests 0
+

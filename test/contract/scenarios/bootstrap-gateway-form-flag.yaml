@@ -1,0 +1,10 @@
+description: "the gateway form given as a flag reaches the platform"
+args: [--graphql-endpoint, "${FAKE}/v1/vcr/euw1/api/graphql/v1/graphql", app, list]
+config-file: |
+  default_region   = aws.euw1
+
+  [credentials]
+  api_key    = abc123
+  api_secret = s3cret-for-tests
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

@@ -1,0 +1,13 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 1
+@@ stdout 106
+! Config file not found at "~/.vcr-cli", please use 'vcr configure' to create one. Trying to use flags...
+
+@@ stderr 68
+X failed to initialize cli: Post "": unsupported protocol scheme ""
+
+@@ files 0
+
+@@ requests 0
+

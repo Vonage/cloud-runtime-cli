@@ -1,0 +1,2 @@
+description: "the completion command without a shell prints its help"
+args: [completion]

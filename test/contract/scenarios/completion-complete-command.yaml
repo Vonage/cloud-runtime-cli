@@ -1,0 +1,4 @@
+description: "the hidden completion request lists the subcommands of a group"
+group: app
+args: [__complete, app, ""]
+expect-reads: []

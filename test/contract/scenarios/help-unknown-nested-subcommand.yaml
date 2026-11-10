@@ -1,0 +1,4 @@
+description: "an unknown subcommand of a group prints the group help and exits 0"
+group: app
+args: [app, nosuch]
+expect-reads: []

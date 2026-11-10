@@ -1,0 +1,40 @@
+description: "file modes and nested directories are kept in the archive"
+args: [deploy]
+cwd: work/project
+files:
+  - path: work/project/vcr.yml
+    content: |
+      project:
+        name: my-project
+      instance:
+        name: dev
+        runtime: nodejs18
+        region: aws.euw1
+        application-id: 00000000-0000-4000-8000-000000000601
+        entrypoint: [node, index.js]
+  - path: work/project/index.js
+    content: |
+      console.log('hello');
+  - path: work/project/package.json
+    content: |
+      {"name": "my-project", "version": "1.0.0"}
+  - path: work/project/bin/run.sh
+    content: |
+      #!/bin/sh
+    mode: 0755
+  - path: work/project/private.txt
+    content: |
+      x
+    mode: 0600
+  - path: work/project/readonly.txt
+    content: |
+      x
+    mode: 0444
+  - path: work/project/a/b/c/deep.txt
+    content: |
+      x
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /projects/my-project"
+  - "euw1 GET /packages/<uuid>/build/status"
+scrape: [deployed-banner, deployed-instance-id, deployed-service-name, deployed-host-address]

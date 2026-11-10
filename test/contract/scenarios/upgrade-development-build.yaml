@@ -1,0 +1,9 @@
+description: "a development build does not upgrade itself"
+args: [upgrade, --force]
+build: dev
+exe: copy
+requires-hotfix: true
+fixtures:
+  release: {tag: v9.9.9}
+expect-reads: []
+scrape: [version-line]

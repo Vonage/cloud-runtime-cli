@@ -1,0 +1,5 @@
+description: "a project name with a slash is refused before anything is sent"
+group: instance
+args: [instance, remove, --project-name, "a/b", --instance-name, c, --yes]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

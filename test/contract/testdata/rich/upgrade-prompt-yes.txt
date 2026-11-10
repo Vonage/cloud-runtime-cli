@@ -1,0 +1,8 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 218
+vcr-cli version v2.6.1 (commit:0123456789abcdef0123456789abcdef01234567, date:<time>)
+✓ Update available 9.9.9
+Are you sure you want to update to 9.9.9 ? [y/n]: y
+✓ Successfully updated to version 9.9.9  <BIN>/vcr
+

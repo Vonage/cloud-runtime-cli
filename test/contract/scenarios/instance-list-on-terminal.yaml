@@ -1,0 +1,6 @@
+description: "instances are listed on a terminal, newest first"
+args: [instance, list]
+tty: true
+expect-reads:
+  - "euw1 GET /instances"
+  - "euw1 GET /regions/aws.euw1"

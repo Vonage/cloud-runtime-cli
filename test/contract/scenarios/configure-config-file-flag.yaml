@@ -1,0 +1,25 @@
+description: configure reads and writes the file named by --config-file, and leaves the default one alone
+args: [configure, --config-file, "${HOME}/custom.ini"]
+tty: true
+requires-hotfix: true
+files:
+  - path: home/custom.ini
+    content: |
+      graphql_endpoint = ${FAKE}/v1/vcr/euw1/api/graphql/v1/graphql
+      default_region   = aws.use1
+
+      [credentials]
+      api_key    = abc123
+      api_secret = s3cret-for-tests
+    mode: 0600
+steps:
+  - {expect: "Enter your Vonage api key:"}
+  - {send: "\r"}
+  - {expect: "Enter your Vonage api secret"}
+  - {send: "\r"}
+  - {expect: "Select your Vonage region:"}
+  - {send: "\x1b[A"}
+  - {expect: "> AWS - Europe"}
+  - {send: "\r"}
+  - {expect: "New configuration file written to"}
+expect-reads: [euw1 GET /regions]

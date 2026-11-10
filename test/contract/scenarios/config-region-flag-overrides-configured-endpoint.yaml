@@ -1,0 +1,5 @@
+description: "--region derives a production endpoint even when the file names another one"
+args: [--region, aws.use1, app, list]
+expect-reads: []
+fenced-host: api-eu.vonage.com
+fenced-host-baseline: graphql.use1.runtime.vonage.cloud

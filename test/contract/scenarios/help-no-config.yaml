@@ -1,0 +1,5 @@
+description: "help pages need no configuration file"
+group: deploy
+args: [deploy, --help]
+config: none
+expect-reads: []

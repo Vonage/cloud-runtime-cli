@@ -1,0 +1,23 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 1
+@@ stdout 0
+
+@@ stderr 761
+unknown shorthand flag: 'v' in -v
+Usage:  vcr deploy [path_to_code] [flags]
+
+Flags:
+  -i, --app-id string          Vonage application UUID to link with this deployment (overrides manifest)
+  -c, --capabilities string    Comma-separated capabilities: messages-v1,voice,rtc (overrides manifest)
+  -f, --filename string        Path to manifest file (default: vcr.yml in project directory)
+  -n, --instance-name string   Instance name, e.g., dev, staging, prod (overrides manifest)
+  -p, --project-name string    Project name (overrides manifest value)
+  -r, --runtime string         Runtime environment, e.g., nodejs18, nodejs20, python3 (overrides manifest)
+  -z, --tgz string             Path to pre-compressed tar.gz file to deploy (skips local compression)
+  
+
+@@ files 0
+
+@@ requests 0
+

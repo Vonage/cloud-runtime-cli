@@ -1,0 +1,6 @@
+description: "--filter keeps the instances whose service name contains the text"
+args: [instance, list, --filter, dev]
+expect-reads:
+  - "euw1 GET /instances?filter=dev"
+  - "euw1 GET /regions/aws.euw1"
+scrape: [table-lines]

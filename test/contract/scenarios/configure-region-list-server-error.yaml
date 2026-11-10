@@ -1,0 +1,14 @@
+description: configure reports the error when the region list cannot be fetched
+args: [configure]
+tty: true
+fixtures:
+  overrides:
+    - {match: "* graphql:Regions", status: 500}
+    - {match: "GET /regions", status: 500}
+steps:
+  - {expect: "Enter your Vonage api key:"}
+  - {send: "\r"}
+  - {expect: "Enter your Vonage api secret"}
+  - {send: "\r"}
+  - {expect: "failed to retrieve regions"}
+expect-reads: [euw1 GET /regions]

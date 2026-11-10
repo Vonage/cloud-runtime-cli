@@ -1,0 +1,60 @@
+name: Weekly vulnerability scan
+
+# Report-only: opens or updates one issue with the findings. It never blocks a PR; ci.yml blocks.
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch: {}
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { persist-credentials: false }
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with: { go-version-file: go.mod, cache: true }
+      - id: scan
+        # The command of `make vulncheck`, as ci.yml runs it (same version), run directly to read its exit status.
+        run: |
+          # Status 3 means findings. Any other failure is the tool failing, which fails this run.
+          status=0
+          go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./... > scan.txt 2>&1 || status=$?
+          cat scan.txt
+          case $status in
+            0) ;;
+            3) echo "findings=true" >> "$GITHUB_OUTPUT" ;;
+            *) exit "$status" ;;
+          esac
+      - name: Open or update the issue
+        if: steps.scan.outputs.findings == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          title='Weekly vulnerability scan'
+          {
+            printf 'The weekly scan found vulnerabilities in code this module calls.\n\n'
+            printf 'Run: %s/%s/actions/runs/%s\n\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
+            printf '```\n'
+            head -c 60000 scan.txt
+            printf '\n```\n'
+          } > body.md
+          gh label create security --description "Security findings" 2>/dev/null || true
+          number=$(gh issue list --label security --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$number" ]; then
+            gh issue edit "$number" --body-file body.md
+          else
+            gh issue create --title "$title" --label security --body-file body.md
+          fi

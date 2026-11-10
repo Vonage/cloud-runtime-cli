@@ -1,0 +1,5 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 23
+No applications found.
+

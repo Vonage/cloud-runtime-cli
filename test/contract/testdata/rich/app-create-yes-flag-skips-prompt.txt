@@ -1,0 +1,7 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 56
+✓ Application created
+  ID    <uuid>
+  Name  test-app
+

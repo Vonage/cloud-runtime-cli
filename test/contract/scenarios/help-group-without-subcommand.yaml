@@ -1,0 +1,4 @@
+description: "a command group without a subcommand prints its help and exits 0"
+group: app
+args: [app]
+expect-reads: []

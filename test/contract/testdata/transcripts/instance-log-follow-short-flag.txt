@@ -1,0 +1,54 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 0
+@@ stdout 153
+2026-10-14T10:00:01Z [application] first
+2026-10-14T10:00:02Z [application] second
+2026-10-14T10:00:03Z [provider] third
+Interrupt received, stopping...
+
+@@ stderr 0
+
+@@ files 0
+
+@@ requests 2304
+euw1 POST graphql:Region
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($alias: String!) {\\n  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {\\n    name\\n    alias\\n\\tdeployment_api_url\\n\\tmarketplace_api_url\\n\\tassets_api_url\\n\\tendpoint_url_scheme\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":{"alias":"aws.euw1"}}
+
+euw1 POST graphql:InstanceByID
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery myQuery ($id: uuid!) {\\n  Instances_by_pk(id: $id) {\\n    id\\n    service_name\\n  }\\n}","variables":{"id":"00000000-0000-4000-8000-000000000501"}}
+
+euw1 POST graphql:Logs
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($instance_id: String!, $limit: Int!, $timestamp: Time!) {\\n  Logs(where: {instance_id: {_eq: $instance_id}, timestamp: {_gt: $timestamp}}, order_by: {timestamp: desc}, limit: $limit) {\\n    log_level\\n    source_type\\n    message\\n    timestamp\\n  }\\n}","variables":{"instance_id":"00000000-0000-4000-8000-000000000501","limit":2,"timestamp":"<time>"}}
+
+euw1 POST graphql:Logs
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($instance_id: String!, $limit: Int!, $timestamp: Time!) {\\n  Logs(where: {instance_id: {_eq: $instance_id}, timestamp: {_gt: $timestamp}}, order_by: {timestamp: desc}, limit: $limit) {\\n    log_level\\n    source_type\\n    message\\n    timestamp\\n  }\\n}","variables":{"instance_id":"00000000-0000-4000-8000-000000000501","limit":2,"timestamp":"2026-10-14T10:00:02Z"}}
+
+euw1 POST graphql:Logs
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($instance_id: String!, $limit: Int!, $timestamp: Time!) {\\n  Logs(where: {instance_id: {_eq: $instance_id}, timestamp: {_gt: $timestamp}}, order_by: {timestamp: desc}, limit: $limit) {\\n    log_level\\n    source_type\\n    message\\n    timestamp\\n  }\\n}","variables":{"instance_id":"00000000-0000-4000-8000-000000000501","limit":2,"timestamp":"2026-10-14T10:00:02Z"}}
+
+gh GET /releases/latest
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+

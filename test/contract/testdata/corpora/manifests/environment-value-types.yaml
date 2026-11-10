@@ -1,0 +1,35 @@
+project:
+  name: environment-types-project
+instance:
+  name: dev
+  runtime: nodejs18
+  region: aws.euw1
+  application-id: 00000000-0000-4000-8000-000000000601
+  entrypoint: [node, index.js]
+  environment:
+    - name: AN_INTEGER
+      value: 42
+    - name: A_FLOAT
+      value: 3.14
+    - name: A_BOOLEAN
+      value: true
+    - name: A_QUOTED_NUMBER
+      value: "007"
+    - name: AN_EMPTY_STRING
+      value: ""
+    - name: A_MULTI_LINE_STRING
+      value: |
+        first line
+        second line
+    - name: A_FOLDED_STRING
+      value: >
+        folded across
+        two lines
+    - name: FROM_A_SECRET
+      secret: SOME_SECRET_NAME
+debug:
+  application-id: 00000000-0000-4000-8000-000000000602
+  entrypoint: ["${TESTAPP}"]
+  environment:
+    - name: DEBUG_ONLY
+      value: yes

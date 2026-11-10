@@ -1,0 +1,7 @@
+description: "a failing release lookup is reported"
+args: [upgrade]
+fixtures:
+  overrides:
+    - {match: "GET gh:/releases/latest", status: 500, body: "unavailable"}
+expect-reads: []
+scrape: [version-line]

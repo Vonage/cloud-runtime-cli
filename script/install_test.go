@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
+	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -106,7 +107,7 @@ func keyID(blob []byte) string {
 func newSigningKey(t *testing.T, dir, name string) *signingKey {
 	t.Helper()
 	path := filepath.Join(dir, name)
-	out, err := exec.Command("ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-C", "", "-f", path).CombinedOutput()
+	out, err := exec.CommandContext(context.Background(), "ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-C", "", "-f", path).CombinedOutput()
 	require.NoError(t, err, string(out))
 	pub, err := os.ReadFile(path + ".pub")
 	require.NoError(t, err)
@@ -140,7 +141,7 @@ func testKeys(t *testing.T) (*signingKey, *signingKey) {
 func TestMain(m *testing.M) {
 	code := m.Run()
 	if keysDir != "" {
-		os.RemoveAll(keysDir)
+		_ = os.RemoveAll(keysDir)
 	}
 	os.Exit(code)
 }
@@ -199,7 +200,7 @@ func newEnv(t *testing.T) *env {
 			t.Skipf("%s not found", tool)
 		}
 	}
-	if out, _ := exec.Command("ssh-keygen", "-Y", "bogus").CombinedOutput(); strings.Contains(string(out), "option -- ") {
+	if out, _ := exec.CommandContext(context.Background(), "ssh-keygen", "-Y", "bogus").CombinedOutput(); strings.Contains(string(out), "option -- ") {
 		t.Skip("ssh-keygen -Y is not supported")
 	}
 	root := t.TempDir()
@@ -275,7 +276,7 @@ func (e *env) publish(tag string, o releaseOpts) {
 	sums := filepath.Join(dir, "checksums.txt")
 	e.write(sums, strings.Join(lines, "\n")+"\n")
 	for _, s := range o.sigs {
-		cmd := exec.Command("ssh-keygen", "-Y", "sign", "-f", s.signer.path, "-n", s.namespace, "checksums.txt")
+		cmd := exec.CommandContext(context.Background(), "ssh-keygen", "-Y", "sign", "-f", s.signer.path, "-n", s.namespace, "checksums.txt")
 		cmd.Dir = dir
 		out, err := cmd.CombinedOutput()
 		require.NoError(t, err, string(out))
@@ -318,7 +319,7 @@ func (e *env) run(args ...string) result {
 	home := filepath.Join(e.root, "home")
 	require.NoError(t, os.MkdirAll(home, 0o755))
 
-	cmd := exec.Command("sh", append([]string{e.scriptWithKeys()}, append(args, "-o", e.out)...)...)
+	cmd := exec.CommandContext(context.Background(), "sh", append([]string{e.scriptWithKeys()}, append(args, "-o", e.out)...)...)
 	cmd.Env = []string{
 		"PATH=" + shims + string(os.PathListSeparator) + os.Getenv("PATH"),
 		"HOME=" + home,

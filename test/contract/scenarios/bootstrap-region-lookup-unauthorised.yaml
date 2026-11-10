@@ -1,0 +1,8 @@
+description: "a region lookup that the platform refuses is reported"
+args: [app, list]
+fixtures:
+  overrides:
+    - {match: "POST graphql:Region", status: 403, body: '{"errors":[{"message":"access denied"}]}'}
+    - {match: "GET /regions/*", status: 401, body: '{"error":{"code":401,"message":"unauthorized","traceId":"trace-2"}}'}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

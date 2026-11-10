@@ -1,0 +1,9 @@
+description: "answering y at the confirmation removes the application"
+args: [app, remove, 00000000-0000-4000-8000-000000000601]
+tty: true
+steps:
+  - {expect: "Are you sure you want to remove application \"00000000-0000-4000-8000-000000000601\"? [y/n]:"}
+  - {send: "y\r"}
+  - {expect: "removed"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

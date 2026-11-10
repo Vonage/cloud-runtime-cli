@@ -1,0 +1,12 @@
+# vcr rich golden v1
+exit 1
+@@ stdout 238
+? Enter your project name: project
+? Enter your Instance name: dev
+✓ Runtimes retrieved
+? Select a runtime: nodejs18
+✗ failed to ask region
+  HTTP status  500
+  Trace ID     fake-trace-id
+  Quote the trace ID when contacting support.
+

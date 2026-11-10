@@ -1,0 +1,6 @@
+description: "ls is an alias of list"
+args: [instance, ls]
+expect-reads:
+  - "euw1 GET /instances"
+  - "euw1 GET /regions/aws.euw1"
+scrape: [table-lines]

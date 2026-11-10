@@ -1,0 +1,8 @@
+description: "upgrade with --force replaces the running binary with the latest signed release"
+args: [upgrade, --force]
+exe: copy
+requires-hotfix: true
+fixtures:
+  release: {tag: v9.9.9}
+expect-reads: []
+scrape: [version-line, upgrade-success]

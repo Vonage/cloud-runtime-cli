@@ -1,0 +1,4 @@
+description: "no notice is printed when the release is the running version"
+args: [app, list]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

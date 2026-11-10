@@ -1,0 +1,37 @@
+description: deploy when the first build connection drops   # required, one line, public wording
+group: deploy                           # optional when the id starts with a group name; required otherwise
+args: [deploy, --instance-name, dev]    # argv after the program name; required (may be [])
+cwd: work/project                       # relative to the sandbox root; default "work"
+tty: false                              # true: run in a PTY; the final screen text becomes stdout, stderr stays empty
+stdin: ""                               # text piped to stdin; key absent = /dev/null; with any `send` step the pipe stays open
+build: release                          # release (default) | dev (no version stamp: the binary reports itself as a development build)
+exe: stamped                            # stamped (default) | copy (the binary is copied to bin/vcr in the sandbox and that copy runs)
+requires: []                            # any of non-root, ipv6, ssh-keygen: the scenario is skipped when unmet
+requires-hotfix: false                  # true: the expected behaviour is a security fix that a release baseline has
+hold-ports: []                          # names of ${PORT:<name>} ports the runner binds (127.0.0.1) for the whole run
+env: {}                                 # extra environment variables
+config: default                         # default (write home/.vcr-cli) | none
+config-file: |                          # inline content for home/.vcr-cli instead of the default
+  graphql_endpoint = ${FAKE}/v1/vcr/euw1/api/graphql/v1/graphql
+files:                                  # created before the run; path relative to the sandbox root
+  - path: work/project/vcr.yml
+    content: |
+      project: {name: my-project}
+      instance: {name: dev, runtime: nodejs18, region: aws.euw1, application-id: 00000000-0000-4000-8000-000000000601, entrypoint: [node, index.js]}
+  - {path: work/project/index.js, content: "console.log('hi')\n", mode: 0644}
+  - {path: work/project/corpus.ini, from: testdata/corpora/corpus.ini}
+  - {path: work/project/link, link: index.js}
+  - {path: work/project/fifo, type: fifo}
+  - {path: work/project/dir, type: dir, mtime: 2026-10-10T10:00:00Z}
+fixtures:                               # decoded over fakeplatform.Defaults(); see the fake platform package
+  build:
+    connections:
+      - [{send: "Starting build"}, {drop: true}]
+      - [{send: "Step 1/1 : done"}, {send: "\u001b[35mℹ\u001b[0m Status - completed"}]
+steps: []                               # live steps
+expect-reads: [euw1 GET /regions/aws.euw1, euw1 GET /projects/my-project]
+scrape: [deployed-banner, deployed-host-address]
+scrape-except: []                       # names exempt from the implicit check
+fenced-host: ""                         # production-bootstrap scenarios only
+fenced-host-baseline: ""                # the host the baseline binary tries instead (recorder assertion only)
+timeout: 60s                            # wall clock for the process

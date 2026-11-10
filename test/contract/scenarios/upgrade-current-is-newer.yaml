@@ -1,0 +1,6 @@
+description: "upgrade says so when the running version is newer than the latest release"
+args: [upgrade]
+fixtures:
+  release: {tag: v2.0.0}
+expect-reads: []
+scrape: [version-line]

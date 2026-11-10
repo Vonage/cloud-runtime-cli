@@ -1,0 +1,9 @@
+description: "a valid signature by a key that is not trusted is not accepted"
+group: upgrade
+args: [upgrade, --force]
+requires-hotfix: true
+exe: copy
+fixtures:
+  release: {tag: v9.9.9, tamper: unknown-key}
+expect-reads: []
+scrape: [version-line]

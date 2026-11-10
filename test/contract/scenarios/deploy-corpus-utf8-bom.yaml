@@ -1,0 +1,11 @@
+description: "a manifest that starts with a byte order mark is read"
+args: [deploy]
+cwd: work/project
+files:
+  - {path: work/project/vcr.yml, from: testdata/corpora/manifests/utf8-bom.yaml, mode: 0644}
+  - {path: work/project/index.js, content: "console.log('hello');\n"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /projects/bom-project"
+  - "euw1 GET /packages/<uuid>/build/status"
+scrape: [deployed-banner, deployed-instance-id, deployed-service-name, deployed-host-address]

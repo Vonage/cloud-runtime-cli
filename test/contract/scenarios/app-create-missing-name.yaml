@@ -1,0 +1,4 @@
+description: "app create without a name is a usage error"
+args: [app, create]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

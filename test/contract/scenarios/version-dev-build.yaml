@@ -1,0 +1,4 @@
+description: "a development build without a version stamp reports 0.0.1"
+args: [--version]
+build: dev
+scrape: [version-line]

@@ -1,0 +1,4 @@
+description: "without a configuration file or credential flags the command cannot start"
+args: [app, list]
+config: none
+expect-reads: []

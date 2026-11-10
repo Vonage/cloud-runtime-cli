@@ -1,0 +1,2 @@
+description: "the help page of vcr completion powershell"
+args: [completion, powershell, --help]

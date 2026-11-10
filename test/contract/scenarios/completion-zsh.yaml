@@ -1,0 +1,2 @@
+description: "the zsh completion script is printed"
+args: [completion, zsh]

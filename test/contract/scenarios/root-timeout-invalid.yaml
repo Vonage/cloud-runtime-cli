@@ -1,0 +1,3 @@
+description: "a timeout that is not a duration is a usage error"
+args: [--timeout, abc, app, list]
+expect-reads: []

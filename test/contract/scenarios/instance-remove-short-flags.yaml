@@ -1,0 +1,5 @@
+description: "the short flags of instance remove"
+args: [instance, remove, -p, my-project, -n, dev, -y]
+expect-reads:
+  - "euw1 GET /projects/my-project/instances/dev"
+  - "euw1 GET /regions/aws.euw1"

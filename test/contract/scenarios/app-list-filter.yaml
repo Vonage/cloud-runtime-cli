@@ -1,0 +1,5 @@
+description: "--filter is sent to the platform as the name pattern"
+args: [app, list, --filter, second]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+scrape: [table-lines]

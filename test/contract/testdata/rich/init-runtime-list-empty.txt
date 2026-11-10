@@ -1,0 +1,8 @@
+# vcr rich golden v1
+exit 1
+@@ stdout 155
+? Enter your project name: project
+? Enter your Instance name: dev
+✓ Runtimes retrieved
+✗ failed to ask runtime: please provide options to select from
+

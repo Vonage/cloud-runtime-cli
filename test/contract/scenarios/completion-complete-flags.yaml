@@ -1,0 +1,4 @@
+description: "the hidden completion request lists the flags of a command"
+group: deploy
+args: [__complete, deploy, --]
+expect-reads: []

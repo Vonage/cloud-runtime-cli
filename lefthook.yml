@@ -1,5 +1,4 @@
-# Lefthook configuration for git hooks
-# Install: brew install lefthook && lefthook install
+# Lefthook configuration for git hooks. Install them once per clone with `make hooks`.
 # Docs: https://github.com/evilmartians/lefthook
 
 commit-msg:
@@ -9,19 +8,17 @@ commit-msg:
 
 pre-commit:
   parallel: true
+  skip: [merge, rebase]
   commands:
-    go-fmt:
+    gofmt:
       glob: "*.go"
-      run: gofmt -l -w {staged_files}
-      stage_fixed: true
-    go-vet:
-      glob: "*.go"
-      run: go vet ./...
+      run: |
+        unformatted=$(gofmt -l {staged_files}) || exit 1
+        if [ -n "$unformatted" ]; then printf 'gofmt would rewrite:\n%s\n\nrun: make fmt\n' "$unformatted"; exit 1; fi
+    lint:
+      run: make lint
 
 pre-push:
-  parallel: true
   commands:
-    go-test:
-      run: go test ./...
-    golangci-lint:
-      run: golangci-lint run
+    test:
+      run: make test

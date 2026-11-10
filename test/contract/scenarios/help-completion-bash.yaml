@@ -1,0 +1,2 @@
+description: "the help page of vcr completion bash"
+args: [completion, bash, --help]

@@ -1,0 +1,8 @@
+description: "the update notice after a command that failed"
+args: [app, list]
+fixtures:
+  release: {tag: v9.9.9}
+  overrides:
+    - {match: "GET /applications", status: 500, body: '{"error":{"code":1001,"message":"internal error","traceId":"trace-1"}}'}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

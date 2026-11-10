@@ -1,0 +1,4 @@
+description: "the help page of vcr app list"
+group: app
+args: [app, list, --help]
+expect-reads: []

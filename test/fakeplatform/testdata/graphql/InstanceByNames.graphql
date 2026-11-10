@@ -1,0 +1,7 @@
+
+query MyQuery ($project_name: String!, $instance_name: String!) {
+  Instances(where: {Project: {name: {_eq: $project_name}}, _and: {name: {_eq: $instance_name}}, deleted: {_eq: false}}) {
+    id
+    service_name
+  }
+}

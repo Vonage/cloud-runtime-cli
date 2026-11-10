@@ -1,0 +1,25 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 1
+@@ stdout 0
+
+@@ stderr 188
+unknown command "nosuchcmd" for "vcr"
+Usage:  vcr <command> <subcommand> [flags]
+
+Available commands:
+  app
+  completion
+  configure
+  debug
+  deploy
+  init
+  instance
+  secret
+  upgrade
+
+
+@@ files 0
+
+@@ requests 0
+

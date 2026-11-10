@@ -1,0 +1,4 @@
+description: "the default configuration file in the home directory is read"
+args: [app, list]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

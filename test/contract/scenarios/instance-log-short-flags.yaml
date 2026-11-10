@@ -1,0 +1,14 @@
+description: "the short flags of instance log"
+args: [instance, log, -p, my-project, -n, dev, -l, warn, -s, application]
+fixtures:
+  logs:
+    - {instance: 00000000-0000-4000-8000-000000000501, level: info, source: application, message: "starting", timestamp: "2026-10-14T10:00:01Z"}
+    - {instance: 00000000-0000-4000-8000-000000000501, level: info, source: application, message: "listening on 3000", timestamp: "2026-10-14T10:00:02Z"}
+    - {instance: 00000000-0000-4000-8000-000000000501, level: warn, source: application, message: "slow request", timestamp: "2026-10-14T10:00:03Z"}
+    - {instance: 00000000-0000-4000-8000-000000000501, level: error, source: provider, message: "provider call failed", timestamp: "2026-10-14T10:00:04Z"}
+    - {instance: 00000000-0000-4000-8000-000000000501, level: info, source: application, message: "shutting down", timestamp: "2026-10-14T10:00:05Z"}
+expect-reads:
+  - "euw1 GET /instances/00000000-0000-4000-8000-000000000501/logs?limit=300"
+  - "euw1 GET /projects/my-project/instances/dev"
+  - "euw1 GET /regions/aws.euw1"
+scrape: [log-line]

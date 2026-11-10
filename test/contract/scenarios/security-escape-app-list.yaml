@@ -1,0 +1,13 @@
+description: "application names with terminal control sequences are printed without them"
+group: app
+args: [app, list]
+fixtures:
+  applications:
+    - {id: 00000000-0000-4000-8000-000000000601, name: "title\x1b]0;pwned\x07set"}
+    - {id: 00000000-0000-4000-8000-000000000602, name: "clear\x1b[2Jscreen"}
+    - {id: 00000000-0000-4000-8000-000000000603, name: "move\x1b[10A\x1b[5Cup"}
+    - {id: 00000000-0000-4000-8000-000000000604, name: "colour\x1b[31mred\x1b[0mtext"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+scrape: [table-lines]
+scrape-except: [table-lines]

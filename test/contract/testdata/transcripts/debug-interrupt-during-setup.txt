@@ -1,0 +1,41 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit signal:SIGINT
+@@ stdout 0
+
+@@ stderr 0
+
+@@ files 0
+
+@@ requests 1272
+euw1 POST graphql:Region
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($alias: String!) {\\n  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {\\n    name\\n    alias\\n\\tdeployment_api_url\\n\\tmarketplace_api_url\\n\\tassets_api_url\\n\\tendpoint_url_scheme\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":{"alias":"aws.euw1"}}
+
+euw1 POST graphql:Region
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($alias: String!) {\\n  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {\\n    name\\n    alias\\n\\tdeployment_api_url\\n\\tmarketplace_api_url\\n\\tassets_api_url\\n\\tendpoint_url_scheme\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":{"alias":"aws.euw1"}}
+
+euw1 POST /debug/services
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"apiApplicationId":"00000000-0000-4000-8000-000000000602","capabilities":{},"region":"aws.euw1","runtime":"debug-proxy"}
+
+euw1 GET /debug/services/dbg-service-1/status
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+
+gh GET /releases/latest
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+

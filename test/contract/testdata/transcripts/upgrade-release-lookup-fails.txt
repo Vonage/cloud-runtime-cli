@@ -1,0 +1,26 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 1
+@@ stdout 424
+vcr-cli version v2.6.1 (commit:0123456789abcdef0123456789abcdef01234567, date:<time>)
+────────────────────────────────────────────────────────
+────────────────────────────────────────────────────────
+
+@@ stderr 218
+X Error Encountered: failed to get assets
+
+ℹ Details:
+  - HTTP Status : 500
+  - Message     : unavailable
+  - Trace ID    : fake-trace-id
+
+Please refer to the documentation or contact support for further assistance.
+
+@@ files 0
+
+@@ requests 65
+gh GET /releases/latest
+  auth: basic 
+  acct: none
+  trace: yes
+

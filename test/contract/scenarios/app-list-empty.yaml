@@ -1,0 +1,6 @@
+description: "an account without applications prints an empty table"
+args: [app, list]
+fixtures:
+  applications: []
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

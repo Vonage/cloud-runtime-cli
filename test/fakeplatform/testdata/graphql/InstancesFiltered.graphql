@@ -1,0 +1,9 @@
+
+query MyQuery ($service_name: String!) {
+  Instances(order_by: {updated_at: desc}, where: {deleted: {_eq: false}, service_name: {_ilike: $service_name}}) {
+    id
+    api_application_id
+    name
+    service_name
+  }
+}

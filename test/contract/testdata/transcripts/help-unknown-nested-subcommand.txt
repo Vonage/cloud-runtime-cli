@@ -1,0 +1,20 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 0
+@@ stdout 0
+
+@@ stderr 136
+unknown command "nosuch" for "vcr app"
+
+Usage:  vcr app <command> [flags]
+
+Available commands:
+  create
+  generate-keys
+  list
+  remove
+
+@@ files 0
+
+@@ requests 0
+

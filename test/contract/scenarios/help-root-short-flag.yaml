@@ -1,0 +1,2 @@
+description: "-h prints the root help page and exits 0"
+args: [-h]

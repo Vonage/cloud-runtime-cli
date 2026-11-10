@@ -1,0 +1,4 @@
+description: "the help page of vcr init"
+group: init
+args: [init, --help]
+expect-reads: []

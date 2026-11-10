@@ -1,0 +1,16 @@
+description: "a manifest that is not valid yaml is reported"
+args: [deploy]
+cwd: work/project
+files:
+  - path: work/project/vcr.yml
+    content: |
+      project: [unclosed
+      instance:
+        name: dev
+  - path: work/project/index.js
+    content: |
+      console.log('hello');
+  - path: work/project/package.json
+    content: |
+      {"name": "my-project", "version": "1.0.0"}
+expect-reads: []

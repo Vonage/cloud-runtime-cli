@@ -1,0 +1,4 @@
+description: "app generate-keys without an id is a usage error"
+args: [app, generate-keys]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

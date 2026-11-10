@@ -1,0 +1,35 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 0
+@@ stdout 875
+┌──────────────────────────────────────┬───────────────┐
+│                  ID                  │     NAME      │
+├──────────────────────────────────────┼───────────────┤
+│ 00000000-0000-4000-8000-000000000601 │ title\x1b]0;pwned\x07set      │
+│ 00000000-0000-4000-8000-000000000602 │ clear\x1b[2Jscreen   │
+│ 00000000-0000-4000-8000-000000000603 │ move\x1b[10A\x1b[5Cup        │
+│ 00000000-0000-4000-8000-000000000604 │ colour\x1b[31mred\x1b[0mtext │
+└──────────────────────────────────────┴───────────────┘
+
+@@ stderr 0
+
+@@ files 0
+
+@@ requests 591
+euw1 POST graphql:Region
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery ($alias: String!) {\\n  Regions(where: {enabled: {_eq: true}, _and: {alias: {_eq: $alias}}}) {\\n    name\\n    alias\\n\\tdeployment_api_url\\n\\tmarketplace_api_url\\n\\tassets_api_url\\n\\tendpoint_url_scheme\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":{"alias":"aws.euw1"}}
+
+euw1 GET /applications?pattern=
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+
+gh GET /releases/latest
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+

@@ -1,0 +1,20 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 640
+? Enter your project name: Bad Name
+✗ project name "Bad Name" is not correct,  project name should be lower case alphanumeric or - characters
+? Enter your project name: good-name
+? Enter your Instance name: dev
+✓ Runtimes retrieved
+? Select a runtime: nodejs18
+✓ Regions retrieved
+? Select a region: AWS - Europe (Ireland) - (aws.euw1)
+✓ Applications retrieved
+? Select your Vonage application ID for deployment: SKIP
+✓ Applications retrieved
+? Select your Vonage application ID for debug: SKIP
+✓ Templates retrieved
+? Select a product template for runtime nodejs18:  SKIP
+✓ Project created in <WORK>/project
+Next: vcr deploy
+

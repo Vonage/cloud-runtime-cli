@@ -1,0 +1,7 @@
+description: "app list reads a configuration file whose values are empty"
+args: [app, list]
+config: none
+files:
+  - {path: home/.vcr-cli, from: testdata/corpora/config/empty-values.ini, mode: 0600}
+expect-reads:
+  - "euw1 GET /regions"

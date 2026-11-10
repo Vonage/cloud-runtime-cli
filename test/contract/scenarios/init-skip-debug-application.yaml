@@ -1,0 +1,31 @@
+description: "the debug application question can be skipped while the deployment application is chosen"
+args: [init]
+tty: true
+cwd: work/project
+files:
+  - {path: work/project, type: dir}
+steps:
+  - {expect: "Enter your project name:"}
+  - {send: "\r"}
+  - {expect: "Enter your Instance name:"}
+  - {send: "\r"}
+  - {expect: "Select a runtime:"}
+  - {send: "\r"}
+  - {expect: "Select a region:"}
+  - {send: "\r"}
+  - {expect: "Select your Vonage application ID for deployment:"}
+  - {send: "\x1b[B"}
+  - {expect: "> CREATE NEW APP"}
+  - {send: "\x1b[B"}
+  - {expect: "> my-app"}
+  - {send: "\r"}
+  - {expect: "Select your Vonage application ID for debug:"}
+  - {send: "\r"}
+  - {expect: "Select a product template for runtime"}
+  - {send: "\r"}
+  - {expect: "created"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /runtimes"
+  - "euw1 GET /regions"
+  - "euw1 GET /products/templates"

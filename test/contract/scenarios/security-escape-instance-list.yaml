@@ -1,0 +1,12 @@
+description: "instance names with terminal control sequences are printed without them"
+group: instance
+args: [instance, list]
+fixtures:
+  instances:
+    - {id: 00000000-0000-4000-8000-000000000501, name: "dev\x1b]0;pwned\x07", serviceName: "my-project-dev", apiApplicationId: 00000000-0000-4000-8000-000000000601, projectName: my-project, region: aws.euw1, updatedAt: "2026-10-14T10:00:00Z"}
+    - {id: 00000000-0000-4000-8000-000000000502, name: "clear\x1b[2Jscreen", serviceName: "svc\x1b[31mcolour\x1b[0m", apiApplicationId: 00000000-0000-4000-8000-000000000601, projectName: "my-project\x1b[10Aup", region: aws.euw1, updatedAt: "2026-10-13T10:00:00Z"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /instances"
+scrape: [table-lines]
+scrape-except: [table-lines]

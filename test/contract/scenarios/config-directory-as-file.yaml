@@ -1,0 +1,6 @@
+description: "a directory given as the configuration file is a read error"
+args: [--config-file, "${HOME}/confdir", app, list]
+files:
+  - path: home/confdir
+    type: dir
+expect-reads: []

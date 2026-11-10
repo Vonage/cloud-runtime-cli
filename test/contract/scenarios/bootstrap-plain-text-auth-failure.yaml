@@ -1,0 +1,7 @@
+description: "a plain text 401 from the platform is still reported"
+args: [app, list]
+fixtures:
+  overrides:
+    - {match: "GET /applications", status: 401, body: "Unauthorized", contentType: text/plain}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

@@ -1,0 +1,9 @@
+description: "an archive that differs from the signed list by one bit is not installed"
+group: upgrade
+args: [upgrade, --force]
+requires-hotfix: true
+exe: copy
+fixtures:
+  release: {tag: v9.9.9, tamper: archive-bitflip}
+expect-reads: []
+scrape: [version-line]

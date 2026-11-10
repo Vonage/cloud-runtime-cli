@@ -1,0 +1,9 @@
+description: "a server error is reported"
+args: [instance, list]
+fixtures:
+  overrides:
+    - {match: "POST graphql:Instances", status: 500, body: '{"error":{"code":1001,"message":"internal error","traceId":"trace-500"}}'}
+    - {match: "GET /instances", status: 500, body: '{"error":{"code":1001,"message":"internal error","traceId":"trace-500"}}'}
+expect-reads:
+  - "euw1 GET /instances"
+  - "euw1 GET /regions/aws.euw1"

@@ -1,0 +1,3 @@
+*.tmp  
+escaped-space.txt\ 
+  leading-spaces.txt

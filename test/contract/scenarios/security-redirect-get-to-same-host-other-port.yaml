@@ -1,0 +1,9 @@
+description: "a redirect of a GET to another port of the same host is followed without credentials"
+group: app
+args: [app, list]
+fixtures:
+  overrides:
+    - {match: "GET /applications", status: 302, headers: {Location: "http://${OTHER_SAME_HOST}/captured"}}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+scrape-except: [table-lines]

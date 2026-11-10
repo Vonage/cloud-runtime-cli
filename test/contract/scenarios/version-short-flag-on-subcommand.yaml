@@ -1,0 +1,4 @@
+description: "-v on a subcommand is not the version flag and is a usage error"
+group: deploy
+args: [deploy, -v]
+expect-reads: []

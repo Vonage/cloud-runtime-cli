@@ -1,0 +1,16 @@
+description: "a world-readable configuration file is made private when it is read"
+args: [app, list]
+requires-hotfix: true
+config: none
+files:
+  - path: home/.vcr-cli
+    content: |
+      graphql_endpoint = ${FAKE}/v1/vcr/euw1/api/graphql/v1/graphql
+      default_region   = aws.euw1
+
+      [credentials]
+      api_key    = abc123
+      api_secret = s3cret-for-tests
+    mode: 0644
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

@@ -1,0 +1,1035 @@
+[
+  {
+    "path": "vcr",
+    "use": "vcr \u003ccommand\u003e \u003csubcommand\u003e [flags]",
+    "short": "Streamline your Vonage Cloud Runtime development and management tasks with VCR",
+    "long": "VCR CLI is a powerful command-line interface designed to streamline\nand simplify the development and management of applications on\nthe Vonage Cloud Runtime platform.\n\nVonage Cloud Runtime (VCR) enables you to build, deploy, and run serverless\napplications that integrate with Vonage communication APIs including Voice,\nMessages, and RTC (Real-Time Communication).\n\nGETTING STARTED\n  1. Configure the CLI with your Vonage API credentials:\n     $ vcr configure\n\n  2. Initialize a new project from a template:\n     $ vcr init my-project\n\n  3. Deploy your application:\n     $ vcr deploy\n\nCORE WORKFLOW\n  • vcr configure  - Set up your Vonage API credentials and region\n  • vcr app        - Create and manage Vonage applications\n  • vcr init       - Initialize a project from a template\n  • vcr deploy     - Deploy your application to VCR\n  • vcr debug      - Run your application locally in debug mode\n  • vcr instance   - Manage deployed instances (logs, removal)\n  • vcr secret     - Manage secrets for your applications\n  • vcr upgrade    - Update the VCR CLI to the latest version\n",
+    "example": "# Configure the CLI with your Vonage credentials\n$ vcr configure\n\n# Create a new Vonage application\n$ vcr app create --name my-app\n\n# List all your Vonage applications\n$ vcr app list\n\n# Initialize a new project in the current directory\n$ vcr init\n\n# Initialize a new project in a specific directory\n$ vcr init my-project\n\n# Deploy your application to VCR\n$ vcr deploy\n\n# Run your application locally in debug mode\n$ vcr debug\n\n# View logs for a deployed instance\n$ vcr instance log --project-name my-project --instance-name dev\n\n# Create a secret for your application\n$ vcr secret create --name MY_API_KEY --value \"secret-value\"\n",
+    "argsValidatorSet": false,
+    "runnable": false,
+    "annotations": {
+      "versionInfo": "vcr-cli version 0.0.1 (commit:0000, date:2021-09-01T00:00:00Z)\n"
+    },
+    "localFlags": [
+      {
+        "name": "version",
+        "shorthand": "v",
+        "type": "bool",
+        "default": "false",
+        "usage": "Show VCR CLI version",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "api-key",
+        "type": "string",
+        "default": "",
+        "usage": "Vonage API key",
+        "persistent": true
+      },
+      {
+        "name": "api-secret",
+        "type": "string",
+        "default": "",
+        "usage": "Vonage API secret",
+        "persistent": true
+      },
+      {
+        "name": "config-file",
+        "type": "string",
+        "default": "~/.vcr-cli",
+        "usage": "Path to config file (default is $HOME/.vcr-cli)",
+        "persistent": true
+      },
+      {
+        "name": "endpoint",
+        "type": "string",
+        "default": "",
+        "usage": "Platform API base URL (overrides --graphql-endpoint and the config file)",
+        "persistent": true
+      },
+      {
+        "name": "graphql-endpoint",
+        "type": "string",
+        "default": "",
+        "usage": "Deprecated: use --endpoint. GraphQL endpoint used to fetch metadata",
+        "persistent": true
+      },
+      {
+        "name": "help",
+        "type": "bool",
+        "default": "false",
+        "usage": "Show help for command",
+        "persistent": true,
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "region",
+        "type": "string",
+        "default": "",
+        "usage": "Vonage platform region",
+        "persistent": true
+      },
+      {
+        "name": "timeout",
+        "shorthand": "t",
+        "type": "duration",
+        "default": "10m0s",
+        "usage": "Overall deadline for the command, including waiting for a build to finish (e.g. 20m)",
+        "persistent": true
+      }
+    ],
+    "inheritedFlags": null,
+    "children": [
+      "app",
+      "completion",
+      "configure",
+      "debug",
+      "deploy",
+      "help",
+      "init",
+      "instance",
+      "secret",
+      "upgrade"
+    ]
+  },
+  {
+    "path": "vcr app",
+    "use": "app \u003ccommand\u003e",
+    "short": "Manage Vonage applications for VCR deployments",
+    "long": "Manage Vonage applications for VCR deployments.\n\nVonage applications are containers that hold your communication settings and\ncapabilities. Each VCR deployment must be linked to a Vonage application.\n\nWHAT IS A VONAGE APPLICATION?\n  A Vonage application provides:\n  • Authentication credentials (API keys and private keys)\n  • Enabled capabilities (Voice, Messages, RTC)\n  • Webhook URLs for receiving events\n\nAVAILABLE COMMANDS\n  create         Create a new Vonage application\n  remove (rm)    Remove a Vonage application\n  list (ls)      List all Vonage applications in your account\n  generate-keys  Generate new key pairs for an existing application\n\nWORKFLOW\n  1. Create an application: vcr app create --name my-app\n  2. Use the application ID in your vcr.yml manifest\n  3. Deploy your VCR application with: vcr deploy\n",
+    "example": "# Create a new application with Voice and Messages capabilities\n$ vcr app create --name my-app --voice --messages\n\n# Remove an application\n$ vcr app remove 12345678-1234-1234-1234-123456789abc\n\n# Generate new keys for an existing application\n$ vcr app generate-keys --app-id 12345678-1234-1234-1234-123456789abc\n\n# List all applications\n$ vcr app list\n\n# List applications filtered by name\n$ vcr app list --filter \"production\"\n",
+    "argsValidatorSet": false,
+    "runnable": false,
+    "localFlags": null,
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ],
+    "children": [
+      "create",
+      "generate-keys",
+      "list",
+      "remove"
+    ]
+  },
+  {
+    "path": "vcr app create",
+    "use": "create",
+    "short": "Create a new Vonage application",
+    "long": "Create a new Vonage application for use with VCR.\n\nThis command creates a Vonage application with the specified capabilities enabled.\nThe application ID returned can be used in your vcr.yml manifest file to link\nyour VCR deployment with the Vonage platform.\n\nCAPABILITIES\n  Applications can have one or more capabilities enabled:\n  • Voice     (-v, --voice)    - Enable Voice API for phone calls\n  • Messages  (-m, --messages) - Enable Messages API for SMS, WhatsApp, etc.\n  • RTC       (-r, --rtc)      - Enable Real-Time Communication for in-app voice/video\n\nNOTE: If no capabilities are specified, the application is created without any\nenabled capabilities. You can enable capabilities later via the Vonage Dashboard.\n",
+    "example": "# Create a basic application\n$ vcr app create --name my-app\n✓ Application created\nℹ id: 12345678-1234-1234-1234-123456789abc\nℹ name: my-app\n\n# Create an application with Voice capability enabled\n$ vcr app create --name voice-app --voice\n\n# Create an application with multiple capabilities\n$ vcr app create --name full-app --voice --messages --rtc\n\n# Create without confirmation prompt\n$ vcr app create --name my-app --yes\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "messages",
+        "shorthand": "m",
+        "type": "bool",
+        "default": "false",
+        "usage": "Enable Messages API capability",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "name",
+        "shorthand": "n",
+        "type": "string",
+        "default": "",
+        "usage": "Name of the application (required)",
+        "required": true
+      },
+      {
+        "name": "rtc",
+        "shorthand": "r",
+        "type": "bool",
+        "default": "false",
+        "usage": "Enable RTC (Real-Time Communication) capability",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "voice",
+        "shorthand": "v",
+        "type": "bool",
+        "default": "false",
+        "usage": "Enable Voice API capability",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "yes",
+        "shorthand": "y",
+        "type": "bool",
+        "default": "false",
+        "usage": "Skip confirmation prompts",
+        "noOptDefVal": "true"
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr app generate-keys",
+    "use": "generate-keys --app-id \u003capplication-id\u003e",
+    "short": "Generate new key pairs for a Vonage application",
+    "long": "Generate new public/private key pairs for a Vonage application.\n\nThis command regenerates the authentication keys for a Vonage application,\nallowing the VCR platform to access the application's credentials.\n\nWHEN TO USE THIS COMMAND\n  • You created an application via the Vonage Dashboard (not the CLI)\n  • You need to rotate your application's keys for security\n  • You're troubleshooting authentication issues with VCR\n\nWARNING: Regenerating keys will invalidate any existing private keys for this\napplication. Any services using the old keys will need to be updated.\n\nFINDING YOUR APPLICATION ID\n  Use 'vcr app list' to see all your applications and their IDs.\n",
+    "example": "# Generate new keys for an application\n$ vcr app generate-keys --app-id 42066b10-c4ae-48a0-addd-feb2bd615a67\n✓ Application \"42066b10-c4ae-48a0-addd-feb2bd615a67\" configured with newly generated keys\n\n# Using the short flag\n$ vcr app generate-keys -i 42066b10-c4ae-48a0-addd-feb2bd615a67\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "app-id",
+        "shorthand": "i",
+        "type": "string",
+        "default": "",
+        "usage": "The UUID of the Vonage application (required)",
+        "required": true
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr app list",
+    "use": "list",
+    "aliases": [
+      "ls"
+    ],
+    "short": "List all Vonage applications in your account",
+    "long": "List all Vonage applications associated with your account.\n\nThis command displays a table of all Vonage applications, showing their IDs\nand names. Use the application ID in your vcr.yml manifest file to link\nyour VCR deployment to a specific application.\n\nUse the --filter flag to search for applications by name. The filter performs\na case-insensitive substring match.\n",
+    "example": "# List all applications\n$ vcr app list\n+--------------------------------------+----------------+\n|                  ID                  |      NAME      |\n+--------------------------------------+----------------+\n| 12345678-1234-1234-1234-123456789abc | my-voice-app   |\n| 87654321-4321-4321-4321-cba987654321 | my-sms-app     |\n+--------------------------------------+----------------+\n\n# List applications using the short alias\n$ vcr app ls\n\n# Filter applications by name\n$ vcr app list --filter \"voice\"\n+--------------------------------------+----------------+\n|                  ID                  |      NAME      |\n+--------------------------------------+----------------+\n| 12345678-1234-1234-1234-123456789abc | my-voice-app   |\n+--------------------------------------+----------------+\n\n# Filter with partial match\n$ vcr app list -f \"prod\"\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "filter",
+        "shorthand": "f",
+        "type": "string",
+        "default": "",
+        "usage": "Filter applications by name (case-insensitive substring match)"
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr app remove",
+    "use": "remove \u003capplicationID\u003e",
+    "aliases": [
+      "rm"
+    ],
+    "short": "Remove a Vonage application",
+    "long": "Remove a Vonage application from your account.\n\nThis command permanently removes a Vonage application and its associated\ncredentials. Any VCR instances linked to this application will lose their\nauthentication credentials on next restart.\n\nWARNING: This action is irreversible. Make sure no running instances\ndepend on this application before removing it.\n",
+    "example": "# Remove an application (will prompt for confirmation)\n$ vcr app remove 12345678-1234-1234-1234-123456789abc\n\n# Remove without confirmation prompt (useful for CI/CD)\n$ vcr app remove 12345678-1234-1234-1234-123456789abc --yes\n\n# Using the short alias\n$ vcr app rm 12345678-1234-1234-1234-123456789abc --yes\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "yes",
+        "shorthand": "y",
+        "type": "bool",
+        "default": "false",
+        "usage": "Skip confirmation prompt (use with caution)",
+        "noOptDefVal": "true"
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr completion",
+    "use": "completion",
+    "short": "Generate the autocompletion script for the specified shell",
+    "long": "Generate the autocompletion script for vcr for the specified shell.\nSee each sub-command's help for details on how to use the generated script.\n",
+    "argsValidatorSet": true,
+    "runnable": false,
+    "localFlags": null,
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ],
+    "children": [
+      "bash",
+      "fish",
+      "powershell",
+      "zsh"
+    ]
+  },
+  {
+    "path": "vcr completion bash",
+    "use": "bash",
+    "short": "Generate the autocompletion script for bash",
+    "long": "Generate the autocompletion script for the bash shell.\n\nThis script depends on the 'bash-completion' package.\nIf it is not installed already, you can install it via your OS's package manager.\n\nTo load completions in your current shell session:\n\n\tsource \u003c(vcr completion bash)\n\nTo load completions for every new session, execute once:\n\n#### Linux:\n\n\tvcr completion bash \u003e /etc/bash_completion.d/vcr\n\n#### macOS:\n\n\tvcr completion bash \u003e $(brew --prefix)/etc/bash_completion.d/vcr\n\nYou will need to start a new shell for this setup to take effect.\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "no-descriptions",
+        "type": "bool",
+        "default": "false",
+        "usage": "disable completion descriptions",
+        "noOptDefVal": "true"
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr completion fish",
+    "use": "fish",
+    "short": "Generate the autocompletion script for fish",
+    "long": "Generate the autocompletion script for the fish shell.\n\nTo load completions in your current shell session:\n\n\tvcr completion fish | source\n\nTo load completions for every new session, execute once:\n\n\tvcr completion fish \u003e ~/.config/fish/completions/vcr.fish\n\nYou will need to start a new shell for this setup to take effect.\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "no-descriptions",
+        "type": "bool",
+        "default": "false",
+        "usage": "disable completion descriptions",
+        "noOptDefVal": "true"
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr completion powershell",
+    "use": "powershell",
+    "short": "Generate the autocompletion script for powershell",
+    "long": "Generate the autocompletion script for powershell.\n\nTo load completions in your current shell session:\n\n\tvcr completion powershell | Out-String | Invoke-Expression\n\nTo load completions for every new session, add the output of the above command\nto your powershell profile.\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "no-descriptions",
+        "type": "bool",
+        "default": "false",
+        "usage": "disable completion descriptions",
+        "noOptDefVal": "true"
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr completion zsh",
+    "use": "zsh",
+    "short": "Generate the autocompletion script for zsh",
+    "long": "Generate the autocompletion script for the zsh shell.\n\nIf shell completion is not already enabled in your environment you will need\nto enable it.  You can execute the following once:\n\n\techo \"autoload -U compinit; compinit\" \u003e\u003e ~/.zshrc\n\nTo load completions in your current shell session:\n\n\tsource \u003c(vcr completion zsh)\n\nTo load completions for every new session, execute once:\n\n#### Linux:\n\n\tvcr completion zsh \u003e \"${fpath[1]}/_vcr\"\n\n#### macOS:\n\n\tvcr completion zsh \u003e $(brew --prefix)/share/zsh/site-functions/_vcr\n\nYou will need to start a new shell for this setup to take effect.\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "no-descriptions",
+        "type": "bool",
+        "default": "false",
+        "usage": "disable completion descriptions",
+        "noOptDefVal": "true"
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr configure",
+    "use": "configure",
+    "short": "Configure VCR CLI with your Vonage API credentials",
+    "long": "Configure the VCR CLI with your Vonage API credentials.\n\nThis interactive command sets up the VCR CLI by prompting you for:\n  • Vonage API Key     - Found in your Vonage API Dashboard\n  • Vonage API Secret  - Found in your Vonage API Dashboard\n  • Default Region     - The Vonage Cloud Runtime region for deployments\n\nOn successful configuration, a configuration file is created at $HOME/.vcr-cli\n(or the path specified by --config-file).\n\nPREREQUISITES\n  You need a Vonage API account to use VCR. Get your API credentials from:\n  https://dashboard.nexmo.com/settings\n\nCONFIGURATION FILE\n  The configuration file stores your credentials and preferences. You can have\n  multiple configuration files for different accounts/environments by using\n  the --config-file flag with other commands.\n\nNOTE: The VCR CLI requires configuration before any other commands will work.\nRun this command first after installing the CLI.\n",
+    "example": "# Configure the CLI interactively\n$ vcr configure\n? Enter your Vonage api key: abc123\n? Enter your Vonage api secret: ********\n? Select your Vonage region: aws.euw1 - AWS Europe (Ireland)\n✓ New configuration file written to /Users/you/.vcr-cli\n\n# Use a custom configuration file path\n$ vcr configure --config-file ~/.vcr-cli-staging\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": null,
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr debug",
+    "use": "debug [path_to_project]",
+    "short": "Run your application locally in debug mode with live VCR integration",
+    "long": "Run your application locally in debug mode with live VCR integration.\n\nDebug mode allows you to run your application code locally while connected to the\nVCR platform. A remote debug server acts as a proxy, forwarding requests from Vonage\nservices (webhooks, events) to your local machine.\n\nHOW IT WORKS\n  1. A debug proxy server is deployed to VCR\n  2. Your local application starts and connects to the proxy\n  3. Vonage webhooks/events are forwarded to your local machine\n  4. You can set breakpoints and debug your code in real-time\n\nREQUIREMENTS\n  • A vcr.yml manifest with a debug.entrypoint defined\n  • A Vonage application linked to your project\n  • The debug.application-id can differ from instance.application-id\n\nVS CODE DEBUGGER INTEGRATION\n  To attach VS Code debugger, add this configuration to .vscode/launch.json:\n\n  {\n    \"version\": \"0.2.0\",\n    \"configurations\": [\n      {\n        \"type\": \"node\",\n        \"request\": \"attach\",\n        \"name\": \"Attach VCR Debugger\",\n        \"port\": 9229,\n        \"restart\": true,\n        \"localRoot\": \"${workspaceFolder}\"\n      }\n    ]\n  }\n\nENVIRONMENT VARIABLES\n  Environment variables from debug.environment (or instance.environment as fallback)\n  in your manifest are loaded. For secrets, export them locally before running debug.\n\nCLEANUP\n  Press Ctrl+C to stop debug mode. The remote debug server is automatically removed\n  unless --preserve-data is specified.\n",
+    "example": "# Start debug mode in the current directory\n$ vcr debug\n\n# Start debug mode in a specific directory\n$ vcr debug ./my-project\n\n# Use a custom name for the debug proxy (makes URL deterministic)\n$ vcr debug --name my-debugger\n\n# Use a specific Vonage application for debugging\n$ vcr debug --app-id 12345678-1234-1234-1234-123456789abc\n\n# Change the local application port (default: 3000)\n$ vcr debug --app-port 8080\n\n# Change the debugger proxy port (default: 3001)\n$ vcr debug --debugger-port 4000\n\n# Preserve data after debug session ends\n$ vcr debug --preserve-data\n\n# Skip confirmation prompts\n$ vcr debug --yes\n\n# Enable verbose logging for troubleshooting\n$ vcr debug --verbose\n\n# Use a specific manifest file\n$ vcr debug --filename ./custom-vcr.yml\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "app-id",
+        "shorthand": "i",
+        "type": "string",
+        "default": "",
+        "usage": "Vonage application ID for debugging (overrides manifest)"
+      },
+      {
+        "name": "app-port",
+        "shorthand": "a",
+        "type": "int",
+        "default": "3000",
+        "usage": "Local port your application listens on (default: 3000)"
+      },
+      {
+        "name": "debugger-port",
+        "shorthand": "d",
+        "type": "int",
+        "default": "3001",
+        "usage": "Local port for debugger proxy server (default: 3001)"
+      },
+      {
+        "name": "filename",
+        "shorthand": "f",
+        "type": "string",
+        "default": "",
+        "usage": "Path to VCR manifest file (default: vcr.yml in project directory)"
+      },
+      {
+        "name": "name",
+        "shorthand": "n",
+        "type": "string",
+        "default": "",
+        "usage": "Name for the debug proxy server (creates deterministic URL)"
+      },
+      {
+        "name": "preserve-data",
+        "type": "bool",
+        "default": "false",
+        "usage": "Keep debug session data after stopping (useful for debugging state issues)",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "runtime",
+        "shorthand": "r",
+        "type": "string",
+        "default": "",
+        "usage": "Runtime environment (overrides manifest, e.g., nodejs18)"
+      },
+      {
+        "name": "verbose",
+        "shorthand": "v",
+        "type": "bool",
+        "default": "false",
+        "usage": "Enable verbose logging for troubleshooting",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "yes",
+        "shorthand": "y",
+        "type": "bool",
+        "default": "false",
+        "usage": "Skip confirmation prompts",
+        "noOptDefVal": "true"
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ],
+    "children": [
+      "prune-sessions"
+    ]
+  },
+  {
+    "path": "vcr debug prune-sessions",
+    "use": "prune-sessions",
+    "short": "Remove all active debug sessions",
+    "long": "Remove all active debug sessions for the configured API key.",
+    "argsValidatorSet": false,
+    "runnable": true,
+    "localFlags": null,
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr deploy",
+    "use": "deploy [path_to_code]",
+    "short": "Deploy your application to Vonage Cloud Runtime",
+    "long": "Deploy your application to Vonage Cloud Runtime.\n\nThis command packages your application code and deploys it to the VCR platform.\nThe deployment process includes:\n  1. Creating/retrieving your project\n  2. Compressing and uploading your source code\n  3. Building your application in the cloud\n  4. Deploying to the specified region\n\nMANIFEST FILE (vcr.yml)\n  A manifest file defines your deployment configuration. The CLI looks for\n  vcr.yml, vcr.yaml, neru.yml, or neru.yaml in your project directory.\n\n  Example manifest:\n\n  project:\n    name: booking-app                    # Project name (lowercase, alphanumeric, hyphens)\n\n  instance:\n    name: dev                            # Instance name (e.g., dev, staging, prod)\n    runtime: nodejs22                    # Runtime: nodejs22, nodejs18, python3, etc.\n    region: aws.euw1                     # Region: aws.euw1, aws.use1, etc.\n    application-id: \u003cuuid\u003e               # Vonage application UUID\n    entrypoint:                          # Command to start your application\n      - node\n      - index.js\n    environment:                         # Environment variables\n      - name: VONAGE_NUMBER\n        value: \"12012010601\"\n      - name: API_KEY\n        secret: MY_SECRET                # Reference a VCR secret that is created using the 'vcr secret create' command\n    capabilities:                        # Vonage API capabilities\n      - messages-v1\n      - voice\n      - rtc\n    build-script: ./build.sh             # Optional build script\n    domains:                             # Custom domains (optional)\n      - api.example.com\n    health-check-path: /custom/health    # Custom health check endpoint (default: /_/health)\n    security:                            # Endpoint security (optional, defaults to public)\n      access: private                    # Default access level: [private, public, authenticated]\n      auth-method: vonage_basic           # Required when access is 'authenticated'\n      override:\n        - path: \"/api/public\"\n          access: public                 # Override for specific paths\n\t\t- path: \"/api/users/*/settings\"\n\t\t  access: public\n\t\t- path: \"/api/secure\"\n\t\t  access: authenticated\n\t\t  auth-method: vonage_basic\n\n  debug:\n    name: debug                          # Debug instance name\n    application-id: \u003cuuid\u003e               # Separate app for debugging (optional)\n    entrypoint:\n      - node\n      - --inspect\n      - index.js\n\nAPPLICATION REQUIREMENTS\n  Your application must meet these requirements to deploy successfully:\n\n  1. HTTP Server on VCR_PORT\n     Your app MUST listen for HTTP requests on the port specified by the\n     VCR_PORT environment variable (automatically injected by VCR).\n\n     Example (Node.js):\n       const port = process.env.VCR_PORT || 8080;\n       app.listen(port, () =\u003e console.log('Server running on port ' + port));\n\n     Example (Python):\n       port = int(os.environ.get('VCR_PORT', 8080))\n       app.run(host='0.0.0.0', port=port)\n\n  2. Health Check Endpoint\n     Your app MUST expose a health check endpoint that returns HTTP 200.\n     VCR uses this to verify your app started correctly.\n\n     By default, VCR checks GET /_/health. You can customize this by\n     setting health-check-path in your manifest:\n\n       instance:\n         health-check-path: /custom/health\n\n     Example (Node.js/Express):\n       app.get('/_/health', (req, res) =\u003e res.status(200).send('OK'));\n\n     Example (Python/Flask):\n       @app.route('/_/health')\n       def health(): return 'OK', 200\n\nIGNORING FILES\n  Create a .vcrignore file to exclude files from deployment (similar to .gitignore).\n  Common exclusions: node_modules/, .git/, *.log, .env\n\nCAPABILITIES\n  • messages-v1  - Messages API (SMS, WhatsApp, Viber, etc.)\n  • voice        - Voice API (phone calls, IVR)\n  • rtc          - Real-Time Communication (in-app voice/video)\n\nSECURITY ACCESS LEVELS\n  • public          - No authentication required (default if security is omitted)\n  • private         - Returns forbidden for those paths\n  • authenticated   - Requires authentication using a specified auth method\n\nAUTH METHODS (used with 'authenticated' access)\n  • vonage_basic    - Vonage Basic authentication\n\nTROUBLESHOOTING\n  \"credential not found\" error after deployment:\n    This usually means the Vonage application keys need to be regenerated\n    for VCR access. Run:\n      $ vcr app generate-keys --app-id \u003cyour-app-id\u003e\n\n  Application fails to start:\n    • Verify your app listens on VCR_PORT (not a hardcoded port)\n    • Ensure GET /_/health returns HTTP 200\n    • Check logs with: vcr instance log -p \u003cproject\u003e -n \u003cinstance\u003e\n",
+    "example": "# Deploy from the current directory\n$ vcr deploy\n\n# Deploy from a specific directory\n$ vcr deploy ./my-project\n\n# Override the project name\n$ vcr deploy --project-name my-project\n\n# Override the instance name\n$ vcr deploy --instance-name production\n\n# Override the runtime\n$ vcr deploy --runtime nodejs20\n\n# Override the Vonage application ID\n$ vcr deploy --app-id 12345678-1234-1234-1234-123456789abc\n\n# Deploy a pre-compressed tarball\n$ vcr deploy --tgz ./my-app.tar.gz\n\n# Use a custom manifest file\n$ vcr deploy --filename ./custom-manifest.yml\n\n# Override capabilities\n$ vcr deploy --capabilities \"messages-v1,voice\"\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "app-id",
+        "shorthand": "i",
+        "type": "string",
+        "default": "",
+        "usage": "Vonage application UUID to link with this deployment (overrides manifest)"
+      },
+      {
+        "name": "capabilities",
+        "shorthand": "c",
+        "type": "string",
+        "default": "",
+        "usage": "Comma-separated capabilities: messages-v1,voice,rtc (overrides manifest)"
+      },
+      {
+        "name": "filename",
+        "shorthand": "f",
+        "type": "string",
+        "default": "",
+        "usage": "Path to manifest file (default: vcr.yml in project directory)"
+      },
+      {
+        "name": "instance-name",
+        "shorthand": "n",
+        "type": "string",
+        "default": "",
+        "usage": "Instance name, e.g., dev, staging, prod (overrides manifest)"
+      },
+      {
+        "name": "project-name",
+        "shorthand": "p",
+        "type": "string",
+        "default": "",
+        "usage": "Project name (overrides manifest value)"
+      },
+      {
+        "name": "runtime",
+        "shorthand": "r",
+        "type": "string",
+        "default": "",
+        "usage": "Runtime environment, e.g., nodejs18, nodejs20, python3 (overrides manifest)"
+      },
+      {
+        "name": "tgz",
+        "shorthand": "z",
+        "type": "string",
+        "default": "",
+        "usage": "Path to pre-compressed tar.gz file to deploy (skips local compression)"
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr help",
+    "use": "help [command]",
+    "short": "Help about any command",
+    "long": "Help provides help for any command in the application.\nSimply type vcr help [path to command] for full details.",
+    "argsValidatorSet": false,
+    "runnable": true,
+    "localFlags": null,
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr init",
+    "use": "init [path_to_project]",
+    "aliases": [
+      "i"
+    ],
+    "short": "Initialize a new VCR project from a template",
+    "long": "Initialize a new VCR project from a template.\n\nThis interactive command creates a new VCR project by guiding you through:\n  • Project name        - A unique identifier for your project\n  • Instance name       - The deployment instance name (e.g., dev, staging, prod)\n  • Runtime             - The programming language runtime (e.g., nodejs18, python3)\n  • Region              - The Vonage Cloud Runtime region for deployment\n  • Application ID      - The Vonage application to link (for deployment)\n  • Debug Application   - The Vonage application for debug mode\n  • Template            - A starter template for your chosen runtime\n\nOUTPUT\n  A vcr.yml manifest file is created with your configuration. This file defines\n  how your application is built and deployed to the VCR platform.\n\nTEMPLATES\n  Templates provide starter code for common use cases including:\n  • Starter projects (basic setup)\n  • Voice applications\n  • Messaging applications\n  • Real-time communication apps\n\nPROJECT NAME REQUIREMENTS\n  • Must contain only lowercase letters, numbers, and hyphens\n  • Must start and end with an alphanumeric character\n",
+    "example": "# Initialize a project in the current directory\n$ vcr init\n? Enter your project name: my-project\n? Enter your Instance name: dev\n? Select a runtime: nodejs18\n? Select a region: aws.euw1 - AWS Europe (Ireland)\n? Select your Vonage application ID for deployment: my-app (abc123...)\n? Select your Vonage application ID for debug: my-debug-app (def456...)\n? Select a product template: Starter Project - Node.js\n✓ vcr.yml created\n\n# Initialize in a new directory (creates directory if it doesn't exist)\n$ vcr init my-new-project\n\n# Initialize using the short alias\n$ vcr i my-project\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": null,
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr instance",
+    "use": "instance \u003ccommand\u003e",
+    "short": "Manage deployed VCR instances",
+    "long": "Manage deployed VCR instances.\n\nInstances are running deployments of your VCR applications. Each deployment\ncreates an instance that can be monitored and managed using these commands.\n\nWHAT IS AN INSTANCE?\n  An instance is a deployed version of your application running on VCR.\n  Each instance has:\n  • A unique instance ID\n  • A service name (URL endpoint)\n  • A project name and instance name (from your manifest)\n\nAVAILABLE COMMANDS\n  list (ls)     List all deployed instances\n  log (logs)    View real-time logs from a running instance\n  remove (rm)   Delete an instance and free its resources\n\nIDENTIFYING INSTANCES\n  Instances can be identified by either:\n  • Instance ID: A unique UUID assigned during deployment\n  • Project + Instance name: The combination from your vcr.yml manifest\n",
+    "example": "# List all instances\n$ vcr instance list\n\n# List instances filtered by service name\n$ vcr instance list --filter \"my-service\"\n\n# View logs for an instance by project and instance name\n$ vcr instance log --project-name my-app --instance-name dev\n\n# View logs for an instance by ID\n$ vcr instance log --id 12345678-1234-1234-1234-123456789abc\n\n# Remove an instance\n$ vcr instance remove --project-name my-app --instance-name dev\n\n# Remove an instance by ID with automatic confirmation\n$ vcr instance rm --id 12345678-1234-1234-1234-123456789abc --yes\n",
+    "argsValidatorSet": false,
+    "runnable": false,
+    "localFlags": null,
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ],
+    "children": [
+      "list",
+      "log",
+      "remove"
+    ]
+  },
+  {
+    "path": "vcr instance list",
+    "use": "list",
+    "aliases": [
+      "ls"
+    ],
+    "short": "List all deployed VCR instances",
+    "long": "List all deployed VCR instances.\n\nThis command displays a table of all non-deleted VCR instances, showing their\nIDs, linked API application IDs, instance names and service names.\n",
+    "example": "# List all instances\n$ vcr instance list\n+--------------------------------------+--------------------------------------+---------------+--------------+\n|             INSTANCE ID              |         API APPLICATION ID           | INSTANCE NAME | SERVICE NAME |\n+--------------------------------------+--------------------------------------+---------------+--------------+\n| 12345678-1234-1234-1234-123456789abc | 87654321-4321-4321-4321-cba987654321 | dev           | my-service   |\n+--------------------------------------+--------------------------------------+---------------+--------------+\n\n# List instances using the short alias\n$ vcr instance ls\n\n# Filter instances by service name\n$ vcr instance list --filter \"my-service\"\n\n# Filter with short flag\n$ vcr instance list -f \"prod\"\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "filter",
+        "shorthand": "f",
+        "type": "string",
+        "default": "",
+        "usage": "Filter instances by service name (case-insensitive substring match)"
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr instance log",
+    "use": "log",
+    "aliases": [
+      "logs"
+    ],
+    "short": "Fetch logs from a deployed VCR instance",
+    "long": "Fetch logs from a deployed VCR instance.\n\nBy default, the command retrieves the last N log entries (controlled by --history)\nand exits. Use --follow (-f) to continuously stream new log entries until you\npress Ctrl+C.\n\nIDENTIFYING THE INSTANCE\n  You can identify the instance using either:\n  • --id: The unique instance UUID\n  • --project-name + --instance-name: The combination from your manifest\n\nLOG LEVELS\n  Filter logs by severity level (shows specified level and above):\n  • trace  - Most verbose, includes all logs\n  • debug  - Debug information and above\n  • info   - Informational messages and above\n  • warn   - Warnings and above\n  • error  - Errors and above\n  • fatal  - Only fatal errors\n\nSOURCE TYPES\n  Filter logs by their source:\n  • application  - Logs from your application code\n  • provider     - Logs from VCR platform services\n\nOUTPUT FORMAT\n  Each log line shows: [timestamp] [source_type] message\n  Example: 2024-01-15T10:30:00Z [application] Server started on port 3000\n",
+    "example": "# Print the last logs by project and instance name (default, exits after output)\n$ vcr instance log --project-name my-app --instance-name dev\n2024-01-15T10:30:00Z [application] Server started on port 3000\n2024-01-15T10:30:01Z [application] Connected to database\n\n# Print the last logs by instance ID\n$ vcr instance log --id 12345678-1234-1234-1234-123456789abc\n\n# Continuously stream new logs (press Ctrl+C to stop)\n$ vcr instance log -p my-app -n dev --follow\n$ vcr instance log -p my-app -n dev -f\n\n# Print the last 500 log entries and exit\n$ vcr instance log -p my-app -n dev --history 500\n\n# Filter to show only errors and above\n$ vcr instance log -p my-app -n dev --log-level error\n\n# Show only application logs (exclude provider logs)\n$ vcr instance log -p my-app -n dev --source-type application\n\n# Combine filters with follow\n$ vcr instance log -p my-app -n dev -l warn -s application -f\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "follow",
+        "shorthand": "f",
+        "type": "bool",
+        "default": "false",
+        "usage": "Continuously stream new log entries (press Ctrl+C to stop)",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "history",
+        "type": "int",
+        "default": "300",
+        "usage": "Number of historical log entries to fetch initially (default: 300)"
+      },
+      {
+        "name": "id",
+        "shorthand": "i",
+        "type": "string",
+        "default": "",
+        "usage": "Instance UUID (alternative to project-name + instance-name)"
+      },
+      {
+        "name": "instance-name",
+        "shorthand": "n",
+        "type": "string",
+        "default": "",
+        "usage": "Instance name (requires --project-name)"
+      },
+      {
+        "name": "log-level",
+        "shorthand": "l",
+        "type": "string",
+        "default": "",
+        "usage": "Minimum log level: trace, debug, info, warn, error, fatal"
+      },
+      {
+        "name": "project-name",
+        "shorthand": "p",
+        "type": "string",
+        "default": "",
+        "usage": "Project name (requires --instance-name)"
+      },
+      {
+        "name": "source-type",
+        "shorthand": "s",
+        "type": "string",
+        "default": "",
+        "usage": "Filter by source: application, provider"
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr instance remove",
+    "use": "remove",
+    "aliases": [
+      "rm"
+    ],
+    "short": "Remove a deployed VCR instance",
+    "long": "Remove a deployed VCR instance.\n\nThis command permanently deletes an instance from the VCR platform, stopping\nthe running application and freeing all associated resources.\n\nIDENTIFYING THE INSTANCE\n  You can identify the instance to remove using either:\n  • --id: The unique instance UUID (from deployment output)\n  • --project-name + --instance-name: The combination from your manifest\n\nWARNING: This action is irreversible. All data associated with the instance\nwill be permanently deleted. You will be prompted for confirmation unless\n--yes is specified.\n",
+    "example": "# Remove by project and instance name\n$ vcr instance remove --project-name my-app --instance-name dev\n? Are you sure you want to remove instance with id=\"abc123\" and service_name=\"my-service\"? Yes\n✓ Instance \"abc123\" successfully removed\n\n# Remove using the short alias\n$ vcr instance rm -p my-app -n dev\n\n# Remove by instance ID\n$ vcr instance remove --id 12345678-1234-1234-1234-123456789abc\n\n# Skip confirmation prompt (useful for CI/CD)\n$ vcr instance rm --project-name my-app --instance-name dev --yes\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "id",
+        "shorthand": "i",
+        "type": "string",
+        "default": "",
+        "usage": "Instance UUID (alternative to project-name + instance-name)"
+      },
+      {
+        "name": "instance-name",
+        "shorthand": "n",
+        "type": "string",
+        "default": "",
+        "usage": "Instance name (requires --project-name)"
+      },
+      {
+        "name": "project-name",
+        "shorthand": "p",
+        "type": "string",
+        "default": "",
+        "usage": "Project name (requires --instance-name)"
+      },
+      {
+        "name": "yes",
+        "shorthand": "y",
+        "type": "bool",
+        "default": "false",
+        "usage": "Skip confirmation prompt (use with caution)",
+        "noOptDefVal": "true"
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr secret",
+    "use": "secret \u003ccommand\u003e",
+    "short": "Manage secrets for VCR applications",
+    "long": "Manage secrets for VCR applications.\n\nSecrets allow you to securely store sensitive values like API keys, passwords,\nand tokens that your VCR applications need at runtime. Secrets are:\n  • Encrypted at rest\n  • Injected as environment variables into your deployed instances\n  • Scoped to your Vonage account\n\nUSING SECRETS IN YOUR APPLICATION\n  Reference secrets in your vcr.yml manifest:\n\n  instance:\n    environment:\n      - name: MY_API_KEY\n        secret: MY_SECRET_NAME   # References a secret\n\n  The secret value is then available in your application as the\n  environment variable MY_API_KEY.\n\nAVAILABLE COMMANDS\n  create (add)   Create a new secret\n  list (ls)      List all secrets\n  update         Update an existing secret's value\n  remove (rm)    Delete a secret\n\nSECRET NAMING\n  Secret names must be valid environment variable names:\n  • Alphanumeric characters and underscores only\n  • Cannot start with a number\n  • Case-sensitive\n",
+    "example": "# Create a secret with a value\n$ vcr secret create --name MY_API_KEY --value \"sk-12345...\"\n\n# Create a secret from a file (useful for certificates, multi-line values)\n$ vcr secret create --name SSL_CERT --filename ./cert.pem\n\n# Update a secret's value\n$ vcr secret update --name MY_API_KEY --value \"sk-new-key...\"\n\n# Remove a secret\n$ vcr secret remove --name MY_API_KEY\n",
+    "argsValidatorSet": false,
+    "runnable": false,
+    "localFlags": null,
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ],
+    "children": [
+      "create",
+      "list",
+      "remove",
+      "update"
+    ]
+  },
+  {
+    "path": "vcr secret create",
+    "use": "create",
+    "aliases": [
+      "add"
+    ],
+    "short": "Create a new secret",
+    "long": "Create a new secret for use in VCR applications.\n\nSecrets are securely stored and can be referenced in your vcr.yml manifest\nto inject sensitive values as environment variables in your deployed instances.\n\nSECRET VALUE INPUT\n  You can provide the secret value in two ways:\n  • --value: Pass the value directly (be careful with shell history)\n  • --filename: Read the value from a file (recommended for multi-line values)\n\n  If neither is provided, you will be prompted to enter the value interactively.\n\nSECRET NAMING RULES\n  • Must be a valid environment variable name\n  • Alphanumeric characters and underscores only\n  • Cannot start with a number\n  • Case-sensitive (MY_SECRET and my_secret are different)\n\nNOTE: Secret names must be unique within your account. If a secret with the\nsame name already exists, this command will fail. Use 'vcr secret update' instead.\n",
+    "example": "# Create a secret with a direct value\n$ vcr secret create --name MY_API_KEY --value \"sk-12345abcde\"\n✓ Secret \"MY_API_KEY\" created\n\n# Create a secret from a file\n$ vcr secret create --name SSL_CERT --filename ./server.crt\n\n# Create a secret with interactive value input (value not shown in history)\n$ vcr secret create --name DATABASE_PASSWORD\n? Enter value for secret \"DATABASE_PASSWORD\": ********\n✓ Secret \"DATABASE_PASSWORD\" created\n\n# Using short flags\n$ vcr secret create -n WEBHOOK_SECRET -v \"whsec_xyz123\"\n\n# Using the 'add' alias\n$ vcr secret add --name MY_TOKEN --value \"token123\"\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "filename",
+        "shorthand": "f",
+        "type": "string",
+        "default": "",
+        "usage": "Path to file containing the secret value"
+      },
+      {
+        "name": "name",
+        "shorthand": "n",
+        "type": "string",
+        "default": "",
+        "usage": "Secret name (must be valid env var name, required)",
+        "required": true
+      },
+      {
+        "name": "value",
+        "shorthand": "v",
+        "type": "string",
+        "default": "",
+        "usage": "Secret value (or use --filename for file input)"
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr secret list",
+    "use": "list",
+    "aliases": [
+      "ls"
+    ],
+    "short": "List all secrets",
+    "long": "List all secrets stored in your VCR account.\n\nThis command displays the names of all secrets. Secret values are never\nshown for security reasons.\n\nUse this to verify which secrets are available before referencing them\nin your vcr.yml manifest.\n",
+    "example": "# List all secrets\n$ vcr secret list\n✓ Found 3 secret(s):\n  ℹ MY_API_KEY\n  ℹ DATABASE_PASSWORD\n  ℹ SSL_CERT\n\n# No secrets configured\n$ vcr secret list\n! No secrets found\n\n# Using the 'ls' alias\n$ vcr secret ls\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": null,
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr secret remove",
+    "use": "remove",
+    "aliases": [
+      "rm"
+    ],
+    "short": "Remove a secret",
+    "long": "Remove a secret from your VCR account.\n\nThis command permanently deletes a secret. Any deployed instances that\nreference this secret will fail to access the value on their next restart.\n\nWARNING: This action is irreversible. Make sure no running instances\ndepend on this secret before removing it.\n\nBEFORE REMOVING\n  1. Check if any vcr.yml manifests reference this secret\n  2. Update or redeploy affected instances first\n  3. Then remove the secret\n",
+    "example": "# Remove a secret by name\n$ vcr secret remove --name MY_API_KEY\n✓ Secret \"MY_API_KEY\" successfully removed\n\n# Using the short flag\n$ vcr secret remove -n DATABASE_PASSWORD\n\n# Using the 'rm' alias\n$ vcr secret rm --name OLD_TOKEN\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "name",
+        "shorthand": "n",
+        "type": "string",
+        "default": "",
+        "usage": "Name of the secret to remove (required)",
+        "required": true
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr secret update",
+    "use": "update",
+    "short": "Update an existing secret's value",
+    "long": "Update the value of an existing secret.\n\nThis command changes the value of a secret that was previously created.\nThe new value will be available to instances on their next restart or\nnew deployment.\n\nSECRET VALUE INPUT\n  You can provide the new value in two ways:\n  • --value: Pass the value directly (be careful with shell history)\n  • --filename: Read the value from a file (recommended for multi-line values)\n\n  If neither is provided, you will be prompted to enter the value interactively.\n\nNOTE: The secret must already exist. Use 'vcr secret create' to create a new secret.\n\nUPDATING RUNNING INSTANCES\n  Instances do not automatically pick up secret changes. You need to either:\n  • Redeploy the instance: vcr deploy\n  • Or restart the instance through the dashboard\n",
+    "example": "# Update a secret's value directly\n$ vcr secret update --name MY_API_KEY --value \"sk-newkey12345\"\n✓ Secret \"MY_API_KEY\" updated\n\n# Update a secret from a file\n$ vcr secret update --name SSL_CERT --filename ./new-cert.pem\n\n# Update with interactive input (value hidden)\n$ vcr secret update --name DATABASE_PASSWORD\n? Enter new value for secret \"DATABASE_PASSWORD\": ********\n✓ Secret \"DATABASE_PASSWORD\" updated\n\n# Using short flags\n$ vcr secret update -n WEBHOOK_SECRET -v \"whsec_newvalue\"\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "filename",
+        "shorthand": "f",
+        "type": "string",
+        "default": "",
+        "usage": "Path to file containing the new secret value"
+      },
+      {
+        "name": "name",
+        "shorthand": "n",
+        "type": "string",
+        "default": "",
+        "usage": "Name of the secret to update (required)",
+        "required": true
+      },
+      {
+        "name": "value",
+        "shorthand": "v",
+        "type": "string",
+        "default": "",
+        "usage": "New value for the secret (or use --filename)"
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  },
+  {
+    "path": "vcr upgrade",
+    "use": "upgrade",
+    "short": "Check for and install VCR CLI updates",
+    "long": "Check for and install VCR CLI updates.\n\nThis command displays the current VCR CLI version and checks if a newer\nversion is available. If an update is found, you'll be prompted to install it.\n\nVERSION CHECK\n  The command compares your installed version against the latest release\n  on GitHub. It shows:\n  • Current version: Your installed version\n  • Latest version: The newest available release\n\nUPDATE PROCESS\n  If a new version is available:\n  1. You'll be prompted to confirm the update (unless --force is used)\n  2. The new binary is downloaded from GitHub releases\n  3. The current binary is replaced with the new one\n  4. Success message confirms the update\n\nCUSTOM INSTALLATION PATH\n  If you installed the CLI in a custom location (not the default), use\n  --path to specify where the vcr binary is located.\n\nTROUBLESHOOTING\n  • If update fails due to permissions, try running with sudo\n  • On some systems, you may need to reinstall using brew or the installer\n",
+    "example": "# Check current version and available updates\n$ vcr upgrade\nvcr-cli version 1.2.3 (commit:abc123, date:2024-01-15)\n✓ You are using the latest version of vcr-cli (1.2.3)\n\n# When an update is available\n$ vcr upgrade\nvcr-cli version 1.2.3 (commit:abc123, date:2024-01-15)\n? Are you sure you want to update to 1.3.0? Yes\n✓ Successfully updated to version 1.3.0\n\n# Force update without prompt (useful for CI/CD)\n$ vcr upgrade --force\n\n# Update CLI installed in a custom location\n$ vcr upgrade --path /opt/vonage/bin\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "force",
+        "shorthand": "f",
+        "type": "bool",
+        "default": "false",
+        "usage": "Skip confirmation prompt and update automatically",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "path",
+        "shorthand": "p",
+        "type": "string",
+        "default": "",
+        "usage": "Custom path to VCR CLI installation directory"
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ]
+  }
+]

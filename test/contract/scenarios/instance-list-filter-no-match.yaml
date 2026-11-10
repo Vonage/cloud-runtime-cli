@@ -1,0 +1,5 @@
+description: "a filter that matches nothing prints an empty table"
+args: [instance, list, --filter, zzz]
+expect-reads:
+  - "euw1 GET /instances?filter=zzz"
+  - "euw1 GET /regions/aws.euw1"

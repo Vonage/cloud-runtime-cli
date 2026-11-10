@@ -1,0 +1,8 @@
+description: "clearing NO_COLOR on a terminal shows colour in the interactive layout"
+args: [app, create, --name, demo, --yes]
+tty: true
+presentation: rich
+env:
+  NO_COLOR: ""
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

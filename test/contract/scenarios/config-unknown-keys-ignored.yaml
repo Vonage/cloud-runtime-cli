@@ -1,0 +1,16 @@
+description: "unknown keys and sections of the configuration file are ignored"
+args: [app, list]
+config-file: |
+  graphql_endpoint = ${FAKE}/v1/vcr/euw1/api/graphql/v1/graphql
+  default_region   = aws.euw1
+
+  [credentials]
+  api_key    = abc123
+  api_secret = s3cret-for-tests
+
+  unknown_key = value
+
+  [extras]
+  flavour = plain
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

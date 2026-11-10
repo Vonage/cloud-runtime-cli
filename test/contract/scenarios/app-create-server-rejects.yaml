@@ -1,0 +1,7 @@
+description: "a rejected application is reported with the platform message"
+args: [app, create, --name, my-new-app]
+fixtures:
+  overrides:
+    - {match: "POST /applications", status: 422, body: '{"error":{"code":3000,"message":"application name is not allowed","traceId":"trace-422"}}'}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

@@ -1,0 +1,10 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 282
+! Fail to read config file ~/.vcr-cli. Creating a new config...
+? Enter your Vonage api key: abc123
+? Enter your Vonage api secret: ****************
+✓ Regions retrieved
+? Select your Vonage region: AWS Europe(Ireland) - (aws.euw1)
+✓ New configuration file written to ~/.vcr-cli
+

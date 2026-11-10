@@ -1,0 +1,6 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 123
+Are you sure you want to remove application "00000000-0000-4000-8000-000000000601"? [y/n]: n
+! Application removal aborted
+

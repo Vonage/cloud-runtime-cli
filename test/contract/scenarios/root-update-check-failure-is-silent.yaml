@@ -1,0 +1,7 @@
+description: "a failing update check does not change the result of the command"
+args: [app, list]
+fixtures:
+  overrides:
+    - {match: "GET gh:/releases/latest", status: 500, body: "unavailable"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

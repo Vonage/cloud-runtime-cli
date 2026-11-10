@@ -1,0 +1,11 @@
+description: "any answer but y or n asks the question again"
+args: [app, create, --name, test-app]
+tty: true
+steps:
+  - {expect: "Are you sure you want to create an application? [y/n]:"}
+  - {send: "maybe\r"}
+  - {expect: "maybe\nAre you sure you want to create an application? [y/n]:"}
+  - {send: "y\r"}
+  - {expect: "Application created"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

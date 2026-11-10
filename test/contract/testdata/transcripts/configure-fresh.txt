@@ -1,0 +1,29 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 0
+@@ stdout 263
+! Fail to read config file ~/.vcr-cli. Creating a new config...
+? Enter your Vonage api key: abc123
+? Enter your Vonage api secret: s3cret-for-tests
+? Select your Vonage region: AWS - Europe (Ireland) - (aws.euw1)
+✓ New configuration file written to ~/.vcr-cli
+
+@@ stderr 0
+
+@@ files 285
++ home/.vcr-cli mode=0644 size=154 sha256=07d839ea7ab29e77974d4dd435e7bcdaf36b90b5351276825759e1cdd71e1312
+  | graphql_endpoint = <FAKE>/v1/vcr/euw1/api/graphql/v1/graphql
+  | default_region   = aws.euw1
+  | 
+  | [credentials]
+  | api_key    = abc123
+  | api_secret = s3cret-for-tests
+
+@@ requests 325
+euw1 POST graphql:Regions
+  auth: basic abc123
+  acct: abc123
+  trace: yes
+  type: application/json
+  body: {"query":"\\nquery MyQuery {\\n  Regions(where: {enabled: {_eq: true}}) {\\n \\tname    \\n\\talias\\n\\tdeployment_api_url\\n\\tassets_api_url\\n\\tdebugger_url_scheme\\n\\thost_template\\n  }\\n}","variables":null}
+

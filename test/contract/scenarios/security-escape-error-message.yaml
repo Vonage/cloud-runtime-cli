@@ -1,0 +1,11 @@
+description: "control sequences in an error message and in the container logs of an error are not passed on"
+group: app
+args: [app, list]
+fixtures:
+  overrides:
+    - match: "GET /applications"
+      status: 500
+      body: '{"error":{"code":1001,"message":"failed \u001b]0;pwned\u0007 \u001b[31mred\u001b[0m text","traceId":"trace-esc"}}'
+      containerLogs: "log \x1b]0;pwned2\x07 line\n\x1b[2Jcleared\nplain last line"
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

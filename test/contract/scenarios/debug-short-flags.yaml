@@ -1,0 +1,15 @@
+description: "the short flags of vcr debug"
+args: [debug, -a, "${PORT:app}", -d, "${PORT:debugger}", -n, my-debugger, -r, nodejs18, -i, 00000000-0000-4000-8000-000000000603, -f, custom.yml, -y]
+cwd: work/project
+files:
+  - path: work/project/custom.yml
+    content: |
+      project: {name: my-project}
+      instance: {name: dev, runtime: nodejs18, region: aws.euw1, application-id: 00000000-0000-4000-8000-000000000601}
+      debug: {application-id: 00000000-0000-4000-8000-000000000602, entrypoint: ["${TESTAPP}"]}
+steps:
+  - {wait-peer: connected}
+  - {wait-stdout: testapp env XDG_CONFIG_HOME}
+  - {signal: SIGINT}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

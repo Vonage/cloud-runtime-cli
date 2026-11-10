@@ -1,0 +1,8 @@
+
+query MyQuery {
+  Products(where: {ProductVersions: {code_template_enabled: {_eq: true}}, type: {_eq: public}}, order_by: {name: asc}) {
+    id
+    name
+    programming_language
+  }
+}

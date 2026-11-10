@@ -1,0 +1,9 @@
+
+query MyQuery {
+  Runtimes(where: {enabled: {_eq: true}}, order_by: {name: asc}) {
+    id
+    name
+    language
+	comments
+  }
+}

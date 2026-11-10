@@ -1,0 +1,18 @@
+# vcr rich golden v1
+exit 1
+@@ stdout 620
+? Enter your project name: work
+? Enter your Instance name: dev
+✓ Runtimes retrieved
+? Select a runtime: nodejs18
+✓ Regions retrieved
+? Select a region: AWS - Europe (Ireland) - (aws.euw1)
+✓ Applications retrieved
+? Select your Vonage application ID for deployment: SKIP
+✓ Applications retrieved
+? Select your Vonage application ID for debug: SKIP
+✓ Templates retrieved
+? Select a product template for runtime nodejs18:  Starter Project - Node.js
+✓ Template downloaded
+✗ failed to uncompress template files: failed to create directory <WORK>/static: mkdirat static: statat static: path escapes from parent
+

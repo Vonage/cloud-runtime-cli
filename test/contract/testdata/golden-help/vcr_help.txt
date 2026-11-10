@@ -1,0 +1,22 @@
+$ vcr help --help
+[exit=0]
+--- stdout ---
+Help provides help for any command in the application.
+Simply type vcr help [path to command] for full details.
+
+USAGE
+  vcr help [command] [flags]
+
+INHERITED FLAGS
+      --api-key string            Vonage API key
+      --api-secret string         Vonage API secret
+      --config-file string        Path to config file (default is $HOME/.vcr-cli) (default "~/.vcr-cli")
+      --graphql-endpoint string   Graphql endpoint used to fetch metadata
+      --help                      Show help for command
+      --region string             Vonage platform region
+  -t, --timeout duration          Overall deadline for the command, including waiting for a build to finish (e.g. 20m) (default 10m0s)
+
+LEARN MORE
+  Use 'vcr <command> <subcommand> --help' for more information about a command.
+
+--- stderr ---

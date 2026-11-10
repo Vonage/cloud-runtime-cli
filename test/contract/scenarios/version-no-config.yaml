@@ -1,0 +1,4 @@
+description: "the version is printed without a configuration file"
+args: [--version]
+config: none
+scrape: [version-line]

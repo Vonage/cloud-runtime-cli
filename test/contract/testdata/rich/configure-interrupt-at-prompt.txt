@@ -1,0 +1,6 @@
+# vcr rich golden v1
+exit 1
+@@ stdout 76
+? Enter your Vonage api key: (abc123)
+✗ failed to read api key: interrupt
+

@@ -1,0 +1,9 @@
+description: "a manifest with only the project and the instance name is deployed with the configured region"
+args: [deploy]
+cwd: work/project
+files:
+  - {path: work/project/vcr.yml, from: testdata/corpora/manifests/config-vcr.yaml, mode: 0644}
+  - {path: work/project/index.js, content: "console.log('hello');\n"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /projects/test"

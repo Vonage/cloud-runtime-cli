@@ -1,0 +1,2 @@
+description: "an unknown command is a usage error"
+args: [nosuchcmd]

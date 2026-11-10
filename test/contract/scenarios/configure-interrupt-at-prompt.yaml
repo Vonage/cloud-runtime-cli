@@ -1,0 +1,7 @@
+description: Ctrl-C at the first prompt of configure ends the command with an error
+args: [configure]
+tty: true
+steps:
+  - {expect: "Enter your Vonage api key:"}
+  - {send: "\x03"}
+expect-reads: []

@@ -1,0 +1,60 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 0
+@@ stdout 1956
+Configure the VCR CLI with your Vonage API credentials.
+
+This interactive command sets up the VCR CLI by prompting you for:
+  • Vonage API Key     - Found in your Vonage API Dashboard
+  • Vonage API Secret  - Found in your Vonage API Dashboard
+  • Default Region     - The Vonage Cloud Runtime region for deployments
+
+On successful configuration, a configuration file is created at $HOME/.vcr-cli
+(or the path specified by --config-file).
+
+PREREQUISITES
+  You need a Vonage API account to use VCR. Get your API credentials from:
+  https://dashboard.nexmo.com/settings
+
+CONFIGURATION FILE
+  The configuration file stores your credentials and preferences. You can have
+  multiple configuration files for different accounts/environments by using
+  the --config-file flag with other commands.
+
+NOTE: The VCR CLI requires configuration before any other commands will work.
+Run this command first after installing the CLI.
+
+
+USAGE
+  vcr configure [flags]
+
+INHERITED FLAGS
+      --api-key string            Vonage API key
+      --api-secret string         Vonage API secret
+      --config-file string        Path to config file (default is $HOME/.vcr-cli) (default "~/.vcr-cli")
+      --graphql-endpoint string   Graphql endpoint used to fetch metadata
+      --help                      Show help for command
+      --region string             Vonage platform region
+  -t, --timeout duration          Overall deadline for the command, including waiting for a build to finish (e.g. 20m) (default 10m0s)
+
+EXAMPLES
+  # Configure the CLI interactively
+  $ vcr configure
+  ? Enter your Vonage api key: abc123
+  ? Enter your Vonage api secret: ********
+  ? Select your Vonage region: aws.euw1 - AWS Europe (Ireland)
+  ✓ New configuration file written to /Users/you/.vcr-cli
+  
+  # Use a custom configuration file path
+  $ vcr configure --config-file ~/.vcr-cli-staging
+
+LEARN MORE
+  Use 'vcr <command> <subcommand> --help' for more information about a command.
+
+
+@@ stderr 0
+
+@@ files 0
+
+@@ requests 0
+

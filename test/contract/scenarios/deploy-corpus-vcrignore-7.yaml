@@ -1,0 +1,40 @@
+description: "a negated .vcrignore pattern brings back a file that an earlier pattern left out"
+args: [deploy]
+cwd: work/project
+files:
+  - {path: work/project/vcr.yml, from: testdata/corpora/manifests/minimal.yaml, mode: 0644}
+  - {path: work/project/index.js, content: "console.log('hello');\n"}
+  - {path: "work/project/app.log", content: "content of app.log\n"}
+  - {path: "work/project/keep.log", content: "content of keep.log\n"}
+  - {path: "work/project/notes.tmp", content: "content of notes.tmp\n"}
+  - {path: "work/project/escaped-space.txt ", content: "content of escaped-space.txt\n"}
+  - {path: "work/project/leading-spaces.txt", content: "content of leading-spaces.txt\n"}
+  - {path: "work/project/root-only.txt", content: "content of root-only.txt\n"}
+  - {path: "work/project/sub/root-only.txt", content: "content of sub/root-only.txt\n"}
+  - {path: "work/project/sub/deep/trace.log", content: "content of sub/deep/trace.log\n"}
+  - {path: "work/project/sub/readme.md", content: "content of sub/readme.md\n"}
+  - {path: "work/project/build/out.js", content: "content of build/out.js\n"}
+  - {path: "work/project/src/build/x.js", content: "content of src/build/x.js\n"}
+  - {path: "work/project/node_modules/pkg/index.js", content: "content of node_modules/pkg/index.js\n"}
+  - {path: "work/project/src/node_modules/y.js", content: "content of src/node_modules/y.js\n"}
+  - {path: "work/project/temp/a.txt", content: "content of temp/a.txt\n"}
+  - {path: "work/project/x.bak", content: "content of x.bak\n"}
+  - {path: "work/project/sub/y.bak", content: "content of sub/y.bak\n"}
+  - {path: "work/project/cache/blob.bin", content: "content of cache/blob.bin\n"}
+  - {path: "work/project/other/cache", content: "content of other/cache\n"}
+  - {path: "work/project/docs/readme.md", content: "content of docs/readme.md\n"}
+  - {path: "work/project/docs/guide.md", content: "content of docs/guide.md\n"}
+  - {path: "work/project/generated/g.js", content: "content of generated/g.js\n"}
+  - {path: "work/project/src/generated/h.js", content: "content of src/generated/h.js\n"}
+  - {path: "work/project/logs/a/b/c.txt", content: "content of logs/a/b/c.txt\n"}
+  - {path: "work/project/maps/app.js.map", content: "content of maps/app.js.map\n"}
+  - {path: "work/project/#important.txt", content: "content of #important.txt\n"}
+  - {path: "work/project/!bang.txt", content: "content of !bang.txt\n"}
+  - {path: "work/project/#not-a-pattern.txt", content: "content of #not-a-pattern.txt\n"}
+  - {path: "work/project/src/main.js", content: "content of src/main.js\n"}
+  - {path: work/project/.vcrignore, from: testdata/corpora/vcrignore/7.vcrignore, mode: 0644}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /projects/minimal-project"
+  - "euw1 GET /packages/<uuid>/build/status"
+scrape: [deployed-banner, deployed-instance-id, deployed-service-name, deployed-host-address]

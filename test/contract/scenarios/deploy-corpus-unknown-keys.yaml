@@ -1,0 +1,11 @@
+description: "keys the CLI does not know are ignored in a manifest"
+args: [deploy]
+cwd: work/project
+files:
+  - {path: work/project/vcr.yml, from: testdata/corpora/manifests/unknown-keys.yaml, mode: 0644}
+  - {path: work/project/index.js, content: "console.log('hello');\n"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /projects/unknown-keys-project"
+  - "euw1 GET /packages/<uuid>/build/status"
+scrape: [deployed-banner, deployed-instance-id, deployed-service-name, deployed-host-address]

@@ -1,0 +1,4 @@
+description: "init cannot ask its questions without a terminal"
+args: [init]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

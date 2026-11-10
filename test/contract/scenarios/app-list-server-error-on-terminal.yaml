@@ -1,0 +1,8 @@
+description: "a server error on a terminal is reported with its trace id and the application logs"
+args: [app, list]
+tty: true
+fixtures:
+  overrides:
+    - {match: "GET /applications", status: 500, body: '{"error":{"code":1001,"message":"internal error","traceId":"trace-500"}}', containerLogs: "boot failed\nsecond line"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

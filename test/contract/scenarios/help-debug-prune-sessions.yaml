@@ -1,0 +1,4 @@
+description: "the help page of vcr debug prune-sessions"
+group: debug
+args: [debug, prune-sessions, --help]
+expect-reads: []

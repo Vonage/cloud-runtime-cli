@@ -1,0 +1,10 @@
+description: "answering y at the confirmation removes the instance"
+args: [instance, remove, --id, 00000000-0000-4000-8000-000000000501]
+tty: true
+steps:
+  - {expect: "are you sure you want to remove instance with id=\"00000000-0000-4000-8000-000000000501\" and service_name=\"my-project-dev\" ? [y/n]:"}
+  - {send: "y\r"}
+  - {expect: "successfully removed"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /instances/00000000-0000-4000-8000-000000000501"

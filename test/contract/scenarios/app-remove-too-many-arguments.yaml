@@ -1,0 +1,3 @@
+description: "app remove with two ids is a usage error"
+args: [app, remove, 00000000-0000-4000-8000-000000000601, 00000000-0000-4000-8000-000000000602]
+expect-reads: []

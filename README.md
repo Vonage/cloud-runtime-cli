@@ -1,6 +1,6 @@
 # Vonage cloud runtime - CLI
 
-![Actions](https://github.com/Vonage/vonage-cloud-runtime-cli/workflows/Release%20CLI/badge.svg)
+![Actions](https://github.com/Vonage/vonage-cloud-runtime-cli/workflows/CI-Pipeline/badge.svg)
 
 <img src="https://developer.nexmo.com/assets/images/Vonage_Nexmo.svg" height="48px" alt="Nexmo is now known as Vonage" />
 
@@ -11,7 +11,8 @@ the [Vonage Cloud Runtime platform](https://developer.vonage.com/en/cloud-runtim
 * [Installation](#installation)
 * [Project Structure](#project-structure)
 * [Usage](#usage)
-* [Development Setup](#development-setup)
+* [Terminal output](#terminal-output)
+* [Development](#development)
 * [Contributions](#contributions)
 * [Conventional Commits](#conventional-commits)
 * [Release Process](#release-process)
@@ -39,7 +40,7 @@ pwsh -Command "iwr https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/ma
 
 ### Verifying a download
 
-From v2.6.1 each release has a `checksums.txt` and a signature of it, `checksums.txt.<keyid>.sig`. The first line of `checksums.txt` is `# vcr <tag>`, followed by one SHA-256 line per archive. The signature is made with `ssh-keygen -Y sign` in the `vcr-release` namespace, and `<keyid>` is the first 8 bytes, in hex, of the SHA-256 of the raw public key. A release can carry one signature file per key; one valid signature is enough. The install scripts check the checksum and the signature for you.
+From v2.6.1 each release has a `checksums.txt` and a signature of it, `checksums.txt.<keyid>.sig`. The first line of `checksums.txt` is `# vcr <tag>`, followed by one SHA-256 line per archive. The signature is made with `ssh-keygen -Y sign` in the `vcr-release` namespace, and `<keyid>` is the first 8 bytes, in hex, of the SHA-256 of the raw public key. A release can carry one signature file per key; one valid signature is enough. `vcr upgrade` and the install scripts check the checksum and the signature for you, and install nothing that does not verify.
 
 To check a download by hand you need OpenSSH 8.0 or newer. Save the release key as `allowed_signers`:
 
@@ -57,77 +58,56 @@ grep ' vcr_linux_amd64.tar.gz$' checksums.txt | sha256sum -c -    # macOS: shasu
 
 The first command prints `Good "vcr-release" signature` and the second prints `OK`. On Windows, compare `(Get-FileHash vcr_windows_amd64.tar.gz).Hash` with the matching line in `checksums.txt`.
 
-
 ## Project Structure
 
-[Structure](PLAN.md) of the project
+The layout of the code, the rules it follows and how to check a change are in [AGENTS.md](AGENTS.md).
 
 ## Usage
 
 Usage examples are in the `docs/` folder - [vcr](docs/vcr.md)
 
-## Development Setup
+The platform address is set with `endpoint` in `~/.vcr-cli` or with `--endpoint`. They replace `graphql_endpoint` and `--graphql-endpoint`, which still work but are deprecated. When `vcr` finds only `graphql_endpoint` in the config file, it offers to add the `endpoint` key on an interactive terminal, and otherwise prints the line to add. `vcr configure` writes both keys.
 
-### Prerequisites
+## Terminal output
 
-- Go 1.26+
-- Node.js 18+ (for commitlint)
-- [golangci-lint](https://golangci-lint.run/welcome/install/)
-- [Lefthook](https://github.com/evilmartians/lefthook) (for git hooks)
+In an interactive terminal, `vcr` shows live progress that settles into result lines with timings, titled result blocks and compact error messages with hints. Output that is piped, redirected or produced in CI is the same as in earlier releases, so scripts and editor integrations keep working.
 
-### Setting Up Git Hooks
+The new presentation is used when stdout and stderr are both terminals, `TERM` is set and is not `dumb`, and `CI` is unset (or `0` or `false`). Two settings change it:
 
-This project uses [Lefthook](https://github.com/evilmartians/lefthook) to manage git hooks. Install and configure it:
+| Setting | Effect |
+|---|---|
+| `VCR_UI=classic` | The output of earlier releases, exactly. Use it for anything that allocates a terminal but reads the output, such as an `expect` script. |
+| `VCR_UI=static` | The same lines and layout without animation or cursor movement, for screen readers and recordings. Also used when the terminal is narrower than 40 columns. |
 
-```bash
-# Install lefthook (macOS)
-brew install lefthook
+`NO_COLOR` turns colour off and keeps the layout. Help pages are not affected.
 
-# Or with Go
-go install github.com/evilmartians/lefthook@latest
+## Development
 
-# Install commitlint dependencies
-npm install
+Prerequisites: Go 1.27 or newer, `make`, and Node.js 20 for the commit-message hook.
 
-# Install the git hooks
-lefthook install
+```sh
+make hooks      # git hooks: gofmt report and lint on commit, commit-message check, tests on push (once per clone; needs lefthook and Node.js, and also runs `npm ci --ignore-scripts` for the commit-message tool)
+make build      # dist/vcr, stamped like a release
+make test       # go test -race ./...
+make lint       # pinned golangci-lint
+make contract   # replay the recorded command-line contract against the built binary
+make contract-rich  # replay the terminal goldens
+make vulncheck  # govulncheck ./...
+make docs       # regenerate docs/vcr*.md
+make help       # every target
 ```
 
-### What the Hooks Do
-
-| Hook | Action |
-|------|--------|
-| `commit-msg` | Validates commit message follows [conventional commits](#conventional-commits) format |
-| `pre-commit` | Runs `gofmt` and `go vet` on staged Go files |
-| `pre-push` | Runs `go test` and `golangci-lint` before pushing |
-
-### Skipping Hooks (when needed)
-
-```bash
-# Skip all hooks
-git commit --no-verify -m "wip: work in progress"
-
-# Skip specific hooks
-LEFTHOOK_EXCLUDE=pre-push git push
-```
-
-### Local Hook Overrides
-
-Create a `lefthook-local.yml` to override hooks locally (this file is gitignored):
-
-```yaml
-# lefthook-local.yml
-pre-push:
-  commands:
-    go-test:
-      skip: true  # Skip tests on push locally
-```
+The command-line contract is frozen: `test/contract` holds scenarios and transcripts recorded from v2.6.1, and
+`make contract` replays them against the binary built from the working tree. A deliberate difference is a line in
+`test/contract/allowed-diffs.txt` with a plain reason; `make contract-record` re-records the transcripts from
+`BASELINE_REF` (default `v2.6.1`). Layout and conventions are in [AGENTS.md](AGENTS.md). `git commit --no-verify`
+skips the hooks; CI runs the same checks.
 
 ## Contributions
 
 Yes please! This command-line interface is open source, community-driven, and benefits greatly from the input of its users.
 
-Please make all your changes on a branch, and open a pull request, these are welcome and will be reviewed with delight! If it's a big change, it is recommended to open an issue for discussion before you start.
+Please work on a branch and open a pull request; these are welcome and will be reviewed with delight! If it's a big change, it is recommended to open an issue for discussion before you start.
 
 All changes require tests to go with them.
 
@@ -195,16 +175,18 @@ This project uses [Release Please](https://github.com/googleapis/release-please)
 2. **Release PR**: A "Release PR" is automatically created/updated with:
    - Version bump based on commit types
    - Auto-generated changelog entries
-3. **Publish release**: When the Release PR is merged, a GitHub Release is created
-4. **Build & distribute**: The release triggers the build pipeline which:
+3. **Draft release**: When the Release PR is merged, lint and the tests run, then a draft GitHub Release is created
+4. **Build, sign & publish**: The release triggers the build pipeline which:
    - Cross-compiles binaries for all platforms
    - Code signs macOS binaries, and notarizes them when the repository variable `APPLE_NOTARIZE` is `true`
-   - Uploads artifacts to the GitHub Release
+   - Signs `checksums.txt` with the release key (see [Verifying a download](#verifying-a-download))
+   - Uploads the archives, the checksums and the signature to the draft, then publishes it
+   - Installs the published release and checks that it reports the new version
 
 ### Manual Release
 
 If needed, you can trigger a manual release via the GitHub Actions UI:
-1. Go to Actions → "Release CLI"
+1. Go to Actions → "Manual Release"
 2. Click "Run workflow"
 3. Enter the release tag (e.g., `v2.1.3`)
 

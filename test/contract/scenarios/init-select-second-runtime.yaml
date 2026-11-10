@@ -1,0 +1,35 @@
+description: "choosing the second runtime offers the templates of its language"
+args: [init]
+tty: true
+cwd: work/project
+files:
+  - {path: work/project, type: dir}
+fixtures:
+  products:
+    - {id: 00000000-0000-4000-8000-000000000201, name: Starter Project - Node.js, programmingLanguage: nodejs, activeVersionId: 00000000-0000-4000-8000-000000000301}
+    - {id: 00000000-0000-4000-8000-000000000202, name: Starter Project - Python, programmingLanguage: python, activeVersionId: 00000000-0000-4000-8000-000000000302}
+steps:
+  - {expect: "Enter your project name:"}
+  - {send: "\r"}
+  - {expect: "Enter your Instance name:"}
+  - {send: "\r"}
+  - {expect: "Select a runtime:"}
+  - {send: "\x1b[B"}
+  - {expect: "> python3"}
+  - {send: "\r"}
+  - {expect: "Select a region:"}
+  - {send: "\r"}
+  - {expect: "Select your Vonage application ID for deployment:"}
+  - {send: "\r"}
+  - {expect: "Select your Vonage application ID for debug:"}
+  - {send: "\r"}
+  - {expect: "Select a product template for runtime"}
+  - {send: "\x1b[B"}
+  - {expect: "> Starter Project - Python"}
+  - {send: "\r"}
+  - {expect: "created"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /runtimes"
+  - "euw1 GET /regions"
+  - "euw1 GET /products/templates"

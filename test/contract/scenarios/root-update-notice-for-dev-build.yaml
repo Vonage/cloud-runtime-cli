@@ -1,0 +1,7 @@
+description: "a development build is told about a newer release against 0.0.1"
+args: [app, list]
+build: dev
+fixtures:
+  release: {tag: v9.9.9}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

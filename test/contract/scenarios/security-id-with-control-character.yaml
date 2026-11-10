@@ -1,0 +1,5 @@
+description: "an application id with a line break is refused"
+group: app
+args: [app, generate-keys, --app-id, "a\nb"]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

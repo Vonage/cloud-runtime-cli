@@ -1,0 +1,11 @@
+project:
+  name: empty-lists-project
+instance:
+  name: dev
+  runtime: nodejs18
+  region: aws.euw1
+  application-id: 00000000-0000-4000-8000-000000000601
+  environment: []
+  capabilities: []
+  entrypoint: []
+  domains: []

@@ -1,0 +1,8 @@
+description: "a refused request on a terminal is reported with a hint to check the credentials"
+args: [app, list]
+tty: true
+fixtures:
+  overrides:
+    - {match: "GET /applications", status: 401, body: '{"error":{"code":401,"message":"invalid credentials","traceId":"trace-401"}}'}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

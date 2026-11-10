@@ -1,0 +1,4 @@
+description: "the short flags of app create"
+args: [app, create, -n, x, -m, -r, -v, -y]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

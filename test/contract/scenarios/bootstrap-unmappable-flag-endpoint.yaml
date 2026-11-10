@@ -1,0 +1,4 @@
+description: "an endpoint flag that is neither the gateway nor the production form"
+args: [--graphql-endpoint, "${FAKE}/graphql", app, list]
+expect-reads: []
+scrape-except: [table-lines]

@@ -1,0 +1,4 @@
+description: "the help page of vcr instance remove"
+group: instance
+args: [instance, remove, --help]
+expect-reads: []

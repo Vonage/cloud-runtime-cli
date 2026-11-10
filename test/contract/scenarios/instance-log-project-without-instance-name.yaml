@@ -1,0 +1,4 @@
+description: "--project-name needs --instance-name"
+args: [instance, log, --project-name, my-project]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

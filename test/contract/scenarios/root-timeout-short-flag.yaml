@@ -1,0 +1,4 @@
+description: "the -t flag sets the deadline of a command"
+args: [-t, 5s, app, list]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

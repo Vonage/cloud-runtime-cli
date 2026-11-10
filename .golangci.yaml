@@ -1,0 +1,60 @@
+version: "2"
+run:
+  timeout: 10m
+  tests: true
+linters:
+  default: standard            # errcheck, govet, ineffassign, staticcheck, unused
+  enable:
+    - asasalint
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - contextcheck
+    - copyloopvar
+    - dupword
+    - durationcheck
+    - errorlint
+    - exhaustive
+    - fatcontext
+    - forcetypeassert
+    - gocheckcompilerdirectives
+    - gosec
+    - makezero
+    - mirror
+    - misspell
+    - nakedret
+    - nilerr
+    - nilnil
+    - noctx
+    - nolintlint
+    - predeclared
+    - reassign
+    - thelper
+    - unconvert
+    - usestdlibvars
+    - wastedassign
+  settings:
+    errcheck:
+      exclude-functions:
+        - (io.Closer).Close
+        - (io.ReadCloser).Close
+        - (io.WriteCloser).Close
+        - (net.Conn).Close
+        - (net.Listener).Close
+        - (*os.File).Close
+    exhaustive:
+      default-signifies-exhaustive: true
+    gosec:
+      excludes:
+        - G304                 # the CLI reads the paths the user names
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+  exclusions:
+    rules:
+      - text: "Error return value of `fmt.Fprint(f|ln)?` is not checked"
+        linters: [errcheck]
+      - path: _test\.go
+        linters: [gosec]
+issues:
+  max-same-issues: 0

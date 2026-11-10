@@ -1,0 +1,3 @@
+description: "app remove without an id is a usage error"
+args: [app, remove]
+expect-reads: []

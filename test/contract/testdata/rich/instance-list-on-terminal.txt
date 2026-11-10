@@ -1,0 +1,10 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 255
+Instance ID                           API Application ID                    Instance Name  Service Name
+<uuid>  <uuid>  dev            my-project-dev
+<uuid>  <uuid>  staging        my-project-staging
+<uuid>  <uuid>  prod           other-prod
+
+3 instances
+

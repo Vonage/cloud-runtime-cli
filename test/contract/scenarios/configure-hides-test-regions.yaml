@@ -1,0 +1,53 @@
+description: regions whose name or alias holds "test" are left out of the region picker
+args: [configure, --graphql-endpoint, "${FAKE}/v1/vcr/euw1/api/graphql/v1/graphql"]
+tty: true
+requires-hotfix: true
+config: none
+fixtures:
+  regions:
+    - alias: aws.test1
+      name: AWS - Test Region
+      enabled: true
+      deploymentApiUrl: "${FAKE}/v1/vcr/euw1/api/deployment"
+      assetsApiUrl: "${FAKE}/v1/vcr/euw1/api/assets"
+      marketplaceApiUrl: "${FAKE}/v1/vcr/euw1/api/marketplace"
+      endpointUrlScheme: http
+      debuggerUrlScheme: ws
+      hostTemplate: "http://${OTHER_HOST}"
+    - alias: aws.euw1
+      name: AWS - Europe (Ireland)
+      default: true
+      enabled: true
+      deploymentApiUrl: "${FAKE}/v1/vcr/euw1/api/deployment"
+      assetsApiUrl: "${FAKE}/v1/vcr/euw1/api/assets"
+      marketplaceApiUrl: "${FAKE}/v1/vcr/euw1/api/marketplace"
+      endpointUrlScheme: http
+      debuggerUrlScheme: ws
+      hostTemplate: "http://${OTHER_HOST}"
+    - alias: aws.use1
+      name: AWS - Preview Testing
+      enabled: true
+      deploymentApiUrl: "${FAKE}/v1/vcr/euw1/api/deployment"
+      assetsApiUrl: "${FAKE}/v1/vcr/euw1/api/assets"
+      marketplaceApiUrl: "${FAKE}/v1/vcr/euw1/api/marketplace"
+      endpointUrlScheme: http
+      debuggerUrlScheme: ws
+      hostTemplate: "http://${OTHER_HOST}"
+    - alias: aws.apse1
+      name: AWS - Asia Pacific (Singapore)
+      enabled: true
+      deploymentApiUrl: "${FAKE}/v1/vcr/euw1/api/deployment"
+      assetsApiUrl: "${FAKE}/v1/vcr/euw1/api/assets"
+      marketplaceApiUrl: "${FAKE}/v1/vcr/euw1/api/marketplace"
+      endpointUrlScheme: http
+      debuggerUrlScheme: ws
+      hostTemplate: "http://${OTHER_HOST}"
+steps:
+  - {expect: "Enter your Vonage api key:"}
+  - {send: "abc123\r"}
+  - {expect: "Enter your Vonage api secret:"}
+  - {send: "s3cret-for-tests\r"}
+  - {expect: "Select your Vonage region:"}
+  - {send: "\r"}
+  - {expect: "New configuration file written to"}
+expect-reads: [euw1 GET /regions]

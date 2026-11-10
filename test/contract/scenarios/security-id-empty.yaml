@@ -1,0 +1,5 @@
+description: "an empty application id is refused"
+group: app
+args: [app, remove, "", --yes]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"

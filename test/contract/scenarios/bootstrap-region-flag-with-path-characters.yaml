@@ -1,0 +1,4 @@
+description: "a --region with path characters is an error"
+args: [--region, aws.x/../y, app, list]
+requires-hotfix: true
+expect-reads: []

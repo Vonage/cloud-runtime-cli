@@ -1,0 +1,21 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 657
+? Enter your project name: project
+? Enter your Instance name: dev
+✓ Runtimes retrieved
+? Select a runtime: nodejs18
+✓ Regions retrieved
+? Select a region: AWS - Europe (Ireland) - (aws.euw1)
+✓ Applications retrieved
+? Select your Vonage application ID for deployment: SKIP
+✓ Applications retrieved
+? Select your Vonage application ID for debug: SKIP
+✓ Templates retrieved
+? Select a product template for runtime nodejs18:  Starter Project - Node.js
+✓ Template downloaded
+✓ Template unpacked
+! Failed to parse template manifest file due to yaml: line 1: did not find expected ',' or ']'.
+✓ Project created in <WORK>/project
+Next: vcr deploy
+

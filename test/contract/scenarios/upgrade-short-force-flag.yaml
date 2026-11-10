@@ -1,0 +1,8 @@
+description: "-f is the short form of --force"
+args: [upgrade, -f]
+exe: copy
+requires-hotfix: true
+fixtures:
+  release: {tag: v9.9.9}
+expect-reads: []
+scrape: [version-line, upgrade-success]

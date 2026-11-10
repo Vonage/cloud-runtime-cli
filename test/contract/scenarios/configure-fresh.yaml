@@ -1,0 +1,14 @@
+description: configure from scratch asks for key, secret and region and writes the file
+args: [configure, --graphql-endpoint, "${FAKE}/v1/vcr/euw1/api/graphql/v1/graphql"]
+tty: true
+requires-hotfix: true
+config: none
+steps:
+  - {expect: "Enter your Vonage api key:"}
+  - {send: "abc123\r"}
+  - {expect: "Enter your Vonage api secret:"}
+  - {send: "s3cret-for-tests\r"}
+  - {expect: "Select your Vonage region:"}
+  - {send: "\r"}
+  - {expect: "New configuration file written to"}
+expect-reads: [euw1 GET /regions]

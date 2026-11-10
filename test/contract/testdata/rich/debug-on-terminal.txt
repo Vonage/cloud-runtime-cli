@@ -1,0 +1,53 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 1204
+✓ Debug server deployed  dbg-service-1
+✓ Debug server ready
+✓ Debug proxy connected
+
+✓ Debugger ready
+  Service  dbg-service-1
+  Host     <OTHER>
+
+Forwarding requests. Press Ctrl+C to stop.
+testapp ready
+testapp env API_ACCOUNT_ID
+testapp env API_ACCOUNT_SECRET
+testapp env API_APPLICATION_ID
+testapp env CODE_DIR
+testapp env DEBUG
+testapp env DEBUGGER_URL_SCHEME
+testapp env ENDPOINT_URL_SCHEME
+testapp env FORCE_COLOR
+testapp env HOME
+testapp env HTTPS_PROXY
+testapp env HTTP_PROXY
+testapp env INSTANCE_ID
+testapp env INSTANCE_SERVICE_NAME
+testapp env NERU_APP_PORT
+testapp env NO_COLOR
+testapp env NO_PROXY
+testapp env PATH
+testapp env PRIVATE_KEY
+testapp env REGION
+testapp env TERM
+testapp env TMPDIR
+testapp env TZ
+testapp env VCR_API_ACCOUNT_ID
+testapp env VCR_API_ACCOUNT_SECRET
+testapp env VCR_API_APPLICATION_ID
+testapp env VCR_CODE_DIR
+testapp env VCR_DEBUG
+testapp env VCR_DEBUGGER_URL_SCHEME
+testapp env VCR_ENDPOINT_URL_SCHEME
+testapp env VCR_INSTANCE_PUBLIC_URL
+testapp env VCR_INSTANCE_SERVICE_NAME
+testapp env VCR_PORT
+testapp env VCR_PRIVATE_KEY
+testapp env VCR_REGION
+testapp env XDG_CACHE_HOME
+testapp env XDG_CONFIG_HOME
+<time>  GET  /hello  200  <dur>
+
+✓ Debugger removed
+

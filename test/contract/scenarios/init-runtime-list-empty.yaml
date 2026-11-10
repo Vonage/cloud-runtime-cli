@@ -1,0 +1,17 @@
+description: "init with no runtimes to offer ends with an error at the runtime question"
+args: [init]
+tty: true
+cwd: work/project
+files:
+  - {path: work/project, type: dir}
+fixtures:
+  runtimes: []
+steps:
+  - {expect: "Enter your project name:"}
+  - {send: "\r"}
+  - {expect: "Enter your Instance name:"}
+  - {send: "\r"}
+  - {expect: "failed to ask runtime"}
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+  - "euw1 GET /runtimes"

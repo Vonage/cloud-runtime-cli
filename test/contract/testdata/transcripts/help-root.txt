@@ -1,0 +1,95 @@
+# vcr contract transcript v1
+# baseline: f4b9df0 f4b9df09e4c6f347dfa4d2637cf122e5a15934f5
+exit 0
+@@ stdout 3094
+VCR CLI is a powerful command-line interface designed to streamline
+and simplify the development and management of applications on
+the Vonage Cloud Runtime platform.
+
+Vonage Cloud Runtime (VCR) enables you to build, deploy, and run serverless
+applications that integrate with Vonage communication APIs including Voice,
+Messages, and RTC (Real-Time Communication).
+
+GETTING STARTED
+  1. Configure the CLI with your Vonage API credentials:
+     $ vcr configure
+
+  2. Initialize a new project from a template:
+     $ vcr init my-project
+
+  3. Deploy your application:
+     $ vcr deploy
+
+CORE WORKFLOW
+  • vcr configure  - Set up your Vonage API credentials and region
+  • vcr app        - Create and manage Vonage applications
+  • vcr init       - Initialize a project from a template
+  • vcr deploy     - Deploy your application to VCR
+  • vcr debug      - Run your application locally in debug mode
+  • vcr instance   - Manage deployed instances (logs, removal)
+  • vcr secret     - Manage secrets for your applications
+  • vcr upgrade    - Update the VCR CLI to the latest version
+
+
+USAGE
+  vcr <command> <subcommand> [flags]
+
+AVAILABLE COMMANDS
+  app:         Manage Vonage applications for VCR deployments
+  completion:  Generate the autocompletion script for the specified shell
+  configure:   Configure VCR CLI with your Vonage API credentials
+  debug:       Run your application locally in debug mode with live VCR integration
+  deploy:      Deploy your application to Vonage Cloud Runtime
+  init:        Initialize a new VCR project from a template
+  instance:    Manage deployed VCR instances
+  secret:      Manage secrets for VCR applications
+  upgrade:     Check for and install VCR CLI updates
+
+FLAGS
+      --api-key string            Vonage API key
+      --api-secret string         Vonage API secret
+      --config-file string        Path to config file (default is $HOME/.vcr-cli) (default "~/.vcr-cli")
+      --graphql-endpoint string   Graphql endpoint used to fetch metadata
+      --help                      Show help for command
+      --region string             Vonage platform region
+  -t, --timeout duration          Overall deadline for the command, including waiting for a build to finish (e.g. 20m) (default 10m0s)
+  -v, --version                   Show VCR CLI version
+
+EXAMPLES
+  # Configure the CLI with your Vonage credentials
+  $ vcr configure
+  
+  # Create a new Vonage application
+  $ vcr app create --name my-app
+  
+  # List all your Vonage applications
+  $ vcr app list
+  
+  # Initialize a new project in the current directory
+  $ vcr init
+  
+  # Initialize a new project in a specific directory
+  $ vcr init my-project
+  
+  # Deploy your application to VCR
+  $ vcr deploy
+  
+  # Run your application locally in debug mode
+  $ vcr debug
+  
+  # View logs for a deployed instance
+  $ vcr instance log --project-name my-project --instance-name dev
+  
+  # Create a secret for your application
+  $ vcr secret create --name MY_API_KEY --value "secret-value"
+
+LEARN MORE
+  Use 'vcr <command> <subcommand> --help' for more information about a command.
+
+
+@@ stderr 0
+
+@@ files 0
+
+@@ requests 0
+

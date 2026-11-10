@@ -1,0 +1,9 @@
+description: "a failing logs backend"
+args: [instance, log, --id, 00000000-0000-4000-8000-000000000501]
+fixtures:
+  logsFailure: true
+expect-reads:
+  - "euw1 GET /instances/00000000-0000-4000-8000-000000000501"
+  - "euw1 GET /instances/00000000-0000-4000-8000-000000000501/logs?limit=300"
+  - "euw1 GET /regions/aws.euw1"
+scrape-except: [table-lines]

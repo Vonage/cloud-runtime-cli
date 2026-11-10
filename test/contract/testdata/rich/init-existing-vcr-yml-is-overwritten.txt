@@ -1,0 +1,20 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 562
+? Enter your project name: project
+? Enter your Instance name: prod
+✓ Runtimes retrieved
+? Select a runtime: nodejs18
+✓ Regions retrieved
+? Select a region: AWS - Europe (Ireland) - (aws.euw1)
+✓ Applications retrieved
+? Select your Vonage application ID for deployment: SKIP
+✓ Applications retrieved
+? Select your Vonage application ID for debug: SKIP
+✓ Templates retrieved
+? Select a product template for runtime nodejs18:  Starter Project - Node.js
+✓ Template downloaded
+✓ Template unpacked
+✓ Project created in <WORK>/project
+Next: vcr deploy
+

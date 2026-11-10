@@ -1,0 +1,5 @@
+description: "an id of .. is not a valid application id"
+args: [app, generate-keys, --app-id, ..]
+expect-reads:
+  - "euw1 GET /regions/aws.euw1"
+scrape-except: [table-lines]

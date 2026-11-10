@@ -1,0 +1,6 @@
+# ignore the logs
+
+*.log
+
+# and the temporary files
+*.tmp
