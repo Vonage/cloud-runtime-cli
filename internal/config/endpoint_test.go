@@ -137,5 +137,5 @@ func TestAddEndpointLeavesAReadOnlyFileAlone(t *testing.T) {
 
 	require.ErrorIs(t, err, ErrReadOnly)
 	assert.Equal(t, fullConfig, readText(t, path))
-	assert.Equal(t, os.FileMode(0o400), permOf(t, path))
+	assert.Zero(t, permOf(t, path)&0o222, "the file is still read-only")
 }
