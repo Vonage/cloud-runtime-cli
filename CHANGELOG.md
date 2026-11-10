@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/Vonage/cloud-runtime-cli/compare/v2.7.0...v3.0.0) (2026-11-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* rewrite the CLI on the deployment API ([#103](https://github.com/Vonage/cloud-runtime-cli/issues/103))
+
+### 🚀 Features
+
+* rewrite the CLI on the deployment API ([#103](https://github.com/Vonage/cloud-runtime-cli/issues/103)) ([dabf261](https://github.com/Vonage/cloud-runtime-cli/commit/dabf261856400a8f907c8933820ab43b76ec51ee))
+
 ## [2.7.0](https://github.com/Vonage/cloud-runtime-cli/compare/v2.6.1...v2.7.0) (2026-11-04)
 
 
