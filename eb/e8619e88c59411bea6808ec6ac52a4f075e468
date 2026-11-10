@@ -1,0 +1,90 @@
+internal/term/block.go
+  c8bf54170bf3e6b5 1-56
+internal/term/block_test.go
+  c8bf54170bf3e6b5 1-97
+internal/term/gate.go
+  c8bf54170bf3e6b5 1-106
+internal/term/gate_pty_test.go
+  c8bf54170bf3e6b5 1-238
+internal/term/gate_test.go
+  c8bf54170bf3e6b5 1-207
+internal/term/gutter.go
+  c8bf54170bf3e6b5 1-65
+internal/term/gutter_test.go
+  c8bf54170bf3e6b5 1-105
+internal/term/live.go
+  c8bf54170bf3e6b5 1-130
+internal/term/live_test.go
+  c8bf54170bf3e6b5 1-331
+internal/term/notice.go
+  c8bf54170bf3e6b5 1-18
+internal/term/notice_test.go
+  c8bf54170bf3e6b5 1-37
+internal/term/present.go
+  c8bf54170bf3e6b5 4-5,39-46,50-53,55-59,61-63,65-70
+internal/term/present_helpers_test.go
+  c8bf54170bf3e6b5 1-105
+internal/term/prompt_pty_test.go
+  c8bf54170bf3e6b5 1-70
+internal/term/prompter.go
+  c8bf54170bf3e6b5 12,41,44,48-65,98-100
+internal/term/rich_table.go
+  c8bf54170bf3e6b5 1-124
+internal/term/rich_table_test.go
+  c8bf54170bf3e6b5 1-137
+internal/term/spinner.go
+  c8bf54170bf3e6b5 18-28
+internal/term/step.go
+  c8bf54170bf3e6b5 1-118
+internal/term/step_test.go
+  c8bf54170bf3e6b5 1-320
+internal/term/style.go
+  c8bf54170bf3e6b5 9-16,20-41
+internal/term/style_rich_test.go
+  c8bf54170bf3e6b5 1-49
+internal/term/surface.go
+  c8bf54170bf3e6b5 1-185
+internal/term/surface_test.go
+  c8bf54170bf3e6b5 1-296
+internal/term/term.go
+  c8bf54170bf3e6b5 12-13,30-35,41-47,65
+internal/term/term_test.go
+  c8bf54170bf3e6b5 61
+internal/term/termbuf.go
+  c8bf54170bf3e6b5 1-121
+internal/term/termbuf_test.go
+  c8bf54170bf3e6b5 1-106
+internal/term/testrich.go
+  c8bf54170bf3e6b5 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "1f13757fd86c2a87a2cc113acee4b5e8f9d25d2d",
+  "prompts": {
+    "c8bf54170bf3e6b5": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "f2f2d108-edcb-4db7-b0a3-77b77c8871ab",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:39.249Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:39.249Z"
+        }
+      ],
+      "total_additions": 3168,
+      "total_deletions": 81,
+      "accepted_lines": 3168,
+      "overriden_lines": 0
+    }
+  }
+}
