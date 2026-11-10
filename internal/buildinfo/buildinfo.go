@@ -14,7 +14,7 @@ type Info struct {
 	Version        string // "dev" in local builds, "vX.Y.Z" in releases
 	Commit         string
 	Date           string
-	APIVersion     string // deployment-api version segment, "v0.3" in releases
+	APIVersion     string // deployment-api version segment, "v0.5" in releases
 	ReleaseURL     string // GitHub API base for releases, e.g. https://api.github.com/repos/Vonage/cloud-runtime-cli
 	UpgradeTestKey string // extra trusted release key; set only in test builds, empty in releases
 }

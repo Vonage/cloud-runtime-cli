@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  API_VERSION: ${{ vars.API_VERSION || 'v0.3' }}
+  API_VERSION: v0.5
 
 jobs:
   lint:

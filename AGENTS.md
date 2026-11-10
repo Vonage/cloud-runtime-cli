@@ -24,7 +24,7 @@
   reason; never edit a transcript by hand.
 - Some names are public contract and stay: the `X-Neru-*` headers, `~/.neru-cli`, and the `--graphql-endpoint` flag
   (still accepted; it is mapped to the deployment API's address).
-- `version`, `commit`, `buildDate`, `apiVersion` and `releaseURL` are stamped with `-X main.*`. `apiVersion` is `v0.3`
+- `version`, `commit`, `buildDate`, `apiVersion` and `releaseURL` are stamped with `-X main.*`. `apiVersion` is `v0.5`
   and `make build` fails if it is empty. `upgradeTestKey` is empty in releases.
 - Diagnostics keep today's streams (some warnings go to stdout). Do not "fix" that.
 - On an interactive terminal (stdout and stderr are terminals, `TERM` is set and not `dumb`, `CI` is unset, `0` or

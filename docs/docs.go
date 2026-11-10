@@ -57,7 +57,7 @@ func newEnv() *cmdenv.Env {
 			Version:    "dev",
 			Commit:     "0000",
 			Date:       "2021-09-01T00:00:00Z",
-			APIVersion: "v0.3",
+			APIVersion: "v0.5",
 		},
 		Flags: &config.Flags{},
 	}

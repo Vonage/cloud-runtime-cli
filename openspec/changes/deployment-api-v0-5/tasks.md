@@ -18,7 +18,7 @@ Run every command from the repository root. `make test` is `go test -race ./...`
 
 ## 2. Build for v0.5
 
-- [ ] 2.1 Default `API_VERSION` to `v0.5`.
+- [x] 2.1 Default `API_VERSION` to `v0.5`.
   - Files: `Makefile`, `.github/workflows/ci.yml`, `.github/workflows/release.yml`, `docs/docs.go`, `AGENTS.md`, `internal/buildinfo/buildinfo.go` and `internal/platform/options.go` (comments).
   - Test first: none; run `make build && ./dist/vcr --version` and check that `strings dist/vcr | grep -c '^v0.5$'` is at least 1.
   - Verify: `make build test lint docs` and `make contract`

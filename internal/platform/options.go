@@ -23,7 +23,7 @@ type Credentials struct {
 // Options configure a Resolver.
 type Options struct {
 	Bootstrap  string // from endpoint.Bootstrap, without the version segment
-	APIVersion string // "v0.3" in releases
+	APIVersion string // "v0.5" in releases
 	Creds      Credentials
 	UserAgent  string      // buildinfo.Info.UserAgent()
 	Clock      clock.Clock // retry and reconnect delays
