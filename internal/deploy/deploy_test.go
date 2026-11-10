@@ -217,6 +217,13 @@ func TestRunRequiredValuesAreCheckedAtTheirStage(t *testing.T) {
 			wantOut:   projectLine + "✓ Deployment parameters validated\n✓ Source code uploaded.\n",
 		},
 		{
+			name:      "names with no letters or digits are found after the upload",
+			change:    func(p *Plan) { p.ProjectName, p.InstanceName = "__", ".." },
+			wantErr:   `failed to get package name: project name "__" and instance name ".." have no letters or digits`,
+			wantCalls: uploaded,
+			wantOut:   `✓ Project "__" retrieved: project_id="p-1"` + "\n✓ Deployment parameters validated\n✓ Source code uploaded.\n",
+		},
+		{
 			name: "a capability error comes before the missing runtime",
 			change: func(p *Plan) {
 				p.Capabilities = []string{"voice-v1-beta"}

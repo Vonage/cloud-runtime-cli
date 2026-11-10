@@ -10,9 +10,9 @@ Run every command from the repository root. `make test` is `go test -race ./...`
   - Verify: `go test ./internal/platform/ -count=1`
   - Accept: the new tests pass and the existing `CreatePackage` tests are unchanged.
 
-- [ ] 1.2 Deploy names the package `<project>-<instance>`, sanitised.
-  - Files: `internal/deploy/packagename.go` (`packageName`), `internal/deploy/packagename_test.go`, `internal/deploy/stages.go` (`packageRequest`), `internal/deploy/*_test.go`.
-  - Test first: table test for `packageName`: `web`/`prod` → `web-prod`; `My_Shop 2`/`Dev.EU` → `my-shop-2-dev-eu`; `--a--`/`b` → `a-b`; `123`/`456` → `123-456`; `__`/`..` → empty. Then: a plan with `ProjectName: "web"`, `InstanceName: "prod"` builds `Name: "web-prod"`; a plan whose names sanitise to empty fails in `packageRequest` with an error naming both; a `cmdtest` deploy stamped `v0.5`, with a manifest naming `shop` and `dev`, sends `POST /v0.5/packages` with `"name":"shop-dev"`.
+- [x] 1.2 Deploy names the package `<project>-<instance>`, sanitised.
+  - Files: `internal/deploy/packagename.go` (`packageName`), `internal/deploy/packagename_test.go`, `internal/deploy/stages.go` (`packageRequest`), `internal/deploy/*_test.go`, `internal/cli/deploy/env_test.go`, `internal/cli/deploy/fake_test.go`.
+  - Test first: table test for `packageName`: `web`/`prod` → `web-prod`; `My_Shop 2`/`Dev.EU` → `my-shop-2-dev-eu`; `--a--`/`b` → `a-b`; `123`/`456` → `123-456`; `__`/`..` → empty. Then: a plan with `ProjectName: "web"`, `InstanceName: "prod"` builds `Name: "web-prod"`; a plan whose names sanitise to empty fails in `packageRequest` with an error naming both; a deploy command test (`internal/cli/deploy`, `newEnvAt`) built for `v0.5`, with a manifest naming `Shop` and `dev`, sends `POST /v0.5/packages` with `"name":"shop-dev"`.
   - Verify: `go test ./internal/deploy/ ./internal/cli/deploy/ -count=1`
   - Accept: tests pass, and `make contract` passes with no new lines in `test/contract/allowed-diffs.txt`.
 

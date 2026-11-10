@@ -43,6 +43,7 @@ func TestRunRequestBodies(t *testing.T) {
 		Capabilities:    manifest.Capabilities{Messages: "v1", Voice: "v0"},
 		BuildScriptPath: "./build.sh",
 		Runtime:         "nodejs18",
+		Name:            "my-project-dev",
 	}, h.api.packageReq)
 	assert.Equal(t, platform.DeployRequest{
 		PackageID:           "pkg-1",

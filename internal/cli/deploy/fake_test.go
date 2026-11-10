@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -58,6 +59,34 @@ func TestDeployAgainstTheFakePlatform(t *testing.T) {
 	}, deployRequestsOf(srv))
 	for _, r := range srv.Requests() {
 		assert.Equal(t, testKey, r.User, "%s %s", r.Method, r.Path)
+	}
+}
+
+func TestDeployNamesThePackageFromV05(t *testing.T) {
+	tests := []struct {
+		version  string
+		args     []string
+		wantName any // nil: no name field
+	}{
+		{version: "v0.3", wantName: nil},
+		{version: "v0.5", wantName: "shop-dev"},
+		{version: "v0.5", args: []string{"--project-name", "Web", "--instance-name", "prod"}, wantName: "web-prod"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.version+" "+strings.Join(tt.args, " "), func(t *testing.T) {
+			srv := fakeplatform.Start(t, fakeplatform.Defaults())
+			env, _, _ := newEnvAt(t, srv, defaultSettings(), good, tt.version)
+			dir := writeProject(t, manifestYAML("Shop", "aws.euw1", ""))
+
+			err := execute(t, env, append([]string{dir}, tt.args...)...)
+
+			require.NoError(t, err)
+			pkg := requestNamed(t, srv, "POST /packages")
+			assert.True(t, strings.HasSuffix(pkg.Path, "/"+tt.version+"/packages"), pkg.Path)
+			name, sent := jsonBody(t, pkg)["name"]
+			assert.Equal(t, tt.wantName != nil, sent)
+			assert.Equal(t, tt.wantName, name)
+		})
 	}
 }
 

@@ -45,10 +45,17 @@ func defaultSettings() config.Settings {
 func newEnv(t *testing.T, srv *fakeplatform.Server, settings config.Settings, creds platform.Credentials,
 ) (env *cmdenv.Env, stdout, stderr *bytes.Buffer) {
 	t.Helper()
+	return newEnvAt(t, srv, settings, creds, "v0.3")
+}
+
+// newEnvAt is newEnv with the CLI built for apiVersion.
+func newEnvAt(t *testing.T, srv *fakeplatform.Server, settings config.Settings, creds platform.Credentials, apiVersion string,
+) (env *cmdenv.Env, stdout, stderr *bytes.Buffer) {
+	t.Helper()
 	streams, out, errOut := term.Test("", false)
 	resolver, err := platform.NewResolver(platform.Options{
 		Bootstrap:  srv.DeploymentAPIURL("euw1"),
-		APIVersion: "v0.3",
+		APIVersion: apiVersion,
 		Creds:      creds,
 		UserAgent:  "vcr-cli/test",
 		Clock:      clock.System(),
@@ -59,7 +66,7 @@ func newEnv(t *testing.T, srv *fakeplatform.Server, settings config.Settings, cr
 		IO:       streams,
 		Prompt:   streams.Prompter(),
 		Clock:    clock.System(),
-		Build:    buildinfo.Info{Version: "v2.6.1", APIVersion: "v0.3"},
+		Build:    buildinfo.Info{Version: "v2.6.1", APIVersion: apiVersion},
 		Flags:    &config.Flags{},
 		Settings: settings,
 		Resolver: resolver,

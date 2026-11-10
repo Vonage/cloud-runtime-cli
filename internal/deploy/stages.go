@@ -196,6 +196,11 @@ func (r *runner) packageRequest(sourceKey string) (platform.PackageRequest, erro
 	if err := required("runtime", "runtime", r.p.Runtime); err != nil {
 		return platform.PackageRequest{}, err
 	}
+	name := packageName(r.p.ProjectName, r.p.InstanceName)
+	if name == "" {
+		return platform.PackageRequest{}, fmt.Errorf("failed to get package name: project name %q and instance name %q have no letters or digits",
+			r.p.ProjectName, r.p.InstanceName)
+	}
 	inst := r.p.Manifest.Instance
 	return platform.PackageRequest{
 		SourceCodeKey:   sourceKey,
@@ -203,6 +208,7 @@ func (r *runner) packageRequest(sourceKey string) (platform.PackageRequest, erro
 		Capabilities:    capabilities,
 		BuildScriptPath: inst.BuildScript,
 		Runtime:         r.p.Runtime,
+		Name:            name,
 	}, nil
 }
 
