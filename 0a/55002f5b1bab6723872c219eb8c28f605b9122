@@ -1,0 +1,80 @@
+go.mod
+  ae51bd51067b9e59 18
+go.sum
+  ae51bd51067b9e59 110-111
+internal/cli/cmdenv/region.go
+  ae51bd51067b9e59 1-29
+internal/cli/cmdenv/regionclient_test.go
+  ae51bd51067b9e59 1-130
+internal/cli/cmdenv/signal.go
+  ae51bd51067b9e59 1-22
+internal/cli/cmdenv/signal_test.go
+  ae51bd51067b9e59 1-75
+internal/cli/harness_test.go
+  ae51bd51067b9e59 1-220
+internal/cli/prerun.go
+  ae51bd51067b9e59 1-130
+internal/cli/prerun_init_test.go
+  ae51bd51067b9e59 1-163
+internal/cli/prerun_test.go
+  ae51bd51067b9e59 1-251
+internal/cli/root.go
+  ae51bd51067b9e59 22-25,32-35,40-47
+internal/cli/root_test.go
+  ae51bd51067b9e59 162-173
+internal/cli/run.go
+  ae51bd51067b9e59 6-7,13,27-49,57-59,64-96
+internal/cli/run_test.go
+  ae51bd51067b9e59 1-237
+internal/cli/testtree_test.go
+  ae51bd51067b9e59 94
+internal/cli/updatecheck.go
+  ae51bd51067b9e59 1-70
+internal/cli/updatecheck_test.go
+  ae51bd51067b9e59 1-214
+internal/selfupdate/latest.go
+  ae51bd51067b9e59 1-191
+internal/selfupdate/latest_status_test.go
+  ae51bd51067b9e59 1-172
+internal/selfupdate/latest_test.go
+  ae51bd51067b9e59 1-227
+internal/selfupdate/notice.go
+  ae51bd51067b9e59 1-61
+internal/selfupdate/notice_test.go
+  ae51bd51067b9e59 1-93
+internal/selfupdate/selfupdate.go
+  ae51bd51067b9e59 5
+internal/selfupdate/urlrule_test.go
+  ae51bd51067b9e59 1-103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "8748ea111c388080dbafb619c3eee95a5444a923",
+  "prompts": {
+    "ae51bd51067b9e59": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "0f3b942e-fb59-4517-8b82-44df9ea949b2",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:44.491Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:44.491Z"
+        }
+      ],
+      "total_additions": 2483,
+      "total_deletions": 64,
+      "accepted_lines": 2483,
+      "overriden_lines": 0
+    }
+  }
+}
