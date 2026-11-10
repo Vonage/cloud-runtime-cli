@@ -1,0 +1,31 @@
+internal/platform/routes_helpers_test.go
+  s_5481395ded4513::t_27192e0ae555a5 27-31,34
+  s_5481395ded4513::t_4bc911b9bfbd31 26
+internal/platform/core.go
+  s_5481395ded4513::t_1292ef831fb098 72
+internal/platform/deployments_test.go
+  s_5481395ded4513::t_631fd3e038f8f4 87-109
+internal/platform/deployments.go
+  s_5481395ded4513::t_af38c254a7b738 7-8,12-15
+  s_5481395ded4513::t_1954916ad9bdea 38
+internal/platform/helpers_test.go
+  s_5481395ded4513::t_94935720cf4172 150
+  s_5481395ded4513::t_3529658a61e5a9 132-136,142
+  s_5481395ded4513::t_458bd94a8a7877 131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "297de219bbbcc9c04b68dcfc77f0f77b846701ae",
+  "prompts": {},
+  "sessions": {
+    "s_5481395ded4513": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_9cf33872-1607-4ff8-8b4a-27f03350570c",
+        "model": "auto"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
