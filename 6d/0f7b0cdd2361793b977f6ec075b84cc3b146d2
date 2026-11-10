@@ -1,0 +1,262 @@
+.github/workflows/ci.yml
+  efcc1c66f3e2ccdf 6,8-15,18,20-21,23-27,29-47,49-50,52-63,65,67-68,70-75,77-97,99-122,124,126-127,130-135,137,139-140,143-149
+.github/workflows/vulncheck-weekly.yml
+  efcc1c66f3e2ccdf 1-45
+.gitignore
+  efcc1c66f3e2ccdf 5-7
+.golangci.yaml
+  efcc1c66f3e2ccdf 1-60
+Makefile
+  efcc1c66f3e2ccdf 1-2,10-30,32-44,48,50-66,72,76,80,84,88,92,96,100,104-160,162,164-166,168
+docs/docs.go
+  efcc1c66f3e2ccdf 117
+go.mod
+  efcc1c66f3e2ccdf 3-5,11,31-32,40,42-43,58
+go.sum
+  efcc1c66f3e2ccdf 11-12,17-20,51-52,57-60,139-140
+internal/bundle/archive.go
+  efcc1c66f3e2ccdf 39
+internal/bundle/archive_test.go
+  efcc1c66f3e2ccdf 27,34
+internal/bundle/helpers_test.go
+  efcc1c66f3e2ccdf 33,80,99,107
+internal/bundle/special_unix_test.go
+  efcc1c66f3e2ccdf 23,82,88,95
+internal/bundle/tgz.go
+  efcc1c66f3e2ccdf 14
+internal/bundle/walk.go
+  efcc1c66f3e2ccdf 112
+internal/bundle/walk_test.go
+  efcc1c66f3e2ccdf 36,226
+internal/cli/app/app_test.go
+  efcc1c66f3e2ccdf 77-80
+internal/cli/app/helpers_test.go
+  efcc1c66f3e2ccdf 34
+internal/cli/cmdtest/cmdtest.go
+  efcc1c66f3e2ccdf 80-82,84,88,97,112,144-145,150,157,162-163,174,178,180,227-229,233,235,243,249-251,255,257,265,269-270,272
+internal/cli/cmdtest/cmdtest_test.go
+  efcc1c66f3e2ccdf 186,189,194
+internal/cli/cmdtest/rich.go
+  efcc1c66f3e2ccdf 33-34,43
+internal/cli/cmdtest/script.go
+  efcc1c66f3e2ccdf 45-46,49
+internal/cli/debug/helpers_test.go
+  efcc1c66f3e2ccdf 213
+internal/cli/initcmd/flow.go
+  efcc1c66f3e2ccdf 97
+internal/cli/instance/helpers_test.go
+  efcc1c66f3e2ccdf 50
+internal/cli/run.go
+  efcc1c66f3e2ccdf 28
+internal/cli/run_test.go
+  efcc1c66f3e2ccdf 166,168,174-175
+internal/cli/secret/remove_test.go
+  efcc1c66f3e2ccdf 93
+internal/cli/secret/value.go
+  efcc1c66f3e2ccdf 102
+internal/cli/secret/value_test.go
+  efcc1c66f3e2ccdf 286,288,295
+internal/cli/upgrade/helpers_test.go
+  efcc1c66f3e2ccdf 89-93,97-98,115,157-158,165,171-173
+internal/cli/upgrade/rich_test.go
+  efcc1c66f3e2ccdf 154
+internal/cli/upgrade/target_test.go
+  efcc1c66f3e2ccdf 18-20,60
+internal/clock/clock_test.go
+  efcc1c66f3e2ccdf 53-54,56,63
+internal/config/helpers_test.go
+  efcc1c66f3e2ccdf 53
+internal/config/read_unix_test.go
+  efcc1c66f3e2ccdf 24,30
+internal/debugsession/app_terminal_pty_test.go
+  efcc1c66f3e2ccdf 59
+internal/debugsession/helper_test.go
+  efcc1c66f3e2ccdf 111,138,252
+internal/debugsession/listen.go
+  efcc1c66f3e2ccdf 105,136,138,140
+internal/debugsession/rich_causes_test.go
+  efcc1c66f3e2ccdf 137-138,142,148,150,155,158-160,164,167-168,171,174
+internal/debugsession/run.go
+  efcc1c66f3e2ccdf 30,70
+internal/debugsession/run_harness_test.go
+  efcc1c66f3e2ccdf 146-149
+internal/debugsession/run_setup_test.go
+  efcc1c66f3e2ccdf 22-25
+internal/debugsession/tunnel_exec_test.go
+  efcc1c66f3e2ccdf 167
+internal/deploy/fake_api_test.go
+  efcc1c66f3e2ccdf 165,174
+internal/deploy/rich_match_test.go
+  efcc1c66f3e2ccdf 112,133-137,141-145
+internal/deploy/source_test.go
+  efcc1c66f3e2ccdf 23,75,80-87,105,200
+internal/manifest/helpers_test.go
+  efcc1c66f3e2ccdf 88
+internal/manifest/parse.go
+  efcc1c66f3e2ccdf 11
+internal/manifest/projectdir_test.go
+  efcc1c66f3e2ccdf 102,104
+internal/platform/applications_test.go
+  efcc1c66f3e2ccdf 143
+internal/platform/debugservices_test.go
+  efcc1c66f3e2ccdf 116
+internal/platform/deployments_test.go
+  efcc1c66f3e2ccdf 35,211,233
+internal/platform/reads_helpers_test.go
+  efcc1c66f3e2ccdf 20,26,31,36,41,46,51,56,61,67,72
+internal/platform/reads_test.go
+  efcc1c66f3e2ccdf 82,86,91,96,101,106,166
+internal/platform/routes_helpers_test.go
+  efcc1c66f3e2ccdf 40-47
+internal/platform/template_test.go
+  efcc1c66f3e2ccdf 96
+internal/platform/upload.go
+  efcc1c66f3e2ccdf 46
+internal/platform/upload_retry_test.go
+  efcc1c66f3e2ccdf 134,186,201
+internal/platform/watch_connect_test.go
+  efcc1c66f3e2ccdf 18,69
+internal/platform/watch_context_test.go
+  efcc1c66f3e2ccdf 21
+internal/platform/watch_frames_test.go
+  efcc1c66f3e2ccdf 66,110,135,174,198
+internal/scaffold/extract.go
+  efcc1c66f3e2ccdf 34
+internal/scaffold/helpers_test.go
+  efcc1c66f3e2ccdf 30
+internal/selfupdate/checksums_test.go
+  efcc1c66f3e2ccdf 13-14,18
+internal/selfupdate/download_test.go
+  efcc1c66f3e2ccdf 36,97
+internal/selfupdate/latest_status_test.go
+  efcc1c66f3e2ccdf 194
+internal/selfupdate/replace_test.go
+  efcc1c66f3e2ccdf 24-25,27-28,40-41,43,52-55,188-189,191
+internal/selfupdate/sshsig_helpers_test.go
+  efcc1c66f3e2ccdf 48-51,56-59,111-112,114-116,118,151-153,158-159,196
+internal/selfupdate/untar.go
+  efcc1c66f3e2ccdf 32
+internal/selfupdate/untar_test.go
+  efcc1c66f3e2ccdf 32-33,41,43,45,49-50,54-55,60-62,173-174,179,181-182,184
+internal/selfupdate/upgrade_helpers_test.go
+  efcc1c66f3e2ccdf 54-55,57,61-62,68-71,134-135,137
+internal/selfupdate/upgrade_limits_test.go
+  efcc1c66f3e2ccdf 54
+internal/selfupdate/verify_test.go
+  efcc1c66f3e2ccdf 210-213,215,220,222
+internal/term/gate_pty_test.go
+  efcc1c66f3e2ccdf 98
+internal/term/live.go
+  efcc1c66f3e2ccdf 99,105,110,114,116
+internal/term/masked.go
+  efcc1c66f3e2ccdf 74,148
+internal/term/present.go
+  efcc1c66f3e2ccdf 61
+internal/term/prompter_test.go
+  efcc1c66f3e2ccdf 197
+internal/term/sanitize_machine.go
+  efcc1c66f3e2ccdf 61,92
+internal/term/sanitize_test.go
+  efcc1c66f3e2ccdf 321-322,326,329,332,335,338,341,346
+internal/term/spinner.go
+  efcc1c66f3e2ccdf 23-24
+internal/term/step.go
+  efcc1c66f3e2ccdf 38,106,112-113
+lefthook.yml
+  efcc1c66f3e2ccdf 1,11,13,15-19,23-24
+script/install_test.go
+  efcc1c66f3e2ccdf 7,110,144,203,279,322
+test/contract/build.go
+  efcc1c66f3e2ccdf 105,138,144-145,171-172,174,190,214,223,279,293-294
+test/contract/driver.go
+  efcc1c66f3e2ccdf 6,249
+test/contract/exec.go
+  efcc1c66f3e2ccdf 98,215,240,251
+test/contract/normalise.go
+  efcc1c66f3e2ccdf 7,276,281-296
+test/contract/normalise_test.go
+  efcc1c66f3e2ccdf 128,130,134
+test/contract/placeholders.go
+  efcc1c66f3e2ccdf 76,80-85
+test/contract/placeholders_test.go
+  efcc1c66f3e2ccdf 61,66
+test/contract/presentation_test.go
+  efcc1c66f3e2ccdf 194
+test/contract/pty.go
+  efcc1c66f3e2ccdf 6,54
+test/contract/record.go
+  efcc1c66f3e2ccdf 38,56,66-68,72,143-144,146,150
+test/contract/replay.go
+  efcc1c66f3e2ccdf 104-105,115,125,181-183
+test/contract/requests.go
+  efcc1c66f3e2ccdf 153
+test/contract/requests_test.go
+  efcc1c66f3e2ccdf 40
+test/contract/rich.go
+  efcc1c66f3e2ccdf 108,180-181,204
+test/contract/run.go
+  efcc1c66f3e2ccdf 82-83,86,89,105-106,109,119,136
+test/contract/sandbox.go
+  efcc1c66f3e2ccdf 66,90
+test/contract/snapshot.go
+  efcc1c66f3e2ccdf 101
+test/contract/stub_test.go
+  efcc1c66f3e2ccdf 8,103,115,155-158,166,201,220,239
+test/contract/testapp/main.go
+  efcc1c66f3e2ccdf 7,42-43,129
+test/contract/testapp_test.go
+  efcc1c66f3e2ccdf 29,56,63,69,74,76,93,106,113-129
+test/fakeplatform/envelope.go
+  efcc1c66f3e2ccdf 10-11,32,68
+test/fakeplatform/github_test.go
+  efcc1c66f3e2ccdf 209,217,225,238,249,255,262,268,302
+test/fakeplatform/helpers_test.go
+  efcc1c66f3e2ccdf 98,122
+test/fakeplatform/overrides_test.go
+  efcc1c66f3e2ccdf 47,138
+test/fakeplatform/peer_test.go
+  efcc1c66f3e2ccdf 209
+test/fakeplatform/rest_test.go
+  efcc1c66f3e2ccdf 26,35,89-91
+test/fakeplatform/server.go
+  efcc1c66f3e2ccdf 70-72,78-80,82,84,89,285
+test/fakeplatform/server_test.go
+  efcc1c66f3e2ccdf 92,152
+test/fakeplatform/sshsig.go
+  efcc1c66f3e2ccdf 90
+test/fakeplatform/sshsig_test.go
+  efcc1c66f3e2ccdf 254
+test/fakeplatform/watch_test.go
+  efcc1c66f3e2ccdf 29,199
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "9551ce692bb3997ddbd1c09eb2dc6e5051bf17b9",
+  "prompts": {
+    "efcc1c66f3e2ccdf": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "bbfaa209-38de-4630-bf7d-b5f6cf0c78f3",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:36.153Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:36.153Z"
+        }
+      ],
+      "total_additions": 875,
+      "total_deletions": 582,
+      "accepted_lines": 875,
+      "overriden_lines": 0
+    }
+  }
+}
