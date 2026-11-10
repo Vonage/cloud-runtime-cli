@@ -1,0 +1,70 @@
+internal/platform/applications.go
+  e7c8e64f44d50512 1-66
+internal/platform/applications_test.go
+  e7c8e64f44d50512 1-200
+internal/platform/conformance_test.go
+  e7c8e64f44d50512 1-14
+internal/platform/debugservices.go
+  e7c8e64f44d50512 1-76
+internal/platform/debugservices_test.go
+  e7c8e64f44d50512 1-204
+internal/platform/deployments.go
+  e7c8e64f44d50512 1-114
+internal/platform/deployments_test.go
+  e7c8e64f44d50512 1-327
+internal/platform/routes_fake_test.go
+  e7c8e64f44d50512 1-148
+internal/platform/routes_helpers_test.go
+  e7c8e64f44d50512 1-74
+internal/platform/secrets.go
+  e7c8e64f44d50512 1-58
+internal/platform/secrets_test.go
+  e7c8e64f44d50512 1-183
+internal/platform/status.go
+  e7c8e64f44d50512 1-13
+internal/platform/transport.go
+  e7c8e64f44d50512 124-125,129,132
+internal/platform/upload.go
+  e7c8e64f44d50512 1-119
+internal/platform/upload_form_test.go
+  e7c8e64f44d50512 1-69
+internal/platform/upload_retry.go
+  e7c8e64f44d50512 1-70
+internal/platform/upload_retry_rules_test.go
+  e7c8e64f44d50512 1-105
+internal/platform/upload_retry_test.go
+  e7c8e64f44d50512 1-302
+internal/platform/upload_test.go
+  e7c8e64f44d50512 1-205
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "fefe80ccfec3a83922b3e452790ad4b02a5b3f77",
+  "prompts": {
+    "e7c8e64f44d50512": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "d1e4ff4e-47f7-4e85-a1c5-52752825c098",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:46.941Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:46.941Z"
+        }
+      ],
+      "total_additions": 2351,
+      "total_deletions": 153,
+      "accepted_lines": 2351,
+      "overriden_lines": 0
+    }
+  }
+}
