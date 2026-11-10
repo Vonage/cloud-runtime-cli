@@ -1,0 +1,242 @@
+internal/cli/app/create.go
+  1322ae3a418788d9 77-78,80,98-105
+internal/cli/app/create_test.go
+  1322ae3a418788d9 17,224-311
+internal/cli/app/generatekeys.go
+  1322ae3a418788d9 12,57-61,74-81
+internal/cli/app/generatekeys_test.go
+  1322ae3a418788d9 18,121-155
+internal/cli/app/list.go
+  1322ae3a418788d9 11,67-69,77-84,89
+internal/cli/app/list_test.go
+  1322ae3a418788d9 10,155-215
+internal/cli/app/remove.go
+  1322ae3a418788d9 13,52-55,64,70-83
+internal/cli/app/remove_test.go
+  1322ae3a418788d9 18,174-239
+internal/cli/app/rich.go
+  1322ae3a418788d9 1-77
+internal/cli/app/rich_test.go
+  1322ae3a418788d9 1-68
+internal/cli/cmdtest/cmdtest.go
+  1322ae3a418788d9 40-46,67-69,74-75,88,96-97,103-104,107-109,170
+internal/cli/cmdtest/cmdtest_rich_test.go
+  1322ae3a418788d9 1-170
+internal/cli/cmdtest/rich.go
+  1322ae3a418788d9 1-77
+internal/cli/configure/configure.go
+  1322ae3a418788d9 81-83,86,101,108-126,164,166-183,194
+internal/cli/configure/configure_test.go
+  1322ae3a418788d9 4,8,18-19,243-336
+internal/cli/configure/helpers_test.go
+  1322ae3a418788d9 73,104
+internal/cli/configure/rich.go
+  1322ae3a418788d9 1-57
+internal/cli/harness_test.go
+  1322ae3a418788d9 18,103-106,113-129
+internal/cli/instance/list.go
+  1322ae3a418788d9 11,59-61,69-74,81
+internal/cli/instance/list_test.go
+  1322ae3a418788d9 10,190-275
+internal/cli/instance/remove.go
+  1322ae3a418788d9 70-72
+internal/cli/instance/remove_region_test.go
+  1322ae3a418788d9 14,119-151
+internal/cli/instance/remove_test.go
+  1322ae3a418788d9 18,293-377
+internal/cli/instance/rich.go
+  1322ae3a418788d9 1-56
+internal/cli/instance/rich_test.go
+  1322ae3a418788d9 1-69
+internal/cli/prerun.go
+  1322ae3a418788d9 36
+internal/cli/prerun_test.go
+  1322ae3a418788d9 4,9,16-17,19-20,258-396
+internal/cli/rich.go
+  1322ae3a418788d9 1-38
+internal/cli/run.go
+  1322ae3a418788d9 20
+internal/cli/run_test.go
+  1322ae3a418788d9 15,18,240-287
+internal/cli/secret/create.go
+  1322ae3a418788d9 13,77-78,80,82,88-89,95-102
+internal/cli/secret/create_test.go
+  1322ae3a418788d9 17,239-298
+internal/cli/secret/list.go
+  1322ae3a418788d9 51-53
+internal/cli/secret/list_test.go
+  1322ae3a418788d9 17,114-170
+internal/cli/secret/remove.go
+  1322ae3a418788d9 12,59-63,76-83
+internal/cli/secret/remove_test.go
+  1322ae3a418788d9 17,164-205
+internal/cli/secret/rich.go
+  1322ae3a418788d9 1-81
+internal/cli/secret/rich_test.go
+  1322ae3a418788d9 1-92
+internal/cli/secret/update.go
+  1322ae3a418788d9 13,72-73,75,77,83-84,90-97
+internal/cli/secret/update_test.go
+  1322ae3a418788d9 17,196-219
+internal/cli/secret/value.go
+  1322ae3a418788d9 54-66
+internal/cli/upgrade/helpers_test.go
+  1322ae3a418788d9 4,10,16,72,123,150,154-168
+internal/cli/upgrade/rich.go
+  1322ae3a418788d9 1-68
+internal/cli/upgrade/rich_test.go
+  1322ae3a418788d9 1-179
+internal/cli/upgrade/upgrade.go
+  1322ae3a418788d9 16,71-72,74,76,100-115,119,122,124,126,131-148,151-159,162,164,166
+internal/clierr/render.go
+  1322ae3a418788d9 28-30,34
+internal/clierr/rich.go
+  1322ae3a418788d9 1-142
+internal/clierr/rich_test.go
+  1322ae3a418788d9 1-364
+internal/selfupdate/notice.go
+  1322ae3a418788d9 45-48
+internal/selfupdate/notice_test.go
+  1322ae3a418788d9 5,7,12,97-153
+internal/selfupdate/rich.go
+  1322ae3a418788d9 1-6
+internal/term/rich_table.go
+  1322ae3a418788d9 60-62,64-66,70,72
+internal/term/rich_table_test.go
+  1322ae3a418788d9 89,108,116,123-163
+test/contract/scenarios/app-generate-keys-on-terminal.yaml
+  1322ae3a418788d9 1-5
+test/contract/scenarios/app-list-empty-on-terminal.yaml
+  1322ae3a418788d9 1-7
+test/contract/scenarios/app-list-on-terminal.yaml
+  1322ae3a418788d9 1-5
+test/contract/scenarios/app-list-server-error-on-terminal.yaml
+  1322ae3a418788d9 1-8
+test/contract/scenarios/app-list-unauthorised-on-terminal.yaml
+  1322ae3a418788d9 1-8
+test/contract/scenarios/instance-list-empty-on-terminal.yaml
+  1322ae3a418788d9 1-8
+test/contract/scenarios/instance-list-on-terminal.yaml
+  1322ae3a418788d9 1-6
+test/contract/scenarios/root-update-notice-on-terminal.yaml
+  1322ae3a418788d9 1-7
+test/contract/scenarios/secret-list-empty-on-terminal.yaml
+  1322ae3a418788d9 1-7
+test/contract/scenarios/secret-list-on-terminal.yaml
+  1322ae3a418788d9 1-5
+test/contract/scenarios/secret-remove-on-terminal.yaml
+  1322ae3a418788d9 1-5
+test/contract/testdata/rich/app-create-confirm-retries-on-other-input.txt
+  1322ae3a418788d9 3,7-8
+test/contract/testdata/rich/app-create-confirm-yes.txt
+  1322ae3a418788d9 3,6-7
+test/contract/testdata/rich/app-create-yes-flag-skips-prompt.txt
+  1322ae3a418788d9 3,5-6
+test/contract/testdata/rich/app-generate-keys-on-terminal.txt
+  1322ae3a418788d9 1-5
+test/contract/testdata/rich/app-list-empty-on-terminal.txt
+  1322ae3a418788d9 1-5
+test/contract/testdata/rich/app-list-on-terminal.txt
+  1322ae3a418788d9 1-9
+test/contract/testdata/rich/app-list-server-error-on-terminal.txt
+  1322ae3a418788d9 1-11
+test/contract/testdata/rich/app-list-unauthorised-on-terminal.txt
+  1322ae3a418788d9 1-10
+test/contract/testdata/rich/app-ui-colour-keeps-the-rich-layout.txt
+  1322ae3a418788d9 3,5-6
+test/contract/testdata/rich/app-ui-no-colour-keeps-the-rich-layout.txt
+  1322ae3a418788d9 3,5-6
+test/contract/testdata/rich/configure-api-key-flag-is-the-default.txt
+  1322ae3a418788d9 3,6
+test/contract/testdata/rich/configure-config-file-flag.txt
+  1322ae3a418788d9 3,6
+test/contract/testdata/rich/configure-existing-change-region.txt
+  1322ae3a418788d9 3,6
+test/contract/testdata/rich/configure-existing-keep-defaults.txt
+  1322ae3a418788d9 3,6
+test/contract/testdata/rich/configure-fresh.txt
+  1322ae3a418788d9 3,7
+test/contract/testdata/rich/configure-hides-test-regions.txt
+  1322ae3a418788d9 3,7
+test/contract/testdata/rich/configure-region-list-server-error.txt
+  1322ae3a418788d9 3,6-9
+test/contract/testdata/rich/configure-writes-through-symlink.txt
+  1322ae3a418788d9 3,6
+test/contract/testdata/rich/init-region-list-server-error.txt
+  1322ae3a418788d9 3,7-10
+test/contract/testdata/rich/instance-list-empty-on-terminal.txt
+  1322ae3a418788d9 1-5
+test/contract/testdata/rich/instance-list-on-terminal.txt
+  1322ae3a418788d9 1-10
+test/contract/testdata/rich/instance-remove-confirm-no.txt
+  1322ae3a418788d9 3-4
+test/contract/testdata/rich/instance-remove-confirm-yes.txt
+  1322ae3a418788d9 3-4
+test/contract/testdata/rich/root-update-notice-on-terminal.txt
+  1322ae3a418788d9 1-11
+test/contract/testdata/rich/secret-list-empty-on-terminal.txt
+  1322ae3a418788d9 1-5
+test/contract/testdata/rich/secret-list-on-terminal.txt
+  1322ae3a418788d9 1-7
+test/contract/testdata/rich/secret-remove-on-terminal.txt
+  1322ae3a418788d9 1-5
+test/contract/testdata/rich/security-escape-region-picker.txt
+  1322ae3a418788d9 3,7
+test/contract/testdata/rich/upgrade-prompt-no.txt
+  1322ae3a418788d9 3,5
+test/contract/testdata/rich/upgrade-prompt-yes.txt
+  1322ae3a418788d9 3,5,7
+test/contract/testdata/transcripts/app-generate-keys-on-terminal.txt
+  1322ae3a418788d9 1-28
+test/contract/testdata/transcripts/app-list-empty-on-terminal.txt
+  1322ae3a418788d9 1-30
+test/contract/testdata/transcripts/app-list-on-terminal.txt
+  1322ae3a418788d9 1-33
+test/contract/testdata/transcripts/app-list-server-error-on-terminal.txt
+  1322ae3a418788d9 1-41
+test/contract/testdata/transcripts/app-list-unauthorised-on-terminal.txt
+  1322ae3a418788d9 1-37
+test/contract/testdata/transcripts/instance-list-empty-on-terminal.txt
+  1322ae3a418788d9 1-32
+test/contract/testdata/transcripts/instance-list-on-terminal.txt
+  1322ae3a418788d9 1-36
+test/contract/testdata/transcripts/root-update-notice-on-terminal.txt
+  1322ae3a418788d9 1-37
+test/contract/testdata/transcripts/secret-list-empty-on-terminal.txt
+  1322ae3a418788d9 1-28
+test/contract/testdata/transcripts/secret-list-on-terminal.txt
+  1322ae3a418788d9 1-30
+test/contract/testdata/transcripts/secret-remove-on-terminal.txt
+  1322ae3a418788d9 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "e1d523126ee45991b9c47c1138f969f0cc8a921f",
+  "prompts": {
+    "1322ae3a418788d9": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "92f4ef36-9c42-4384-addb-92f6fd763960",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:38.397Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:38.397Z"
+        }
+      ],
+      "total_additions": 3468,
+      "total_deletions": 146,
+      "accepted_lines": 3468,
+      "overriden_lines": 0
+    }
+  }
+}
