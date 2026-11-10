@@ -1,0 +1,86 @@
+README.md
+  ec094c7d5389fb60 14,70-82
+internal/cli/debug/prune.go
+  ec094c7d5389fb60 4,10,21,24-38
+internal/cli/debug/resolve.go
+  ec094c7d5389fb60 145,160-170
+internal/cli/debug/rich.go
+  ec094c7d5389fb60 1-34
+internal/cli/debug/rich_test.go
+  ec094c7d5389fb60 1-113
+internal/debugsession/accesslog.go
+  ec094c7d5389fb60 19-22
+internal/debugsession/accesslog_rich.go
+  ec094c7d5389fb60 1-65
+internal/debugsession/accesslog_rich_test.go
+  ec094c7d5389fb60 1-122
+internal/debugsession/app_terminal_pty_test.go
+  ec094c7d5389fb60 1-97
+internal/debugsession/helper_test.go
+  ec094c7d5389fb60 20,79-86,108-121
+internal/debugsession/intro.go
+  ec094c7d5389fb60 16-24
+internal/debugsession/rich.go
+  ec094c7d5389fb60 1-103
+internal/debugsession/rich_causes_test.go
+  ec094c7d5389fb60 1-203
+internal/debugsession/rich_helpers_test.go
+  ec094c7d5389fb60 1-68
+internal/debugsession/rich_hold_test.go
+  ec094c7d5389fb60 1-91
+internal/debugsession/rich_test.go
+  ec094c7d5389fb60 1-251
+internal/debugsession/run.go
+  ec094c7d5389fb60 119,127-137,140-142,153,155-157,160-165,185,198,202-203
+internal/debugsession/teardown.go
+  ec094c7d5389fb60 6-7,59,65-75,83-86,97-103
+internal/debugsession/tunnel_harness_test.go
+  ec094c7d5389fb60 14,29,59-61
+internal/term/child.go
+  ec094c7d5389fb60 1-13
+internal/term/child_test.go
+  ec094c7d5389fb60 1-64
+internal/term/readme_test.go
+  ec094c7d5389fb60 1-54
+test/contract/rich.go
+  ec094c7d5389fb60 40-42,117-135
+test/contract/rich_test.go
+  ec094c7d5389fb60 41-80
+test/contract/scenarios/debug-on-terminal.yaml
+  ec094c7d5389fb60 1-23
+test/contract/testdata/rich/debug-on-terminal.txt
+  ec094c7d5389fb60 1-53
+test/contract/testdata/transcripts/debug-on-terminal.txt
+  ec094c7d5389fb60 1-112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "b0b2cabba2a7a2a3c71335d8b96765cbafdab2db",
+  "prompts": {
+    "ec094c7d5389fb60": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "9ef127fd-a81b-4b49-9d15-259d3a141ccf",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:36.645Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:36.645Z"
+        }
+      ],
+      "total_additions": 1667,
+      "total_deletions": 29,
+      "accepted_lines": 1667,
+      "overriden_lines": 0
+    }
+  }
+}
