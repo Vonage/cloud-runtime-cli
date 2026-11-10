@@ -1,0 +1,20 @@
+openspec/changes/deployment-api-v0-5/proposal.md
+  s_5481395ded4513::t_eea4e401412d34 11
+  s_5481395ded4513::t_1fee9178c2c328 12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c4f0cb5a0f5fe75acb40f6525c36a279e93c9118",
+  "prompts": {},
+  "sessions": {
+    "s_5481395ded4513": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_9cf33872-1607-4ff8-8b4a-27f03350570c",
+        "model": "auto"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
