@@ -1,0 +1,40 @@
+internal/platform/buildstatus_test.go
+  804360932bcd449c 1-104
+internal/platform/reads.go
+  804360932bcd449c 149-167,223,239
+internal/platform/upload_retry.go
+  804360932bcd449c 41,44-45,49-56
+openspec/changes/build-status-polling/tasks.md
+  804360932bcd449c 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "6f47290713beecd53a007f09cdb5fcb72de2c459",
+  "prompts": {
+    "804360932bcd449c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ea2636df-b30e-4fc6-92f4-37ea2a65bb6b",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-06T18:26:01.127Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-06T18:26:01.127Z"
+        }
+      ],
+      "total_additions": 137,
+      "total_deletions": 5,
+      "accepted_lines": 137,
+      "overriden_lines": 0
+    }
+  }
+}
