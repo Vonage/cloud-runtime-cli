@@ -1,0 +1,1154 @@
+test/contract/allowed-diffs.txt
+  a911409a22dae67d 1
+test/contract/consistency_test.go
+  a911409a22dae67d 1-245
+test/contract/driver.go
+  a911409a22dae67d 6,161-163,166,172-175
+test/contract/exec_test.go
+  a911409a22dae67d 254-259
+test/contract/mutation_test.go
+  a911409a22dae67d 1-103
+test/contract/placeholders.go
+  a911409a22dae67d 29-30,44,49-50,66-90
+test/contract/requests_test.go
+  a911409a22dae67d 153
+test/contract/scenarios/app-create-all-capabilities.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/app-create-missing-name.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/app-create-server-rejects.yaml
+  a911409a22dae67d 1-7
+test/contract/scenarios/app-create-short-flags.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/app-create-yes.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/app-create.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/app-generate-keys-id-dotdot.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/app-generate-keys-missing-flag.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/app-generate-keys-not-found.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/app-generate-keys-short-flag.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/app-generate-keys.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/app-list-alias.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/app-list-empty.yaml
+  a911409a22dae67d 1-6
+test/contract/scenarios/app-list-filter-short.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/app-list-filter.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/app-list-server-error.yaml
+  a911409a22dae67d 1-7
+test/contract/scenarios/app-list.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/app-remove-alias.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/app-remove-id-with-slash.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/app-remove-missing-argument.yaml
+  a911409a22dae67d 1-3
+test/contract/scenarios/app-remove-not-found.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/app-remove-too-many-arguments.yaml
+  a911409a22dae67d 1-3
+test/contract/scenarios/app-remove-yes.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/app-remove.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/bootstrap-default-production-fenced.yaml
+  a911409a22dae67d 1-12
+test/contract/scenarios/bootstrap-direct-form-fenced.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/bootstrap-gateway-form-config.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/bootstrap-gateway-form-flag.yaml
+  a911409a22dae67d 1-10
+test/contract/scenarios/bootstrap-plain-text-auth-failure.yaml
+  a911409a22dae67d 1-7
+test/contract/scenarios/bootstrap-region-flag-invalid.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/bootstrap-region-flag-only-fenced.yaml
+  a911409a22dae67d 1-6
+test/contract/scenarios/bootstrap-region-flag-use1-fenced.yaml
+  a911409a22dae67d 1-6
+test/contract/scenarios/bootstrap-region-flag-with-path-characters.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/bootstrap-region-lookup-unauthorised.yaml
+  a911409a22dae67d 1-8
+test/contract/scenarios/bootstrap-unknown-default-region.yaml
+  a911409a22dae67d 1-11
+test/contract/scenarios/bootstrap-unmappable-config-endpoint.yaml
+  a911409a22dae67d 1-11
+test/contract/scenarios/bootstrap-unmappable-flag-endpoint.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/bootstrap-wrong-secret.yaml
+  a911409a22dae67d 1-11
+test/contract/scenarios/completion-bash-no-descriptions.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/completion-bash.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/completion-complete-command.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/completion-complete-flags.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/completion-fish-no-descriptions.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/completion-fish.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/completion-group-help.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/completion-no-config.yaml
+  a911409a22dae67d 1-3
+test/contract/scenarios/completion-powershell-no-descriptions.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/completion-powershell.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/completion-zsh-no-descriptions.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/completion-zsh.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/config-broken-symlink-config.yaml
+  a911409a22dae67d 1-9
+test/contract/scenarios/config-comments-and-spacing.yaml
+  a911409a22dae67d 1-14
+test/contract/scenarios/config-default-file-used.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/config-default-region-used.yaml
+  a911409a22dae67d 1-11
+test/contract/scenarios/config-directory-as-file.yaml
+  a911409a22dae67d 1-6
+test/contract/scenarios/config-explicit-broken-symlink.yaml
+  a911409a22dae67d 1-8
+test/contract/scenarios/config-explicit-file-missing-falls-back.yaml
+  a911409a22dae67d 1-6
+test/contract/scenarios/config-explicit-file.yaml
+  a911409a22dae67d 1-15
+test/contract/scenarios/config-graphql-endpoint-flag-overrides-config.yaml
+  a911409a22dae67d 1-11
+test/contract/scenarios/config-missing-everywhere-uses-flags.yaml
+  a911409a22dae67d 1-6
+test/contract/scenarios/config-mode-0644-is-tightened-on-read.yaml
+  a911409a22dae67d 1-16
+test/contract/scenarios/config-neru-cli-fallback.yaml
+  a911409a22dae67d 1-16
+test/contract/scenarios/config-parse-error-with-secret-line.yaml
+  a911409a22dae67d 1-10
+test/contract/scenarios/config-parse-error.yaml
+  a911409a22dae67d 1-10
+test/contract/scenarios/config-region-flag-overrides-configured-endpoint.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/config-symlinked-config-is-read.yaml
+  a911409a22dae67d 1-17
+test/contract/scenarios/config-unknown-keys-ignored.yaml
+  a911409a22dae67d 1-16
+test/contract/scenarios/configure-region-flag-invalid.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/configure-without-terminal.yaml
+  a911409a22dae67d 1-3
+test/contract/scenarios/debug-app-exits-early.yaml
+  a911409a22dae67d 1-16
+test/contract/scenarios/debug-app-id-flag.yaml
+  a911409a22dae67d 1-15
+test/contract/scenarios/debug-debugger-port-in-use.yaml
+  a911409a22dae67d 1-12
+test/contract/scenarios/debug-env-names-without-instance-id.yaml
+  a911409a22dae67d 1-17
+test/contract/scenarios/debug-env-names.yaml
+  a911409a22dae67d 1-15
+test/contract/scenarios/debug-execute-roundtrip.yaml
+  a911409a22dae67d 1-18
+test/contract/scenarios/debug-filename-flag.yaml
+  a911409a22dae67d 1-15
+test/contract/scenarios/debug-flags-ports-and-name.yaml
+  a911409a22dae67d 1-15
+test/contract/scenarios/debug-interrupt-during-setup.yaml
+  a911409a22dae67d 1-16
+test/contract/scenarios/debug-interrupt-removes-service.yaml
+  a911409a22dae67d 1-15
+test/contract/scenarios/debug-manifest-app-id-precedence.yaml
+  a911409a22dae67d 1-15
+test/contract/scenarios/debug-manifest-without-debug-block.yaml
+  a911409a22dae67d 1-10
+test/contract/scenarios/debug-no-entrypoint.yaml
+  a911409a22dae67d 1-11
+test/contract/scenarios/debug-preserve-data.yaml
+  a911409a22dae67d 1-15
+test/contract/scenarios/debug-prune-sessions.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/debug-public-request-is-relayed.yaml
+  a911409a22dae67d 1-17
+test/contract/scenarios/debug-remote-call-through-local-debugger.yaml
+  a911409a22dae67d 1-20
+test/contract/scenarios/debug-runtime-flag.yaml
+  a911409a22dae67d 1-15
+test/contract/scenarios/debug-service-not-ready-then-ready.yaml
+  a911409a22dae67d 1-17
+test/contract/scenarios/debug-short-flags.yaml
+  a911409a22dae67d 1-15
+test/contract/scenarios/debug-takeover-close-1008.yaml
+  a911409a22dae67d 1-18
+test/contract/scenarios/debug-unknown-inbound-operation-ends-the-session.yaml
+  a911409a22dae67d 1-15
+test/contract/scenarios/debug-verbose.yaml
+  a911409a22dae67d 1-18
+test/contract/scenarios/debug-yes-flag.yaml
+  a911409a22dae67d 1-15
+test/contract/scenarios/deploy-app-id-flag.yaml
+  a911409a22dae67d 1-24
+test/contract/scenarios/deploy-bad-default-region-with-valid-manifest-region.yaml
+  a911409a22dae67d 1-31
+test/contract/scenarios/deploy-basic.yaml
+  a911409a22dae67d 1-24
+test/contract/scenarios/deploy-build-connect-always-rejected.yaml
+  a911409a22dae67d 1-26
+test/contract/scenarios/deploy-build-connect-retries-then-succeeds.yaml
+  a911409a22dae67d 1-27
+test/contract/scenarios/deploy-build-connection-dropped-then-completes.yaml
+  a911409a22dae67d 1-29
+test/contract/scenarios/deploy-build-failed.yaml
+  a911409a22dae67d 1-27
+test/contract/scenarios/deploy-build-interrupted.yaml
+  a911409a22dae67d 1-30
+test/contract/scenarios/deploy-build-normal-close-before-completion.yaml
+  a911409a22dae67d 1-27
+test/contract/scenarios/deploy-build-timeout.yaml
+  a911409a22dae67d 1-27
+test/contract/scenarios/deploy-capabilities-flag.yaml
+  a911409a22dae67d 1-24
+test/contract/scenarios/deploy-config-default-region-fills-missing-region.yaml
+  a911409a22dae67d 1-23
+test/contract/scenarios/deploy-creates-missing-project.yaml
+  a911409a22dae67d 1-26
+test/contract/scenarios/deploy-deployments-rejected.yaml
+  a911409a22dae67d 1-26
+test/contract/scenarios/deploy-existing-project.yaml
+  a911409a22dae67d 1-27
+test/contract/scenarios/deploy-filename-flag.yaml
+  a911409a22dae67d 1-24
+test/contract/scenarios/deploy-flags-override-manifest.yaml
+  a911409a22dae67d 1-27
+test/contract/scenarios/deploy-instance-name-flag.yaml
+  a911409a22dae67d 1-24
+test/contract/scenarios/deploy-manifest-missing-instance-name.yaml
+  a911409a22dae67d 1-22
+test/contract/scenarios/deploy-manifest-name-neru-yaml.yaml
+  a911409a22dae67d 1-24
+test/contract/scenarios/deploy-manifest-name-neru-yml.yaml
+  a911409a22dae67d 1-24
+test/contract/scenarios/deploy-manifest-name-vcr-yaml.yaml
+  a911409a22dae67d 1-24
+test/contract/scenarios/deploy-manifest-name-vcr-yml.yaml
+  a911409a22dae67d 1-24
+test/contract/scenarios/deploy-manifest-newest-wins.yaml
+  a911409a22dae67d 1-36
+test/contract/scenarios/deploy-manifest-parse-error.yaml
+  a911409a22dae67d 1-16
+test/contract/scenarios/deploy-missing-manifest.yaml
+  a911409a22dae67d 1-11
+test/contract/scenarios/deploy-package-empty-directory.yaml
+  a911409a22dae67d 1-31
+test/contract/scenarios/deploy-package-ignored-directory-with-negated-file.yaml
+  a911409a22dae67d 1-37
+test/contract/scenarios/deploy-package-jfs-files-always-skipped.yaml
+  a911409a22dae67d 1-45
+test/contract/scenarios/deploy-package-modes-and-nesting.yaml
+  a911409a22dae67d 1-39
+test/contract/scenarios/deploy-package-node-modules-included.yaml
+  a911409a22dae67d 1-33
+test/contract/scenarios/deploy-package-symlinks.yaml
+  a911409a22dae67d 1-38
+test/contract/scenarios/deploy-package-unreadable-file.yaml
+  a911409a22dae67d 1-32
+test/contract/scenarios/deploy-package-vcrignore-negation.yaml
+  a911409a22dae67d 1-37
+test/contract/scenarios/deploy-package-vcrignore.yaml
+  a911409a22dae67d 1-59
+test/contract/scenarios/deploy-path-argument.yaml
+  a911409a22dae67d 1-24
+test/contract/scenarios/deploy-project-create-fails.yaml
+  a911409a22dae67d 1-27
+test/contract/scenarios/deploy-project-name-flag.yaml
+  a911409a22dae67d 1-24
+test/contract/scenarios/deploy-runtime-flag.yaml
+  a911409a22dae67d 1-24
+test/contract/scenarios/deploy-tgz-missing-file.yaml
+  a911409a22dae67d 1-23
+test/contract/scenarios/deploy-tgz.yaml
+  a911409a22dae67d 1-26
+test/contract/scenarios/deploy-upload-fails-502.yaml
+  a911409a22dae67d 1-26
+test/contract/scenarios/deploy-upload-retry-then-succeeds.yaml
+  a911409a22dae67d 1-27
+test/contract/scenarios/deploy-upload-transport-error-once.yaml
+  a911409a22dae67d 1-27
+test/contract/scenarios/deploy-validation-errors.yaml
+  a911409a22dae67d 1-30
+test/contract/scenarios/help-app-create.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-app-generate-keys.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-app-list.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-app-remove.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-app.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-command-form.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-completion-bash.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/help-completion-fish.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/help-completion-powershell.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/help-completion-zsh.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/help-completion.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/help-configure.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-debug-prune-sessions.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-debug.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-deploy.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-flag-among-arguments.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-group-without-subcommand.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-help.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/help-init.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-instance-list.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-instance-log.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-instance-remove.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-instance.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-no-config.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/help-root-short-flag.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/help-root-without-args.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/help-root.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/help-secret-create.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-secret-list.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-secret-remove.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-secret-update.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-secret.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-unknown-command.yaml
+  a911409a22dae67d 1-2
+test/contract/scenarios/help-unknown-flag.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-unknown-nested-subcommand.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/help-upgrade.yaml
+  a911409a22dae67d 1-3
+test/contract/scenarios/init-alias-without-terminal.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/init-path-argument-without-terminal.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/init-without-terminal.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/instance-list-alias.yaml
+  a911409a22dae67d 1-6
+test/contract/scenarios/instance-list-empty.yaml
+  a911409a22dae67d 1-7
+test/contract/scenarios/instance-list-filter-is-case-insensitive.yaml
+  a911409a22dae67d 1-6
+test/contract/scenarios/instance-list-filter-no-match.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/instance-list-filter-wildcards.yaml
+  a911409a22dae67d 1-6
+test/contract/scenarios/instance-list-filter.yaml
+  a911409a22dae67d 1-6
+test/contract/scenarios/instance-list-hides-deleted.yaml
+  a911409a22dae67d 1-10
+test/contract/scenarios/instance-list-newest-first.yaml
+  a911409a22dae67d 1-12
+test/contract/scenarios/instance-list-package-owner-visible.yaml
+  a911409a22dae67d 1-10
+test/contract/scenarios/instance-list-server-error.yaml
+  a911409a22dae67d 1-9
+test/contract/scenarios/instance-list.yaml
+  a911409a22dae67d 1-6
+test/contract/scenarios/instance-log-alias-logs.yaml
+  a911409a22dae67d 1-14
+test/contract/scenarios/instance-log-backend-failure.yaml
+  a911409a22dae67d 1-8
+test/contract/scenarios/instance-log-by-id.yaml
+  a911409a22dae67d 1-14
+test/contract/scenarios/instance-log-by-names.yaml
+  a911409a22dae67d 1-14
+test/contract/scenarios/instance-log-empty.yaml
+  a911409a22dae67d 1-8
+test/contract/scenarios/instance-log-follow-keeps-strict-cursor.yaml
+  a911409a22dae67d 1-18
+test/contract/scenarios/instance-log-follow-poll-error.yaml
+  a911409a22dae67d 1-20
+test/contract/scenarios/instance-log-follow-short-flag.yaml
+  a911409a22dae67d 1-17
+test/contract/scenarios/instance-log-follow.yaml
+  a911409a22dae67d 1-17
+test/contract/scenarios/instance-log-history-limit.yaml
+  a911409a22dae67d 1-14
+test/contract/scenarios/instance-log-id-not-found.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/instance-log-instance-in-other-region.yaml
+  a911409a22dae67d 1-11
+test/contract/scenarios/instance-log-instance-without-project-name.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/instance-log-level-filter.yaml
+  a911409a22dae67d 1-14
+test/contract/scenarios/instance-log-malformed-id.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/instance-log-missing-selector.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/instance-log-names-not-found.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/instance-log-project-without-instance-name.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/instance-log-short-flags.yaml
+  a911409a22dae67d 1-14
+test/contract/scenarios/instance-log-source-filter.yaml
+  a911409a22dae67d 1-14
+test/contract/scenarios/instance-remove-alias.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/instance-remove-by-id.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/instance-remove-by-names.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/instance-remove-id-not-found.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/instance-remove-instance-in-other-region.yaml
+  a911409a22dae67d 1-6
+test/contract/scenarios/instance-remove-malformed-id.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/instance-remove-missing-selector.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/instance-remove-names-not-found.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/instance-remove-server-refuses.yaml
+  a911409a22dae67d 1-8
+test/contract/scenarios/instance-remove-short-flags.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/root-credentials-endpoint-and-region-from-flags.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/root-credentials-from-flags.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/root-flags-override-config-credentials.yaml
+  a911409a22dae67d 1-11
+test/contract/scenarios/root-global-flags-after-subcommand.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/root-no-config-no-flags.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/root-timeout-invalid.yaml
+  a911409a22dae67d 1-3
+test/contract/scenarios/root-timeout-long-flag.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/root-timeout-short-flag.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/root-update-check-failure-is-silent.yaml
+  a911409a22dae67d 1-7
+test/contract/scenarios/root-update-notice-absent-when-current.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/root-update-notice-absent-when-latest-is-older.yaml
+  a911409a22dae67d 1-6
+test/contract/scenarios/root-update-notice-after-failed-command.yaml
+  a911409a22dae67d 1-8
+test/contract/scenarios/root-update-notice-for-dev-build.yaml
+  a911409a22dae67d 1-7
+test/contract/scenarios/root-update-notice-shown.yaml
+  a911409a22dae67d 1-7
+test/contract/scenarios/secret-create-alias-add.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/secret-create-already-exists.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/secret-create-filename.yaml
+  a911409a22dae67d 1-8
+test/contract/scenarios/secret-create-invalid-name.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/secret-create-missing-file.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/secret-create-missing-name.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/secret-create-short-flags.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/secret-create-stdin-empty.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/secret-create-stdin.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/secret-create-value-wins-over-filename.yaml
+  a911409a22dae67d 1-8
+test/contract/scenarios/secret-create-value.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/secret-list-alias.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/secret-list-empty.yaml
+  a911409a22dae67d 1-7
+test/contract/scenarios/secret-list-server-error.yaml
+  a911409a22dae67d 1-7
+test/contract/scenarios/secret-list.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/secret-remove-alias.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/secret-remove-invalid-name.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/secret-remove-missing-name-flag.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/secret-remove-missing-succeeds.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/secret-remove-name-with-dotdot.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/secret-remove.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/secret-update-filename.yaml
+  a911409a22dae67d 1-8
+test/contract/scenarios/secret-update-invalid-name.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/secret-update-missing-name.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/secret-update-missing-secret.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/secret-update-stdin.yaml
+  a911409a22dae67d 1-5
+test/contract/scenarios/secret-update-value.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/upgrade-already-latest.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/upgrade-current-is-newer.yaml
+  a911409a22dae67d 1-6
+test/contract/scenarios/upgrade-development-build.yaml
+  a911409a22dae67d 1-9
+test/contract/scenarios/upgrade-force.yaml
+  a911409a22dae67d 1-8
+test/contract/scenarios/upgrade-no-asset-for-this-platform.yaml
+  a911409a22dae67d 1-7
+test/contract/scenarios/upgrade-path-flag.yaml
+  a911409a22dae67d 1-8
+test/contract/scenarios/upgrade-path-short-flag.yaml
+  a911409a22dae67d 1-8
+test/contract/scenarios/upgrade-path-without-binary.yaml
+  a911409a22dae67d 1-6
+test/contract/scenarios/upgrade-release-lookup-fails.yaml
+  a911409a22dae67d 1-7
+test/contract/scenarios/upgrade-short-force-flag.yaml
+  a911409a22dae67d 1-8
+test/contract/scenarios/upgrade-without-terminal-proceeds.yaml
+  a911409a22dae67d 1-8
+test/contract/scenarios/version-dev-build.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/version-long.yaml
+  a911409a22dae67d 1-3
+test/contract/scenarios/version-no-config.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/version-short-flag-on-subcommand.yaml
+  a911409a22dae67d 1-4
+test/contract/scenarios/version-short.yaml
+  a911409a22dae67d 1-3
+test/contract/scraped.yaml
+  a911409a22dae67d 14,16,18,20
+test/contract/scraped_test.go
+  a911409a22dae67d 16-19,54-71
+test/contract/testapp/main.go
+  a911409a22dae67d 46,89-97
+test/contract/testdata/transcripts/app-create-all-capabilities.txt
+  a911409a22dae67d 1-32
+test/contract/testdata/transcripts/app-create-missing-name.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/app-create-server-rejects.txt
+  a911409a22dae67d 1-39
+test/contract/testdata/transcripts/app-create-short-flags.txt
+  a911409a22dae67d 1-32
+test/contract/testdata/transcripts/app-create-yes.txt
+  a911409a22dae67d 1-32
+test/contract/testdata/transcripts/app-create.txt
+  a911409a22dae67d 1-32
+test/contract/testdata/transcripts/app-generate-keys-id-dotdot.txt
+  a911409a22dae67d 1-37
+test/contract/testdata/transcripts/app-generate-keys-missing-flag.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/app-generate-keys-not-found.txt
+  a911409a22dae67d 1-37
+test/contract/testdata/transcripts/app-generate-keys-short-flag.txt
+  a911409a22dae67d 1-28
+test/contract/testdata/transcripts/app-generate-keys.txt
+  a911409a22dae67d 1-28
+test/contract/testdata/transcripts/app-list-alias.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/app-list-empty.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/app-list-filter-short.txt
+  a911409a22dae67d 1-32
+test/contract/testdata/transcripts/app-list-filter.txt
+  a911409a22dae67d 1-32
+test/contract/testdata/transcripts/app-list-server-error.txt
+  a911409a22dae67d 1-41
+test/contract/testdata/transcripts/app-list.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/app-remove-alias.txt
+  a911409a22dae67d 1-28
+test/contract/testdata/transcripts/app-remove-id-with-slash.txt
+  a911409a22dae67d 1-28
+test/contract/testdata/transcripts/app-remove-missing-argument.txt
+  a911409a22dae67d 1-12
+test/contract/testdata/transcripts/app-remove-not-found.txt
+  a911409a22dae67d 1-28
+test/contract/testdata/transcripts/app-remove-too-many-arguments.txt
+  a911409a22dae67d 1-12
+test/contract/testdata/transcripts/app-remove-yes.txt
+  a911409a22dae67d 1-28
+test/contract/testdata/transcripts/app-remove.txt
+  a911409a22dae67d 1-28
+test/contract/testdata/transcripts/bootstrap-default-production-fenced.txt
+  a911409a22dae67d 1-12
+test/contract/testdata/transcripts/bootstrap-direct-form-fenced.txt
+  a911409a22dae67d 1-12
+test/contract/testdata/transcripts/bootstrap-gateway-form-config.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/bootstrap-gateway-form-flag.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/bootstrap-plain-text-auth-failure.txt
+  a911409a22dae67d 1-37
+test/contract/testdata/transcripts/bootstrap-region-flag-invalid.txt
+  a911409a22dae67d 1-12
+test/contract/testdata/transcripts/bootstrap-region-flag-only-fenced.txt
+  a911409a22dae67d 1-13
+test/contract/testdata/transcripts/bootstrap-region-flag-use1-fenced.txt
+  a911409a22dae67d 1-13
+test/contract/testdata/transcripts/bootstrap-region-flag-with-path-characters.txt
+  a911409a22dae67d 1-12
+test/contract/testdata/transcripts/bootstrap-region-lookup-unauthorised.txt
+  a911409a22dae67d 1-26
+test/contract/testdata/transcripts/bootstrap-unknown-default-region.txt
+  a911409a22dae67d 1-18
+test/contract/testdata/transcripts/bootstrap-unmappable-config-endpoint.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/bootstrap-unmappable-flag-endpoint.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/bootstrap-wrong-secret.txt
+  a911409a22dae67d 1-27
+test/contract/testdata/transcripts/completion-bash-no-descriptions.txt
+  a911409a22dae67d 1-448
+test/contract/testdata/transcripts/completion-bash.txt
+  a911409a22dae67d 1-448
+test/contract/testdata/transcripts/completion-complete-command.txt
+  a911409a22dae67d 1-28
+test/contract/testdata/transcripts/completion-complete-flags.txt
+  a911409a22dae67d 1-38
+test/contract/testdata/transcripts/completion-fish-no-descriptions.txt
+  a911409a22dae67d 1-257
+test/contract/testdata/transcripts/completion-fish.txt
+  a911409a22dae67d 1-257
+test/contract/testdata/transcripts/completion-group-help.txt
+  a911409a22dae67d 1-36
+test/contract/testdata/transcripts/completion-no-config.txt
+  a911409a22dae67d 1-13
+test/contract/testdata/transcripts/completion-powershell-no-descriptions.txt
+  a911409a22dae67d 1-292
+test/contract/testdata/transcripts/completion-powershell.txt
+  a911409a22dae67d 1-292
+test/contract/testdata/transcripts/completion-zsh-no-descriptions.txt
+  a911409a22dae67d 1-234
+test/contract/testdata/transcripts/completion-zsh.txt
+  a911409a22dae67d 1-234
+test/contract/testdata/transcripts/config-broken-symlink-config.txt
+  a911409a22dae67d 1-13
+test/contract/testdata/transcripts/config-comments-and-spacing.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/config-default-file-used.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/config-default-region-used.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/config-directory-as-file.txt
+  a911409a22dae67d 1-12
+test/contract/testdata/transcripts/config-explicit-broken-symlink.txt
+  a911409a22dae67d 1-34
+test/contract/testdata/transcripts/config-explicit-file-missing-falls-back.txt
+  a911409a22dae67d 1-34
+test/contract/testdata/transcripts/config-explicit-file.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/config-graphql-endpoint-flag-overrides-config.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/config-missing-everywhere-uses-flags.txt
+  a911409a22dae67d 1-19
+test/contract/testdata/transcripts/config-mode-0644-is-tightened-on-read.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/config-neru-cli-fallback.txt
+  a911409a22dae67d 1-34
+test/contract/testdata/transcripts/config-parse-error-with-secret-line.txt
+  a911409a22dae67d 1-13
+test/contract/testdata/transcripts/config-parse-error.txt
+  a911409a22dae67d 1-13
+test/contract/testdata/transcripts/config-region-flag-overrides-configured-endpoint.txt
+  a911409a22dae67d 1-12
+test/contract/testdata/transcripts/config-symlinked-config-is-read.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/config-unknown-keys-ignored.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/configure-region-flag-invalid.txt
+  a911409a22dae67d 1-12
+test/contract/testdata/transcripts/configure-without-terminal.txt
+  a911409a22dae67d 1-12
+test/contract/testdata/transcripts/debug-app-exits-early.txt
+  a911409a22dae67d 1-106
+test/contract/testdata/transcripts/debug-app-id-flag.txt
+  a911409a22dae67d 1-106
+test/contract/testdata/transcripts/debug-debugger-port-in-use.txt
+  a911409a22dae67d 1-71
+test/contract/testdata/transcripts/debug-env-names-without-instance-id.txt
+  a911409a22dae67d 1-105
+test/contract/testdata/transcripts/debug-env-names.txt
+  a911409a22dae67d 1-106
+test/contract/testdata/transcripts/debug-execute-roundtrip.txt
+  a911409a22dae67d 1-109
+test/contract/testdata/transcripts/debug-filename-flag.txt
+  a911409a22dae67d 1-106
+test/contract/testdata/transcripts/debug-flags-ports-and-name.txt
+  a911409a22dae67d 1-106
+test/contract/testdata/transcripts/debug-interrupt-during-setup.txt
+  a911409a22dae67d 1-41
+test/contract/testdata/transcripts/debug-interrupt-removes-service.txt
+  a911409a22dae67d 1-106
+test/contract/testdata/transcripts/debug-manifest-app-id-precedence.txt
+  a911409a22dae67d 1-106
+test/contract/testdata/transcripts/debug-manifest-without-debug-block.txt
+  a911409a22dae67d 1-31
+test/contract/testdata/transcripts/debug-no-entrypoint.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/debug-preserve-data.txt
+  a911409a22dae67d 1-106
+test/contract/testdata/transcripts/debug-prune-sessions.txt
+  a911409a22dae67d 1-28
+test/contract/testdata/transcripts/debug-public-request-is-relayed.txt
+  a911409a22dae67d 1-117
+test/contract/testdata/transcripts/debug-remote-call-through-local-debugger.txt
+  a911409a22dae67d 1-111
+test/contract/testdata/transcripts/debug-runtime-flag.txt
+  a911409a22dae67d 1-106
+test/contract/testdata/transcripts/debug-service-not-ready-then-ready.txt
+  a911409a22dae67d 1-116
+test/contract/testdata/transcripts/debug-short-flags.txt
+  a911409a22dae67d 1-106
+test/contract/testdata/transcripts/debug-takeover-close-1008.txt
+  a911409a22dae67d 1-113
+test/contract/testdata/transcripts/debug-unknown-inbound-operation-ends-the-session.txt
+  a911409a22dae67d 1-108
+test/contract/testdata/transcripts/debug-verbose.txt
+  a911409a22dae67d 1-130
+test/contract/testdata/transcripts/debug-yes-flag.txt
+  a911409a22dae67d 1-106
+test/contract/testdata/transcripts/deploy-app-id-flag.txt
+  a911409a22dae67d 1-88
+test/contract/testdata/transcripts/deploy-bad-default-region-with-valid-manifest-region.txt
+  a911409a22dae67d 1-18
+test/contract/testdata/transcripts/deploy-basic.txt
+  a911409a22dae67d 1-88
+test/contract/testdata/transcripts/deploy-build-connect-always-rejected.txt
+  a911409a22dae67d 1-106
+test/contract/testdata/transcripts/deploy-build-connect-retries-then-succeeds.txt
+  a911409a22dae67d 1-98
+test/contract/testdata/transcripts/deploy-build-connection-dropped-then-completes.txt
+  a911409a22dae67d 1-93
+test/contract/testdata/transcripts/deploy-build-failed.txt
+  a911409a22dae67d 1-75
+test/contract/testdata/transcripts/deploy-build-interrupted.txt
+  a911409a22dae67d 1-72
+test/contract/testdata/transcripts/deploy-build-normal-close-before-completion.txt
+  a911409a22dae67d 1-73
+test/contract/testdata/transcripts/deploy-build-timeout.txt
+  a911409a22dae67d 1-75
+test/contract/testdata/transcripts/deploy-capabilities-flag.txt
+  a911409a22dae67d 1-88
+test/contract/testdata/transcripts/deploy-config-default-region-fills-missing-region.txt
+  a911409a22dae67d 1-88
+test/contract/testdata/transcripts/deploy-creates-missing-project.txt
+  a911409a22dae67d 1-95
+test/contract/testdata/transcripts/deploy-deployments-rejected.txt
+  a911409a22dae67d 1-92
+test/contract/testdata/transcripts/deploy-existing-project.txt
+  a911409a22dae67d 1-88
+test/contract/testdata/transcripts/deploy-filename-flag.txt
+  a911409a22dae67d 1-88
+test/contract/testdata/transcripts/deploy-flags-override-manifest.txt
+  a911409a22dae67d 1-86
+test/contract/testdata/transcripts/deploy-instance-name-flag.txt
+  a911409a22dae67d 1-88
+test/contract/testdata/transcripts/deploy-manifest-missing-instance-name.txt
+  a911409a22dae67d 1-38
+test/contract/testdata/transcripts/deploy-manifest-name-neru-yaml.txt
+  a911409a22dae67d 1-88
+test/contract/testdata/transcripts/deploy-manifest-name-neru-yml.txt
+  a911409a22dae67d 1-88
+test/contract/testdata/transcripts/deploy-manifest-name-vcr-yaml.txt
+  a911409a22dae67d 1-88
+test/contract/testdata/transcripts/deploy-manifest-name-vcr-yml.txt
+  a911409a22dae67d 1-88
+test/contract/testdata/transcripts/deploy-manifest-newest-wins.txt
+  a911409a22dae67d 1-89
+test/contract/testdata/transcripts/deploy-manifest-parse-error.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/deploy-missing-manifest.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/deploy-package-empty-directory.txt
+  a911409a22dae67d 1-89
+test/contract/testdata/transcripts/deploy-package-ignored-directory-with-negated-file.txt
+  a911409a22dae67d 1-90
+test/contract/testdata/transcripts/deploy-package-jfs-files-always-skipped.txt
+  a911409a22dae67d 1-90
+test/contract/testdata/transcripts/deploy-package-modes-and-nesting.txt
+  a911409a22dae67d 1-92
+test/contract/testdata/transcripts/deploy-package-node-modules-included.txt
+  a911409a22dae67d 1-91
+test/contract/testdata/transcripts/deploy-package-symlinks.txt
+  a911409a22dae67d 1-93
+test/contract/testdata/transcripts/deploy-package-unreadable-file.txt
+  a911409a22dae67d 1-90
+test/contract/testdata/transcripts/deploy-package-vcrignore-negation.txt
+  a911409a22dae67d 1-90
+test/contract/testdata/transcripts/deploy-package-vcrignore.txt
+  a911409a22dae67d 1-91
+test/contract/testdata/transcripts/deploy-path-argument.txt
+  a911409a22dae67d 1-88
+test/contract/testdata/transcripts/deploy-project-create-fails.txt
+  a911409a22dae67d 1-53
+test/contract/testdata/transcripts/deploy-project-name-flag.txt
+  a911409a22dae67d 1-88
+test/contract/testdata/transcripts/deploy-runtime-flag.txt
+  a911409a22dae67d 1-88
+test/contract/testdata/transcripts/deploy-tgz-missing-file.txt
+  a911409a22dae67d 1-46
+test/contract/testdata/transcripts/deploy-tgz.txt
+  a911409a22dae67d 1-86
+test/contract/testdata/transcripts/deploy-upload-fails-502.txt
+  a911409a22dae67d 1-66
+test/contract/testdata/transcripts/deploy-upload-retry-then-succeeds.txt
+  a911409a22dae67d 1-66
+test/contract/testdata/transcripts/deploy-upload-transport-error-once.txt
+  a911409a22dae67d 1-57
+test/contract/testdata/transcripts/deploy-validation-errors.txt
+  a911409a22dae67d 1-47
+test/contract/testdata/transcripts/help-app-create.txt
+  a911409a22dae67d 1-65
+test/contract/testdata/transcripts/help-app-generate-keys.txt
+  a911409a22dae67d 1-54
+test/contract/testdata/transcripts/help-app-list.txt
+  a911409a22dae67d 1-63
+test/contract/testdata/transcripts/help-app-remove.txt
+  a911409a22dae67d 1-49
+test/contract/testdata/transcripts/help-app.txt
+  a911409a22dae67d 1-71
+test/contract/testdata/transcripts/help-command-form.txt
+  a911409a22dae67d 1-76
+test/contract/testdata/transcripts/help-completion-bash.txt
+  a911409a22dae67d 1-51
+test/contract/testdata/transcripts/help-completion-fish.txt
+  a911409a22dae67d 1-42
+test/contract/testdata/transcripts/help-completion-powershell.txt
+  a911409a22dae67d 1-39
+test/contract/testdata/transcripts/help-completion-zsh.txt
+  a911409a22dae67d 1-53
+test/contract/testdata/transcripts/help-completion.txt
+  a911409a22dae67d 1-36
+test/contract/testdata/transcripts/help-configure.txt
+  a911409a22dae67d 1-60
+test/contract/testdata/transcripts/help-debug-prune-sessions.txt
+  a911409a22dae67d 1-28
+test/contract/testdata/transcripts/help-debug.txt
+  a911409a22dae67d 1-114
+test/contract/testdata/transcripts/help-deploy.txt
+  a911409a22dae67d 1-183
+test/contract/testdata/transcripts/help-flag-among-arguments.txt
+  a911409a22dae67d 1-90
+test/contract/testdata/transcripts/help-group-without-subcommand.txt
+  a911409a22dae67d 1-71
+test/contract/testdata/transcripts/help-help.txt
+  a911409a22dae67d 1-29
+test/contract/testdata/transcripts/help-init.txt
+  a911409a22dae67d 1-71
+test/contract/testdata/transcripts/help-instance-list.txt
+  a911409a22dae67d 1-53
+test/contract/testdata/transcripts/help-instance-log.txt
+  a911409a22dae67d 1-90
+test/contract/testdata/transcripts/help-instance-remove.txt
+  a911409a22dae67d 1-62
+test/contract/testdata/transcripts/help-instance.txt
+  a911409a22dae67d 1-73
+test/contract/testdata/transcripts/help-no-config.txt
+  a911409a22dae67d 1-183
+test/contract/testdata/transcripts/help-root-short-flag.txt
+  a911409a22dae67d 1-95
+test/contract/testdata/transcripts/help-root-without-args.txt
+  a911409a22dae67d 1-95
+test/contract/testdata/transcripts/help-root.txt
+  a911409a22dae67d 1-95
+test/contract/testdata/transcripts/help-secret-create.txt
+  a911409a22dae67d 1-72
+test/contract/testdata/transcripts/help-secret-list.txt
+  a911409a22dae67d 1-50
+test/contract/testdata/transcripts/help-secret-remove.txt
+  a911409a22dae67d 1-54
+test/contract/testdata/transcripts/help-secret-update.txt
+  a911409a22dae67d 1-68
+test/contract/testdata/transcripts/help-secret.txt
+  a911409a22dae67d 1-77
+test/contract/testdata/transcripts/help-unknown-command.txt
+  a911409a22dae67d 1-25
+test/contract/testdata/transcripts/help-unknown-flag.txt
+  a911409a22dae67d 1-17
+test/contract/testdata/transcripts/help-unknown-nested-subcommand.txt
+  a911409a22dae67d 1-20
+test/contract/testdata/transcripts/help-upgrade.txt
+  a911409a22dae67d 1-75
+test/contract/testdata/transcripts/init-alias-without-terminal.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/init-path-argument-without-terminal.txt
+  a911409a22dae67d 1-24
+test/contract/testdata/transcripts/init-without-terminal.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/instance-list-alias.txt
+  a911409a22dae67d 1-36
+test/contract/testdata/transcripts/instance-list-empty.txt
+  a911409a22dae67d 1-32
+test/contract/testdata/transcripts/instance-list-filter-is-case-insensitive.txt
+  a911409a22dae67d 1-34
+test/contract/testdata/transcripts/instance-list-filter-no-match.txt
+  a911409a22dae67d 1-32
+test/contract/testdata/transcripts/instance-list-filter-wildcards.txt
+  a911409a22dae67d 1-34
+test/contract/testdata/transcripts/instance-list-filter.txt
+  a911409a22dae67d 1-34
+test/contract/testdata/transcripts/instance-list-hides-deleted.txt
+  a911409a22dae67d 1-34
+test/contract/testdata/transcripts/instance-list-newest-first.txt
+  a911409a22dae67d 1-37
+test/contract/testdata/transcripts/instance-list-package-owner-visible.txt
+  a911409a22dae67d 1-35
+test/contract/testdata/transcripts/instance-list-server-error.txt
+  a911409a22dae67d 1-39
+test/contract/testdata/transcripts/instance-list.txt
+  a911409a22dae67d 1-36
+test/contract/testdata/transcripts/instance-log-alias-logs.txt
+  a911409a22dae67d 1-41
+test/contract/testdata/transcripts/instance-log-backend-failure.txt
+  a911409a22dae67d 1-36
+test/contract/testdata/transcripts/instance-log-by-id.txt
+  a911409a22dae67d 1-41
+test/contract/testdata/transcripts/instance-log-by-names.txt
+  a911409a22dae67d 1-41
+test/contract/testdata/transcripts/instance-log-empty.txt
+  a911409a22dae67d 1-36
+test/contract/testdata/transcripts/instance-log-follow-keeps-strict-cursor.txt
+  a911409a22dae67d 1-54
+test/contract/testdata/transcripts/instance-log-follow-poll-error.txt
+  a911409a22dae67d 1-54
+test/contract/testdata/transcripts/instance-log-follow-short-flag.txt
+  a911409a22dae67d 1-54
+test/contract/testdata/transcripts/instance-log-follow.txt
+  a911409a22dae67d 1-54
+test/contract/testdata/transcripts/instance-log-history-limit.txt
+  a911409a22dae67d 1-38
+test/contract/testdata/transcripts/instance-log-id-not-found.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/instance-log-instance-in-other-region.txt
+  a911409a22dae67d 1-37
+test/contract/testdata/transcripts/instance-log-instance-without-project-name.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/instance-log-level-filter.txt
+  a911409a22dae67d 1-38
+test/contract/testdata/transcripts/instance-log-malformed-id.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/instance-log-missing-selector.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/instance-log-names-not-found.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/instance-log-project-without-instance-name.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/instance-log-short-flags.txt
+  a911409a22dae67d 1-37
+test/contract/testdata/transcripts/instance-log-source-filter.txt
+  a911409a22dae67d 1-37
+test/contract/testdata/transcripts/instance-remove-alias.txt
+  a911409a22dae67d 1-35
+test/contract/testdata/transcripts/instance-remove-by-id.txt
+  a911409a22dae67d 1-35
+test/contract/testdata/transcripts/instance-remove-by-names.txt
+  a911409a22dae67d 1-35
+test/contract/testdata/transcripts/instance-remove-id-not-found.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/instance-remove-instance-in-other-region.txt
+  a911409a22dae67d 1-44
+test/contract/testdata/transcripts/instance-remove-malformed-id.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/instance-remove-missing-selector.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/instance-remove-names-not-found.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/instance-remove-server-refuses.txt
+  a911409a22dae67d 1-44
+test/contract/testdata/transcripts/instance-remove-short-flags.txt
+  a911409a22dae67d 1-35
+test/contract/testdata/transcripts/root-credentials-endpoint-and-region-from-flags.txt
+  a911409a22dae67d 1-34
+test/contract/testdata/transcripts/root-credentials-from-flags.txt
+  a911409a22dae67d 1-19
+test/contract/testdata/transcripts/root-flags-override-config-credentials.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/root-global-flags-after-subcommand.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/root-no-config-no-flags.txt
+  a911409a22dae67d 1-13
+test/contract/testdata/transcripts/root-timeout-invalid.txt
+  a911409a22dae67d 1-17
+test/contract/testdata/transcripts/root-timeout-long-flag.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/root-timeout-short-flag.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/root-update-check-failure-is-silent.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/root-update-notice-absent-when-current.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/root-update-notice-absent-when-latest-is-older.txt
+  a911409a22dae67d 1-33
+test/contract/testdata/transcripts/root-update-notice-after-failed-command.txt
+  a911409a22dae67d 1-41
+test/contract/testdata/transcripts/root-update-notice-for-dev-build.txt
+  a911409a22dae67d 1-37
+test/contract/testdata/transcripts/root-update-notice-shown.txt
+  a911409a22dae67d 1-37
+test/contract/testdata/transcripts/secret-create-alias-add.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/secret-create-already-exists.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/secret-create-filename.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/secret-create-invalid-name.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/secret-create-missing-file.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/secret-create-missing-name.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/secret-create-short-flags.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/secret-create-stdin-empty.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/secret-create-stdin.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/secret-create-value-wins-over-filename.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/secret-create-value.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/secret-list-alias.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/secret-list-empty.txt
+  a911409a22dae67d 1-28
+test/contract/testdata/transcripts/secret-list-server-error.txt
+  a911409a22dae67d 1-37
+test/contract/testdata/transcripts/secret-list.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/secret-remove-alias.txt
+  a911409a22dae67d 1-28
+test/contract/testdata/transcripts/secret-remove-invalid-name.txt
+  a911409a22dae67d 1-28
+test/contract/testdata/transcripts/secret-remove-missing-name-flag.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/secret-remove-missing-succeeds.txt
+  a911409a22dae67d 1-28
+test/contract/testdata/transcripts/secret-remove-name-with-dotdot.txt
+  a911409a22dae67d 1-28
+test/contract/testdata/transcripts/secret-remove.txt
+  a911409a22dae67d 1-28
+test/contract/testdata/transcripts/secret-update-filename.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/secret-update-invalid-name.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/secret-update-missing-name.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/secret-update-missing-secret.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/secret-update-stdin.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/secret-update-value.txt
+  a911409a22dae67d 1-30
+test/contract/testdata/transcripts/upgrade-already-latest.txt
+  a911409a22dae67d 1-17
+test/contract/testdata/transcripts/upgrade-current-is-newer.txt
+  a911409a22dae67d 1-17
+test/contract/testdata/transcripts/upgrade-development-build.txt
+  a911409a22dae67d 1-26
+test/contract/testdata/transcripts/upgrade-force.txt
+  a911409a22dae67d 1-26
+test/contract/testdata/transcripts/upgrade-no-asset-for-this-platform.txt
+  a911409a22dae67d 1-18
+test/contract/testdata/transcripts/upgrade-path-flag.txt
+  a911409a22dae67d 1-26
+test/contract/testdata/transcripts/upgrade-path-short-flag.txt
+  a911409a22dae67d 1-26
+test/contract/testdata/transcripts/upgrade-path-without-binary.txt
+  a911409a22dae67d 1-17
+test/contract/testdata/transcripts/upgrade-release-lookup-fails.txt
+  a911409a22dae67d 1-26
+test/contract/testdata/transcripts/upgrade-short-force-flag.txt
+  a911409a22dae67d 1-26
+test/contract/testdata/transcripts/upgrade-without-terminal-proceeds.txt
+  a911409a22dae67d 1-26
+test/contract/testdata/transcripts/version-dev-build.txt
+  a911409a22dae67d 1-12
+test/contract/testdata/transcripts/version-long.txt
+  a911409a22dae67d 1-12
+test/contract/testdata/transcripts/version-no-config.txt
+  a911409a22dae67d 1-12
+test/contract/testdata/transcripts/version-short-flag-on-subcommand.txt
+  a911409a22dae67d 1-23
+test/contract/testdata/transcripts/version-short.txt
+  a911409a22dae67d 1-12
+test/contract/upload.go
+  a911409a22dae67d 17-21,93,95,99-104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "ff446bef74be2b82d96569a671a22b1b2096cd98",
+  "prompts": {
+    "a911409a22dae67d": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "62d2ce49-e673-4b83-9f87-2a6fcae04ab1",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-09T11:22:53.948Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (opencode/claude-opus-5.5).",
+          "timestamp": "2026-11-09T11:22:53.948Z"
+        }
+      ],
+      "total_additions": 18673,
+      "total_deletions": 25,
+      "accepted_lines": 18673,
+      "overriden_lines": 0
+    }
+  }
+}
