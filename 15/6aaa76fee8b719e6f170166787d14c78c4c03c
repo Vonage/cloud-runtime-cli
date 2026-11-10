@@ -1,0 +1,48 @@
+internal/cli/deploy/env_test.go
+  8374e06749044cd3 46-52,58,69
+internal/cli/deploy/fake_test.go
+  8374e06749044cd3 7,65-92
+internal/deploy/bodies_test.go
+  8374e06749044cd3 46
+internal/deploy/deploy_test.go
+  8374e06749044cd3 218-224
+internal/deploy/packagename.go
+  8374e06749044cd3 1-23
+internal/deploy/packagename_test.go
+  8374e06749044cd3 1-25
+internal/deploy/stages.go
+  8374e06749044cd3 199-203,211
+openspec/changes/deployment-api-v0-5/tasks.md
+  8374e06749044cd3 13-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "156aaa76fee8b719e6f170166787d14c78c4c03c",
+  "prompts": {
+    "8374e06749044cd3": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "20c4a20f-d193-4404-a973-66dbef1e1fe6",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-10T14:22:05.083Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
+          "timestamp": "2026-11-10T14:22:05.083Z"
+        }
+      ],
+      "total_additions": 103,
+      "total_deletions": 5,
+      "accepted_lines": 103,
+      "overriden_lines": 0
+    }
+  }
+}
