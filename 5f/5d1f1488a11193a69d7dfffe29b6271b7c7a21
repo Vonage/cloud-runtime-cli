@@ -1,0 +1,28 @@
+.github/workflows/ci.yml
+  h_df1d95ff1e9b8c 15
+.github/workflows/release.yml
+  h_df1d95ff1e9b8c 443
+AGENTS.md
+  h_df1d95ff1e9b8c 27
+Makefile
+  h_df1d95ff1e9b8c 18
+docs/docs.go
+  h_df1d95ff1e9b8c 60
+internal/buildinfo/buildinfo.go
+  h_df1d95ff1e9b8c 17
+internal/platform/options.go
+  h_df1d95ff1e9b8c 26
+openspec/changes/deployment-api-v0-5/tasks.md
+  h_df1d95ff1e9b8c 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9d4ad3f2327ceeeb3d547fb644962b1765a4a615",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
