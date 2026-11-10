@@ -1,0 +1,34 @@
+internal/deploy/packagename_test.go
+  s_5481395ded4513::t_4358c1e125a654 1-25
+internal/deploy/packagename.go
+  s_5481395ded4513::t_cec00f361bb58d 1-2
+  s_5481395ded4513::t_535ea04b168ed5 3-23
+internal/deploy/stages.go
+  s_5481395ded4513::t_e4f9c1beec8ca7 199-203,211
+internal/deploy/bodies_test.go
+  s_5481395ded4513::t_3d0e7668c6ddeb 46
+internal/cli/deploy/env_test.go
+  s_5481395ded4513::t_955407307c2170 48-52,58,69
+  s_5481395ded4513::t_d8868ac560ffd4 46-47
+internal/cli/deploy/fake_test.go
+  s_5481395ded4513::t_7b16a919598fb3 65-92
+internal/deploy/deploy_test.go
+  s_5481395ded4513::t_09aaf231f1945e 220-224
+  s_5481395ded4513::t_4ef128b96e3c56 218-219
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "156aaa76fee8b719e6f170166787d14c78c4c03c",
+  "prompts": {},
+  "sessions": {
+    "s_5481395ded4513": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_9cf33872-1607-4ff8-8b4a-27f03350570c",
+        "model": "auto"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
