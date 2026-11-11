@@ -71,6 +71,11 @@ tidy:
 docs:
 	go run ./docs
 
+## schema: regenerate schema/vcr.schema.json from the Vonage Application API v2 definition (SPEC=<file>)
+schema:
+	@test -n '$(SPEC)' || { echo "SPEC is required: make schema SPEC=<the Vonage Application API v2 definition>"; exit 1; }
+	$(GO) run ./tools/schemagen -spec '$(SPEC)' -out schema/vcr.schema.json
+
 ## contract: replay the recorded transcripts (PORTED, SCENARIO and VCR_BIN narrow or redirect the run)
 contract:
 	VCR_CONTRACT=1 VCR_BIN='$(VCR_BIN)' PORTED='$(PORTED)' NO_GRAPHQL='$(NO_GRAPHQL)' SCENARIO='$(SCENARIO)' go test ./test/contract/ -run '^TestContract$$' -count=1 -timeout 30m
@@ -167,4 +172,4 @@ clean:
 help:
 	@grep -hE '^## [a-z-]+:' $(MAKEFILE_LIST) | sed 's/^## //' | awk -F': ' '{printf "  %-24s %s\n", $$1, $$2}'
 
-.PHONY: build build-all test lint vulncheck fmt tidy docs contract contract-record contract-rich contract-rich-record contract-baseline contract-self contract-mutate contract-baseline-check hooks hooks-uninstall clean help
+.PHONY: build build-all test lint vulncheck fmt tidy docs schema contract contract-record contract-rich contract-rich-record contract-baseline contract-self contract-mutate contract-baseline-check hooks hooks-uninstall clean help

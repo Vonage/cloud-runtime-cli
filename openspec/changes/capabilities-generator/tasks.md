@@ -76,19 +76,19 @@ packages it touched, and every group ends with `cd <WT> && make test lint` passi
 
 ## 5. Schema
 
-- [ ] 5.1 Failing test in new `internal/manifest/schema_test.go` (adds the test-only dependency
+- [x] 5.1 Failing test in new `internal/manifest/schema_test.go` (adds the test-only dependency
   `github.com/santhosh-tekuri/jsonschema/v6`): loads `../../schema/vcr.schema.json`; passes the all-eight default
   block wrapped in a minimal manifest, `testdata/commented.yml`, and every manifest under `internal/manifest/testdata`
   and `test/contract/testdata/corpora` that `manifest.Parse` accepts; fails `instance.scaling.min-scale: "two"` and
   `application-capabilities.voice.region: mars-1` at those paths; passes `voice.new_field: 1`. Verify: `cd <WT> && go
   test ./internal/manifest/ -run TestSchema` fails (no file).
-- [ ] 5.2 Implement `tools/schemagen/main.go` (`-spec`, `-out`) as the design says, its unit test
+- [x] 5.2 Implement `tools/schemagen/main.go` (`-spec`, `-out`) as the design says, its unit test
   `tools/schemagen/main_test.go` on a small fixture definition (a `$ref` inlined, `example` and `x-*` dropped,
   `default: "true"` made `true`, `additionalProperties: true` set), and a `schema` Makefile target (`SPEC` required,
   added to `.PHONY` and `help`). Generate `schema/vcr.schema.json` from the Application API v2.4.1 definition and
   commit it. Verify: `cd <WT> && go test ./tools/schemagen/ ./internal/manifest/ -run 'TestSchema|.'` passes and
   `make schema SPEC=<file>` run twice leaves `git status` clean.
-- [ ] 5.3 Add one paragraph to `README.md` on the schema: the URL
+- [x] 5.3 Add one paragraph to `README.md` on the schema: the URL
   `https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/schema/vcr.schema.json` and the
   `# yaml-language-server: $schema=<url>` line. Verify: `cd <WT> && make docs` leaves `docs/` matching the new help
   (commit the regenerated `docs/vcr_app*.md`).
