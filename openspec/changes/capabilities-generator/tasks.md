@@ -19,12 +19,12 @@ packages it touched, and every group ends with `cd <WT> && make test lint` passi
 
 ## 1. Defaults
 
-- [ ] 1.1 Failing table test in new `internal/manifest/appcaps_defaults_test.go`: `DefaultCapability(name, NetworkAPIs{})`
+- [x] 1.1 Failing table test in new `internal/manifest/appcaps_defaults_test.go`: `DefaultCapability(name, NetworkAPIs{})`
   returns the default from the spec table for each of the eight names, exact `map[string]any` per name (voice,
   messages with `version: v1`, rtc, verify with `version: v2`, the six video webhooks with `active: true` and no
   `http_method`, `vbc` as an empty map, the three meetings webhooks, network_apis from the struct). An unknown name
   returns an error. Verify: `cd <WT> && go test ./internal/manifest/ -run TestDefaultCapability` fails, then passes.
-- [ ] 1.2 Implement `internal/manifest/appcaps_defaults.go`: `CapabilityNames` (flag order), `NetworkAPIs{ApplicationID,
+- [x] 1.2 Implement `internal/manifest/appcaps_defaults.go`: `CapabilityNames` (flag order), `NetworkAPIs{ApplicationID,
   RedirectURI}`, `DefaultCapability`, and the address helper (`{{instance_url}}/<cap>/<webhook>`, `_url` dropped,
   `_` to `-`). Verify: the 1.1 test passes; `CheckApplicationCapabilities` on a block of all eight defaults returns nil
   (add that case to the 1.1 file).
