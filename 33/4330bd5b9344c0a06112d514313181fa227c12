@@ -1,44 +1,25 @@
-internal/cli/app/app.go
-  1c8eadda6dc84bb7 13-14,35,57-59,64
-internal/cli/app/app_test.go
-  1c8eadda6dc84bb7 30,39-43,48
-internal/cli/app/capabilities.go
-  1c8eadda6dc84bb7 1-36
-internal/cli/app/capabilities_add.go
-  1c8eadda6dc84bb7 1-237
 internal/cli/app/capabilities_test.go
-  1c8eadda6dc84bb7 1-321
-openspec/changes/capabilities-generator/tasks.md
-  1c8eadda6dc84bb7 50,56
+  s_8f29aed92d4586::t_a6836f130e67d6 1-52,58-321
+  s_8f29aed92d4586::t_c51192e406f3c7 53-57
+internal/cli/app/capabilities_add.go
+  s_8f29aed92d4586::t_926b8684bf8aff 1-126,129-237
+  s_8f29aed92d4586::t_7cb07c2b7701e5 127-128
+internal/cli/app/capabilities.go
+  s_8f29aed92d4586::t_e2c9363c85d43c 1-36
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "vonage-override-1.0.0",
+  "git_ai_version": "1.7.5",
   "base_commit_sha": "334330bd5b9344c0a06112d514313181fa227c12",
-  "prompts": {
-    "1c8eadda6dc84bb7": {
+  "prompts": {},
+  "sessions": {
+    "s_8f29aed92d4586": {
       "agent_id": {
         "tool": "kiro",
-        "id": "871839de-671f-493f-9853-dc21c83b380b",
-        "model": "claude-opus-5.5"
+        "id": "sess_0276e312-5042-41e2-ac18-64c60c7380c7",
+        "model": "auto"
       },
-      "human_author": "Simon Chan <simon.chan@vonage.com>",
-      "messages": [
-        {
-          "type": "user",
-          "text": "[vg-ai attribution override: 100% AI]",
-          "timestamp": "2026-11-11T21:23:49.692Z"
-        },
-        {
-          "type": "assistant",
-          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
-          "timestamp": "2026-11-11T21:23:49.692Z"
-        }
-      ],
-      "total_additions": 610,
-      "total_deletions": 6,
-      "accepted_lines": 610,
-      "overriden_lines": 0
+      "human_author": "Simon Chan <simon.chan@vonage.com>"
     }
   }
 }
