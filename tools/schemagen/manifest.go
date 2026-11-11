@@ -1,10 +1,15 @@
 package main
 
+import "maps"
+
 const schemaID = "https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/schema/vcr.schema.json"
 
 // manifestSchema is the schema of vcr.yml. It mirrors the structs and yaml tags in internal/manifest/manifest.go;
 // caps, generated from the Vonage Application API v2 definition, is application-capabilities.
 func manifestSchema(caps map[string]any) map[string]any {
+	// The CLI reads a bare application-capabilities: as an empty block; only the top level allows null.
+	block := maps.Clone(caps)
+	block["type"] = orNull("object")
 	s := object("The Vonage Cloud Runtime manifest that the vcr CLI reads.", map[string]any{
 		"project": object("The project.", map[string]any{
 			"name": str("The project name."),
@@ -42,7 +47,7 @@ func manifestSchema(caps map[string]any) map[string]any {
 			"entrypoint":     strList("The command that starts the application locally."),
 			"preserve-data":  map[string]any{"type": orNull("boolean"), "description": "Keep the session data after it stops."},
 		}),
-		"application-capabilities": caps,
+		"application-capabilities": block,
 	})
 	s["type"] = "object" // the document itself must be a mapping
 	s["$schema"] = "http://json-schema.org/draft-07/schema#"

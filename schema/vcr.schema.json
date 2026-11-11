@@ -535,7 +535,10 @@
           "type": "object"
         }
       },
-      "type": "object"
+      "type": [
+        "object",
+        "null"
+      ]
     },
     "debug": {
       "additionalProperties": true,

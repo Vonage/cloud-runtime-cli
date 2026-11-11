@@ -181,6 +181,14 @@ func TestSchemaAcceptsEmptyKeys(t *testing.T) {
 	require.NoError(t, validateYAML(t, sch, src))
 }
 
+func TestSchemaAcceptsAnEmptyApplicationCapabilitiesKey(t *testing.T) {
+	sch := compileSchema(t)
+	src := "project:\n  name: p\napplication-capabilities:\n"
+	_, err := manifest.Parse([]byte(src))
+	require.NoError(t, err)
+	require.NoError(t, validateYAML(t, sch, src))
+}
+
 func TestSchemaAllowsAKeyItDoesNotDescribe(t *testing.T) {
 	sch := compileSchema(t)
 	src := "project: {name: p}\ninstance: {name: dev}\napplication-capabilities:\n  voice:\n    new_field: 1\n"
