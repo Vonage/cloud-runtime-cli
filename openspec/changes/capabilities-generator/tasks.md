@@ -40,7 +40,8 @@ packages it touched, and every group ends with `cd <WT> && make test lint` passi
   in the output; a file whose top level is not a mapping returns an error. Verify: `cd <WT> && go test
   ./internal/manifest/ -run TestAddCapabilities` fails, then passes after 2.2.
 - [x] 2.2 Implement `internal/manifest/edit.go` on `yaml.Node` (decode, find or append the top-level mapping key,
-  set or skip each child, delete `instance.capabilities`, encode with `SetIndent(2)`), plus `WriteFileAtomic(path,
+  set or skip each child, encode only the block with the file's indent and splice it and the `instance.capabilities`
+  removal into the original bytes by line range), plus `WriteFileAtomic(path,
   data)` (temp file in the same directory, keep the mode, rename). Test `WriteFileAtomic` keeps a `0600` mode. Verify:
   the 2.1 tests and `cd <WT> && go test ./internal/manifest/...` pass.
 
