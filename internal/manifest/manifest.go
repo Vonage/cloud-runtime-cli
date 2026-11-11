@@ -9,6 +9,9 @@ type Manifest struct {
 	Project  Project  `yaml:"project"`
 	Instance Instance `yaml:"instance"`
 	Debug    Debug    `yaml:"debug,omitempty"`
+	// ApplicationCapabilities is the Vonage application "capabilities" object exactly as written in vcr.yml. The
+	// CLI sends it as is; only CheckApplicationCapabilities looks inside.
+	ApplicationCapabilities map[string]any `yaml:"application-capabilities,omitempty"`
 }
 
 type Project struct {

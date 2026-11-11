@@ -67,6 +67,36 @@ func TestTemplateIsMergedOverTheAnswers(t *testing.T) {
 	assert.Empty(t, h.stderr.String())
 }
 
+func TestTemplateManifestKeepsTheApplicationCapabilitiesBlock(t *testing.T) {
+	const blockYAML = `application-capabilities: {voice: {webhooks: {answer_url: {address: "{{instance_url}}/answer", http_method: POST}}, signed_callbacks: true}}` + "\n"
+	h := templateHarness(t, tarGz(t, entry("index.js", "x\n"), entry("vcr.yml", templateManifest+blockYAML)))
+
+	require.NoError(t, h.run())
+
+	got, err := manifest.Read(h.path("vcr.yml"))
+	require.NoError(t, err)
+	assert.Equal(t, map[string]any{"voice": map[string]any{
+		"signed_callbacks": true,
+		"webhooks": map[string]any{
+			"answer_url": map[string]any{"address": "{{instance_url}}/answer", "http_method": "POST"},
+		},
+	}}, got.ApplicationCapabilities)
+	assert.NotContains(t, readText(t, h.path("vcr.yml")), "unknown-key")
+	assert.Equal(t, "✓ "+h.path("vcr.yml")+" created\n", h.stdout.String())
+}
+
+func TestTemplateManifestWithoutABlockWritesNone(t *testing.T) {
+	h := templateHarness(t, tarGz(t, entry("index.js", "x\n"), entry("vcr.yml", templateManifest)))
+
+	require.NoError(t, h.run())
+
+	got, err := manifest.Read(h.path("vcr.yml"))
+	require.NoError(t, err)
+	assert.Nil(t, got.ApplicationCapabilities)
+	assert.NotContains(t, readText(t, h.path("vcr.yml")), "application-capabilities")
+	assert.Equal(t, "✓ "+h.path("vcr.yml")+" created\n", h.stdout.String())
+}
+
 func TestTemplateManifestWithAnotherNameIsRenamed(t *testing.T) {
 	h := templateHarness(t, tarGz(t, entry("index.js", "x\n"), entry("neru.yml", templateManifest)))
 

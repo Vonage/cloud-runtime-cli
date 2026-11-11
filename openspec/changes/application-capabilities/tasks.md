@@ -37,7 +37,7 @@ Defined once here; the tasks refer to them by name.
 
 ## 1. Manifest
 
-- [ ] 1.1 Failing tests in new `internal/manifest/appcaps_test.go` (package `manifest_test`, helpers in `helpers_test.go`).
+- [x] 1.1 Failing tests in new `internal/manifest/appcaps_test.go` (package `manifest_test`, helpers in `helpers_test.go`).
   - Helper `exampleBlock() map[string]any` builds the spec block as plain maps:
     `{"voice": {"webhooks": {"answer_url": {"address": "{{instance_url}}/answer", "http_method": "POST"}}, "signed_callbacks": true}}`.
   - `TestParseReadsTheBlockAsWritten`: `manifest.Parse` of
@@ -57,7 +57,7 @@ Defined once here; the tasks refer to them by name.
   - Do not change `fullManifest()`, `testdata/full.yml` or `defaults.yml`: the existing `TestMarshalGolden` and
     `TestReadParsesEverySection` are the proof that a manifest without a block marshals byte for byte as before.
   - Verify: `cd <WT> && go test ./internal/manifest/` fails to compile (no field yet).
-- [ ] 1.2 Add the field and the deep clone.
+- [x] 1.2 Add the field and the deep clone.
   - `internal/manifest/manifest.go:8-12`, after `Debug`:
     ```go
     // ApplicationCapabilities is the Vonage application "capabilities" object exactly as written in vcr.yml. The
@@ -84,7 +84,7 @@ Defined once here; the tasks refer to them by name.
     ```
   - `Manifest.Merge` keeps copying only the six values; the block comes from `base`, which is what `vcr init` needs.
   - Verify: 1.1 passes; `TestMarshalGolden` and `TestMergeSharesNothingWithTheBase` still pass.
-- [ ] 1.3 Failing table test `TestCheckApplicationCapabilities` in `appcaps_test.go`, then
+- [x] 1.3 Failing table test `TestCheckApplicationCapabilities` in `appcaps_test.go`, then
   `CheckApplicationCapabilities` in `internal/manifest/appcaps.go`.
   - Signature and sketch:
     ```go
@@ -141,7 +141,7 @@ Defined once here; the tasks refer to them by name.
   - The error texts are pinned here as literals with `assert.EqualError`; other packages use `require.ErrorIs`
     against the exported vars, or `ErrorContains`.
   - Verify: `cd <WT> && go test ./internal/manifest/ -run 'CheckApplicationCapabilities|Block'`.
-- [ ] 1.4 `vcr init` keeps the block. Failing test first in `internal/cli/initcmd/template_test.go` (file is 211 lines; the new
+- [x] 1.4 `vcr init` keeps the block. Failing test first in `internal/cli/initcmd/template_test.go` (file is 211 lines; the new
   test is short):
   `TestTemplateManifestKeepsTheApplicationCapabilitiesBlock`. Use `templateHarness(t, tarGz(t, entry("index.js", "x\n"),
   entry("vcr.yml", templateManifest+blockYAML)))` where `blockYAML` is
@@ -155,7 +155,7 @@ Defined once here; the tasks refer to them by name.
   `layOverTemplateManifest` (`template.go:109-122`) already goes through `manifest.Merge`. The contract's `init-*` scenarios
   have no block and compare written files, so they must stay green.
   - Verify: `cd <WT> && go test ./internal/cli/initcmd/ ./internal/scaffold/` (fails before 1.2, passes after).
-- [ ] 1.5 Commit: `feat: read and check an application-capabilities block in vcr.yml`.
+- [x] 1.5 Commit: `feat: read and check an application-capabilities block in vcr.yml`.
   Before it: `cd <WT> && make test`.
 
 ## 2. Platform client
