@@ -1,0 +1,34 @@
+internal/manifest/manifest.go
+  f3b7663f62546b46 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "4b2319a1997404bb6ec82bb74fb84a88577928ed",
+  "prompts": {
+    "f3b7663f62546b46": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "88231389-8a7c-4a75-9d6d-b537d6d435cb",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-11T12:24:40.131Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
+          "timestamp": "2026-11-11T12:24:40.131Z"
+        }
+      ],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
