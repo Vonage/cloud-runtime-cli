@@ -47,13 +47,13 @@ packages it touched, and every group ends with `cd <WT> && make test lint` passi
 
 ## 3. Command
 
-- [ ] 3.1 Failing tests in new `internal/cli/app/capabilities_test.go`, using the package's test env and a temp
+- [x] 3.1 Failing tests in new `internal/cli/app/capabilities_test.go`, using the package's test env and a temp
   project dir: each flag writes its default (one row per flag); the three flag errors from Exact strings exit 1 and
   leave the file byte-identical; skip and `--force` messages on stderr; list removal message; `--filename`; no
   manifest error; `--print` with and without a manifest writes YAML of only the block to stdout and leaves the file
   unchanged and creates none; no config file and no fake platform requests. Verify: `cd <WT> && go test
   ./internal/cli/app/ -run TestCapabilitiesAdd` fails, then passes after 3.2.
-- [ ] 3.2 Implement `internal/cli/app/capabilities.go` (`vcr app capabilities`, `cmdenv.None`, group only) and
+- [x] 3.2 Implement `internal/cli/app/capabilities.go` (`vcr app capabilities`, `cmdenv.None`, group only) and
   `capabilities_add.go` (flags from `CapabilityNames`, `--network-application-id`, `--redirect-uri`, `--filename`/`-f`,
   `--force`, `--print`), registered in `app.go` `NewCmd`. Add `capabilities` to the `vcr app` Long text's AVAILABLE
   COMMANDS and one example. Verify: the 3.1 tests pass; `cd <WT> && make build && ./dist/vcr app capabilities add

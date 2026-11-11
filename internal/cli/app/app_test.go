@@ -27,7 +27,7 @@ func TestGroupIsAnnotatedFullAndHasNoRunFunction(t *testing.T) {
 	assert.False(t, group.Runnable())
 }
 
-func TestGroupHasTheFourCommands(t *testing.T) {
+func TestGroupHasTheFiveCommands(t *testing.T) {
 	srv := startFake(t)
 	h := cmdtest.New(t, srv, cmdtest.Options{})
 
@@ -36,11 +36,16 @@ func TestGroupHasTheFourCommands(t *testing.T) {
 	names := map[string][]string{}
 	for _, c := range group.Commands() {
 		names[c.Name()] = c.Aliases
-		assert.Empty(t, c.Annotations[cmdenv.Annotation], "%s takes its mode from the group", c.Name())
+		if c.Name() == "capabilities" {
+			assert.Equal(t, cmdenv.None, c.Annotations[cmdenv.Annotation], "capabilities works offline")
+		} else {
+			assert.Empty(t, c.Annotations[cmdenv.Annotation], "%s takes its mode from the group", c.Name())
+		}
 		assert.Nil(t, c.PersistentPreRunE)
 		assert.Nil(t, c.PersistentPostRun)
 	}
 	assert.Equal(t, map[string][]string{
+		"capabilities":  nil,
 		"create":        nil,
 		"generate-keys": nil,
 		"list":          {"ls"},
