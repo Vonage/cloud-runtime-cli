@@ -400,7 +400,7 @@ applied with `{{instance_url}}` replaced.
 
 ## 4. Debug
 
-- [ ] 4.1 Failing tests in new `internal/cli/debug/appcaps_test.go` (package `debug`; `newFixture`, `fixture.project`,
+- [x] 4.1 Failing tests in new `internal/cli/debug/appcaps_test.go` (package `debug`; `newFixture`, `fixture.project`,
   `fixture.run`, `fullManifest`, `instanceOnlyManifest`, `instanceAppID`, `debugAppID`, `choose`, `fallbackAppIDWarning`
   from `helpers_test.go`, `prompt_test.go`, `resolve_test.go`). The session is the `recorder`, so "no debug-session
   request" is `f.rec.count() == 0`, and `f.srv.Requests()` shows the region lookup.
@@ -429,7 +429,7 @@ applied with `{{instance_url}}` replaced.
     | separate debug application | `newFixture(t, false)` | `fullManifest + blockYAML` | none | no error; `rec.only(t).cfg.AppID == debugAppID`; `cfg.Manifest.ApplicationCapabilities` equals the block as nested maps |
     | no block, fallback unchanged | `newFixture(t, false)` | `instanceOnlyManifest` | `--yes` | no error; `cfg.AppID == instanceAppID`; stdout is `fallbackAppIDWarning` |
   - Verify: `cd <WT> && go test ./internal/cli/debug/` fails.
-- [ ] 4.2 Wire the checks into the command.
+- [x] 4.2 Wire the checks into the command.
   - `internal/cli/debug/resolve.go:44-47` `execute`: after `loadProject` and before `chooseRegion` (:48):
     ```go
     if err := manifest.CheckApplicationCapabilities(m, nil); err != nil {
@@ -448,7 +448,7 @@ applied with `{{instance_url}}` replaced.
     An error, not a prompt: `--yes` and non-terminal runs skip prompts. `Config` needs no new field: the session reads
     `Manifest.ApplicationCapabilities`.
   - Verify: the rows of 4.1 pass.
-- [ ] 4.3 Failing tests in new `internal/debugsession/appcaps_test.go` (package `debugsession`; `sharedSession`, `testConfig`,
+- [x] 4.3 Failing tests in new `internal/debugsession/appcaps_test.go` (package `debugsession`; `sharedSession`, `testConfig`,
   `startRun`, `waitForOutput`, `helperReady`, `newLocalSetup`, `testIO`, `lockedBuffer`, `startRichRun` from
   `run_harness_test.go`, `rich_helpers_test.go`, `helper_test.go`).
   - `TestDeployRequestCarriesTheBlock`: like `TestDeployRequestNamesTheRegionAndTheApplication` (`run_test.go:75`) with
@@ -475,7 +475,7 @@ applied with `{{instance_url}}` replaced.
     a second row without the field has no such line; `errOut.Raw()` is empty.
   - Existing `introBlock` calls in `intro_test.go` and `run_test.go:50` must keep compiling unchanged (variadic last argument).
   - Verify: `cd <WT> && go test ./internal/debugsession/` fails.
-- [ ] 4.4 Send, show and warn in the session.
+- [x] 4.4 Send, show and warn in the session.
   - `internal/debugsession/run.go` `session` (:34-57): add `appCaps map[string]any // the manifest's block, sent on the debug-service request`.
     `preflight` (:97-115): after the capabilities parse, `s.appCaps = m.ApplicationCapabilities` (no check here; see Plan notes).
   - `run.go:133` and `rich.go:21`: pass `s.appCaps` instead of `nil`.
@@ -500,7 +500,7 @@ applied with `{{instance_url}}` replaced.
     ```
     It reads `s.appCaps`, not `s.cfg.Manifest`, so existing bare-session intro tests (which have no `cfg`) cannot nil-dereference.
   - Verify: `cd <WT> && go test ./internal/debugsession/ ./internal/cli/debug/`.
-- [ ] 4.5 Commit: `feat: send the application-capabilities block from vcr debug and guard the instance application`.
+- [x] 4.5 Commit: `feat: send the application-capabilities block from vcr debug and guard the instance application`.
   Before it: `cd <WT> && make test`.
 
 ## 5. Check

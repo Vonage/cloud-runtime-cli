@@ -18,7 +18,7 @@ const forwardingNotice = "Forwarding requests. Press Ctrl+C to stop."
 
 func (s *session) deployServiceRich() (platform.DebugService, error) {
 	step := s.tio.StartStep("Deploying debug server")
-	service, err := s.api.DeployDebugService(s.setup, s.region.Alias, s.cfg.AppID, s.cfg.Name, s.caps, nil)
+	service, err := s.api.DeployDebugService(s.setup, s.region.Alias, s.cfg.AppID, s.cfg.Name, s.caps, s.appCaps)
 	if err != nil {
 		step.Stop()
 		return service, err
@@ -55,6 +55,9 @@ func (s *session) printIntroRich() {
 	rows := []term.Row{
 		{Label: "Service", Value: term.Sanitize(s.service.ServiceName)},
 		{Label: "Host", Value: style.Bold(term.Sanitize(s.addrs.Host))},
+	}
+	for _, a := range platform.WebhookAddresses(s.service.ApplicationCapabilities) {
+		rows = append(rows, term.Row{Label: a.Label(), Value: style.Bold(term.Sanitize(a.Address))})
 	}
 	s.con.hold(func() {
 		fmt.Fprintln(s.tio.Out)
