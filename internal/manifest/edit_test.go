@@ -3,6 +3,7 @@ package manifest_test
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -181,6 +182,126 @@ func withoutInstanceCapabilities(src string) string {
 	return strings.Join(kept, "")
 }
 
+// rtcBlock4 is the rtc default as the block is written into a four-space manifest.
+const rtcBlock4 = `application-capabilities:
+    rtc:
+        webhooks:
+            event_url:
+                address: '{{instance_url}}/rtc/event'
+                http_method: POST
+`
+
+func TestAddCapabilitiesKeepsAFourSpaceManifestAsWritten(t *testing.T) {
+	src := readGolden(t, "commented-4space.yml")
+	lines := strings.SplitAfter(src, "\n")
+	start := slices.Index(lines, "    capabilities:\n")
+	require.Positive(t, start)
+	want := slices.Concat(lines[:start], lines[start+3:len(lines)-1], strings.SplitAfter(rtcBlock4, "\n"))
+
+	out, res, err := manifest.AddCapabilities([]byte(src), defaults(t, "rtc"), false)
+
+	require.NoError(t, err)
+	assert.Equal(t, want, strings.SplitAfter(string(out), "\n"), "only the block and instance.capabilities change")
+	assert.Equal(t, []string{"voice", "messages-v1"}, res.Removed)
+}
+
+func TestAddCapabilitiesReplacesABlockInTheMiddleOfTheFile(t *testing.T) {
+	head := "project:\n    name: app\n\n"
+	tail := "\n# Debug settings.\ndebug:\n    name: debug\n"
+	src := head + `application-capabilities:
+    rtc:   {webhooks: {event_url: {address: "https://example.com/rtc"}}}
+    voice:
+        webhooks: {}
+` + tail
+
+	out, res, err := manifest.AddCapabilities([]byte(src), defaults(t, "voice"), true)
+
+	require.NoError(t, err)
+	assert.Equal(t, head+`application-capabilities:
+    rtc: {webhooks: {event_url: {address: "https://example.com/rtc"}}}
+    voice:
+        webhooks:
+            answer_url:
+                address: '{{instance_url}}/voice/answer'
+                http_method: POST
+            event_url:
+                address: '{{instance_url}}/voice/event'
+                http_method: POST
+`+tail, string(out))
+	assert.Equal(t, manifest.Result{Replaced: []string{"voice"}}, res)
+}
+
+func TestAddCapabilitiesLeavesTheBlockAloneWhenEverythingIsSkipped(t *testing.T) {
+	src := "application-capabilities:\n    rtc:   {}\n\n    voice: {}\n"
+
+	out, res, err := manifest.AddCapabilities([]byte(src), defaults(t, "voice"), false)
+
+	require.NoError(t, err)
+	assert.Equal(t, src, string(out))
+	assert.Equal(t, manifest.Result{Skipped: []string{"voice"}}, res)
+}
+
+func TestAddCapabilitiesCutsInstanceCapabilitiesByLine(t *testing.T) {
+	const after = "\n# Next.\ndebug:\n  name: debug\n"
+	for name, tc := range map[string]struct{ src, want string }{
+		"flow list between keys": {
+			src:  "instance:\n  name: dev\n  capabilities: [voice, messages-v1] # old\n  runtime: nodejs22\n",
+			want: "instance:\n  name: dev\n  runtime: nodejs22\n",
+		},
+		"flow list over two lines": {
+			src:  "instance:\n  capabilities: [voice,\n    messages-v1]\n  runtime: nodejs22\n",
+			want: "instance:\n  runtime: nodejs22\n",
+		},
+		"flow list as the last key": {
+			src:  "instance:\n  name: dev\n  capabilities: [voice, messages-v1]\n" + after,
+			want: "instance:\n  name: dev\n" + after,
+		},
+		"block list as the last key": {
+			src:  "instance:\n  name: dev\n  capabilities:\n    - voice\n    - messages-v1\n" + after,
+			want: "instance:\n  name: dev\n" + after,
+		},
+		"block list as the last key of the file": {
+			src:  "instance:\n  name: dev\n  capabilities:\n    - voice\n    - messages-v1\n",
+			want: "instance:\n  name: dev\n",
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			out, res, err := manifest.AddCapabilities([]byte(tc.src), defaults(t, "vbc"), false)
+
+			require.NoError(t, err)
+			assert.Equal(t, tc.want+"application-capabilities:\n  vbc: {}\n", string(out))
+			assert.Equal(t, []string{"voice", "messages-v1"}, res.Removed)
+		})
+	}
+}
+
+func TestAddCapabilitiesRewritesAFlowStyleInstance(t *testing.T) {
+	src := "project: {name: app}\ninstance: {name: dev, capabilities: [voice]}\n"
+
+	out, res, err := manifest.AddCapabilities([]byte(src), defaults(t, "vbc"), false)
+
+	require.NoError(t, err)
+	assert.Equal(t, "project: {name: app}\ninstance: {name: dev}\napplication-capabilities:\n  vbc: {}\n", string(out))
+	assert.Equal(t, []string{"voice"}, res.Removed)
+}
+
+func TestAddCapabilitiesAppendsAfterALastLineWithoutANewline(t *testing.T) {
+	out, _, err := manifest.AddCapabilities([]byte("project:\n  name: app"), defaults(t, "vbc"), false)
+
+	require.NoError(t, err)
+	assert.Equal(t, "project:\n  name: app\napplication-capabilities:\n  vbc: {}\n", string(out))
+}
+
+func TestAddCapabilitiesAcceptsCRLFLineEndings(t *testing.T) {
+	src := "project:\r\n  name: app\r\ninstance:\r\n  capabilities: [voice]\r\n  runtime: nodejs22\r\n"
+
+	out, res, err := manifest.AddCapabilities([]byte(src), defaults(t, "vbc"), false)
+
+	require.NoError(t, err)
+	assert.Equal(t, "project:\r\n  name: app\r\ninstance:\r\n  runtime: nodejs22\r\napplication-capabilities:\n  vbc: {}\n", string(out))
+	assert.Equal(t, []string{"voice"}, res.Removed)
+}
+
 func TestAddCapabilitiesRejectsAManifestThatIsNotAMapping(t *testing.T) {
 	for name, src := range map[string]string{
 		"empty":            "",
@@ -188,6 +309,7 @@ func TestAddCapabilitiesRejectsAManifestThatIsNotAMapping(t *testing.T) {
 		"a list":           "- voice\n- rtc\n",
 		"a string":         "voice\n",
 		"a list for block": "application-capabilities:\n  - voice\n",
+		"a flow mapping":   "{project: {name: app}}\n",
 	} {
 		t.Run(name, func(t *testing.T) {
 			_, _, err := manifest.AddCapabilities([]byte(src), defaults(t, "voice"), false)
@@ -222,6 +344,24 @@ func TestWriteFileAtomicKeepsTheFileMode(t *testing.T) {
 			assert.Equal(t, "vcr.yml", filepath.Base(entries[0].Name()))
 		})
 	}
+}
+
+func TestWriteFileAtomicReplacesTheTargetOfASymlink(t *testing.T) {
+	skipOnWindows(t)
+	dir := t.TempDir()
+	target := writeFile(t, dir, "real.yml", smallManifest)
+	link := filepath.Join(dir, "vcr.yml")
+	require.NoError(t, os.Symlink("real.yml", link))
+
+	require.NoError(t, manifest.WriteFileAtomic(link, []byte("a: 1\n")))
+
+	info, err := os.Lstat(link)
+	require.NoError(t, err)
+	assert.Equal(t, os.ModeSymlink, info.Mode().Type(), "the link stays a link")
+	assert.Equal(t, "a: 1\n", readText(t, target))
+	entries, err := os.ReadDir(dir)
+	require.NoError(t, err)
+	assert.Len(t, entries, 2, "no temporary file is left behind")
 }
 
 func TestWriteFileAtomicFailsForAMissingFile(t *testing.T) {

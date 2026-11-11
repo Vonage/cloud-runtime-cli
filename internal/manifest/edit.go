@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -18,10 +20,17 @@ type Result struct {
 	Added, Replaced, Skipped, Removed []string
 }
 
+// splice replaces lines [from, to) of the source with text.
+type splice struct {
+	from, to int
+	text     string
+}
+
 // AddCapabilities sets the capabilities in add (keyed by a name in CapabilityNames) in the manifest's
 // application-capabilities block, creating the block at the end of the file if needed. A capability already in the
 // block is skipped unless force is set, in which case it is replaced in place. Once the block holds anything,
-// instance.capabilities is removed. Everything else in src keeps its comments, order and quoting.
+// instance.capabilities is removed. Only the block is re-encoded, with the file's indent; it and the
+// instance.capabilities lines are spliced into src by line, so every other byte is kept.
 func AddCapabilities(src []byte, add map[string]any, force bool) ([]byte, Result, error) {
 	var res Result
 	if err := checkNames(add); err != nil {
@@ -35,24 +44,57 @@ func AddCapabilities(src []byte, add map[string]any, force bool) ([]byte, Result
 		return nil, res, errors.New("the manifest is not a YAML mapping")
 	}
 	root := doc.Content[0]
-	block, err := capabilitiesBlock(root)
+	if root.Style&yaml.FlowStyle != 0 {
+		return nil, res, errors.New("the manifest is a flow mapping ({...}); write it in block style to edit it")
+	}
+	lines := strings.SplitAfter(string(src), "\n")
+	if lines[len(lines)-1] == "" {
+		lines = lines[:len(lines)-1]
+	}
+	indent := detectIndent(root)
+
+	i, block, err := capabilitiesBlock(root)
 	if err != nil {
 		return nil, res, err
 	}
+	changed := false
 	for _, name := range CapabilityNames {
 		value, ok := add[name]
 		if !ok {
 			continue
 		}
-		if err := setCapability(block, name, value, force, &res); err != nil {
+		c, err := setCapability(block, name, value, force, &res)
+		if err != nil {
 			return nil, res, err
 		}
+		changed = changed || c
+	}
+
+	var edits []splice
+	if changed {
+		key := scalar(blockKey)
+		from, to := len(lines), len(lines)
+		if i >= 0 {
+			key = root.Content[i]
+			from, to = entryRange(root, i, len(lines), lines)
+		}
+		text, err := encodeEntry(key, block, indent)
+		if err != nil {
+			return nil, res, err
+		}
+		edits = append(edits, splice{from, to, text})
 	}
 	if len(block.Content) > 0 {
-		res.Removed = removeInstanceCapabilities(root)
+		removed, edit, err := removeInstanceCapabilities(root, lines, indent)
+		if err != nil {
+			return nil, res, err
+		}
+		if edit != nil {
+			res.Removed = removed
+			edits = append(edits, *edit)
+		}
 	}
-	out, err := encode(&doc)
-	return out, res, err
+	return apply(lines, edits), res, nil
 }
 
 func checkNames(add map[string]any) error {
@@ -64,57 +106,56 @@ func checkNames(add map[string]any) error {
 	return nil
 }
 
-// capabilitiesBlock returns the block's mapping, appending an empty one to root when the key is missing or empty.
-func capabilitiesBlock(root *yaml.Node) (*yaml.Node, error) {
+// capabilitiesBlock returns the index of the block's key in root (-1 when missing) and its mapping, a new empty one
+// when the key is missing or empty.
+func capabilitiesBlock(root *yaml.Node) (int, *yaml.Node, error) {
 	i := keyIndex(root, blockKey)
 	if i < 0 {
-		block := &yaml.Node{Kind: yaml.MappingNode, Tag: "!!map"}
-		root.Content = append(root.Content, scalar(blockKey), block)
-		return block, nil
+		return i, &yaml.Node{Kind: yaml.MappingNode, Tag: "!!map"}, nil
 	}
 	value := root.Content[i+1]
 	switch {
 	case value.Kind == yaml.MappingNode:
-		return value, nil
+		return i, value, nil
 	case value.Kind == yaml.ScalarNode && value.Tag == "!!null":
-		block := &yaml.Node{Kind: yaml.MappingNode, Tag: "!!map"}
-		root.Content[i+1] = block
-		return block, nil
+		return i, &yaml.Node{Kind: yaml.MappingNode, Tag: "!!map"}, nil
 	default:
-		return nil, fmt.Errorf("%s in the manifest is not a mapping", blockKey)
+		return i, nil, fmt.Errorf("%s in the manifest is not a mapping", blockKey)
 	}
 }
 
-func setCapability(block *yaml.Node, name string, value any, force bool, res *Result) error {
+// setCapability sets or skips one capability and reports whether the block changed.
+func setCapability(block *yaml.Node, name string, value any, force bool, res *Result) (bool, error) {
 	i := keyIndex(block, name)
 	if i >= 0 && !force {
 		res.Skipped = append(res.Skipped, name)
-		return nil
+		return false, nil
 	}
 	var node yaml.Node
 	if err := node.Encode(value); err != nil {
-		return fmt.Errorf("failed to encode %s: %w", name, err)
+		return false, fmt.Errorf("failed to encode %s: %w", name, err)
 	}
 	if i >= 0 {
 		block.Content[i+1] = &node
 		res.Replaced = append(res.Replaced, name)
-		return nil
+		return true, nil
 	}
 	block.Content = append(block.Content, scalar(name), &node)
 	res.Added = append(res.Added, name)
-	return nil
+	return true, nil
 }
 
-// removeInstanceCapabilities deletes instance.capabilities and returns its scalar entries in file order.
-func removeInstanceCapabilities(root *yaml.Node) []string {
+// removeInstanceCapabilities returns the instance.capabilities scalar entries in file order and the splice that
+// removes the key: its lines, or the whole re-encoded instance entry when instance is written in flow style.
+func removeInstanceCapabilities(root *yaml.Node, lines []string, indent int) ([]string, *splice, error) {
 	i := keyIndex(root, "instance")
 	if i < 0 || root.Content[i+1].Kind != yaml.MappingNode {
-		return nil
+		return nil, nil, nil
 	}
 	instance := root.Content[i+1]
 	j := keyIndex(instance, "capabilities")
 	if j < 0 {
-		return nil
+		return nil, nil, nil
 	}
 	var removed []string
 	for _, entry := range instance.Content[j+1].Content {
@@ -122,8 +163,90 @@ func removeInstanceCapabilities(root *yaml.Node) []string {
 			removed = append(removed, entry.Value)
 		}
 	}
-	instance.Content = append(instance.Content[:j], instance.Content[j+2:]...)
-	return removed
+	from, to := entryRange(root, i, len(lines), lines)
+	if instance.Style&yaml.FlowStyle != 0 {
+		instance.Content = append(instance.Content[:j], instance.Content[j+2:]...)
+		text, err := encodeEntry(root.Content[i], instance, indent)
+		if err != nil {
+			return nil, nil, err
+		}
+		return removed, &splice{from, to, text}, nil
+	}
+	from, to = entryRange(instance, j, to, lines)
+	return removed, &splice{from, to, ""}, nil
+}
+
+// entryRange returns the 0-based line range [from, to) of the key at index i of a block mapping: from the key's
+// line to the next key's line, or to end for the last key. Blank lines and comments no deeper than the key that
+// close the range stay outside it, since they lead into what follows.
+func entryRange(mapping *yaml.Node, i, end int, lines []string) (int, int) {
+	key := mapping.Content[i]
+	from, to := key.Line-1, end
+	if i+2 < len(mapping.Content) {
+		to = mapping.Content[i+2].Line - 1
+	}
+	for to > from+1 {
+		line := lines[to-1]
+		trimmed := strings.TrimSpace(line)
+		depth := len(line) - len(strings.TrimLeft(line, " \t"))
+		if trimmed != "" && (!strings.HasPrefix(trimmed, "#") || depth > key.Column-1) {
+			break
+		}
+		to--
+	}
+	return from, to
+}
+
+// detectIndent returns the column step from the first top-level key with a nested block mapping to that mapping's
+// first key, or 2 when there is none.
+func detectIndent(root *yaml.Node) int {
+	for i := 0; i+1 < len(root.Content); i += 2 {
+		value := root.Content[i+1]
+		if value.Kind == yaml.MappingNode && value.Style&yaml.FlowStyle == 0 && len(value.Content) > 0 {
+			if step := value.Content[0].Column - root.Content[i].Column; step > 0 {
+				return step
+			}
+		}
+	}
+	return 2
+}
+
+// encodeEntry encodes one top-level key and its value. The key's head and foot comments are dropped, because they
+// sit on lines outside the entry's range and stay in the file.
+func encodeEntry(key, value *yaml.Node, indent int) (string, error) {
+	k := *key
+	k.HeadComment, k.FootComment = "", ""
+	var buf bytes.Buffer
+	enc := yaml.NewEncoder(&buf)
+	enc.SetIndent(indent)
+	if err := enc.Encode(&yaml.Node{Kind: yaml.MappingNode, Tag: "!!map", Content: []*yaml.Node{&k, value}}); err != nil {
+		return "", err
+	}
+	if err := enc.Close(); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
+}
+
+// apply makes the non-overlapping splices on lines. Text added after a last line without a newline gets one first.
+func apply(lines []string, edits []splice) []byte {
+	slices.SortFunc(edits, func(a, b splice) int { return a.from - b.from })
+	var out strings.Builder
+	next := 0
+	for _, e := range edits {
+		for _, line := range lines[next:e.from] {
+			out.WriteString(line)
+		}
+		if e.from == len(lines) && e.from > 0 && !strings.HasSuffix(lines[e.from-1], "\n") {
+			out.WriteString("\n")
+		}
+		out.WriteString(e.text)
+		next = e.to
+	}
+	for _, line := range lines[next:] {
+		out.WriteString(line)
+	}
+	return []byte(out.String())
 }
 
 // keyIndex returns the index of key's key node in a mapping's Content, or -1.
@@ -140,22 +263,13 @@ func scalar(value string) *yaml.Node {
 	return &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: value}
 }
 
-func encode(doc *yaml.Node) ([]byte, error) {
-	var buf bytes.Buffer
-	enc := yaml.NewEncoder(&buf)
-	enc.SetIndent(2)
-	if err := enc.Encode(doc); err != nil {
-		return nil, err
-	}
-	if err := enc.Close(); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
 // WriteFileAtomic replaces an existing file with data through a temporary file in the same directory, keeping the
-// file's mode. The temporary file never outlives a failure.
+// file's mode. A symbolic link stays a link and its target is replaced. The temporary file never outlives a failure.
 func WriteFileAtomic(path string, data []byte) (err error) {
+	path, err = filepath.EvalSymlinks(path)
+	if err != nil {
+		return err
+	}
 	info, err := os.Stat(path)
 	if err != nil {
 		return err
