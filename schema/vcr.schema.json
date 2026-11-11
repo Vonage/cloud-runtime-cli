@@ -543,14 +543,23 @@
       "properties": {
         "application-id": {
           "description": "The ID of the Vonage application the debug session uses.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "entrypoint": {
           "description": "The command that starts the application locally.",
           "items": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
-          "type": "array"
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "environment": {
           "description": "Environment variables of the debug session.",
@@ -560,35 +569,57 @@
             "properties": {
               "name": {
                 "description": "The variable name.",
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "secret": {
                 "description": "The name of a secret that holds the value.",
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "value": {
                 "description": "The value.",
                 "type": [
                   "string",
                   "number",
-                  "boolean"
+                  "boolean",
+                  "null"
                 ]
               }
             },
-            "type": "object"
+            "type": [
+              "object",
+              "null"
+            ]
           },
-          "type": "array"
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "name": {
           "description": "The debug instance name.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "preserve-data": {
           "description": "Keep the session data after it stops.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       },
-      "type": "object"
+      "type": [
+        "object",
+        "null"
+      ]
     },
     "instance": {
       "additionalProperties": true,
@@ -596,32 +627,56 @@
       "properties": {
         "application-id": {
           "description": "The ID of the Vonage application the instance uses.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "build-script": {
           "description": "A script run before the code is uploaded.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "capabilities": {
           "description": "The Vonage capabilities to enable, for example voice or messages-v1. application-capabilities replaces this list.",
           "items": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
-          "type": "array"
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "domains": {
           "description": "Custom domains for the instance.",
           "items": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
-          "type": "array"
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "entrypoint": {
           "description": "The command that starts the application.",
           "items": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
-          "type": "array"
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "environment": {
           "description": "Environment variables of the deployed instance.",
@@ -631,40 +686,65 @@
             "properties": {
               "name": {
                 "description": "The variable name.",
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "secret": {
                 "description": "The name of a secret that holds the value.",
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "value": {
                 "description": "The value.",
                 "type": [
                   "string",
                   "number",
-                  "boolean"
+                  "boolean",
+                  "null"
                 ]
               }
             },
-            "type": "object"
+            "type": [
+              "object",
+              "null"
+            ]
           },
-          "type": "array"
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "health-check-path": {
           "description": "The path the platform calls to check the instance's health.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "name": {
           "description": "The instance name.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "region": {
           "description": "The region, for example aws.euw1.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "runtime": {
           "description": "The runtime, for example nodejs22.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "scaling": {
           "additionalProperties": true,
@@ -672,14 +752,23 @@
           "properties": {
             "max-scale": {
               "description": "The largest number of replicas.",
-              "type": "integer"
+              "type": [
+                "integer",
+                "null"
+              ]
             },
             "min-scale": {
               "description": "The smallest number of replicas.",
-              "type": "integer"
+              "type": [
+                "integer",
+                "null"
+              ]
             }
           },
-          "type": "object"
+          "type": [
+            "object",
+            "null"
+          ]
         },
         "security": {
           "additionalProperties": true,
@@ -687,11 +776,17 @@
           "properties": {
             "access": {
               "description": "The access level, for example public, private or authenticated.",
-              "type": "string"
+              "type": [
+                "string",
+                "null"
+              ]
             },
             "auth-method": {
               "description": "The authentication method, for example vonage_basic.",
-              "type": "string"
+              "type": [
+                "string",
+                "null"
+              ]
             },
             "override": {
               "description": "Access levels for single paths.",
@@ -701,26 +796,47 @@
                 "properties": {
                   "access": {
                     "description": "The access level of the path.",
-                    "type": "string"
+                    "type": [
+                      "string",
+                      "null"
+                    ]
                   },
                   "auth-method": {
                     "description": "The authentication method of the path.",
-                    "type": "string"
+                    "type": [
+                      "string",
+                      "null"
+                    ]
                   },
                   "path": {
                     "description": "The path, for example /api/public.",
-                    "type": "string"
+                    "type": [
+                      "string",
+                      "null"
+                    ]
                   }
                 },
-                "type": "object"
+                "type": [
+                  "object",
+                  "null"
+                ]
               },
-              "type": "array"
+              "type": [
+                "array",
+                "null"
+              ]
             }
           },
-          "type": "object"
+          "type": [
+            "object",
+            "null"
+          ]
         }
       },
-      "type": "object"
+      "type": [
+        "object",
+        "null"
+      ]
     },
     "project": {
       "additionalProperties": true,
@@ -728,10 +844,16 @@
       "properties": {
         "name": {
           "description": "The project name.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
-      "type": "object"
+      "type": [
+        "object",
+        "null"
+      ]
     }
   },
   "title": "vcr.yml",

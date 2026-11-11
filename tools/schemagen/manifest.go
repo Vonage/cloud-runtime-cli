@@ -40,43 +40,50 @@ func manifestSchema(caps map[string]any) map[string]any {
 			"application-id": str("The ID of the Vonage application the debug session uses."),
 			"environment":    environment("Environment variables of the debug session."),
 			"entrypoint":     strList("The command that starts the application locally."),
-			"preserve-data":  map[string]any{"type": "boolean", "description": "Keep the session data after it stops."},
+			"preserve-data":  map[string]any{"type": orNull("boolean"), "description": "Keep the session data after it stops."},
 		}),
 		"application-capabilities": caps,
 	})
+	s["type"] = "object" // the document itself must be a mapping
 	s["$schema"] = "http://json-schema.org/draft-07/schema#"
 	s["$id"] = schemaID
 	s["title"] = "vcr.yml"
 	return s
 }
 
+// orNull adds null to a type: a key with no value, such as environment: with every entry commented out, decodes to null
+// and the CLI reads it as empty.
+func orNull(t string) []any {
+	return []any{t, "null"}
+}
+
 func object(description string, properties map[string]any) map[string]any {
 	return map[string]any{
-		"type": "object", "description": description, "properties": properties, "additionalProperties": true,
+		"type": orNull("object"), "description": description, "properties": properties, "additionalProperties": true,
 	}
 }
 
 func str(description string) map[string]any {
-	return map[string]any{"type": "string", "description": description}
+	return map[string]any{"type": orNull("string"), "description": description}
 }
 
 func integer(description string) map[string]any {
-	return map[string]any{"type": "integer", "description": description}
+	return map[string]any{"type": orNull("integer"), "description": description}
 }
 
 func list(description string, items map[string]any) map[string]any {
-	return map[string]any{"type": "array", "description": description, "items": items}
+	return map[string]any{"type": orNull("array"), "description": description, "items": items}
 }
 
 func strList(description string) map[string]any {
-	return list(description, map[string]any{"type": "string"})
+	return list(description, map[string]any{"type": orNull("string")})
 }
 
 func environment(description string) map[string]any {
 	return list(description, object("One environment variable.", map[string]any{
 		"name": str("The variable name."),
 		// The CLI reads an unquoted number or boolean as its text.
-		"value":  map[string]any{"type": []any{"string", "number", "boolean"}, "description": "The value."},
+		"value":  map[string]any{"type": []any{"string", "number", "boolean", "null"}, "description": "The value."},
 		"secret": str("The name of a secret that holds the value."),
 	}))
 }

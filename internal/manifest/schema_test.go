@@ -172,6 +172,15 @@ func TestSchemaRejectsAWrongValueAtItsPath(t *testing.T) {
 	}
 }
 
+// A key with no value, such as environment: with every entry commented out, decodes to null.
+func TestSchemaAcceptsEmptyKeys(t *testing.T) {
+	sch := compileSchema(t)
+	src := "project:\n  name:\ninstance:\n  name:\n  environment:\n  entrypoint:\n  scaling:\n    min-scale:\ndebug:\n"
+	_, err := manifest.Parse([]byte(src))
+	require.NoError(t, err)
+	require.NoError(t, validateYAML(t, sch, src))
+}
+
 func TestSchemaAllowsAKeyItDoesNotDescribe(t *testing.T) {
 	sch := compileSchema(t)
 	src := "project: {name: p}\ninstance: {name: dev}\napplication-capabilities:\n  voice:\n    new_field: 1\n"
