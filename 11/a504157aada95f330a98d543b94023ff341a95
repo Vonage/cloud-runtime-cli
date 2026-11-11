@@ -1,0 +1,36 @@
+openspec/changes/capabilities-generator/design.md
+  f209b36cbc976bbb 53,66-67
+openspec/changes/capabilities-generator/specs/capabilities-generator/spec.md
+  f209b36cbc976bbb 92-95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "11a504157aada95f330a98d543b94023ff341a95",
+  "prompts": {
+    "f209b36cbc976bbb": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "c541f550-9366-46e7-a5bb-7980437849bc",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-11T23:31:11.335Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
+          "timestamp": "2026-11-11T23:31:11.335Z"
+        }
+      ],
+      "total_additions": 7,
+      "total_deletions": 2,
+      "accepted_lines": 7,
+      "overriden_lines": 0
+    }
+  }
+}
