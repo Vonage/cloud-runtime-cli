@@ -28,11 +28,11 @@ type splice struct {
 }
 
 // AddCapabilities sets the capabilities in add (keyed by a name in CapabilityNames) in the manifest's
-// application-capabilities block, creating the block at the end of the file if needed. A capability already in the
-// block is skipped unless force is set, in which case it is replaced in place. Once the block holds anything,
-// instance.capabilities is removed. Only the block is re-encoded, with the file's indent; it and the
-// instance.capabilities lines are spliced into src by line, so every other byte is kept. A file with more than one
-// YAML document is refused, since only the first is read.
+// application-capabilities block, creating the block at the end of the document (before a "..." end marker) if
+// needed. A capability already in the block is skipped unless force is set, in which case it is replaced in place.
+// Once the block holds anything, instance.capabilities is removed. Only the block is re-encoded, with the file's
+// indent; it and the instance.capabilities lines are spliced into src by line, so every other byte is kept. A file
+// with more than one YAML document is refused, since only the first is read.
 func AddCapabilities(src []byte, add map[string]any, force bool) ([]byte, Result, error) {
 	var res Result
 	if err := checkNames(add); err != nil {
@@ -60,6 +60,7 @@ func AddCapabilities(src []byte, add map[string]any, force bool) ([]byte, Result
 		lines = lines[:len(lines)-1]
 	}
 	indent := detectIndent(root)
+	end := documentEnd(lines)
 
 	i, block, empty, err := capabilitiesBlock(root)
 	if err != nil {
@@ -81,10 +82,10 @@ func AddCapabilities(src []byte, add map[string]any, force bool) ([]byte, Result
 	var edits []splice
 	if changed {
 		key := scalar(blockKey)
-		from, to := len(lines), len(lines)
+		from, to := end, end
 		if i >= 0 {
 			key = root.Content[i]
-			from, to = entryRange(root, i, len(lines), lines)
+			from, to = entryRange(root, i, end, lines)
 		}
 		if empty && key.LineComment == "" {
 			k := *key
@@ -101,7 +102,7 @@ func AddCapabilities(src []byte, add map[string]any, force bool) ([]byte, Result
 		edits = append(edits, splice{from, to, text})
 	}
 	if len(block.Content) > 0 {
-		removed, edit, err := removeInstanceCapabilities(root, lines, indent)
+		removed, edit, err := removeInstanceCapabilities(root, lines, end, indent)
 		if err != nil {
 			return nil, res, err
 		}
@@ -178,8 +179,9 @@ func setCapability(block *yaml.Node, name string, value any, force bool, res *Re
 }
 
 // removeInstanceCapabilities returns the instance.capabilities scalar entries in file order and the splice that
-// removes the key: its lines, or the whole re-encoded instance entry when instance is written in flow style.
-func removeInstanceCapabilities(root *yaml.Node, lines []string, indent int) ([]string, *splice, error) {
+// removes the key: its lines, or the whole re-encoded instance entry when instance is written in flow style. end is
+// the line that ends the document.
+func removeInstanceCapabilities(root *yaml.Node, lines []string, end, indent int) ([]string, *splice, error) {
 	i := keyIndex(root, "instance")
 	if i < 0 || root.Content[i+1].Kind != yaml.MappingNode {
 		return nil, nil, nil
@@ -195,7 +197,7 @@ func removeInstanceCapabilities(root *yaml.Node, lines []string, indent int) ([]
 			removed = append(removed, entry.Value)
 		}
 	}
-	from, to := entryRange(root, i, len(lines), lines)
+	from, to := entryRange(root, i, end, lines)
 	if instance.Style&yaml.FlowStyle != 0 {
 		instance.Content = append(instance.Content[:j], instance.Content[j+2:]...)
 		text, err := encodeEntry(root.Content[i], instance, indent)
@@ -206,6 +208,22 @@ func removeInstanceCapabilities(root *yaml.Node, lines []string, indent int) ([]
 	}
 	from, to = entryRange(instance, j, to, lines)
 	return removed, &splice{from, to, ""}, nil
+}
+
+// documentEnd returns the index of a "..." document end marker line after the document, or len(lines) when there is
+// none. Only blank and comment lines may follow it: anything else is refused as a second document.
+func documentEnd(lines []string) int {
+	for n := len(lines) - 1; n >= 0; n-- {
+		line := strings.TrimRight(lines[n], "\r\n")
+		if trimmed := strings.TrimSpace(line); trimmed == "" || strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+		if rest, ok := strings.CutPrefix(line, "..."); ok && (rest == "" || rest[0] == ' ' || rest[0] == '\t') {
+			return n
+		}
+		break
+	}
+	return len(lines)
 }
 
 // entryRange returns the 0-based line range [from, to) of the key at index i of a block mapping: from the key's

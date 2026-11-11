@@ -347,6 +347,32 @@ func TestAddCapabilitiesAcceptsALeadingDocumentStart(t *testing.T) {
 	assert.Equal(t, "---\n"+smallManifest+"application-capabilities:\n  vbc: {}\n", string(out))
 }
 
+func TestAddCapabilitiesKeepsADocumentEndMarkerLast(t *testing.T) {
+	for name, tail := range map[string]string{
+		"a bare marker":                   "...\n",
+		"a marker before blanks/comments": "...\n\n# the end\n",
+	} {
+		t.Run(name, func(t *testing.T) {
+			out, _, err := manifest.AddCapabilities([]byte("project:\n  name: p\n"+tail), defaults(t, "voice"), false)
+
+			require.NoError(t, err)
+			assert.Equal(t, map[string]any{"voice": defaultOf(t, "voice")}, blockOf(t, out))
+			assert.True(t, strings.HasPrefix(string(out), "project:\n  name: p\napplication-capabilities:\n"), string(out))
+			assert.True(t, strings.HasSuffix(string(out), "\n"+tail), string(out))
+		})
+	}
+}
+
+func TestAddCapabilitiesKeepsADocumentEndMarkerAfterALastBlock(t *testing.T) {
+	src := smallManifest + "application-capabilities:\n  vbc: {}\n...\n"
+
+	out, _, err := manifest.AddCapabilities([]byte(src), defaults(t, "voice"), false)
+
+	require.NoError(t, err)
+	assert.Equal(t, defaults(t, "vbc", "voice"), blockOf(t, out))
+	assert.True(t, strings.HasSuffix(string(out), "\n...\n"), string(out))
+}
+
 func TestAddCapabilitiesRejectsAManifestThatIsNotAMapping(t *testing.T) {
 	for name, src := range map[string]string{
 		"empty":            "",
