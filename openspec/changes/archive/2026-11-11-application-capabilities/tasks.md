@@ -505,7 +505,7 @@ applied with `{{instance_url}}` replaced.
 
 ## 5. Check
 
-- [ ] 5.1 Run `cd <WT> && make lint test contract contract-rich docs`. Verify: all pass.
+- [x] 5.1 Run `cd <WT> && make lint test contract contract-rich docs`. Verify: all pass.
   - `make test` is `go test -race ./...`; CI repeats it on Linux, macOS and Windows. Nothing in this change builds paths or
     depends on newlines beyond Go's `\n`: the new tests compare parsed values, never YAML bytes, and the terminal tests use
     the same buffers as the existing ones. Do not add `filepath` or `os` assumptions to them. `make lint` also lints
@@ -525,12 +525,12 @@ applied with `{{instance_url}}` replaced.
     produce no diff.
   - `cd <WT> && git status --short docs/ test/` prints nothing; `git diff --stat origin/main` lists only `internal/` files and
     the change folder.
-- [ ] 5.2 Check the diff for anything a public repository must not carry: ticket keys, internal hostnames or URLs, internal
+- [x] 5.2 Check the diff for anything a public repository must not carry: ticket keys, internal hostnames or URLs, internal
   service or repository names, plan ids, tool names. Verify:
   read `cd <WT> && git diff origin/main` once through, and `git diff origin/main | grep -nE '[A-Z]{2,}-[0-9]+'` prints nothing
   (ticket-key shape).
-- [ ] 5.3 Run `cd <WT> && openspec validate application-capabilities --strict`. Verify: it passes.
-- [ ] 5.4 Archive the change as the last commit: `docs(openspec): archive application-capabilities`.
+- [x] 5.3 Run `cd <WT> && openspec validate application-capabilities --strict`. Verify: it passes.
+- [x] 5.4 Archive the change as the last commit: `docs(openspec): archive application-capabilities`.
   Verify: `cd <WT> && make test` still passes.
 
 ## Spec traceability
