@@ -302,6 +302,51 @@ func TestAddCapabilitiesAcceptsCRLFLineEndings(t *testing.T) {
 	assert.Equal(t, []string{"voice"}, res.Removed)
 }
 
+func TestAddCapabilitiesKeepsCommentedOutEntriesUnderAnEmptyBlockKey(t *testing.T) {
+	const comments = "application-capabilities:\n  # voice:\n  #   webhooks: {}\n"
+
+	out, res, err := manifest.AddCapabilities([]byte(smallManifest+comments), defaults(t, "voice"), false)
+
+	require.NoError(t, err)
+	assert.True(t, strings.HasPrefix(string(out), smallManifest+comments), string(out))
+	assert.Equal(t, map[string]any{"voice": defaultOf(t, "voice")}, blockOf(t, out))
+	assert.Equal(t, manifest.Result{Added: []string{"voice"}}, res)
+}
+
+func TestAddCapabilitiesWritesAnEmptyFlowBlockInBlockStyle(t *testing.T) {
+	out, _, err := manifest.AddCapabilities([]byte(smallManifest+"application-capabilities: {}\n"), defaults(t, "rtc"), false)
+
+	require.NoError(t, err)
+	assert.Equal(t, smallManifest+`application-capabilities:
+  rtc:
+    webhooks:
+      event_url:
+        address: '{{instance_url}}/rtc/event'
+        http_method: POST
+`, string(out))
+}
+
+func TestAddCapabilitiesRefusesAManifestWithMoreThanOneDocument(t *testing.T) {
+	for name, src := range map[string]string{
+		"a second document":           smallManifest + "---\ndebug:\n  name: debug\n",
+		"content after an end marker": smallManifest + "...\ndebug:\n  name: debug\n",
+	} {
+		t.Run(name, func(t *testing.T) {
+			_, _, err := manifest.AddCapabilities([]byte(src), defaults(t, "vbc"), false)
+
+			require.EqualError(t, err,
+				"manifest holds more than one YAML document: application-capabilities would not be read from the second")
+		})
+	}
+}
+
+func TestAddCapabilitiesAcceptsALeadingDocumentStart(t *testing.T) {
+	out, _, err := manifest.AddCapabilities([]byte("---\n"+smallManifest), defaults(t, "vbc"), false)
+
+	require.NoError(t, err)
+	assert.Equal(t, "---\n"+smallManifest+"application-capabilities:\n  vbc: {}\n", string(out))
+}
+
 func TestAddCapabilitiesRejectsAManifestThatIsNotAMapping(t *testing.T) {
 	for name, src := range map[string]string{
 		"empty":            "",

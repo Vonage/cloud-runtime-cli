@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"slices"
@@ -30,15 +31,22 @@ type splice struct {
 // application-capabilities block, creating the block at the end of the file if needed. A capability already in the
 // block is skipped unless force is set, in which case it is replaced in place. Once the block holds anything,
 // instance.capabilities is removed. Only the block is re-encoded, with the file's indent; it and the
-// instance.capabilities lines are spliced into src by line, so every other byte is kept.
+// instance.capabilities lines are spliced into src by line, so every other byte is kept. A file with more than one
+// YAML document is refused, since only the first is read.
 func AddCapabilities(src []byte, add map[string]any, force bool) ([]byte, Result, error) {
 	var res Result
 	if err := checkNames(add); err != nil {
 		return nil, res, err
 	}
 	var doc yaml.Node
-	if err := yaml.Unmarshal(src, &doc); err != nil {
+	dec := yaml.NewDecoder(bytes.NewReader(src))
+	if err := dec.Decode(&doc); err != nil && !errors.Is(err, io.EOF) {
 		return nil, res, err
+	}
+	// A second Decode that finds anything, even a syntax error after a "..." marker, means a second document.
+	if err := dec.Decode(new(yaml.Node)); !errors.Is(err, io.EOF) {
+		return nil, res, errors.New("manifest holds more than one YAML document: " +
+			blockKey + " would not be read from the second")
 	}
 	if doc.Kind != yaml.DocumentNode || len(doc.Content) == 0 || doc.Content[0].Kind != yaml.MappingNode {
 		return nil, res, errors.New("the manifest is not a YAML mapping")
@@ -53,7 +61,7 @@ func AddCapabilities(src []byte, add map[string]any, force bool) ([]byte, Result
 	}
 	indent := detectIndent(root)
 
-	i, block, err := capabilitiesBlock(root)
+	i, block, empty, err := capabilitiesBlock(root)
 	if err != nil {
 		return nil, res, err
 	}
@@ -78,9 +86,17 @@ func AddCapabilities(src []byte, add map[string]any, force bool) ([]byte, Result
 			key = root.Content[i]
 			from, to = entryRange(root, i, len(lines), lines)
 		}
+		if empty && key.LineComment == "" {
+			k := *key
+			k.LineComment = root.Content[i+1].LineComment
+			key = &k
+		}
 		text, err := encodeEntry(key, block, indent)
 		if err != nil {
 			return nil, res, err
+		}
+		if empty {
+			text = keepCommentLines(text, lines[from+1:to])
 		}
 		edits = append(edits, splice{from, to, text})
 	}
@@ -107,21 +123,37 @@ func checkNames(add map[string]any) error {
 }
 
 // capabilitiesBlock returns the index of the block's key in root (-1 when missing) and its mapping, a new empty one
-// when the key is missing or empty.
-func capabilitiesBlock(root *yaml.Node) (int, *yaml.Node, error) {
-	i := keyIndex(root, blockKey)
+// when the key is missing. empty reports a key whose value is null or an empty mapping: its mapping is a new block
+// style one, so a {} placeholder is not written as one long flow line.
+func capabilitiesBlock(root *yaml.Node) (i int, block *yaml.Node, empty bool, err error) {
+	i = keyIndex(root, blockKey)
 	if i < 0 {
-		return i, &yaml.Node{Kind: yaml.MappingNode, Tag: "!!map"}, nil
+		return i, &yaml.Node{Kind: yaml.MappingNode, Tag: "!!map"}, false, nil
 	}
 	value := root.Content[i+1]
 	switch {
+	case value.Kind == yaml.MappingNode && len(value.Content) == 0,
+		value.Kind == yaml.ScalarNode && value.Tag == "!!null":
+		return i, &yaml.Node{Kind: yaml.MappingNode, Tag: "!!map"}, true, nil
 	case value.Kind == yaml.MappingNode:
-		return i, value, nil
-	case value.Kind == yaml.ScalarNode && value.Tag == "!!null":
-		return i, &yaml.Node{Kind: yaml.MappingNode, Tag: "!!map"}, nil
+		return i, value, false, nil
 	default:
-		return i, nil, fmt.Errorf("%s in the manifest is not a mapping", blockKey)
+		return i, nil, false, fmt.Errorf("%s in the manifest is not a mapping", blockKey)
 	}
+}
+
+// keepCommentLines puts the comment and blank lines of an empty block's old range (the lines after its key) back
+// under the key line of its new text. yaml.v3 attaches them to the document or to the next key, so the encoder
+// would not write them.
+func keepCommentLines(text string, old []string) string {
+	var kept strings.Builder
+	for _, line := range old {
+		if trimmed := strings.TrimSpace(line); trimmed == "" || strings.HasPrefix(trimmed, "#") {
+			kept.WriteString(strings.TrimRight(line, "\r\n") + "\n")
+		}
+	}
+	keyLine, rest, _ := strings.Cut(text, "\n")
+	return keyLine + "\n" + kept.String() + rest
 }
 
 // setCapability sets or skips one capability and reports whether the block changed.
