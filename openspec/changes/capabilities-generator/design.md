@@ -43,11 +43,16 @@ dropped and `_` turned into `-`.
 - Rejected: defaults read from the schema file: the schema says what is allowed, not which webhooks to turn on.
 
 ### The manifest is edited as a `yaml.Node` tree
-A new `internal/manifest/edit.go` decodes the file into a `yaml.Node`, finds or creates the top-level
-`application-capabilities` mapping, sets or skips each capability key, deletes `instance.capabilities`, and encodes
-the tree with a two-space indent. The file is written to a temporary file in the same directory and renamed over
-the original, keeping its mode.
+A new `internal/manifest/edit.go` decodes the file into a `yaml.Node` only to locate keys (by line) and to merge:
+it finds or creates the top-level `application-capabilities` mapping and sets or skips each capability key. Only
+the block is encoded, with the indent the file already uses (two spaces when it has no nested key). The block
+replaces its old line range in the original bytes, or is appended at the end, and the lines of
+`instance.capabilities` are cut out, so every other byte of the file is unchanged. The file is written to a
+temporary file in the same directory and renamed over the original (the target, when the path is a symlink),
+keeping its mode.
 - Rejected: `Read` plus `Marshal`: drops comments and unknown keys.
+- Rejected: encoding the whole node tree: yaml.v3 re-indents every line and drops blank lines.
+- Rejected: appending text to the file: cannot merge into an existing block or remove `instance.capabilities`.
 - Rejected: appending text to the file: cannot merge into an existing block or remove `instance.capabilities`.
 
 ### The schema is generated once and committed
@@ -81,7 +86,8 @@ record a classic transcript from. `allowed-diffs.txt` gets one line for the `vcr
   errors; `make schema` regenerates it.
 - [`meetings` exists only in the response schema and may be retired by Vonage] → It is generated like the others;
   a platform error on deploy is the signal to drop it.
-- [yaml.v3 re-encodes the whole node tree, which can change spacing or line wrapping elsewhere] → The test for the
-  spec's "rest of the manifest is kept" requirement compares every untouched line of a commented corpus file.
+- [yaml.v3 re-encodes the block, which can change its spacing, blank lines or line wrapping] → The risk is confined
+  to the block: the test for the spec's "rest of the manifest is kept" requirement compares every other line of a
+  commented, four-space corpus file byte for byte.
 - [Rich-only scenarios are pinned from the branch, not a baseline] → They are regression pins reviewed like any
   rich golden; there is no older behaviour to compare with.
