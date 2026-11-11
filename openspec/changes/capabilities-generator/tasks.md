@@ -31,7 +31,7 @@ packages it touched, and every group ends with `cd <WT> && make test lint` passi
 
 ## 2. Manifest editor
 
-- [ ] 2.1 Failing tests in new `internal/manifest/edit_test.go` for `AddCapabilities(src []byte, add map[string]any,
+- [x] 2.1 Failing tests in new `internal/manifest/edit_test.go` for `AddCapabilities(src []byte, add map[string]any,
   force bool) (out []byte, Result, error)`; `Result` lists added, replaced, skipped and the removed
   `instance.capabilities` entries. Cases: empty block created at the end of the file; merge into an existing block;
   skip without force; replace with force and leave other capabilities alone; `instance.capabilities` removed and its
@@ -39,7 +39,7 @@ packages it touched, and every group ends with `cd <WT> && make test lint` passi
   top-level `custom: 1`, quoted strings) whose every line outside the block and `instance.capabilities` is unchanged
   in the output; a file whose top level is not a mapping returns an error. Verify: `cd <WT> && go test
   ./internal/manifest/ -run TestAddCapabilities` fails, then passes after 2.2.
-- [ ] 2.2 Implement `internal/manifest/edit.go` on `yaml.Node` (decode, find or append the top-level mapping key,
+- [x] 2.2 Implement `internal/manifest/edit.go` on `yaml.Node` (decode, find or append the top-level mapping key,
   set or skip each child, delete `instance.capabilities`, encode with `SetIndent(2)`), plus `WriteFileAtomic(path,
   data)` (temp file in the same directory, keep the mode, rename). Test `WriteFileAtomic` keeps a `0600` mode. Verify:
   the 2.1 tests and `cd <WT> && go test ./internal/manifest/...` pass.
