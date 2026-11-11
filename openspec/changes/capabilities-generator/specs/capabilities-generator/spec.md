@@ -89,6 +89,10 @@ Comments, key order, quoting and keys the CLI does not know SHALL stay as they w
 - **WHEN** the manifest has a comment above `instance:` and a top-level key `custom: 1`, and `vcr app capabilities add --rtc` runs
 - **THEN** the written manifest still has the comment in the same place and `custom: 1`
 
+#### Scenario: Commented-out entries survive
+- **WHEN** the block is `application-capabilities:` followed only by commented-out lines and `vcr app capabilities add --voice` runs
+- **THEN** the comment lines are still in the file
+
 ### Requirement: The manifest is found like deploy finds it
 The command SHALL write to the manifest named by `--filename`, or else the one `vcr deploy` would pick in the
 current directory (the newest of the manifest file names it accepts). When there is none, it SHALL

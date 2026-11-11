@@ -50,9 +50,9 @@ replaces its old line range in the original bytes, or is appended at the end, an
 `instance.capabilities` are cut out, so every other byte of the file is unchanged. The file is written to a
 temporary file in the same directory and renamed over the original (the target, when the path is a symlink),
 keeping its mode.
+A file with more than one YAML document is refused, because only the first is read.
 - Rejected: `Read` plus `Marshal`: drops comments and unknown keys.
 - Rejected: encoding the whole node tree: yaml.v3 re-indents every line and drops blank lines.
-- Rejected: appending text to the file: cannot merge into an existing block or remove `instance.capabilities`.
 - Rejected: appending text to the file: cannot merge into an existing block or remove `instance.capabilities`.
 
 ### The schema is generated once and committed
@@ -63,7 +63,8 @@ booleans, sets `additionalProperties: true` on every object, and allows `{{insta
 them plain strings. The hand-written part of the generator holds the rest of the manifest (`project`, `instance`,
 `debug`) as a Go literal mirroring the `manifest` structs.
 Scalar types are strict outside `environment[].value`: an unquoted `2024` in a string field or `yes` in a boolean
-field is flagged as a hint, though yaml.v3 accepts both; null is allowed everywhere because an empty key is common.
+field is flagged as a hint, though yaml.v3 accepts both; null is allowed in `project`, `instance`, `debug` and
+for `application-capabilities` itself; the generated part keeps the definition's types.
 - Rejected: fetching the definition in CI: it is not published at a stable public URL.
 - Rejected: a hand-written capabilities schema: 85 KB of definition would drift without a regeneration path.
 
