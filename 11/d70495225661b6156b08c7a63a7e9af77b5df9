@@ -1,0 +1,36 @@
+internal/manifest/edit.go
+  adb305955b0cafd8 31-35,63,85,88,105,182-184,200,213-228
+internal/manifest/edit_test.go
+  adb305955b0cafd8 350-375
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "11d70495225661b6156b08c7a63a7e9af77b5df9",
+  "prompts": {
+    "adb305955b0cafd8": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "f7119241-0c64-4b12-8528-41452538d6dc",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-11T23:44:49.358Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
+          "timestamp": "2026-11-11T23:44:49.358Z"
+        }
+      ],
+      "total_additions": 55,
+      "total_deletions": 11,
+      "accepted_lines": 55,
+      "overriden_lines": 0
+    }
+  }
+}
