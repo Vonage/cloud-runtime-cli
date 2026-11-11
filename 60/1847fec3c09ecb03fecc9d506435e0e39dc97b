@@ -1,0 +1,19 @@
+openspec/changes/application-capabilities/design.md
+  s_8b859cc85c82de::t_aba98f7331565f 1-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "601847fec3c09ecb03fecc9d506435e0e39dc97b",
+  "prompts": {},
+  "sessions": {
+    "s_8b859cc85c82de": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9137fdcd-73ea-47ef-8a8e-7180df868c29",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
