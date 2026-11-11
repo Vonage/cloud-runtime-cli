@@ -164,7 +164,7 @@ Wire contract used here: request field `applicationCapabilities` on `POST /packa
 optional response object `applicationCapabilities` on `POST /deployments` and `POST /debug/services`, the block as
 applied with `{{instance_url}}` replaced.
 
-- [ ] 2.1 Failing tests in new `internal/platform/appcaps_test.go` (package `platform`; helpers `newRouteServer`,
+- [x] 2.1 Failing tests in new `internal/platform/appcaps_test.go` (package `platform`; helpers `newRouteServer`,
   `newRouteServerAt`, `answerJSON`, `mustJSON`, `assertCredentialsSent` from `helpers_test.go` / `routes_helpers_test.go`).
   - `TestCreatePackageSendsTheBlockOnEveryVersion`: block =
     `map[string]any{"voice": map[string]any{"signed_callbacks": true, "webhooks": map[string]any{"answer_url": map[string]any{"address": "{{instance_url}}/answer", "http_method": "POST"}}}}`;
@@ -210,7 +210,7 @@ applied with `{{instance_url}}` replaced.
   - `TestNotAppliedNoticeText`: pins the literal `application-capabilities was not applied: this region's platform did not report applying it`.
   - `TestWebhookLabelIsSanitised`: `WebhookAddress{Path: "voice.\x1b[31mx"}.Label()` is `Webhook voice.x`.
   - Verify: `cd <WT> && go test ./internal/platform/` fails to compile.
-- [ ] 2.2 Request and response types.
+- [x] 2.2 Request and response types.
   - `internal/platform/deployments.go:32-39` `PackageRequest`: append, after `Name`,
     `ApplicationCapabilities map[string]any \`json:"applicationCapabilities,omitempty"\``. `CreatePackage` (:43-57)
     is untouched: no `semver` gate, so the field goes out on every version.
@@ -228,7 +228,7 @@ applied with `{{instance_url}}` replaced.
   - Update every existing call (add `, nil`): `internal/platform/debugservices_test.go:41,59,83,95,105,114`,
     `internal/platform/deployments_test.go:319`, `internal/platform/routes_fake_test.go:129`. Line :41 passes
     `nil` here; the new test in 2.1 passes the block.
-- [ ] 2.3 New `internal/platform/appcaps.go` (stays far below 400 lines):
+- [x] 2.3 New `internal/platform/appcaps.go` (stays far below 400 lines):
   ```go
   // NotAppliedNotice is what a command warns when it sent a block and the response has none.
   const NotAppliedNotice = "application-capabilities was not applied: this region's platform did not report applying it"
@@ -273,13 +273,13 @@ applied with `{{instance_url}}` replaced.
   (`joinPath` is `key` when `path == ""`, else `path + "." + key`.) It never sanitises: callers sanitise the address,
   `Label` sanitises the path.
   - Verify: `cd <WT> && go test ./internal/platform/` passes.
-- [ ] 2.4 `internal/debugsession` compiles again with the new signature (no behaviour yet):
+- [x] 2.4 `internal/debugsession` compiles again with the new signature (no behaviour yet):
   - `internal/debugsession/debugsession.go:19` interface: add `appCaps map[string]any` as the last parameter.
   - Call sites `run.go:133` and `rich.go:21`: pass `nil` (group 4 passes the block).
   - Fake `internal/debugsession/localapi_test.go:74`: add the parameter; add `AppCaps map[string]any` to `deployCall` (:31-35)
     and fill it. Callers `localapi_self_test.go:21,49,61`: add `, nil`.
   - Verify: `cd <WT> && go build ./... && go vet ./... && go test ./internal/platform/ ./internal/debugsession/`.
-- [ ] 2.5 Commit: `feat: let the platform client send and read an application-capabilities block`.
+- [x] 2.5 Commit: `feat: let the platform client send and read an application-capabilities block`.
   Before it: `cd <WT> && make test`.
 
 ## 3. Deploy

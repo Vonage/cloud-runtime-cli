@@ -18,7 +18,7 @@ const forwardingNotice = "Forwarding requests. Press Ctrl+C to stop."
 
 func (s *session) deployServiceRich() (platform.DebugService, error) {
 	step := s.tio.StartStep("Deploying debug server")
-	service, err := s.api.DeployDebugService(s.setup, s.region.Alias, s.cfg.AppID, s.cfg.Name, s.caps)
+	service, err := s.api.DeployDebugService(s.setup, s.region.Alias, s.cfg.AppID, s.cfg.Name, s.caps, nil)
 	if err != nil {
 		step.Stop()
 		return service, err

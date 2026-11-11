@@ -130,7 +130,7 @@ func (s *session) deployService() (platform.DebugService, error) {
 		return s.deployServiceRich()
 	}
 	stop := s.tio.StartSpinner(" Deploying debug server...")
-	service, err := s.api.DeployDebugService(s.setup, s.region.Alias, s.cfg.AppID, s.cfg.Name, s.caps)
+	service, err := s.api.DeployDebugService(s.setup, s.region.Alias, s.cfg.AppID, s.cfg.Name, s.caps, nil)
 	stop()
 	return service, err
 }

@@ -16,7 +16,7 @@ import (
 
 // API is the part of *platform.Client that a debug session uses.
 type API interface {
-	DeployDebugService(ctx context.Context, region, appID, name string, caps manifest.Capabilities) (platform.DebugService, error)
+	DeployDebugService(ctx context.Context, region, appID, name string, caps manifest.Capabilities, appCaps map[string]any) (platform.DebugService, error)
 	DebugServiceReady(ctx context.Context, serviceName string) (bool, error)
 	DeleteDebugService(ctx context.Context, serviceName string, preserveData bool) error
 	DialWebsocket(ctx context.Context, u *url.URL, header http.Header) (*websocket.Conn, *http.Response, error)
