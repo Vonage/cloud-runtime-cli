@@ -26,6 +26,17 @@ func (r *runner) summary(deployed platform.DeployResult) {
 	for _, url := range deployed.HostURLs {
 		b.WriteString(line(yellow("|"), yellow("Instance host address:"), term.YellowBold(term.Sanitize(url))))
 	}
+	for _, a := range platform.WebhookAddresses(deployed.ApplicationCapabilities) {
+		b.WriteString(line(yellow("|"), yellow(a.Label()+":"), term.YellowBold(term.Sanitize(a.Address))))
+	}
 	b.WriteString(line(yellow(`\-------`)))
 	fmt.Fprint(r.t.Out, b.String())
+}
+
+// warnNotApplied says on stderr that a block that was sent has no counterpart in the response.
+func (r *runner) warnNotApplied(deployed platform.DeployResult) {
+	if len(r.p.Manifest.ApplicationCapabilities) == 0 || platform.Applied(deployed.ApplicationCapabilities) {
+		return
+	}
+	fmt.Fprintf(r.t.ErrOut, "%s %s\n", r.c.WarningIcon(), platform.NotAppliedNotice)
 }

@@ -187,6 +187,9 @@ func (r *runner) summaryRich(deployed platform.DeployResult) {
 	for _, url := range deployed.HostURLs {
 		rows = append(rows, term.Row{Label: "Instance host address", Value: term.Sanitize(url)})
 	}
+	for _, a := range platform.WebhookAddresses(deployed.ApplicationCapabilities) {
+		rows = append(rows, term.Row{Label: a.Label(), Value: term.Sanitize(a.Address)})
+	}
 	fmt.Fprintln(r.t.Out)
 	r.t.Block(r.c.SuccessIcon(), "Instance has been deployed!", rows, true)
 }

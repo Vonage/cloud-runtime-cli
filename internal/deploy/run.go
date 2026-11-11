@@ -13,7 +13,9 @@ import (
 // requests, as v2.6.1 does ("failed to parse capabilities: %w"). Run executes v2.6.1's stage order — project (GET, then POST on 404), validate, package, upload, create package,
 // build (the status route polled on clk decides; the watch's frames printed through term.SanitizeStream), deploy — and prints the
 // final block with today's exact lines ("Instance has been deployed!", "Instance id: …", "Instance service name: …",
-// and one "Instance host address: <url>" per host URL, the URL wrapped in term.YellowBold).
+// one "Instance host address: <url>" per host URL, the URL wrapped in term.YellowBold, then one "Webhook <path>: <address>"
+// per address of the applied application-capabilities block). When the manifest's block was sent and the response
+// does not show it applied, a warning goes to stderr before that block.
 func Run(ctx context.Context, t *term.IO, api API, clk clock.Clock, p Plan) error {
 	if p.Manifest == nil {
 		p.Manifest = &manifest.Manifest{}
@@ -68,6 +70,7 @@ func (r *runner) run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	r.warnNotApplied(deployed)
 	r.summary(deployed)
 	return nil
 }

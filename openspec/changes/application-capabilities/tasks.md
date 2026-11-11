@@ -284,7 +284,7 @@ applied with `{{instance_url}}` replaced.
 
 ## 3. Deploy
 
-- [ ] 3.1 Failing tests in new `internal/cli/deploy/appcaps_test.go` (package `deploy`; helpers `newEnv`, `newEnvAt`, `execute`,
+- [x] 3.1 Failing tests in new `internal/cli/deploy/appcaps_test.go` (package `deploy`; helpers `newEnv`, `newEnvAt`, `execute`,
   `manifestYAML`, `writeProject`, `requestsOf`, `requestNamed`, `jsonBody`, `defaultSettings`, `good` from `env_test.go` and
   `fake_test.go`; the fake platform needs no change: it ignores the new request field and answers without the new
   response field).
@@ -315,7 +315,7 @@ applied with `{{instance_url}}` replaced.
     `"! " + platform.NotAppliedNotice + "\n"`; `stdout.String()` ends with the usual
     `| Instance host address: ...` / `\-------` block and `assert.NotContains(t, stdout.String(), "Webhook ")`.
   - Verify: `cd <WT> && go test ./internal/cli/deploy/` fails.
-- [ ] 3.2 Wire the check into the command.
+- [x] 3.2 Wire the check into the command.
   - `internal/cli/deploy/plan.go`: add
     ```go
     // flagCapabilities is the --capabilities value split on commas as typed, or nil when the flag is empty.
@@ -335,7 +335,7 @@ applied with `{{instance_url}}` replaced.
     ```
     The error is returned as is (no prefix), so `clierr.Render` prints it once and the exit code is 1.
   - Verify: the refusal rows of 3.1 pass.
-- [ ] 3.3 Failing tests in new `internal/deploy/appcaps_test.go` (package `deploy`; `newHarness`, `fakeAPI`, `finalBlock`,
+- [x] 3.3 Failing tests in new `internal/deploy/appcaps_test.go` (package `deploy`; `newHarness`, `fakeAPI`, `finalBlock`,
   `wantBlock`, `hostLine` from `deploy_test.go`, `fake_api_test.go`, `summary_test.go`; `newRichRun`, `lines`,
   `squashed`, `blockFrom` from `rich_test.go`).
   - Add helper `webhookLine(path, address string) string { return "| Webhook " + path + ": " + term.YellowBold(address) + "\n" }`.
@@ -373,7 +373,7 @@ applied with `{{instance_url}}` replaced.
     Each `require.NoError(t, h.run())`: the deploy exits 0. One extra rich row (`newRichRun`, `term.Rich`):
     `assert.Contains(t, r.stderr.Raw(), platform.NotAppliedNotice)` and the stdout screen is the usual one.
   - Verify: `cd <WT> && go test ./internal/deploy/` fails.
-- [ ] 3.4 Send, show and warn.
+- [x] 3.4 Send, show and warn.
   - `internal/deploy/stages.go:205-212` `packageRequest`: add `ApplicationCapabilities: r.p.Manifest.ApplicationCapabilities,`
     to the `platform.PackageRequest` literal (`Run` already guarantees `Manifest` is non-nil, `run.go:18-20`). No version check.
   - `internal/deploy/summary.go:26-29` classic: after the host loop and before `\-------`:
@@ -395,7 +395,7 @@ applied with `{{instance_url}}` replaced.
     and in `internal/deploy/run.go:67-71` call `r.warnNotApplied(deployed)` between `r.deploy(...)` and `r.summary(deployed)`,
     so the warning comes before the summary block. Update the doc comment of `Run` (:12-16) to mention the webhook lines.
   - Verify: `cd <WT> && go test ./internal/deploy/ ./internal/cli/deploy/ ./internal/platform/`.
-- [ ] 3.5 Commit: `feat: send the application-capabilities block on vcr deploy and show the addresses applied`.
+- [x] 3.5 Commit: `feat: send the application-capabilities block on vcr deploy and show the addresses applied`.
   Before it: `cd <WT> && make test`.
 
 ## 4. Debug
