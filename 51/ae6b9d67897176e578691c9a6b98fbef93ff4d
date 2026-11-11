@@ -1,52 +1,30 @@
-Makefile
-  27d684f889c604ee 74-78,175
-README.md
-  27d684f889c604ee 71-72
-go.mod
-  27d684f889c604ee 17
-go.sum
-  27d684f889c604ee 29-30,83-84
-internal/manifest/schema_test.go
-  27d684f889c604ee 1-179
-openspec/changes/capabilities-generator/tasks.md
-  27d684f889c604ee 79,85,91
-schema/vcr.schema.json
-  27d684f889c604ee 1-739
 tools/schemagen/main.go
-  27d684f889c604ee 1-191
-tools/schemagen/main_test.go
-  27d684f889c604ee 1-102
+  s_8f29aed92d4586::t_3ea40fbd7d1ca5 1-191
+Makefile
+  s_8f29aed92d4586::t_2b58437c8726f4 74-78
 tools/schemagen/manifest.go
-  27d684f889c604ee 1-82
+  s_8f29aed92d4586::t_4dda664911cc8e 1-82
+internal/manifest/schema_test.go
+  s_8f29aed92d4586::t_7d41607e52f6f0 1-110,113-120,133-179
+  s_8f29aed92d4586::t_4a74efcf062036 111-112,121-132
+tools/schemagen/main_test.go
+  s_8f29aed92d4586::t_8153d8a239afee 1-102
+README.md
+  s_8f29aed92d4586::t_bf5a6b168a43fd 71-72
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "vonage-override-1.0.0",
+  "git_ai_version": "1.7.5",
   "base_commit_sha": "51ae6b9d67897176e578691c9a6b98fbef93ff4d",
-  "prompts": {
-    "27d684f889c604ee": {
+  "prompts": {},
+  "sessions": {
+    "s_8f29aed92d4586": {
       "agent_id": {
         "tool": "kiro",
-        "id": "0e7c8aa8-a51f-4a9e-808a-0ac139a8b296",
-        "model": "claude-opus-5.5"
+        "id": "sess_0276e312-5042-41e2-ac18-64c60c7380c7",
+        "model": "auto"
       },
-      "human_author": "Simon Chan <simon.chan@vonage.com>",
-      "messages": [
-        {
-          "type": "user",
-          "text": "[vg-ai attribution override: 100% AI]",
-          "timestamp": "2026-11-11T21:48:20.134Z"
-        },
-        {
-          "type": "assistant",
-          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
-          "timestamp": "2026-11-11T21:48:20.134Z"
-        }
-      ],
-      "total_additions": 1309,
-      "total_deletions": 4,
-      "accepted_lines": 1309,
-      "overriden_lines": 0
+      "human_author": "Simon Chan <simon.chan@vonage.com>"
     }
   }
 }
