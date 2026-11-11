@@ -1,0 +1,5 @@
+# vcr rich golden v1
+exit 1
+@@ stdout 126
+✗ no capability given: pass one or more of --voice, --messages, --rtc, --verify, --video, --vbc, --meetings, --network-apis
+

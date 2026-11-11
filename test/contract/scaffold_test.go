@@ -99,8 +99,8 @@ func TestGoldenHelpCoversEveryCommand(t *testing.T) {
 	if err := json.Unmarshal(raw, &tree); err != nil {
 		t.Fatalf("decode contract-tree.json: %v", err)
 	}
-	if len(tree) != 27 {
-		t.Errorf("contract tree has %d commands, want 27", len(tree))
+	if len(tree) != 29 {
+		t.Errorf("contract tree has %d commands, want 29", len(tree))
 	}
 
 	want := map[string]bool{}

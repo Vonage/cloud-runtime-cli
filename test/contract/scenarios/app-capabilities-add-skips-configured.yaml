@@ -1,0 +1,22 @@
+description: "a capability already in the block is skipped without --force"
+args: [app, capabilities, add, --filename, vcr.yml, --voice, --rtc]
+cwd: work/project
+tty: true
+presentation: rich
+files:
+  - path: work/project/vcr.yml
+    content: |
+      project:
+        name: my-project
+      application-capabilities:
+        voice:
+          webhooks:
+            answer_url:
+              address: https://example.com/answer
+              http_method: GET
+      instance:
+        name: dev
+        runtime: nodejs18
+        region: aws.euw1
+        entrypoint: [node, index.js]
+expect-reads: []

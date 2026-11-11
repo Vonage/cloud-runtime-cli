@@ -61,14 +61,14 @@ packages it touched, and every group ends with `cd <WT> && make test lint` passi
 
 ## 4. Contract harness
 
-- [ ] 4.1 Add the `vcr app capabilities` and `vcr app capabilities add` nodes to
+- [x] 4.1 Add the `vcr app capabilities` and `vcr app capabilities add` nodes to
   `test/contract/testdata/contract-tree.json`, add `capabilities` to the `vcr app` children, update its Long and
   Example. Verify: `cd <WT> && go test ./internal/cli/ -run TestContractTree` passes.
-- [ ] 4.2 Add `vcr_app_capabilities.txt` and `vcr_app_capabilities_add.txt` to `testdata/golden-help/`, re-record
+- [x] 4.2 Add `vcr_app_capabilities.txt` and `vcr_app_capabilities_add.txt` to `testdata/golden-help/`, re-record
   `vcr_app.txt`, set `goldenPages` to 29 in `internal/cli/golden_test.go`, and add one `allowed-diffs.txt` line for the
   `vcr app` help scenario (reason: `vcr app capabilities was added`). Verify: `cd <WT> && go test ./internal/cli/
   -run Golden` passes.
-- [ ] 4.3 Add rich-only terminal scenarios `test/contract/scenarios/app-capabilities-*.yaml` that together use every
+- [x] 4.3 Add rich-only terminal scenarios `test/contract/scenarios/app-capabilities-*.yaml` that together use every
   flag of the new command, record them with `make contract-rich-record SCENARIO='app-capabilities-*'`, and add an
   `app capabilities: app-capabilities-*` row to `coverage.txt`. If the harness cannot run a rich-only scenario for a
   command the baseline lacks, stop and ask. Verify: `cd <WT> && make contract contract-rich contract-baseline-check`

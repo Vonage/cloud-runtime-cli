@@ -1,0 +1,17 @@
+description: "Video, VBC and Meetings are added to the manifest and instance.capabilities is removed"
+args: [app, capabilities, add, --video, --vbc, --meetings]
+cwd: work/project
+tty: true
+presentation: rich
+files:
+  - path: work/project/vcr.yml
+    content: |
+      project:
+        name: my-project
+      instance:
+        name: dev
+        runtime: nodejs18
+        region: aws.euw1
+        capabilities: [voice, messages]
+        entrypoint: [node, index.js]
+expect-reads: []

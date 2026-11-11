@@ -1,0 +1,8 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 299
+✓ Added video to application-capabilities in <WORK>/project/vcr.yml
+✓ Added vbc to application-capabilities in <WORK>/project/vcr.yml
+✓ Added meetings to application-capabilities in <WORK>/project/vcr.yml
+! Removed instance.capabilities (voice, messages): application-capabilities replaces it
+

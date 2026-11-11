@@ -20,6 +20,7 @@ AVAILABLE COMMANDS
   remove (rm)    Remove a Vonage application
   list (ls)      List all Vonage applications in your account
   generate-keys  Generate new key pairs for an existing application
+  capabilities   Manage the application-capabilities block in vcr.yml
 
 WORKFLOW
   1. Create an application: vcr app create --name my-app
@@ -45,6 +46,9 @@ $ vcr app list
 # List applications filtered by name
 $ vcr app list --filter "production"
 
+# Add the default Voice and Messages capabilities to vcr.yml
+$ vcr app capabilities add --voice --messages
+
 ```
 
 ### Options inherited from parent commands
@@ -63,6 +67,7 @@ $ vcr app list --filter "production"
 ### SEE ALSO
 
 * [vcr](vcr.md)	 - Streamline your Vonage Cloud Runtime development and management tasks with VCR
+* [vcr app capabilities](vcr_app_capabilities.md)	 - Manage the application-capabilities block in vcr.yml
 * [vcr app create](vcr_app_create.md)	 - Create a new Vonage application
 * [vcr app generate-keys](vcr_app_generate-keys.md)	 - Generate new key pairs for a Vonage application
 * [vcr app list](vcr_app_list.md)	 - List all Vonage applications in your account
