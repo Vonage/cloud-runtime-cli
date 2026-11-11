@@ -266,6 +266,22 @@ func TestCapabilitiesAddWithoutManifestFailsAndCreatesNothing(t *testing.T) {
 	assert.Empty(t, entries)
 }
 
+func TestCapabilitiesAddWithAMissingFilenameDoesNotSuggestPrint(t *testing.T) {
+	for name, extra := range map[string][]string{"write": nil, "print": {"--print"}} {
+		t.Run(name, func(t *testing.T) {
+			h, dir := capsHarness(t)
+			missing := filepath.Join(dir, "missing.yml")
+
+			err := h.Run(t.Context(), app.NewCmd, append([]string{"capabilities", "add", "--voice", "-f", missing}, extra...)...)
+
+			require.EqualError(t, err, "failed to find flag manifest file: manifest file not found")
+			entries, err := os.ReadDir(dir)
+			require.NoError(t, err)
+			assert.Empty(t, entries)
+		})
+	}
+}
+
 func TestCapabilitiesAddPrintWithoutManifest(t *testing.T) {
 	h, dir := capsHarness(t)
 

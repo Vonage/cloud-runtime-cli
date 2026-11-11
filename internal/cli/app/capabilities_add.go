@@ -172,7 +172,10 @@ func readManifest(f capabilitiesAddFlags) (string, []byte, error) {
 	}
 	path, err := manifest.Find(dir, f.filename)
 	if err != nil {
-		if f.print && f.filename == "" {
+		if f.filename != "" {
+			return "", nil, err
+		}
+		if f.print {
 			return "", []byte(capabilitiesKey + ":\n"), nil
 		}
 		return "", nil, fmt.Errorf("%w (use --print to see the block without a manifest)", err)
