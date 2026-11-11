@@ -12,7 +12,12 @@ The repository SHALL carry `schema/vcr.schema.json`, a JSON Schema (draft-07) fo
 be reachable at a stable URL on the default branch.
 
 #### Scenario: A manifest the CLI accepts passes
-- **WHEN** a manifest the CLI deploys without error is checked against the schema
+- **WHEN** a manifest the CLI deploys without error is checked against the schema, and its string fields hold
+  strings, its integer fields integers and its boolean fields true or false
+- **THEN** it passes
+
+#### Scenario: An empty key passes
+- **WHEN** `debug:` has no value
 - **THEN** it passes
 
 #### Scenario: A wrong type fails

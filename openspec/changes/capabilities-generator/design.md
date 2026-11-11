@@ -62,6 +62,8 @@ with all eight), inlines the local `$ref`s, drops `example` and `x-*` keys, turn
 booleans, sets `additionalProperties: true` on every object, and allows `{{instance_url}}` in addresses by keeping
 them plain strings. The hand-written part of the generator holds the rest of the manifest (`project`, `instance`,
 `debug`) as a Go literal mirroring the `manifest` structs.
+Scalar types are strict outside `environment[].value`: an unquoted `2024` in a string field or `yes` in a boolean
+field is flagged as a hint, though yaml.v3 accepts both; null is allowed everywhere because an empty key is common.
 - Rejected: fetching the definition in CI: it is not published at a stable public URL.
 - Rejected: a hand-written capabilities schema: 85 KB of definition would drift without a regeneration path.
 
