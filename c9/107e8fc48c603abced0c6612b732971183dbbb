@@ -1,0 +1,34 @@
+openspec/changes/deploy-progress/specs/deploy-progress/spec.md
+  08df057281540f68 143-144,150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "c9107e8fc48c603abced0c6612b732971183dbbb",
+  "prompts": {
+    "08df057281540f68": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "96b99626-e1b3-4ec9-915d-b6f4d9c75c46",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-12T11:34:20.060Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
+          "timestamp": "2026-11-12T11:34:20.060Z"
+        }
+      ],
+      "total_additions": 3,
+      "total_deletions": 2,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    }
+  }
+}
