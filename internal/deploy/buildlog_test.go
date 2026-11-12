@@ -73,6 +73,13 @@ func TestBuildLogReadsPhaseAndKindFromOpeningWords(t *testing.T) {
 			{"ℹ WORKDIR /app", frameHidden, "Copying source"},
 			{"ℹ Pushed vcr.registry/x@sha256:1", frameHidden, "Pushing image"},
 		}},
+		{"a marker inside the script is script output", []readFrame{
+			{"ℹ Cmd: /bin/sh", frameHidden, "Running build script"},
+			{"ℹ Pushed 3 files", frameScript, "Running build script"},
+			{"ℹ COPY assets", frameScript, "Running build script"},
+			{"ℹ Retrieving image list", frameScript, "Running build script"},
+			{"ℹ Taking snapshot of full filesystem...", frameHidden, "Saving image"},
+		}},
 		{"a second script after a snapshot is script output again", []readFrame{
 			{"ℹ Cmd: /bin/sh", frameHidden, "Running build script"},
 			{"ℹ npm ci", frameScript, "Running build script"},

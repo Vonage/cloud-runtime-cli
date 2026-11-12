@@ -28,7 +28,8 @@ Later frames SHALL move the phase only through the phase markers, and the phase 
 These opening words SHALL set a phase: `Retrieving image`: Pulling base image. `Unpacking rootfs`, `Initializing
 snapshotter`: Mounting filesystem. `WORKDIR `, `COPY `: Copying source. `Cmd: /bin/sh`: Running build script.
 `Taking snapshot of full filesystem`: Saving image once the script ran, else Mounting filesystem. `Pushing image
-to`, `Pushed `: Pushing image.
+to`, `Pushed `: Pushing image. While the build script runs only `Taking snapshot of full filesystem` SHALL move the
+phase; another marker there is script output.
 
 #### Scenario: the phases of a build
 - **WHEN** the stream sends `ℹ Instance source code initialized successfully`, `ℹ Retrieving image manifest x`,
@@ -36,6 +37,10 @@ to`, `Pushed `: Pushing image.
   `ℹ Taking snapshot of full filesystem...`, `ℹ Pushing image to vcr.registry/x:1`
 - **THEN** the phase is, after each frame in turn, Preparing source, Pulling base image, Mounting filesystem,
   Copying source, Running build script, Running build script, Saving image, Pushing image
+
+#### Scenario: a marker inside the build script
+- **WHEN** the stream sends `ℹ Cmd: /bin/sh` and then `ℹ Pushed 3 files`
+- **THEN** `Pushed 3 files` is build script output and the phase stays Running build script
 
 ### Requirement: Build script output
 The build script's output SHALL be the frames after a `Cmd: /bin/sh` frame and before the next `Taking snapshot of

@@ -35,7 +35,8 @@ const (
 	maxLogFrames = 2000
 )
 
-// phaseMarkers are the opening words that move the phase. A snapshot before any script is phaseMounting.
+// phaseMarkers are the opening words that move the phase. A snapshot before any script is phaseMounting, and while
+// the script runs only a snapshot moves the phase.
 var phaseMarkers = []struct {
 	prefix string
 	phase  int
@@ -81,6 +82,9 @@ func (l *buildLog) add(frame string) frameKind {
 
 	l.advance(phasePreparing)
 	for _, m := range phaseMarkers {
+		if l.inScript && m.prefix != snapshot {
+			continue // while the script runs, only its end moves the phase
+		}
 		if strings.HasPrefix(words, m.prefix) {
 			l.mark(m.prefix, m.phase)
 			break
