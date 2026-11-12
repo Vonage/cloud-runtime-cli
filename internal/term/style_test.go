@@ -11,13 +11,14 @@ var escapeSequence = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
 func colourHelpers(s Style) map[string]func(string) string {
 	return map[string]func(string) string{
-		"Red":    s.Red,
-		"Yellow": s.Yellow,
-		"Green":  s.Green,
-		"Cyan":   s.Cyan,
-		"Blue":   s.Blue,
-		"Gray":   s.Gray,
-		"Bold":   s.Bold,
+		"Red":     s.Red,
+		"Yellow":  s.Yellow,
+		"Green":   s.Green,
+		"Cyan":    s.Cyan,
+		"Blue":    s.Blue,
+		"Magenta": s.Magenta,
+		"Gray":    s.Gray,
+		"Bold":    s.Bold,
 	}
 }
 

@@ -69,12 +69,12 @@ output must not change: `cd <WT> && make contract` passes at the end of every gr
 
 ## 5. Boxes
 
-- [ ] 5.1 Failing tests in new `internal/term/box_test.go` with `term.TestRich` at fixed widths: a titled box with
+- [x] 5.1 Failing tests in new `internal/term/box_test.go` with `term.TestRich` at fixed widths: a titled box with
   padded labels sized to its widest row; a box with groups (a head row and indented rows); a value with escape
   sequences measured without them; a widest line over the width gives the borderless form with the same rows and
   no border character; under `NO_COLOR` no escape sequence; Classic prints nothing. Add `Style.Magenta` with a test
   in `style_test.go`. Verify: `cd <WT> && go test ./internal/term/ -run 'TestBox|TestStyle'` fails.
-- [ ] 5.2 Implement `internal/term/box.go` and `Style.Magenta` in `style.go`. Verify: the 5.1 tests pass.
+- [x] 5.2 Implement `internal/term/box.go` and `Style.Magenta` in `style.go`. Verify: the 5.1 tests pass.
 
 ## 6. The deploy summary
 

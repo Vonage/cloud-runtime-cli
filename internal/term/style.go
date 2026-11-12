@@ -43,12 +43,13 @@ func (s Style) FailureIcon() string {
 // infoIcon is the theme's dim bullet for informational lines.
 func (s Style) infoIcon() string { return s.Gray(infoGlyph) }
 
-func (s Style) Red(x string) string    { return s.scheme.Red(x) }
-func (s Style) Yellow(x string) string { return s.scheme.Yellow(x) }
-func (s Style) Green(x string) string  { return s.scheme.Green(x) }
-func (s Style) Cyan(x string) string   { return s.scheme.Cyan(x) }
-func (s Style) Blue(x string) string   { return s.scheme.Blue(x) }
-func (s Style) Bold(x string) string   { return s.scheme.Bold(x) }
+func (s Style) Red(x string) string     { return s.scheme.Red(x) }
+func (s Style) Yellow(x string) string  { return s.scheme.Yellow(x) }
+func (s Style) Green(x string) string   { return s.scheme.Green(x) }
+func (s Style) Cyan(x string) string    { return s.scheme.Cyan(x) }
+func (s Style) Blue(x string) string    { return s.scheme.Blue(x) }
+func (s Style) Magenta(x string) string { return s.scheme.Magenta(x) }
+func (s Style) Bold(x string) string    { return s.scheme.Bold(x) }
 
 func (s Style) Gray(x string) string {
 	// iostreams deprecates Gray for Muted, which renders the same while its accessible-colour mode is off.
