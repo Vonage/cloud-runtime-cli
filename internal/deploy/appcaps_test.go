@@ -132,13 +132,10 @@ func TestRichSummaryListsTheAppliedWebhookAddresses(t *testing.T) {
 			require.NoError(t, r.run())
 
 			assert.Equal(t, []string{
-				"✓ Instance has been deployed!",
-				"  Instance id: i-1",
-				"  Instance service name: my-project-dev",
-				"  Instance host address: https://one.example.test",
-				"  Webhook voice.webhooks.answer_url: https://h.example/answer",
-				"  Webhook voice.webhooks.event_url: https://h.example/event",
-			}, blockFrom(t, squashed(lines(r.stdout.Screen())), "✓ Instance has been deployed!"))
+				"● voice",
+				"  answer  https://h.example/answer",
+				"  event   https://h.example/event",
+			}, boxContents(t, summaryOf(t, r), "Application webhooks"))
 		})
 	}
 }
@@ -176,21 +173,18 @@ func TestDeployWarnsWhenTheBlockWasNotApplied(t *testing.T) {
 		})
 	}
 
-	t.Run("rich", func(t *testing.T) {
-		r := newRichRun(t, term.Rich)
-		r.plan.Manifest.ApplicationCapabilities = sampleBlock()
-		r.api.deployed.HostURLs = []string{"https://one.example.test"}
+	for name, mode := range terminalModes {
+		t.Run(name, func(t *testing.T) {
+			r := newRichRun(t, mode)
+			r.plan.Manifest.ApplicationCapabilities = sampleBlock()
+			r.api.deployed.HostURLs = []string{"https://one.example.test"}
 
-		require.NoError(t, r.run())
+			require.NoError(t, r.run())
 
-		assert.Contains(t, r.stderr.Raw(), platform.NotAppliedNotice)
-		assert.Equal(t, []string{
-			"✓ Instance has been deployed!",
-			"  Instance id: i-1",
-			"  Instance service name: my-project-dev",
-			"  Instance host address: https://one.example.test",
-		}, blockFrom(t, squashed(lines(r.stdout.Screen())), "✓ Instance has been deployed!"))
-	})
+			assert.Equal(t, "! "+platform.NotAppliedNotice+"\n", r.stderr.Screen())
+			assert.Equal(t, oneHostBox, summaryOf(t, r), "the instance box only")
+		})
+	}
 }
 
 func ptr(s string) *string { return &s }

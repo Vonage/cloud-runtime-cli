@@ -78,13 +78,13 @@ output must not change: `cd <WT> && make contract` passes at the end of every gr
 
 ## 6. The deploy summary
 
-- [ ] 6.1 Failing tests in `internal/deploy/rich_test.go` and `appcaps_test.go` for Rich and Static: the instance box
+- [x] 6.1 Failing tests in `internal/deploy/rich_test.go` and `appcaps_test.go` for Rich and Static: the instance box
   rows and title from the spec; two host URLs give two `URL` rows with the label on the first; the webhooks box from
   the spec's voice and messages scenario with `POST`; a video address with a blank method; no webhooks box without
   addresses; no `Instance has been deployed!` or `Instance …:` line; the not-applied warning still on stderr. Update
   `TestRichSummaryListsTheAppliedWebhookAddresses` and the other summary expectations. Verify:
   `cd <WT> && go test ./internal/deploy/ -run 'TestRich|TestDeploy'` fails for the new cases.
-- [ ] 6.2 Rewrite `summaryRich` in `internal/deploy/rich.go` with `term.Box`: title from the plan's project name,
+- [x] 6.2 Rewrite `summaryRich` in `internal/deploy/rich.go` with `term.Box`: title from the plan's project name,
   webhooks grouped by the first path segment, names without `webhooks.` and `_url`, bullet colours voice magenta,
   messages blue, rtc yellow, video cyan, verify green, any other bold. `summary.go` classic branch untouched.
   Verify: the 6.1 tests and `cd <WT> && go test ./internal/deploy/...` pass.

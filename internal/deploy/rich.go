@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/Vonage/cloud-runtime-cli/internal/bundle"
@@ -269,18 +270,62 @@ func (r *runner) deployRich(ctx context.Context, projectID, packageID string) (p
 	return result, nil
 }
 
-// summaryRich closes a deploy with the lines that tools read: they are whole and carry no colour.
+// summaryRich closes a deploy with the instance box and, when the platform applied any webhook address, the webhooks
+// box right under it.
 func (r *runner) summaryRich(deployed platform.DeployResult) {
-	rows := []term.Row{
-		{Label: "Instance id", Value: term.Sanitize(deployed.InstanceID)},
-		{Label: "Instance service name", Value: term.Sanitize(deployed.ServiceName)},
+	label := func(text string) string { return r.c.Gray(text) }
+	var rows []term.BoxLine
+	for i, url := range deployed.HostURLs {
+		head := ""
+		if i == 0 {
+			head = label("URL")
+		}
+		rows = append(rows, term.BoxLine{Cells: []string{head, r.c.Bold(r.c.Cyan(term.Sanitize(url)))}})
 	}
-	for _, url := range deployed.HostURLs {
-		rows = append(rows, term.Row{Label: "Instance host address", Value: term.Sanitize(url)})
-	}
-	for _, a := range platform.WebhookAddresses(deployed.ApplicationCapabilities) {
-		rows = append(rows, term.Row{Label: a.Label(), Value: term.Sanitize(a.Address)})
-	}
+	rows = append(rows,
+		term.BoxLine{Cells: []string{label("Instance"), term.Sanitize(deployed.InstanceID)}},
+		term.BoxLine{Cells: []string{label("Service"), term.Sanitize(deployed.ServiceName)}},
+	)
 	fmt.Fprintln(r.t.Out)
-	r.t.Block(r.c.SuccessIcon(), "Instance has been deployed!", rows, true)
+	r.t.Box(r.c.SuccessIcon()+" "+r.c.Bold(term.Sanitize(r.p.ProjectName))+" is live", rows)
+	if webhooks := r.webhookLines(platform.WebhookAddresses(deployed.ApplicationCapabilities)); len(webhooks) > 0 {
+		r.t.Box(r.c.Bold("Application webhooks"), webhooks)
+	}
+}
+
+// webhookLines groups the addresses by capability, the first segment of their path, in the order given. A row is the
+// name, the method when any address has one, and the address.
+func (r *runner) webhookLines(addresses []platform.WebhookAddress) []term.BoxLine {
+	withMethod := slices.ContainsFunc(addresses, func(a platform.WebhookAddress) bool { return term.Sanitize(a.Method) != "" })
+	var out []term.BoxLine
+	group := ""
+	for i, a := range addresses {
+		capability, name, _ := strings.Cut(term.Sanitize(a.Path), ".")
+		if i == 0 || capability != group {
+			group = capability
+			out = append(out, term.BoxLine{Head: r.bullet(capability) + " " + capability})
+		}
+		name = strings.TrimSuffix(strings.TrimPrefix(name, "webhooks."), "_url")
+		cells := []string{name, term.Sanitize(a.Address)}
+		if withMethod {
+			method := term.Sanitize(a.Method)
+			if method != "" {
+				method = r.c.Gray(method)
+			}
+			cells = []string{name, method, cells[1]}
+		}
+		out = append(out, term.BoxLine{Cells: cells})
+	}
+	return out
+}
+
+// bullet is the group head's dot in the capability's colour.
+func (r *runner) bullet(capability string) string {
+	colour := map[string]func(string) string{
+		"voice": r.c.Magenta, "messages": r.c.Blue, "rtc": r.c.Yellow, "video": r.c.Cyan, "verify": r.c.Green,
+	}[capability]
+	if colour == nil {
+		colour = r.c.Bold
+	}
+	return colour("●")
 }
