@@ -79,9 +79,9 @@ The new presentation is used when stdout and stderr are both terminals, `TERM` i
 | Setting | Effect |
 |---|---|
 | `VCR_UI=classic` | The output of earlier releases, exactly. Use it for anything that allocates a terminal but reads the output, such as an `expect` script. |
-| `VCR_UI=static` | The same lines and layout without animation or cursor movement, for screen readers and recordings. `vcr deploy` keeps the build script lines it prints. Also used when the terminal is narrower than 40 columns. |
+| `VCR_UI=static` | The same lines and layout without animation or cursor movement, for screen readers and recordings. `vcr deploy` prints the build script's lines as they arrive. Also used when the terminal is narrower than 40 columns. |
 
-On a terminal, `vcr deploy` shows the build phase and only the build script's output, and prints the full build log when a build fails.
+In the interactive (rich) presentation only, not with `VCR_UI=static`, `vcr deploy` shows a phase bar and the last lines of the build script's output, and collapses them when the build succeeds. In both, a failed build prints the full build log.
 
 `NO_COLOR` turns colour off and keeps the layout. Help pages are not affected.
 
