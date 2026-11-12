@@ -1,48 +1,31 @@
-internal/debugsession/rich.go
-  9cecd3fd143d1c5b 51-53,56-58,60,63-66
 internal/debugsession/rich_hold_test.go
-  9cecd3fd143d1c5b 81-82,86
-internal/debugsession/rich_summary_test.go
-  9cecd3fd143d1c5b 1-129
+  s_8f29aed92d4586::t_9eb4dd55c79e0d 81-82,86
+internal/debugsession/rich.go
+  s_8f29aed92d4586::t_63982e81d6f3e8 51-53,56-58,60,63-66
 internal/debugsession/rich_test.go
-  9cecd3fd143d1c5b 40-41,43-53,58-59,65
+  s_8f29aed92d4586::t_fda0eb4c7430ff 40-41,43-53,58-59,65
+internal/debugsession/rich_summary_test.go
+  s_8f29aed92d4586::t_e3db7fb4624264 1-129
 internal/deploy/rich.go
-  9cecd3fd143d1c5b 291-292
+  s_8f29aed92d4586::t_d59fdac9280bcb 292
+  s_8f29aed92d4586::t_338e7765d03873 291
 internal/platform/appcaps.go
-  9cecd3fd143d1c5b 43-82
-openspec/changes/deploy-progress/tasks.md
-  9cecd3fd143d1c5b 107,112
-test/contract/testdata/rich/debug-on-terminal.txt
-  9cecd3fd143d1c5b 3,8-13
+  s_8f29aed92d4586::t_5af5e7f6d7e99f 43-45
+  s_8f29aed92d4586::t_41867de2cb90db 46-82
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "vonage-override-1.0.0",
+  "git_ai_version": "1.7.5",
   "base_commit_sha": "76731b4a81d27c22b8f84ef30b4b51abea383fa1",
-  "prompts": {
-    "9cecd3fd143d1c5b": {
+  "prompts": {},
+  "sessions": {
+    "s_8f29aed92d4586": {
       "agent_id": {
         "tool": "kiro",
-        "id": "1348412b-990b-4670-997d-d07cdd09a29e",
-        "model": "claude-opus-5.5"
+        "id": "sess_0276e312-5042-41e2-ac18-64c60c7380c7",
+        "model": "auto"
       },
-      "human_author": "Simon Chan <simon.chan@vonage.com>",
-      "messages": [
-        {
-          "type": "user",
-          "text": "[vg-ai attribution override: 100% AI]",
-          "timestamp": "2026-11-12T12:38:29.631Z"
-        },
-        {
-          "type": "assistant",
-          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
-          "timestamp": "2026-11-12T12:38:29.631Z"
-        }
-      ],
-      "total_additions": 210,
-      "total_deletions": 108,
-      "accepted_lines": 210,
-      "overriden_lines": 0
+      "human_author": "Simon Chan <simon.chan@vonage.com>"
     }
   }
 }
