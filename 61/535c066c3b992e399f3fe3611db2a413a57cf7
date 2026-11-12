@@ -1,40 +1,20 @@
-"openspec/changes/{deploy-progress => archive/2026-11-12-deploy-progress}/tasks.md"
-  8f9dc1661fca9ae9 1
+openspec/changes/archive/2026-11-12-deploy-progress/tasks.md
+  h_df1d95ff1e9b8c 119
 openspec/specs/application-capabilities/spec.md
-  8f9dc1661fca9ae9 60,62-64,69
+  h_df1d95ff1e9b8c 60,62-64,69
 openspec/specs/deploy-build-outcome/spec.md
-  8f9dc1661fca9ae9 31-34,38-39
+  h_df1d95ff1e9b8c 31-34,38-39
 openspec/specs/deploy-progress/spec.md
-  8f9dc1661fca9ae9 1-181
+  h_df1d95ff1e9b8c 1-181
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "vonage-override-1.0.0",
+  "git_ai_version": "1.7.5",
   "base_commit_sha": "61535c066c3b992e399f3fe3611db2a413a57cf7",
-  "prompts": {
-    "8f9dc1661fca9ae9": {
-      "agent_id": {
-        "tool": "kiro",
-        "id": "18cdddba-859d-4103-8785-d0f92700199a",
-        "model": "claude-opus-5.5"
-      },
-      "human_author": "Simon Chan <simon.chan@vonage.com>",
-      "messages": [
-        {
-          "type": "user",
-          "text": "[vg-ai attribution override: 100% AI]",
-          "timestamp": "2026-11-12T14:53:58.712Z"
-        },
-        {
-          "type": "assistant",
-          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
-          "timestamp": "2026-11-12T14:53:58.712Z"
-        }
-      ],
-      "total_additions": 193,
-      "total_deletions": 7,
-      "accepted_lines": 193,
-      "overriden_lines": 0
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
     }
   }
 }
