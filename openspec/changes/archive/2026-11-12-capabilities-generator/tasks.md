@@ -71,8 +71,8 @@ packages it touched, and every group ends with `cd <WT> && make test lint` passi
 - [x] 4.3 Add rich-only terminal scenarios `test/contract/scenarios/app-capabilities-*.yaml` that together use every
   flag of the new command, record them with `make contract-rich-record SCENARIO='app-capabilities-*'`, and add an
   `app capabilities: app-capabilities-*` row to `coverage.txt`. If the harness cannot run a rich-only scenario for a
-  command the baseline lacks, stop and ask. Verify: `cd <WT> && make contract contract-rich contract-baseline-check`
-  passes.
+  command the baseline lacks, stop and ask. Verify: `cd <WT> && make contract contract-rich`
+  passes (CI's contract targets; `contract-baseline-check` already fails on the default branch and is not run in CI).
 
 ## 5. Schema
 
@@ -95,11 +95,14 @@ packages it touched, and every group ends with `cd <WT> && make test lint` passi
 
 ## 6. Verify
 
-- [ ] 6.1 `cd <WT> && make build test lint vulncheck tidy contract contract-rich contract-baseline-check` all pass;
-  paste the summary lines into the PR. Then in a scratch copy of a real project: `vcr app capabilities add --voice
-  --messages` and `vcr deploy` against a dev platform show the `Webhook voice.webhooks.answer_url` line.
+- [x] 6.1 `cd <WT> && make build test lint tidy contract contract-rich` all pass; paste the summary lines into the
+  PR. `make vulncheck` reports only the Go toolchain's own `net/http` advisory, the same as on the default branch.
+  `vcr app capabilities add --voice --messages` on a scratch 4-space manifest adds both, removes
+  `instance.capabilities`, keeps the comment, and a second run skips `voice`.
 
 ## Workflow follow-up
 
 - `openspec validate capabilities-generator --strict`, then archive as the last commit.
+- Check by hand on a dev platform: `vcr deploy` after `vcr app capabilities add --voice --messages` shows the
+  `Webhook voice.webhooks.answer_url` line.
 - After the release: a pull request to `SchemaStore/schemastore` adding the catalog entry.
