@@ -45,7 +45,7 @@ output must not change: `cd <WT> && make contract` passes at the end of every gr
 
 ## 3. The build step on a terminal
 
-- [ ] 3.1 Failing tests in `internal/deploy/rich_test.go` with `newRichRun`: (a) Rich, Kaniko frames then 20 script
+- [x] 3.1 Failing tests in `internal/deploy/rich_test.go` with `newRichRun`: (a) Rich, Kaniko frames then 20 script
   lines then `completed`: the final stdout screen goes from `✓ Package created` straight to `✓ Package built`, and
   no frame is on stdout or stderr; (b) mid-build (fake clock, the stream held open): the stderr screen shows the
   live row with `5/7 Running build script` and the last 8 script lines; (c) `failed`: before the error, stdout has
@@ -53,7 +53,7 @@ output must not change: `cd <WT> && make contract` passes at the end of every gr
   the same log; (e) canceled context: no log; (f) Static: script lines printed as they arrive, no Kaniko line, and on
   `failed` only the frames not printed yet. Update the existing gutter tests that expect every frame. Verify:
   `cd <WT> && go test ./internal/deploy/ -run TestRich` fails for the new cases.
-- [ ] 3.2 Implement in `internal/deploy/rich.go` `watchBuildRich`: feed each frame to `buildLog`, update
+- [x] 3.2 Implement in `internal/deploy/rich.go` `watchBuildRich`: feed each frame to `buildLog`, update
   `SetProgress` and `Tail` (Rich) or write script lines to the gutter (Static); on an error other than
   `context.Canceled` stop the step and write the held frames to the gutter before returning. `build.go` stays as
   it is. Change `TestStaticDeployMatchesRichScreen` in `rich_match_test.go` to drop the static gutter lines before

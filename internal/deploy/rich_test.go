@@ -118,8 +118,6 @@ func TestRichDeployResolvesEachStage(t *testing.T) {
 		"✓ Files packaged 1 file",
 		"✓ Source uploaded",
 		"✓ Package created pkg-1",
-		"  │ building",
-		"  │ Status - completed",
 		"✓ Package built",
 		"✓ Instance deployed",
 		"",
@@ -157,16 +155,16 @@ func TestRichDeployShowsDurationOnlyFromTwoSeconds(t *testing.T) {
 	assert.NotContains(t, lineWith(t, out, "Package created"), "(")
 }
 
-func TestRichDeployBuildFramesUseTheGutter(t *testing.T) {
-	r := newRichRun(t, term.Rich)
-	r.api.frames = []string{"\x1b]0;title\a" + "building", "\x1b[35mℹ\x1b[0m Status - completed", "two\n"}
+func TestStaticBuildScriptLinesAreSanitised(t *testing.T) {
+	r := newRichRun(t, term.Static)
+	r.api.frames = []string{"ℹ Cmd: /bin/sh", "\x1b]0;title\a" + "building", "\x1b[35mcoloured\x1b[0m", "two\n"}
 
 	require.NoError(t, r.run())
 
 	frames := blockFrom(t, lines(r.stdout.Screen()), "  │ building")
-	assert.Equal(t, []string{"  │ building", "  │ ℹ Status - completed", "  │ two", "  │"}, frames[:4])
+	assert.Equal(t, []string{"  │ building", "  │ coloured", "  │ two", "  │"}, frames[:4])
 	assert.Equal(t, "✓ Package built", frames[4])
-	assert.Contains(t, r.stdout.Raw(), "\x1b[35mℹ\x1b[0m Status - completed", "the server's colour is untouched")
+	assert.Contains(t, r.stdout.Raw(), "\x1b[35mcoloured\x1b[0m", "the server's colour is untouched")
 	assert.NotContains(t, r.stdout.Raw(), "\x1b]0;")
 }
 

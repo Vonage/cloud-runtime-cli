@@ -30,6 +30,9 @@ const (
 func (s Style) SuccessIcon() string { return s.scheme.SuccessIcon() }
 func (s Style) WarningIcon() string { return s.scheme.WarningIcon() }
 
+// ColorEnabled reports whether the helpers colour their text.
+func (s Style) ColorEnabled() bool { return s.scheme.Enabled }
+
 func (s Style) FailureIcon() string {
 	if s.rich {
 		return s.scheme.Red(failureGlyph)

@@ -40,9 +40,6 @@ func TestRichDeployAgainstTheFakePlatform(t *testing.T) {
 		"✓ Files packaged  2 files",
 		"✓ Source uploaded",
 		"✓ Package created  <id>",
-		"  │ Starting build",
-		"  │ Step 1/2 : install dependencies",
-		"  │ ℹ Status - completed",
 		"✓ Package built",
 		"✓ Instance deployed",
 		"",
@@ -52,7 +49,7 @@ func TestRichDeployAgainstTheFakePlatform(t *testing.T) {
 		"  Instance host address: https://my-project-dev.euw1.runtime.example.test",
 	}
 	assert.Equal(t, want, lines(fixtureID.ReplaceAllString(stdout.Screen(), "<id>")))
-	assert.Contains(t, stdout.Raw(), "\x1b[35mℹ\x1b[0m Status - completed", "the server's colour is untouched")
+	assert.NotContains(t, stdout.Raw(), "Status - completed", "a frame that is not script output is not shown")
 	assert.Empty(t, stderr.Raw())
 	assert.Equal(t, []string{
 		"GET /regions/aws.euw1",

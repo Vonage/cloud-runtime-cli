@@ -52,3 +52,11 @@ func TestYellowBoldBytes(t *testing.T) {
 	assert.Equal(t, "\x1b[0;1;33mhost\x1b[0m", YellowBold("host"))
 	assert.Equal(t, "", YellowBold(""))
 }
+
+func TestStyleReportsWhetherItColours(t *testing.T) {
+	plain, _, _ := Test("", false)
+	coloured, _, _ := newTestIO("", false, false, false, true)
+
+	assert.False(t, plain.Style().ColorEnabled())
+	assert.True(t, coloured.Style().ColorEnabled())
+}
