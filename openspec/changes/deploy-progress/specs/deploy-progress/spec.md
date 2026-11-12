@@ -162,9 +162,20 @@ Under `NO_COLOR` the summary SHALL contain no escape sequence.
 - **WHEN** the host address is 70 characters long and the terminal is 60 columns wide
 - **THEN** the summary has no border characters and shows the whole address
 
+### Requirement: The debugger box
+In the rich and static presentations `vcr debug` SHALL show, where it showed the `Debugger ready` block, a blank
+line and a box titled `✓ Debugger ready` with the rows `URL` (the debug host) and `Service` (the service name),
+then the application webhooks box with the same groups and rows as `vcr deploy`, then the forwarding notice as
+today. The boxes SHALL fit the terminal as deploy's do, and the `Webhook <path>` rows SHALL NOT appear.
+
+#### Scenario: a debug session with webhooks
+- **WHEN** a debug session is ready and its applied block has `voice.webhooks.answer_url` (POST)
+- **THEN** stdout shows the `✓ Debugger ready` box with `URL` and `Service`, then `Application webhooks` with
+  `● voice` and the row `answer  POST  <address>`, then the forwarding notice
+
 ### Requirement: Classic output is unchanged
-With the classic presentation (no terminal, `CI` set, or `VCR_UI=classic`), `vcr deploy` SHALL print every build
-frame and the summary exactly as before this change.
+With the classic presentation (no terminal, `CI` set, or `VCR_UI=classic`), `vcr deploy` and `vcr debug` SHALL print
+every build frame and the summary exactly as before this change.
 
 #### Scenario: deploy in CI
 - **WHEN** `vcr deploy` runs with `CI=true` and the build sends Kaniko lines

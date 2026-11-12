@@ -102,11 +102,23 @@ output must not change: `cd <WT> && make contract` passes at the end of every gr
   deploy` on a terminal shows the build phase and only the build script's output, and the full log when a build
   fails. Verify: `cd <WT> && go test ./internal/term/ -run TestReadme` passes.
 
-## 8. Checks
+## 8. Debug summary
 
-- [ ] 8.1 `cd <WT> && make build test lint tidy contract contract-rich` passes, and the leak check prints nothing
-  before each commit. Install the build for a manual run of `vcr deploy` against a test project: the live line, the
-  collapse and the boxes.
+- [ ] 8.1 Failing tests in `internal/debugsession` (rich and static, existing test helpers): the ready summary is the
+  `✓ Debugger ready` box with `URL` then `Service`, then the webhooks box exactly as deploy draws it, then the
+  forwarding notice; no `Webhook <path>` row; no webhooks box without addresses; the console hold still keeps a
+  request's access line out of the middle (existing hold test). Verify: `cd <WT> && go test ./internal/debugsession/`
+  fails for the new cases.
+- [ ] 8.2 Move the webhooks box lines out of `internal/deploy` into one shared helper both packages use, and rewrite
+  `printIntroRich` with `term.Box`. Classic debug output untouched. Re-record `debug-on-terminal` with `cd <WT> &&
+  make contract-rich-record SCENARIO=debug-on-terminal` and read it. Verify: `cd <WT> && make test lint contract
+  contract-rich` passes and the transcripts are unchanged.
+
+## 9. Checks
+
+- [ ] 9.1 `cd <WT> && make build test lint tidy contract contract-rich` passes, and the leak check prints nothing
+  before each commit. Install the build for a manual run of `vcr deploy` and `vcr debug` against a test project: the
+  live line, the collapse and the boxes.
 
 ## Workflow follow-up
 

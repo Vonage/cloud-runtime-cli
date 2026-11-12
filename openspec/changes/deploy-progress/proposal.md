@@ -21,6 +21,8 @@ lists webhook addresses.
 - When the build fails or times out, the CLI prints the whole build log it held back, Kaniko lines included.
 - The deploy summary becomes two boxes: the deployed instance (URL, instance id, service name) under the title
   `<project> is live`, and the applied webhooks grouped by capability with their HTTP method.
+- `vcr debug`'s ready summary uses the same layout: a `Debugger ready` box with `URL` and `Service`, then the same
+  webhooks box.
 - With `VCR_UI=static`, the filtered build script lines are printed as they arrive, with no bar and no erasing; the
   summary boxes are the same as in the rich presentation.
 - Classic output (CI, pipes, `VCR_UI=classic`) does not change at all.
@@ -29,7 +31,8 @@ lists webhook addresses.
 
 ### New Capabilities
 
-- `deploy-progress`: how `vcr deploy` shows the build and the deployed instance on a terminal.
+- `deploy-progress`: how `vcr deploy` shows the build and the deployed instance on a terminal, and how `vcr debug`
+  shows the ready debugger in the same layout.
 
 ### Modified Capabilities
 
@@ -40,11 +43,12 @@ lists webhook addresses.
 
 ## Impact
 
-- `internal/deploy` (build step and summary in the rich presentation), `internal/term` (a live line with a phase bar
-  and a rolling window, a boxed block), `internal/platform/appcaps.go` (the HTTP method next to each address).
-- Contract rich goldens for deploy change; new rich scenarios for a build with Kaniko lines, a failed build and a
-  deploy with webhooks. Classic transcripts do not change.
-- No new dependency.
+- `internal/deploy` (build step and summary in the rich presentation), `internal/debugsession` (the ready summary),
+  `internal/term` (a live line with a phase bar and a rolling window, a boxed block), `internal/platform/appcaps.go`
+  (the HTTP method next to each address).
+- Contract rich goldens for deploy and debug change; new rich scenarios for a build with Kaniko lines, a failed
+  build and a deploy with webhooks. Classic transcripts do not change.
+- `go-runewidth`, already an indirect dependency, becomes a direct one; no new module.
 
 ## Rollout
 
@@ -56,5 +60,4 @@ on a terminal.
 - Structured build frames from the platform (a phase or source field per frame): needs a server change, and older
   platforms would never send it.
 - A real percentage for the bar: the platform reports no build progress.
-- `vcr debug`'s summary: it has its own presentation, and this change is about deploy.
 - A flag to show the full build log on success: the classic presentation (`VCR_UI=classic`) already does.
