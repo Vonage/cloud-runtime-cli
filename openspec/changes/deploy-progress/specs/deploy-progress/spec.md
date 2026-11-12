@@ -140,13 +140,14 @@ box SHALL be left out, and the not-applied warning on stderr stays as it is.
 
 ### Requirement: Webhook rows
 Each webhook row SHALL show the name (the rest of the dotted path, without a leading `webhooks.` and a trailing
-`_url`), the `http_method` string beside that `address` or a blank when there is none, and the whole address.
+`_url`), the `http_method` string beside that `address` or a blank when there is none, and the whole address, in
+columns each padded to one width across the box.
 
 #### Scenario: voice and messages
 - **WHEN** the applied block has `voice.webhooks.answer_url` (POST, `https://h/voice/answer`) and
   `messages.webhooks.inbound_url` (POST, `https://h/messages/inbound`)
 - **THEN** the box shows `● messages` with the row `inbound  POST  https://h/messages/inbound`, then `● voice` with
-  the row `answer  POST  https://h/voice/answer`
+  the row `answer   POST  https://h/voice/answer`, the name column padded to the width of `inbound`
 
 #### Scenario: a webhook without a method
 - **WHEN** the applied block has `video.webhooks.archive_status.address` and no `http_method` beside it
