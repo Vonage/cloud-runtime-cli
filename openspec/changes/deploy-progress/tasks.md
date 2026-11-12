@@ -91,7 +91,7 @@ output must not change: `cd <WT> && make contract` passes at the end of every gr
 
 ## 7. Contract and docs
 
-- [ ] 7.1 New rich scenarios in `test/contract/scenarios/`: `deploy-build-phases-on-terminal.yaml` (Kaniko frames
+- [x] 7.1 New rich scenarios in `test/contract/scenarios/`: `deploy-build-phases-on-terminal.yaml` (Kaniko frames
   from the spec scenario plus script lines, `completed`), `deploy-build-fails-on-terminal.yaml` (status `failed`)
   and `deploy-webhooks-on-terminal.yaml` (a block whose response has voice and messages addresses), each
   `presentation: rich`. Record them and re-record `deploy-on-terminal` with
