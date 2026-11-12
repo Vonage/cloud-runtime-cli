@@ -2,7 +2,7 @@ module github.com/Vonage/cloud-runtime-cli
 
 go 1.27.0
 
-toolchain go1.27.3
+toolchain go1.27.4
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
