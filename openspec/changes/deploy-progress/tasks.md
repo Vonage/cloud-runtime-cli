@@ -31,14 +31,14 @@ output must not change: `cd <WT> && make contract` passes at the end of every gr
 
 ## 2. Live region: phase bar and tail
 
-- [ ] 2.1 Failing tests in `internal/term/live_test.go` and `internal/term/surface_test.go`, using `term.TestRich`
+- [x] 2.1 Failing tests in `internal/term/live_test.go` and `internal/term/surface_test.go`, using `term.TestRich`
   and the fake clock: `Step.SetProgress(5, 7, "Running build script")` draws `<glyph> Building package  <bar>  5/7
   Running build script` with 5 filled segments at 80 columns, and no bar at 59 columns; `Step.Tail` with 12 lines
   draws the last 8 under the live row, each prefixed with `  │ ` and cut to width−1 with `…`; a write to stdout
   while a tail is drawn leaves the screen (`TermBuffer.Screen()`) with the written text, then the live row and the
   tail, and no leftover rows; `Stop` and `OK` erase every row of the region. Static: both methods draw nothing.
   Verify: `cd <WT> && go test ./internal/term/ -run 'TestLive|TestSurface'` fails.
-- [ ] 2.2 Implement in `internal/term/step.go`, `live.go` and `surface.go`: the progress and tail fields under the
+- [x] 2.2 Implement in `internal/term/step.go`, `live.go` and `surface.go`: the progress and tail fields under the
   step's lock; the surface tracks how many rows it drew and erases them with `\r`, `\x1b[<n>A` and `\x1b[J`
   before every write and on finish; rows re-cut to `columns()` on each draw. Verify: the 2.1 tests and
   `cd <WT> && go test ./internal/term/...` pass, including the existing live and surface tests.

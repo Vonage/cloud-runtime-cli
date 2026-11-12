@@ -119,3 +119,42 @@ func (t *IO) resolvedLine(s *Step, kind resolution, line string) string {
 	}
 	return text + "\n"
 }
+
+// SetProgress gives the step's live row a phase bar: done of total segments filled, then "<done>/<total> <label>".
+// Rich only: Static and Classic ignore it.
+func (s *Step) SetProgress(done, total int, label string) {
+	if s.owner.surf == nil {
+		return
+	}
+	total = max(total, 0)
+	p := &progress{done: min(max(done, 0), total), total: total, label: richLabel(label)}
+	s.mu.Lock()
+	s.progress = p
+	s.mu.Unlock()
+	s.owner.surf.refresh(s)
+}
+
+// Tail replaces the rows drawn under the step's live row with the last tailSize of lines, sanitised, with their
+// colour kept only when colour is on. Rich only: Static and Classic ignore it.
+func (s *Step) Tail(lines []string) {
+	if s.owner.surf == nil {
+		return
+	}
+	lines = lines[max(len(lines)-tailSize, 0):]
+	colour := s.owner.ios.ColorEnabled()
+	kept := make([]string, len(lines))
+	for i, line := range lines {
+		kept[i] = tailLine(line, colour)
+	}
+	s.mu.Lock()
+	s.tail = kept
+	s.mu.Unlock()
+	s.owner.surf.refresh(s)
+}
+
+// region is what the live row of the step shows besides its label: the phase bar, if any, and the tail.
+func (s *Step) region() (*progress, []string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.progress, s.tail
+}

@@ -46,16 +46,131 @@ func richLabel(label string) string {
 // is cut by rune count and ends in "…". A width of 0 or less means the width is unknown and nothing is cut.
 func frameText(label string, elapsed time.Duration, width int, dim func(string) string) string {
 	elapsed = max(elapsed, 0)
-	suffix, suffixRunes := "", 0
-	if elapsed >= elapsedFrom {
-		text := liveElapsed(elapsed)
-		suffix, suffixRunes = "  "+dim(text), 2+utf8.RuneCountInString(text)
-	}
+	suffix, suffixRunes := elapsedSuffix(elapsed, dim)
 	glyph := spinnerFrame(elapsed)
 	if width > 0 {
 		label = fitLabel(label, width-1-utf8.RuneCountInString(glyph)-1-suffixRunes)
 	}
 	return glyph + " " + label + suffix
+}
+
+// progressFrame is frameText for a step with a phase bar: "<glyph> <label>  <bar>  <done>/<total> <phase>", then the
+// elapsed time. The bar is left out under barFrom columns. The phase is cut to fit; when that leaves it no room, the
+// text after the glyph is cut as a whole, without the bar.
+func progressFrame(label string, p progress, elapsed time.Duration, width int, dim func(string) string) string {
+	elapsed = max(elapsed, 0)
+	suffix, suffixRunes := elapsedSuffix(elapsed, dim)
+	glyph := spinnerFrame(elapsed)
+	count := fmt.Sprintf("%d/%d ", p.done, p.total)
+
+	bar, barRunes := "", 0
+	if width <= 0 || width >= barFrom {
+		bar, barRunes = "  "+strings.Repeat("━━", p.done), 2+2*p.total
+		if empty := p.total - p.done; empty > 0 {
+			bar += dim(strings.Repeat("──", empty))
+		}
+	}
+	head := label + bar + "  " + count
+	if width <= 0 {
+		return glyph + " " + head + p.label + suffix
+	}
+
+	room := width - 1 - utf8.RuneCountInString(glyph) - 1 - suffixRunes
+	if phaseRoom := room - utf8.RuneCountInString(label) - barRunes - 2 - len(count); phaseRoom >= 1 {
+		return glyph + " " + head + fitLabel(p.label, phaseRoom) + suffix
+	}
+	return glyph + " " + fitLabel(label+"  "+count+p.label, room) + suffix
+}
+
+// elapsedSuffix is the dim elapsed time a live line ends with from elapsedFrom, and how many runes it takes.
+func elapsedSuffix(elapsed time.Duration, dim func(string) string) (string, int) {
+	if elapsed < elapsedFrom {
+		return "", 0
+	}
+	text := liveElapsed(elapsed)
+	return "  " + dim(text), 2 + utf8.RuneCountInString(text)
+}
+
+// tailLine is a line of the tail as it is kept: sanitised, colour kept only when colour is on, and tabs and newlines
+// turned into spaces so the line takes one row.
+func tailLine(line string, colour bool) string {
+	return strings.Map(func(r rune) rune {
+		if r == '\t' || r == '\n' {
+			return ' '
+		}
+		return r
+	}, sanitize(line, colour))
+}
+
+// tailText is the rows drawn under the live line and how many there are: each on a new row, the dim gutter prefix
+// and the line cut so the row is at most width-1 runes. An unknown or tiny width draws none: a row that wraps would
+// make the region taller than counted.
+func tailText(lines []string, width int, dim func(string) string) (string, int) {
+	room := width - 1 - utf8.RuneCountInString(gutterPrefix)
+	if width <= 0 || room < 1 || len(lines) == 0 {
+		return "", 0
+	}
+	prefix := dim(gutterPrefix)
+	var b strings.Builder
+	for _, line := range lines {
+		b.WriteString("\n" + prefix + fitVisible(line, room))
+	}
+	return b.String(), len(lines)
+}
+
+// fitVisible is fitLabel for a sanitised line, whose only escape sequences are complete colour sequences: they are
+// not counted and never split, and a cut line that had any ends with a reset.
+func fitVisible(line string, room int) string {
+	if visibleRunes(line) <= room {
+		return line
+	}
+	var b strings.Builder
+	kept := 0
+	for i := 0; i < len(line); {
+		if n := colourSequenceLen(line[i:]); n > 0 {
+			b.WriteString(line[i : i+n])
+			i += n
+			continue
+		}
+		if kept == room-1 {
+			break
+		}
+		_, size := utf8.DecodeRuneInString(line[i:])
+		b.WriteString(line[i : i+size])
+		kept++
+		i += size
+	}
+	b.WriteString(ellipsis)
+	if strings.IndexByte(line, escape) >= 0 {
+		b.WriteString(colourReset)
+	}
+	return b.String()
+}
+
+// visibleRunes is how many runes of a sanitised line show on the screen.
+func visibleRunes(line string) int {
+	count := 0
+	for i := 0; i < len(line); {
+		if n := colourSequenceLen(line[i:]); n > 0 {
+			i += n
+			continue
+		}
+		_, size := utf8.DecodeRuneInString(line[i:])
+		count++
+		i += size
+	}
+	return count
+}
+
+// colourSequenceLen is the length of the colour sequence text starts with, or 0 when it does not start with one.
+func colourSequenceLen(text string) int {
+	if !strings.HasPrefix(text, "\x1b[") {
+		return 0
+	}
+	if end := strings.IndexByte(text, 'm'); end > 0 {
+		return end + 1
+	}
+	return 0
 }
 
 // fitLabel returns label cut to room runes, the last of them "…", when it is longer.
