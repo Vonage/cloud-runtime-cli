@@ -143,8 +143,9 @@ func (r *runner) createPackageRich(ctx context.Context, req platform.PackageRequ
 }
 
 // watchBuildRich shows the build phase on the live line and the build script's output: its last lines under the live
-// line (Rich) or each line as it arrives (Static). A build that fails or times out leaves its log, less what is on the
-// screen already; an interrupt leaves nothing. The build status route decides when the build is over.
+// line (Rich) or each line as it arrives (Static). A wait that ends in an error other than an interrupt (a failed
+// build, a timeout, a failing status route) leaves its log, less what is on the screen already; an interrupt leaves
+// nothing. The build status route decides when the build is over.
 func (r *runner) watchBuildRich(ctx context.Context, packageID string) error {
 	step := r.t.StartStep("Building package")
 	view := newBuildView(step, r.t.Gutter(), r.c, r.t.Mode() == term.Static)

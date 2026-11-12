@@ -91,16 +91,20 @@ In the static presentation the CLI SHALL print each line of build script output 
 - **THEN** stdout shows the 3 lines, each prefixed with `  │ `, and no Kaniko line
 
 ### Requirement: A failed build shows the whole log
-When the build status route answers `failed`, or `--timeout` ends the wait, the CLI SHALL print, before the error,
-every frame it did not leave on the screen, in the order they arrived, each prefixed with `  │ `. In the rich
-presentation that is every frame; in the static presentation it is every frame it did not already print. An
-interrupt (Ctrl-C) SHALL erase the build script lines and print no log.
+When the build status route answers `failed` or fails itself (an error it does not retry, or 3 in a row), or
+`--timeout` ends the wait, the CLI SHALL print, before the error, every frame it did not leave on the screen, in
+arrival order, each prefixed with `  │ `. In the rich presentation that is every frame; in the static presentation
+every frame it did not already print. An interrupt (Ctrl-C) SHALL erase the build script lines and print no log.
 
 #### Scenario: a build that fails
 - **WHEN** the stream sends Kaniko lines and the script's `npm ERR! missing script: build`, and the status route
   answers `failed`
 - **THEN** the screen shows every frame, Kaniko lines included, in arrival order, then the build error, and the
   exit code is 1
+
+#### Scenario: the status route fails
+- **WHEN** the stream sends Kaniko and script lines, and the status route answers 503 three times in a row
+- **THEN** the screen shows every frame in arrival order, then the error
 
 #### Scenario: Ctrl-C during the build
 - **WHEN** the user presses Ctrl-C while the build script runs

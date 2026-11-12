@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -13,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/Vonage/cloud-runtime-cli/internal/clierr"
 	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
 
@@ -182,6 +184,22 @@ func TestRichBuildTimeoutPrintsEveryFrame(t *testing.T) {
 	assert.Empty(t, r.stderr.Screen())
 }
 
+func TestRichBuildStatusRouteErrorPrintsEveryFrame(t *testing.T) {
+	r := newRichRun(t, term.Rich)
+	frames := join(kanikoStart, scriptLines(1, 3))
+	r.api.frames = frames
+	r.api.statuses = []statusAnswer{unavailable(), unavailable(), unavailable()}
+	r.afterFrames(func() {})
+
+	err := r.run()
+
+	var apiErr *clierr.APIError
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, http.StatusServiceUnavailable, apiErr.HTTPStatus)
+	assert.Equal(t, guttered(frames), blockFrom(t, squashed(lines(r.stdout.Screen())), "Package created")[1:])
+	assert.Empty(t, r.stderr.Screen())
+}
+
 func TestRichBuildCanceledPrintsNoLog(t *testing.T) {
 	r := newRichRun(t, term.Rich)
 	frames := join(kanikoStart, scriptLines(1, 3))
@@ -271,6 +289,7 @@ func hiddenFrames(n int) []string {
 	}
 	return out
 }
+
 func TestBuildLogLosesItsColourWhenColourIsOff(t *testing.T) {
 	streams, _, _ := term.TestRich(term.Static, 80, nil)
 	var out bytes.Buffer
