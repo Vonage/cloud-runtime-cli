@@ -1,0 +1,34 @@
+internal/term/box.go
+  57cc927f21b519ca 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "25b802d5e9bc2ee2ec39c59bc9ca5fffdd2b51d4",
+  "prompts": {
+    "57cc927f21b519ca": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "133e33a7-36bb-4742-b4fb-a3c9ce29be91",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-12T11:34:44.600Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
+          "timestamp": "2026-11-12T11:34:44.600Z"
+        }
+      ],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
