@@ -9,6 +9,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/briandowns/spinner"
+	"github.com/mattn/go-runewidth"
 )
 
 const (
@@ -55,8 +56,8 @@ func frameText(label string, elapsed time.Duration, width int, dim func(string) 
 }
 
 // progressFrame is frameText for a step with a phase bar: "<glyph> <label>  <bar>  <done>/<total> <phase>", then the
-// elapsed time. The bar is left out under barFrom columns. The phase is cut to fit; when that leaves it no room, the
-// text after the glyph is cut as a whole, without the bar.
+// elapsed time, at most width-1 cells. The bar is left out under barFrom columns. The phase is cut to fit; when that
+// leaves it no room, the text after the glyph is cut as a whole, without the bar.
 func progressFrame(label string, p progress, elapsed time.Duration, width int, dim func(string) string) string {
 	elapsed = max(elapsed, 0)
 	suffix, suffixRunes := elapsedSuffix(elapsed, dim)
@@ -75,11 +76,11 @@ func progressFrame(label string, p progress, elapsed time.Duration, width int, d
 		return glyph + " " + head + p.label + suffix
 	}
 
-	room := width - 1 - utf8.RuneCountInString(glyph) - 1 - suffixRunes
-	if phaseRoom := room - utf8.RuneCountInString(label) - barRunes - 2 - len(count); phaseRoom >= 1 {
-		return glyph + " " + head + fitLabel(p.label, phaseRoom) + suffix
+	room := width - 1 - cellWidth(glyph) - 1 - suffixRunes
+	if phaseRoom := room - cellWidth(label) - barRunes - 2 - len(count); phaseRoom >= 1 {
+		return glyph + " " + head + fitVisible(p.label, phaseRoom) + suffix
 	}
-	return glyph + " " + fitLabel(label+"  "+count+p.label, room) + suffix
+	return glyph + " " + fitVisible(label+"  "+count+p.label, room) + suffix
 }
 
 // elapsedSuffix is the dim elapsed time a live line ends with from elapsedFrom, and how many runes it takes.
@@ -103,10 +104,10 @@ func tailLine(line string, colour bool) string {
 }
 
 // tailText is the rows drawn under the live line and how many there are: each on a new row, the dim gutter prefix
-// and the line cut so the row is at most width-1 runes. An unknown or tiny width draws none: a row that wraps would
+// and the line cut so the row is at most width-1 cells. An unknown or tiny width draws none: a row that wraps would
 // make the region taller than counted.
 func tailText(lines []string, width int, dim func(string) string) (string, int) {
-	room := width - 1 - utf8.RuneCountInString(gutterPrefix)
+	room := width - 1 - cellWidth(gutterPrefix)
 	if width <= 0 || room < 1 || len(lines) == 0 {
 		return "", 0
 	}
@@ -118,10 +119,10 @@ func tailText(lines []string, width int, dim func(string) string) (string, int) 
 	return b.String(), len(lines)
 }
 
-// fitVisible is fitLabel for a sanitised line, whose only escape sequences are complete colour sequences: they are
-// not counted and never split, and a cut line that had any ends with a reset.
+// fitVisible cuts a sanitised line to room cells, the last of them "…", when it is wider. Its only escape sequences
+// are complete colour sequences: they take no cells and are never split, and a cut line that had any ends with a reset.
 func fitVisible(line string, room int) string {
-	if visibleRunes(line) <= room {
+	if cellWidth(line) <= room {
 		return line
 	}
 	var b strings.Builder
@@ -132,12 +133,13 @@ func fitVisible(line string, room int) string {
 			i += n
 			continue
 		}
-		if kept == room-1 {
+		r, size := utf8.DecodeRuneInString(line[i:])
+		cell := cells.RuneWidth(r)
+		if kept+cell > room-1 {
 			break
 		}
-		_, size := utf8.DecodeRuneInString(line[i:])
 		b.WriteString(line[i : i+size])
-		kept++
+		kept += cell
 		i += size
 	}
 	b.WriteString(ellipsis)
@@ -147,16 +149,20 @@ func fitVisible(line string, room int) string {
 	return b.String()
 }
 
-// visibleRunes is how many runes of a sanitised line show on the screen.
-func visibleRunes(line string) int {
+// cells measures runes in terminal cells: a wide rune (CJK, most emoji) takes 2. It does not follow the locale, so
+// ambiguous runes such as "│" and "…" take 1, as they do on most terminals.
+var cells = &runewidth.Condition{StrictEmojiNeutral: true}
+
+// cellWidth is how many terminal cells a sanitised line takes on the screen: its colour sequences take none.
+func cellWidth(line string) int {
 	count := 0
 	for i := 0; i < len(line); {
 		if n := colourSequenceLen(line[i:]); n > 0 {
 			i += n
 			continue
 		}
-		_, size := utf8.DecodeRuneInString(line[i:])
-		count++
+		r, size := utf8.DecodeRuneInString(line[i:])
+		count += cells.RuneWidth(r)
 		i += size
 	}
 	return count

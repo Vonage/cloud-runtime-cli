@@ -166,6 +166,32 @@ func TestLiveTailCutsLongLines(t *testing.T) {
 	})
 }
 
+func TestLiveTailMeasuresWideCharactersInCells(t *testing.T) {
+	const width = 40
+	streams, screen, clk := newShared(t, Rich, width)
+	step := streams.StartStep(buildLabel)
+	step.SetProgress(5, 7, "ビルドスクリプトを実行しています")
+	step.Tail([]string{
+		strings.Repeat("日本語のテキスト", 10),
+		strings.Repeat("✨ built 🚀 ", 10),
+		"x" + strings.Repeat("🚀", 30),
+		"done 🎉",
+	})
+	advance(clk, 300*time.Millisecond)
+	streams.tickLive()
+
+	rows := strings.Split(screen.Screen(), "\n")
+	require.Len(t, rows, 5)
+	for _, row := range rows {
+		assert.LessOrEqual(t, cellWidth(row), width-1, row)
+	}
+	assert.Equal(t, gutterPrefix+"done 🎉", rows[4])
+
+	step.Stop()
+
+	assert.Empty(t, screen.Screen())
+}
+
 func TestLiveTailWithoutColourHasNoEscapes(t *testing.T) {
 	clk := newClock()
 	stderr := &TermBuffer{}

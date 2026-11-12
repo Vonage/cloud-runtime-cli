@@ -36,7 +36,9 @@ scenarios become a table test.
 `term.Step` gains two methods used only by the build step: `SetProgress(done, total int, label string)` and
 `Tail(lines []string)`. The surface draws, for the top step, the live row and then up to 8 tail rows, and erases
 the whole region by moving the cursor up (`\x1b[<n>A`) and clearing to the end of the screen (`\x1b[J`) before any
-write. Tail rows are cut to width−1 runes, so no row wraps and the row count stays exact. The bar is 7
+write. Tail rows and the phase-bar row are cut to width−1 terminal cells, measured with `go-runewidth` (already in
+the module graph) so that a wide rune such as CJK text or an emoji takes 2; no row wraps and the row count stays
+exact. The bar is 7
 segments of 2 cells (`━━` filled, `──` dim for the rest) and is dropped under 60 columns. Static ignores both methods; the build step
 writes script lines to the gutter itself there.
 
