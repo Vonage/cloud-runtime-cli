@@ -47,8 +47,8 @@ writes script lines to the gutter itself there.
 
 ### The failure dump
 
-On a `failed` status or a timeout, `watchBuildRich` stops the step (erasing the region) and writes the recorded
-frames to the gutter before returning the error. In static it writes only the frames it did not print. On
+On a `failed` status, a timeout or a status-route error, `watchBuildRich` stops the step (erasing the region) and
+writes the recorded frames to the gutter before returning the error. In static it writes only the frames it did not print. On
 `context.Canceled` it prints nothing. Memory is bounded by keeping the last 2,000 frames, with a dim
 `… <n> earlier lines` first when more arrived.
 
