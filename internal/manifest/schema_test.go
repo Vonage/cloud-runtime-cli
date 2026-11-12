@@ -136,7 +136,7 @@ func TestSchemaAcceptsEveryCorpusManifest(t *testing.T) {
 	sch := compileSchema(t)
 	files := corpusManifests(t)
 	require.Contains(t, files, filepath.Join("testdata", "commented.yml"))
-	require.True(t, slices.ContainsFunc(files, func(f string) bool { return strings.HasPrefix(f, "../../test/") }),
+	require.True(t, slices.ContainsFunc(files, func(f string) bool { return strings.HasPrefix(filepath.ToSlash(f), "../../test/") }),
 		"no contract corpus manifest found")
 	for _, path := range files {
 		t.Run(path, func(t *testing.T) {
