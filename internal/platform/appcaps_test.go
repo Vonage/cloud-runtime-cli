@@ -195,7 +195,25 @@ func TestWebhookAddresses(t *testing.T) {
 			name: "other fields ignored",
 			input: `{"voice":{"webhooks":{"answer_url":{"address":"https://h/a","http_method":"POST"}},"signed_callbacks":true},` +
 				`"rtc":null,"messages":{"version":"v1"}}`,
-			want: []WebhookAddress{{Path: "voice.webhooks.answer_url", Address: "https://h/a"}},
+			want: []WebhookAddress{{Path: "voice.webhooks.answer_url", Address: "https://h/a", Method: "POST"}},
+		},
+		{
+			name: "the method beside each address",
+			input: `{"voice":{"webhooks":{"answer_url":{"address":"https://h/a","http_method":"GET"},` +
+				`"event_url":{"http_method":"POST","address":"https://h/e"}}}}`,
+			want: []WebhookAddress{
+				{Path: "voice.webhooks.answer_url", Address: "https://h/a", Method: "GET"},
+				{Path: "voice.webhooks.event_url", Address: "https://h/e", Method: "POST"},
+			},
+		},
+		{
+			name:  "a non-string method is blank",
+			input: `{"voice":{"webhooks":{"answer_url":{"address":"https://h/a","http_method":5}}}}`,
+			want:  []WebhookAddress{{Path: "voice.webhooks.answer_url", Address: "https://h/a"}},
+		},
+		{
+			name:  "a method without an address is ignored",
+			input: `{"voice":{"webhooks":{"answer_url":{"http_method":"POST"}}}}`,
 		},
 		{name: "non-string address ignored", input: `{"voice":{"webhooks":{"answer_url":{"address":5}}}}`},
 		{name: "other name ignored", input: `{"voice":{"Address":"x","addr":"y"}}`},

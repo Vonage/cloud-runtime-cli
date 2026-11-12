@@ -14,8 +14,9 @@ import (
 // NotAppliedNotice is what a command warns when it sent a block and the response has none.
 const NotAppliedNotice = "application-capabilities was not applied: this region's platform did not report applying it"
 
-// WebhookAddress is one string field named "address" of an applied block, with the dotted path of the object that holds it.
-type WebhookAddress struct{ Path, Address string }
+// WebhookAddress is one string field named "address" of an applied block, with the dotted path of the object that
+// holds it and the string "http_method" beside it (blank when there is none).
+type WebhookAddress struct{ Path, Address, Method string }
 
 // Label is the text before the colon of a summary line. The path is platform text.
 func (a WebhookAddress) Label() string { return "Webhook " + term.Sanitize(a.Path) }
@@ -44,7 +45,8 @@ func collectAddresses(v any, path string, out *[]WebhookAddress) {
 	case map[string]any:
 		for key, child := range v {
 			if s, ok := child.(string); ok && key == "address" {
-				*out = append(*out, WebhookAddress{Path: cmp.Or(path, key), Address: s})
+				method, _ := v["http_method"].(string)
+				*out = append(*out, WebhookAddress{Path: cmp.Or(path, key), Address: s, Method: method})
 				continue
 			}
 			collectAddresses(child, joinPath(path, key), out)

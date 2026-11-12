@@ -61,10 +61,10 @@ output must not change: `cd <WT> && make contract` passes at the end of every gr
 
 ## 4. Webhook methods
 
-- [ ] 4.1 Failing test in `internal/platform/appcaps_test.go`: `WebhookAddresses` sets `Method` from the string
+- [x] 4.1 Failing test in `internal/platform/appcaps_test.go`: `WebhookAddresses` sets `Method` from the string
   `http_method` beside `address`, blank when absent or not a string; paths and order unchanged. Verify:
   `cd <WT> && go test ./internal/platform/ -run TestWebhookAddresses` fails.
-- [ ] 4.2 Add `Method` to `WebhookAddress` in `internal/platform/appcaps.go`. Classic and debug output stay as they
+- [x] 4.2 Add `Method` to `WebhookAddress` in `internal/platform/appcaps.go`. Classic and debug output stay as they
   are. Verify: the 4.1 test and `cd <WT> && go test ./internal/platform/... ./internal/debugsession/...` pass.
 
 ## 5. Boxes
