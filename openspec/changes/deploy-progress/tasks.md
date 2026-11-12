@@ -20,13 +20,13 @@ output must not change: `cd <WT> && make contract` passes at the end of every gr
 
 ## 1. Build-log reader
 
-- [ ] 1.1 Failing table test in new `internal/deploy/buildlog_test.go` for `buildLog.add(frame string) frameKind`
+- [x] 1.1 Failing table test in new `internal/deploy/buildlog_test.go` for `buildLog.add(frame string) frameKind`
   (kinds: hidden, script, status) and `buildLog.phase() int`: every scenario of the "Frames are read by their
   opening words" requirement, plus: escape sequences and one leading `ℹ ` are removed before matching; a second
   `Cmd: /bin/sh` after a snapshot makes later lines script output again while the phase stays; `frames()` returns
   every frame in arrival order without its `ℹ `; past 2,000 frames it keeps the last 2,000 and reports the dropped
   count. Verify: `cd <WT> && go test ./internal/deploy/ -run TestBuildLog` fails.
-- [ ] 1.2 Implement `internal/deploy/buildlog.go`: the phase names, the prefix table from the spec in one place, the
+- [x] 1.2 Implement `internal/deploy/buildlog.go`: the phase names, the prefix table from the spec in one place, the
   forward-only phase, the script window flag and the bounded record. Verify: the 1.1 test passes.
 
 ## 2. Live region: phase bar and tail
