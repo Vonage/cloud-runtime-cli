@@ -1,0 +1,32 @@
+internal/term/style_test.go
+  s_8f29aed92d4586::t_f3eb26fcfffb8d 55-62
+internal/deploy/rich_build_test.go
+  s_8f29aed92d4586::t_18a0545d0da961 1-147,150-152,154-285
+  s_8f29aed92d4586::t_46fb12c24b94f1 148-149,153
+internal/term/style.go
+  s_8f29aed92d4586::t_8797e546f6df94 33-35
+internal/deploy/rich.go
+  s_8f29aed92d4586::t_556f605f2265fd 144-146,149-150,153-155,162-246
+  s_8f29aed92d4586::t_880ff14737e525 247-248
+internal/deploy/rich_match_test.go
+  s_8f29aed92d4586::t_8a5bd5ed94b35e 229-230,235,242
+  s_8f29aed92d4586::t_2da5666fabeabb 236-241,243-245
+internal/deploy/fake_api_test.go
+  s_8f29aed92d4586::t_e720870c979b3a 49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "494aacb0a4b4a7445c0fb0c4561056e7c302bbfb",
+  "prompts": {},
+  "sessions": {
+    "s_8f29aed92d4586": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_0276e312-5042-41e2-ac18-64c60c7380c7",
+        "model": "auto"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
