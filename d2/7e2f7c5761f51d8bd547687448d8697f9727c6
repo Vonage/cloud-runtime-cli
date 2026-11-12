@@ -1,0 +1,38 @@
+internal/platform/appcaps.go
+  d5aeb43828896e0f 17-19,48-49
+internal/platform/appcaps_test.go
+  d5aeb43828896e0f 198-216
+openspec/changes/deploy-progress/tasks.md
+  d5aeb43828896e0f 64,67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "d27e2f7c5761f51d8bd547687448d8697f9727c6",
+  "prompts": {
+    "d5aeb43828896e0f": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "bb386b8b-55d5-4a85-b4af-b85c145b3542",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-12T10:40:51.247Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
+          "timestamp": "2026-11-12T10:40:51.247Z"
+        }
+      ],
+      "total_additions": 26,
+      "total_deletions": 6,
+      "accepted_lines": 26,
+      "overriden_lines": 0
+    }
+  }
+}
