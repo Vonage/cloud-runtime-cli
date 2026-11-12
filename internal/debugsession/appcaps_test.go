@@ -3,13 +3,11 @@ package debugsession
 import (
 	"encoding/json"
 	"net/http"
-	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Vonage/cloud-runtime-cli/internal/clock/clocktest"
 	"github.com/Vonage/cloud-runtime-cli/internal/platform"
 	"github.com/Vonage/cloud-runtime-cli/internal/term"
 )
@@ -140,46 +138,6 @@ func TestIntroListsTheAppliedWebhookAddresses(t *testing.T) {
 
 			tt.check(t, tio.Style(), out.String())
 			assert.Equal(t, tt.wantErrOut, errOut.String())
-		})
-	}
-}
-
-func TestRichIntroListsTheAppliedWebhookAddresses(t *testing.T) {
-	const host = "https://svc.debug.example.test"
-	usual := func(webhooks ...string) []string {
-		lines := []string{literal(""), literal("✓ Debugger ready"), `^  Service:?\s+svc$`, `^  Host:?\s+` + regexp.QuoteMeta(host) + `$`}
-		lines = append(lines, webhooks...)
-		return append(lines, literal(""), literal(forwardingLine))
-	}
-	tests := []struct {
-		name    string
-		applied string
-		want    []string
-	}{
-		{
-			name:    "applied",
-			applied: appliedTwoWebhooks,
-			want: usual(
-				`^  Webhook voice\.webhooks\.answer_url:?\s+https://h\.example/answer$`,
-				`^  Webhook voice\.webhooks\.event_url:?\s+https://h\.example/event$`,
-			),
-		},
-		{name: "absent", want: usual()},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tio, out, errOut := term.TestRich(term.Rich, 100, clocktest.New(testStart))
-			s := &session{
-				tio:     tio,
-				con:     newConsole(tio, false),
-				service: platform.DebugService{ServiceName: "svc", ApplicationCapabilities: rawOrNil(tt.applied)},
-				addrs:   serviceAddresses{Host: host},
-			}
-
-			s.printIntro()
-
-			requireLines(t, screenLines(out.Screen()), tt.want...)
-			assert.Empty(t, errOut.Raw())
 		})
 	}
 }

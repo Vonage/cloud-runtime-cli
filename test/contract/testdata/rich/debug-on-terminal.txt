@@ -1,13 +1,16 @@
 # vcr rich golden v1
 exit 0
-@@ stdout 1204
+@@ stdout 1484
 ✓ Debug server deployed  dbg-service-1
 ✓ Debug server ready
 ✓ Debug proxy connected
 
-✓ Debugger ready
-  Service  dbg-service-1
-  Host     <OTHER>
+╭─ ✓ Debugger ready ────────────────╮
+│                                   │
+│  URL      <OTHER>  │
+│  Service  dbg-service-1           │
+│                                   │
+╰───────────────────────────────────╯
 
 Forwarding requests. Press Ctrl+C to stop.
 testapp ready

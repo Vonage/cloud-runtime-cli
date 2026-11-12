@@ -40,6 +40,46 @@ func WebhookAddresses(applied json.RawMessage) []WebhookAddress {
 	return out
 }
 
+// WebhooksBoxTitle is the title of a summary's webhooks box.
+const WebhooksBoxTitle = "Application webhooks"
+
+// WebhookLines are the lines of a summary's webhooks box: the addresses grouped by capability, the first segment of
+// their path, in the order given. A row is the name, the method when any address has one, and the address.
+func WebhookLines(style term.Style, addresses []WebhookAddress) []term.BoxLine {
+	withMethod := slices.ContainsFunc(addresses, func(a WebhookAddress) bool { return term.Sanitize(a.Method) != "" })
+	var out []term.BoxLine
+	group := ""
+	for i, a := range addresses {
+		capability, name, _ := strings.Cut(term.Sanitize(a.Path), ".")
+		if i == 0 || capability != group {
+			group = capability
+			out = append(out, term.BoxLine{Head: bullet(style, capability) + " " + capability})
+		}
+		name = strings.TrimSuffix(strings.TrimPrefix(name, "webhooks."), "_url")
+		cells := []string{name, term.Sanitize(a.Address)}
+		if withMethod {
+			method := term.Sanitize(a.Method)
+			if method != "" {
+				method = style.Gray(method)
+			}
+			cells = []string{name, method, cells[1]}
+		}
+		out = append(out, term.BoxLine{Cells: cells})
+	}
+	return out
+}
+
+// bullet is a group head's dot in the capability's colour.
+func bullet(style term.Style, capability string) string {
+	colour := map[string]func(string) string{
+		"voice": style.Magenta, "messages": style.Blue, "rtc": style.Yellow, "video": style.Cyan, "verify": style.Green,
+	}[capability]
+	if colour == nil {
+		colour = style.Bold
+	}
+	return colour("●")
+}
+
 func collectAddresses(v any, path string, out *[]WebhookAddress) {
 	switch v := v.(type) {
 	case map[string]any:

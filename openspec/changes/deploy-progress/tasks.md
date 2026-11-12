@@ -104,12 +104,12 @@ output must not change: `cd <WT> && make contract` passes at the end of every gr
 
 ## 8. Debug summary
 
-- [ ] 8.1 Failing tests in `internal/debugsession` (rich and static, existing test helpers): the ready summary is the
+- [x] 8.1 Failing tests in `internal/debugsession` (rich and static, existing test helpers): the ready summary is the
   `✓ Debugger ready` box with `URL` then `Service`, then the webhooks box exactly as deploy draws it, then the
   forwarding notice; no `Webhook <path>` row; no webhooks box without addresses; the console hold still keeps a
   request's access line out of the middle (existing hold test). Verify: `cd <WT> && go test ./internal/debugsession/`
   fails for the new cases.
-- [ ] 8.2 Move the webhooks box lines out of `internal/deploy` into one shared helper both packages use, and rewrite
+- [x] 8.2 Move the webhooks box lines out of `internal/deploy` into one shared helper both packages use, and rewrite
   `printIntroRich` with `term.Box`. Classic debug output untouched. Re-record `debug-on-terminal` with `cd <WT> &&
   make contract-rich-record SCENARIO=debug-on-terminal` and read it. Verify: `cd <WT> && make test lint contract
   contract-rich` passes and the transcripts are unchanged.

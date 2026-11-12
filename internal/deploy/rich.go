@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
-	"slices"
 	"strings"
 
 	"github.com/Vonage/cloud-runtime-cli/internal/bundle"
@@ -289,44 +288,7 @@ func (r *runner) summaryRich(deployed platform.DeployResult) {
 	)
 	fmt.Fprintln(r.t.Out)
 	r.t.Box(r.c.SuccessIcon()+" "+r.c.Bold(term.Sanitize(r.p.ProjectName))+" is live", rows)
-	if webhooks := r.webhookLines(platform.WebhookAddresses(deployed.ApplicationCapabilities)); len(webhooks) > 0 {
-		r.t.Box(r.c.Bold("Application webhooks"), webhooks)
+	if webhooks := platform.WebhookLines(r.c, platform.WebhookAddresses(deployed.ApplicationCapabilities)); len(webhooks) > 0 {
+		r.t.Box(r.c.Bold(platform.WebhooksBoxTitle), webhooks)
 	}
-}
-
-// webhookLines groups the addresses by capability, the first segment of their path, in the order given. A row is the
-// name, the method when any address has one, and the address.
-func (r *runner) webhookLines(addresses []platform.WebhookAddress) []term.BoxLine {
-	withMethod := slices.ContainsFunc(addresses, func(a platform.WebhookAddress) bool { return term.Sanitize(a.Method) != "" })
-	var out []term.BoxLine
-	group := ""
-	for i, a := range addresses {
-		capability, name, _ := strings.Cut(term.Sanitize(a.Path), ".")
-		if i == 0 || capability != group {
-			group = capability
-			out = append(out, term.BoxLine{Head: r.bullet(capability) + " " + capability})
-		}
-		name = strings.TrimSuffix(strings.TrimPrefix(name, "webhooks."), "_url")
-		cells := []string{name, term.Sanitize(a.Address)}
-		if withMethod {
-			method := term.Sanitize(a.Method)
-			if method != "" {
-				method = r.c.Gray(method)
-			}
-			cells = []string{name, method, cells[1]}
-		}
-		out = append(out, term.BoxLine{Cells: cells})
-	}
-	return out
-}
-
-// bullet is the group head's dot in the capability's colour.
-func (r *runner) bullet(capability string) string {
-	colour := map[string]func(string) string{
-		"voice": r.c.Magenta, "messages": r.c.Blue, "rtc": r.c.Yellow, "video": r.c.Cyan, "verify": r.c.Green,
-	}[capability]
-	if colour == nil {
-		colour = r.c.Bold
-	}
-	return colour("●")
 }
