@@ -98,7 +98,7 @@ output must not change: `cd <WT> && make contract` passes at the end of every gr
   `cd <WT> && make contract-rich-record SCENARIO=<id>`; read every new golden and check it against the spec.
   Verify: `cd <WT> && make contract contract-rich` passes and `git diff --stat test/contract/testdata/transcripts`
   is empty.
-- [ ] 7.2 README "Output" table: `VCR_UI=static` keeps the build script lines it prints; one sentence that `vcr
+- [x] 7.2 README "Output" table: `VCR_UI=static` keeps the build script lines it prints; one sentence that `vcr
   deploy` on a terminal shows the build phase and only the build script's output, and the full log when a build
   fails. Verify: `cd <WT> && go test ./internal/term/ -run TestReadme` passes.
 
