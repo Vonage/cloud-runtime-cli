@@ -19,7 +19,7 @@ type BoxLine struct {
 // lines with two spaces of padding, a blank row and the bottom border, all borders dim. Cells are padded into columns
 // across the whole box with two-space gutters, indented two spaces under the heads when the box has any. Text is
 // measured without escape sequences and never cut: when the box does not fit the terminal, or its width is unknown,
-// the title is printed and then the lines indented two spaces, without borders. Without colour no escape sequence is
+// the title is printed and then the lines indented two spaces, without borders. Without colour no colour sequence is
 // printed, not even one the caller passed.
 func (t *IO) Box(title string, lines []BoxLine) {
 	if t.mode == Classic {
