@@ -112,22 +112,19 @@ func TestRichDeployResolvesEachStage(t *testing.T) {
 
 	require.NoError(t, r.run())
 
+	out := lines(r.stdout.Screen())
+	require.Len(t, out, 8+len(oneHostBox))
 	assert.Equal(t, []string{
 		"✓ Project resolved my-project",
 		"✓ Parameters validated",
 		"✓ Files packaged 1 file",
 		"✓ Source uploaded",
 		"✓ Package created pkg-1",
-		"  │ building",
-		"  │ Status - completed",
 		"✓ Package built",
 		"✓ Instance deployed",
 		"",
-		"✓ Instance has been deployed!",
-		"  Instance id: i-1",
-		"  Instance service name: my-project-dev",
-		"  Instance host address: https://one.example.test",
-	}, squashed(lines(r.stdout.Screen())))
+	}, squashed(out[:8]))
+	assert.Equal(t, oneHostBox, out[8:])
 	assert.Empty(t, r.stderr.Raw())
 	for _, classic := range []string{"Waiting for build", "built successfully", "/-------", "retrieved", "Compressing"} {
 		assert.NotContains(t, r.stdout.Raw(), classic)
@@ -157,65 +154,17 @@ func TestRichDeployShowsDurationOnlyFromTwoSeconds(t *testing.T) {
 	assert.NotContains(t, lineWith(t, out, "Package created"), "(")
 }
 
-func TestRichDeployBuildFramesUseTheGutter(t *testing.T) {
-	r := newRichRun(t, term.Rich)
-	r.api.frames = []string{"\x1b]0;title\a" + "building", "\x1b[35mℹ\x1b[0m Status - completed", "two\n"}
+func TestStaticBuildScriptLinesAreSanitised(t *testing.T) {
+	r := newRichRun(t, term.Static)
+	r.api.frames = []string{"ℹ Cmd: /bin/sh", "\x1b]0;title\a" + "building", "\x1b[35mcoloured\x1b[0m", "two\n"}
 
 	require.NoError(t, r.run())
 
 	frames := blockFrom(t, lines(r.stdout.Screen()), "  │ building")
-	assert.Equal(t, []string{"  │ building", "  │ ℹ Status - completed", "  │ two", "  │"}, frames[:4])
+	assert.Equal(t, []string{"  │ building", "  │ coloured", "  │ two", "  │"}, frames[:4])
 	assert.Equal(t, "✓ Package built", frames[4])
-	assert.Contains(t, r.stdout.Raw(), "\x1b[35mℹ\x1b[0m Status - completed", "the server's colour is untouched")
+	assert.Contains(t, r.stdout.Raw(), "\x1b[35mcoloured\x1b[0m", "the server's colour is untouched")
 	assert.NotContains(t, r.stdout.Raw(), "\x1b]0;")
-}
-
-func TestRichDeployResultBlockIsLiteral(t *testing.T) {
-	const title = "Instance has been deployed!"
-	rows := func(hosts ...string) string {
-		text := "\n  Instance id: i-1\n  Instance service name: svc-1\n"
-		for _, host := range hosts {
-			text += "  Instance host address: " + host + "\n"
-		}
-		return text
-	}
-	tests := []struct {
-		name     string
-		deployed platform.DeployResult
-		want     string
-	}{
-		{
-			name: "one row per address, with no colour in the rows",
-			deployed: platform.DeployResult{
-				InstanceID: "i-1", ServiceName: "svc-1", HostURLs: []string{"https://a.example.test", "https://b.example.test"},
-			},
-			want: rows("https://a.example.test", "https://b.example.test"),
-		},
-		{
-			name:     "no address, no row",
-			deployed: platform.DeployResult{InstanceID: "i-1", ServiceName: "svc-1"},
-			want:     rows(),
-		},
-		{
-			name: "control sequences in the platform's words are removed",
-			deployed: platform.DeployResult{
-				InstanceID: "i-\x1b[2J1", ServiceName: "svc-\x1b]0;title\a1", HostURLs: []string{"https://a.\x1b[31mexample.test"},
-			},
-			want: rows("https://a.example.test"),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := newRichRun(t, term.Rich)
-			r.api.deployed = tt.deployed
-
-			require.NoError(t, r.run())
-
-			_, block, found := strings.Cut(r.stdout.Raw(), title)
-			require.True(t, found)
-			assert.Equal(t, tt.want, block)
-		})
-	}
 }
 
 func TestRichDeployCreatesAMissingProject(t *testing.T) {

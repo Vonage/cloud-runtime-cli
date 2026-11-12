@@ -1,0 +1,5 @@
+description: "--network-apis prints the values of --network-application-id and --redirect-uri"
+args: [app, capabilities, add, --network-apis, --network-application-id, my-network-app, --redirect-uri, "https://example.com/callback", --print]
+tty: true
+presentation: rich
+expect-reads: []

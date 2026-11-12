@@ -1,0 +1,26 @@
+description: deploy from a terminal prints the whole build log, Kaniko lines included, when the build fails
+group: deploy
+args: [deploy]
+cwd: work/project
+tty: true
+presentation: rich
+files:
+  - path: work/project/vcr.yml
+    content: |
+      project: {name: my-project}
+      instance: {name: dev, runtime: nodejs18, region: aws.euw1, application-id: 0f39f387-579b-4259-9f76-2715ff73b8b7, entrypoint: [node, index.js]}
+  - {path: work/project/index.js, content: "console.log('hi')\n"}
+  - {path: work/project/package.json, content: "{\"name\": \"my-project\", \"version\": \"1.0.0\"}\n"}
+fixtures:
+  buildStatus: [{status: failed}]
+  build:
+    connections:
+      - - {send: "\u001b[35mℹ\u001b[0m Instance source code initialized successfully"}
+        - {send: "\u001b[35mℹ\u001b[0m Retrieving image manifest vcr.registry/nodejs18:latest"}
+        - {send: "\u001b[35mℹ\u001b[0m Unpacking rootfs as cmd COPY . . requires it."}
+        - {send: "\u001b[35mℹ\u001b[0m COPY . ."}
+        - {send: "\u001b[35mℹ\u001b[0m Cmd: /bin/sh"}
+        - {send: "\u001b[35mℹ\u001b[0m npm ERR! missing script: build"}
+        - {send: "\u001b[35mℹ\u001b[0m Status - failed"}
+steps: []
+expect-reads: [euw1 GET /regions/aws.euw1, euw1 GET /projects/my-project, euw1 GET /packages/<uuid>/build/status]

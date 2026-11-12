@@ -43,6 +43,8 @@ const (
 	durationFrom = 2 * time.Second        // a resolved line shows its duration from here
 	minRichWidth = 40                     // narrower terminals get Static
 	gutterPrefix = "  │ "                 // the dim prefix of streamed build lines
+	tailSize     = 8                      // the most lines drawn under the live row
+	barFrom      = 60                     // narrower terminals leave the phase bar out
 )
 
 // TermBuffer records what a rich renderer wrote, including carriage returns and erase sequences, and can render the
@@ -65,9 +67,17 @@ type Step struct {
 
 	once sync.Once
 
-	mu     sync.Mutex // guards done and frozen
-	done   bool
-	frozen time.Duration // the duration once resolved
+	mu       sync.Mutex // guards done, frozen, progress and tail
+	done     bool
+	frozen   time.Duration // the duration once resolved
+	progress *progress     // Rich: the phase bar of the live row, nil until SetProgress
+	tail     []string      // Rich: the sanitised lines drawn under the live row, at most tailSize
+}
+
+// progress is what SetProgress set: done of total phases, and the phase's label.
+type progress struct {
+	done, total int
+	label       string
 }
 
 // StepOption changes a step.

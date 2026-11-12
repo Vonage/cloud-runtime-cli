@@ -126,7 +126,7 @@ func TestExistingRoutesAgainstFakePlatform(t *testing.T) {
 	})
 
 	t.Run("debug services", func(t *testing.T) {
-		service, err := c.DeployDebugService(ctx, "aws.euw1", fixtureApp, "", manifest.Capabilities{Messages: "v0.1"})
+		service, err := c.DeployDebugService(ctx, "aws.euw1", fixtureApp, "", manifest.Capabilities{Messages: "v0.1"}, nil)
 		require.NoError(t, err)
 		assert.Equal(t, DebugService{
 			ServiceName: "dbg-service-1", PrivateKey: "-----BEGIN PRIVATE KEY-----\ntest\n-----END PRIVATE KEY-----",

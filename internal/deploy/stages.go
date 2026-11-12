@@ -203,12 +203,13 @@ func (r *runner) packageRequest(sourceKey string) (platform.PackageRequest, erro
 	}
 	inst := r.p.Manifest.Instance
 	return platform.PackageRequest{
-		SourceCodeKey:   sourceKey,
-		Entrypoint:      inst.Entrypoint,
-		Capabilities:    capabilities,
-		BuildScriptPath: inst.BuildScript,
-		Runtime:         r.p.Runtime,
-		Name:            name,
+		SourceCodeKey:           sourceKey,
+		Entrypoint:              inst.Entrypoint,
+		Capabilities:            capabilities,
+		BuildScriptPath:         inst.BuildScript,
+		Runtime:                 r.p.Runtime,
+		Name:                    name,
+		ApplicationCapabilities: r.p.Manifest.ApplicationCapabilities,
 	}, nil
 }
 

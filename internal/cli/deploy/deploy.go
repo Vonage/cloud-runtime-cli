@@ -68,6 +68,9 @@ func run(cmd *cobra.Command, env *cmdenv.Env, f flagValues, args []string) error
 	if err != nil {
 		return fmt.Errorf("failed to read manifest file: %w", err)
 	}
+	if err := manifest.CheckApplicationCapabilities(read, flagCapabilities(f.capabilities)); err != nil {
+		return err
+	}
 
 	region, source := effectiveRegion(env.Flags.Region, read, env.Settings.File.DefaultRegion)
 	client, err := env.RegionClient(cmd.Context(), region)

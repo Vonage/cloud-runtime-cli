@@ -22,7 +22,8 @@ const (
 )
 
 // helpScenarios maps the id of each per-command help scenario to the command
-// it shows: the 27 pages that the golden help files record.
+// it shows: the 27 golden help pages of the baseline's commands. The commands
+// added since have a page but no help scenario, as the baseline cannot record one.
 var helpScenarios = map[string][]string{
 	"help-root":                  {},
 	"help-help":                  {"help"},
@@ -193,10 +194,13 @@ func parseGolden(t *testing.T, raw string) goldenRecording {
 // TestHelpTranscriptsMatchGoldenHelp compares each help transcript with its
 // golden file. The recorder replaces every UUID that a scenario does not
 // contain with <uuid>, which includes the example ids that help pages show, so
-// the golden text goes through the same rules first.
+// the golden text goes through the same rules first. A field that
+// allowed-diffs.txt lets the scenario change is not compared.
 func TestHelpTranscriptsMatchGoldenHelp(t *testing.T) {
 	scs := loadAllScenarios(t)
 	n := NewNormaliser(Layout{}, "", 0, 0, nil, nil)
+	allowed, err := LoadAllowed("allowed-diffs.txt", scenarioIDs(scenariosDir))
+	require.NoError(t, err)
 	for id, path := range helpScenarios {
 		t.Run(id, func(t *testing.T) {
 			sc, ok := scenarioByID(scs, id)
@@ -219,9 +223,15 @@ func TestHelpTranscriptsMatchGoldenHelp(t *testing.T) {
 			stderr, err := Unescape(tr.Stderr)
 			require.NoError(t, err)
 
-			assert.Equal(t, golden.exit, tr.Exit)
-			assert.Equal(t, n.Stream(golden.stdout, false), stdout)
-			assert.Equal(t, n.Stream(golden.stderr, true), stderr)
+			if !allowed.Allows(id, "exit") {
+				assert.Equal(t, golden.exit, tr.Exit)
+			}
+			if !allowed.Allows(id, "stdout") {
+				assert.Equal(t, n.Stream(golden.stdout, false), stdout)
+			}
+			if !allowed.Allows(id, "stderr") {
+				assert.Equal(t, n.Stream(golden.stderr, true), stderr)
+			}
 		})
 	}
 }

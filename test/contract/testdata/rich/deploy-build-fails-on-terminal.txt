@@ -1,0 +1,17 @@
+# vcr rich golden v1
+exit 1
+@@ stdout 484
+✓ Project resolved  my-project
+✓ Parameters validated
+✓ Files packaged  3 files
+✓ Source uploaded
+✓ Package created  <uuid>
+  │ Instance source code initialized successfully
+  │ Retrieving image manifest vcr.registry/nodejs18:latest
+  │ Unpacking rootfs as cmd COPY . . requires it.
+  │ COPY . .
+  │ Cmd: /bin/sh
+  │ npm ERR! missing script: build
+  │ Status - failed
+✗ failed to watch deployment for package_id="<uuid>": error while building package <uuid>
+

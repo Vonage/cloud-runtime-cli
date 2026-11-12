@@ -11,13 +11,14 @@ var escapeSequence = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
 func colourHelpers(s Style) map[string]func(string) string {
 	return map[string]func(string) string{
-		"Red":    s.Red,
-		"Yellow": s.Yellow,
-		"Green":  s.Green,
-		"Cyan":   s.Cyan,
-		"Blue":   s.Blue,
-		"Gray":   s.Gray,
-		"Bold":   s.Bold,
+		"Red":     s.Red,
+		"Yellow":  s.Yellow,
+		"Green":   s.Green,
+		"Cyan":    s.Cyan,
+		"Blue":    s.Blue,
+		"Magenta": s.Magenta,
+		"Gray":    s.Gray,
+		"Bold":    s.Bold,
 	}
 }
 
@@ -51,4 +52,12 @@ func TestStyleColoursOnlyWhenEnabled(t *testing.T) {
 func TestYellowBoldBytes(t *testing.T) {
 	assert.Equal(t, "\x1b[0;1;33mhost\x1b[0m", YellowBold("host"))
 	assert.Equal(t, "", YellowBold(""))
+}
+
+func TestStyleReportsWhetherItColours(t *testing.T) {
+	plain, _, _ := Test("", false)
+	coloured, _, _ := newTestIO("", false, false, false, true)
+
+	assert.False(t, plain.Style().ColorEnabled())
+	assert.True(t, coloured.Style().ColorEnabled())
 }

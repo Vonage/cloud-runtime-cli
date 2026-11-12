@@ -39,6 +39,15 @@ func TestScreenKeepsFinalNewline(t *testing.T) {
 	assert.Equal(t, "a\n", screenOf(t, "a\n\r\x1b[2K"))
 }
 
+func TestScreenCursorUpAndEraseBelow(t *testing.T) {
+	assert.Equal(t, "top\n", screenOf(t, "top\nlive\nrow 1\nrow 2\r\x1b[2A\x1b[J"))
+	assert.Equal(t, "top\nnew\nrow 1", screenOf(t, "top\nlive\nrow 1\r\x1b[1A\x1b[2Knew"))
+	assert.Equal(t, "li", screenOf(t, "live\nrow\r\x1b[1Ali\x1b[J"))
+	assert.Equal(t, "a\nX", screenOf(t, "a\nb\nc\r\x1b[AX\x1b[J"), "a bare A moves one row")
+	assert.Equal(t, "a\nc", screenOf(t, "a\nb\r\x1b[1A\nc"), "a newline above the last row moves down")
+	assert.Equal(t, "x", screenOf(t, "\x1b[5Ax"), "the cursor stops at the top row")
+}
+
 func TestScreenKeepsAHalfWrittenSequenceAsText(t *testing.T) {
 	assert.Equal(t, "ab\x1b[3", screenOf(t, "ab\x1b[3"))
 	assert.Equal(t, "ab\x1b", screenOf(t, "ab\x1b"))

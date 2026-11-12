@@ -9,6 +9,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/briandowns/spinner"
+	"github.com/mattn/go-runewidth"
 )
 
 const (
@@ -46,16 +47,136 @@ func richLabel(label string) string {
 // is cut by rune count and ends in "…". A width of 0 or less means the width is unknown and nothing is cut.
 func frameText(label string, elapsed time.Duration, width int, dim func(string) string) string {
 	elapsed = max(elapsed, 0)
-	suffix, suffixRunes := "", 0
-	if elapsed >= elapsedFrom {
-		text := liveElapsed(elapsed)
-		suffix, suffixRunes = "  "+dim(text), 2+utf8.RuneCountInString(text)
-	}
+	suffix, suffixRunes := elapsedSuffix(elapsed, dim)
 	glyph := spinnerFrame(elapsed)
 	if width > 0 {
 		label = fitLabel(label, width-1-utf8.RuneCountInString(glyph)-1-suffixRunes)
 	}
 	return glyph + " " + label + suffix
+}
+
+// progressFrame is frameText for a step with a phase bar: "<glyph> <label>  <bar>  <done>/<total> <phase>", then the
+// elapsed time, at most width-1 cells. The bar is left out under barFrom columns. The phase is cut to fit; when that
+// leaves it no room, the text after the glyph is cut as a whole, without the bar.
+func progressFrame(label string, p progress, elapsed time.Duration, width int, dim func(string) string) string {
+	elapsed = max(elapsed, 0)
+	suffix, suffixRunes := elapsedSuffix(elapsed, dim)
+	glyph := spinnerFrame(elapsed)
+	count := fmt.Sprintf("%d/%d ", p.done, p.total)
+
+	bar, barRunes := "", 0
+	if width <= 0 || width >= barFrom {
+		bar, barRunes = "  "+strings.Repeat("━━", p.done), 2+2*p.total
+		if empty := p.total - p.done; empty > 0 {
+			bar += dim(strings.Repeat("──", empty))
+		}
+	}
+	head := label + bar + "  " + count
+	if width <= 0 {
+		return glyph + " " + head + p.label + suffix
+	}
+
+	room := width - 1 - cellWidth(glyph) - 1 - suffixRunes
+	if phaseRoom := room - cellWidth(label) - barRunes - 2 - len(count); phaseRoom >= 1 {
+		return glyph + " " + head + fitVisible(p.label, phaseRoom) + suffix
+	}
+	return glyph + " " + fitVisible(label+"  "+count+p.label, room) + suffix
+}
+
+// elapsedSuffix is the dim elapsed time a live line ends with from elapsedFrom, and how many runes it takes.
+func elapsedSuffix(elapsed time.Duration, dim func(string) string) (string, int) {
+	if elapsed < elapsedFrom {
+		return "", 0
+	}
+	text := liveElapsed(elapsed)
+	return "  " + dim(text), 2 + utf8.RuneCountInString(text)
+}
+
+// tailLine is a line of the tail as it is kept: sanitised, colour kept only when colour is on, and tabs and newlines
+// turned into spaces so the line takes one row.
+func tailLine(line string, colour bool) string {
+	return strings.Map(func(r rune) rune {
+		if r == '\t' || r == '\n' {
+			return ' '
+		}
+		return r
+	}, sanitize(line, colour))
+}
+
+// tailText is the rows drawn under the live line and how many there are: each on a new row, the dim gutter prefix
+// and the line cut so the row is at most width-1 cells. An unknown or tiny width draws none: a row that wraps would
+// make the region taller than counted.
+func tailText(lines []string, width int, dim func(string) string) (string, int) {
+	room := width - 1 - cellWidth(gutterPrefix)
+	if width <= 0 || room < 1 || len(lines) == 0 {
+		return "", 0
+	}
+	prefix := dim(gutterPrefix)
+	var b strings.Builder
+	for _, line := range lines {
+		b.WriteString("\n" + prefix + fitVisible(line, room))
+	}
+	return b.String(), len(lines)
+}
+
+// fitVisible cuts a sanitised line to room cells, the last of them "…", when it is wider. Its only escape sequences
+// are complete colour sequences: they take no cells and are never split, and a cut line that had any ends with a reset.
+func fitVisible(line string, room int) string {
+	if cellWidth(line) <= room {
+		return line
+	}
+	var b strings.Builder
+	kept := 0
+	for i := 0; i < len(line); {
+		if n := colourSequenceLen(line[i:]); n > 0 {
+			b.WriteString(line[i : i+n])
+			i += n
+			continue
+		}
+		r, size := utf8.DecodeRuneInString(line[i:])
+		cell := cells.RuneWidth(r)
+		if kept+cell > room-1 {
+			break
+		}
+		b.WriteString(line[i : i+size])
+		kept += cell
+		i += size
+	}
+	b.WriteString(ellipsis)
+	if strings.IndexByte(line, escape) >= 0 {
+		b.WriteString(colourReset)
+	}
+	return b.String()
+}
+
+// cells measures runes in terminal cells: a wide rune (CJK, most emoji) takes 2. It does not follow the locale, so
+// ambiguous runes such as "│" and "…" take 1, as they do on most terminals.
+var cells = &runewidth.Condition{StrictEmojiNeutral: true}
+
+// cellWidth is how many terminal cells a sanitised line takes on the screen: its colour sequences take none.
+func cellWidth(line string) int {
+	count := 0
+	for i := 0; i < len(line); {
+		if n := colourSequenceLen(line[i:]); n > 0 {
+			i += n
+			continue
+		}
+		r, size := utf8.DecodeRuneInString(line[i:])
+		count += cells.RuneWidth(r)
+		i += size
+	}
+	return count
+}
+
+// colourSequenceLen is the length of the colour sequence text starts with, or 0 when it does not start with one.
+func colourSequenceLen(text string) int {
+	if !strings.HasPrefix(text, "\x1b[") {
+		return 0
+	}
+	if end := strings.IndexByte(text, 'm'); end > 0 {
+		return end + 1
+	}
+	return 0
 }
 
 // fitLabel returns label cut to room runes, the last of them "…", when it is longer.

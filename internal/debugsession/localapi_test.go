@@ -32,6 +32,7 @@ type deployCall struct {
 	Ctx                 context.Context
 	Region, AppID, Name string
 	Caps                manifest.Capabilities
+	AppCaps             map[string]any
 }
 
 type readyCall struct {
@@ -71,8 +72,8 @@ type localAPI struct {
 
 var _ API = (*localAPI)(nil)
 
-func (a *localAPI) DeployDebugService(ctx context.Context, region, appID, name string, caps manifest.Capabilities) (platform.DebugService, error) {
-	call := deployCall{Ctx: ctx, Region: region, AppID: appID, Name: name, Caps: caps}
+func (a *localAPI) DeployDebugService(ctx context.Context, region, appID, name string, caps manifest.Capabilities, appCaps map[string]any) (platform.DebugService, error) {
+	call := deployCall{Ctx: ctx, Region: region, AppID: appID, Name: name, Caps: caps, AppCaps: appCaps}
 	a.mu.Lock()
 	a.deploys = append(a.deploys, call)
 	hook, service, err := a.onDeploy, a.service, a.deployErr

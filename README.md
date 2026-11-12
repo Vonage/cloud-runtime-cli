@@ -68,6 +68,8 @@ Usage examples are in the `docs/` folder - [vcr](docs/vcr.md)
 
 The platform address is set with `endpoint` in `~/.vcr-cli` or with `--endpoint`. They replace `graphql_endpoint` and `--graphql-endpoint`, which still work but are deprecated. When `vcr` finds only `graphql_endpoint` in the config file, it offers to add the `endpoint` key on an interactive terminal, and otherwise prints the line to add. `vcr configure` writes both keys.
 
+A JSON Schema for `vcr.yml` is published at `https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/schema/vcr.schema.json`. It describes `project`, `instance`, `debug` and `application-capabilities`, and accepts keys it does not describe. Editors that use the YAML language server (for example VS Code with the YAML extension) complete and check the manifest when its first line is `# yaml-language-server: $schema=https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/schema/vcr.schema.json`.
+
 ## Terminal output
 
 In an interactive terminal, `vcr` shows live progress that settles into result lines with timings, titled result blocks and compact error messages with hints. Output that is piped, redirected or produced in CI is the same as in earlier releases, so scripts and editor integrations keep working.
@@ -77,7 +79,9 @@ The new presentation is used when stdout and stderr are both terminals, `TERM` i
 | Setting | Effect |
 |---|---|
 | `VCR_UI=classic` | The output of earlier releases, exactly. Use it for anything that allocates a terminal but reads the output, such as an `expect` script. |
-| `VCR_UI=static` | The same lines and layout without animation or cursor movement, for screen readers and recordings. Also used when the terminal is narrower than 40 columns. |
+| `VCR_UI=static` | The same lines and layout without animation or cursor movement, for screen readers and recordings. `vcr deploy` prints the build script's lines as they arrive. Also used when the terminal is narrower than 40 columns. |
+
+In the interactive (rich) presentation only, not with `VCR_UI=static`, `vcr deploy` shows a phase bar and the last lines of the build script's output, and collapses them when the build succeeds. In both, a failed build prints the full build log.
 
 `NO_COLOR` turns colour off and keeps the layout. Help pages are not affected.
 

@@ -1,0 +1,22 @@
+description: "--force replaces a configured capability in the manifest that -f names"
+args: [app, capabilities, add, -f, other.yml, --voice, --force]
+cwd: work/project
+tty: true
+presentation: rich
+files:
+  - path: work/project/other.yml
+    content: |
+      project:
+        name: my-project
+      application-capabilities:
+        voice:
+          webhooks:
+            answer_url:
+              address: https://example.com/answer
+              http_method: GET
+      instance:
+        name: dev
+        runtime: nodejs18
+        region: aws.euw1
+        entrypoint: [node, index.js]
+expect-reads: []

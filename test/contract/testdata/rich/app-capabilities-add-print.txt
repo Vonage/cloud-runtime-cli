@@ -1,0 +1,33 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 713
+application-capabilities:
+  voice:
+    webhooks:
+      answer_url:
+        address: '{{instance_url}}/voice/answer'
+        http_method: POST
+      event_url:
+        address: '{{instance_url}}/voice/event'
+        http_method: POST
+  messages:
+    version: v1
+    webhooks:
+      inbound_url:
+        address: '{{instance_url}}/messages/inbound'
+        http_method: POST
+      status_url:
+        address: '{{instance_url}}/messages/status'
+        http_method: POST
+  rtc:
+    webhooks:
+      event_url:
+        address: '{{instance_url}}/rtc/event'
+        http_method: POST
+  verify:
+    version: v2
+    webhooks:
+      status_url:
+        address: '{{instance_url}}/verify/status'
+        http_method: POST
+

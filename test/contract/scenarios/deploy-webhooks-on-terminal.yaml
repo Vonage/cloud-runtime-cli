@@ -1,0 +1,30 @@
+description: deploy from a terminal shows the applied webhooks in a box under the instance box
+group: deploy
+args: [deploy]
+cwd: work/project
+tty: true
+presentation: rich
+files:
+  - path: work/project/vcr.yml
+    content: |
+      project: {name: my-project}
+      instance: {name: dev, runtime: nodejs18, region: aws.euw1, application-id: 0f39f387-579b-4259-9f76-2715ff73b8b7, entrypoint: [node, index.js]}
+      application-capabilities:
+        voice:
+          webhooks:
+            answer_url: {address: "{{instance_url}}/voice/answer", http_method: POST}
+        messages:
+          webhooks:
+            inbound_url: {address: "{{instance_url}}/messages/inbound", http_method: POST}
+  - {path: work/project/index.js, content: "console.log('hi')\n"}
+  - {path: work/project/package.json, content: "{\"name\": \"my-project\", \"version\": \"1.0.0\"}\n"}
+fixtures:
+  overrides:
+    - match: "POST /deployments"
+      body: >-
+        {"instanceId":"00000000-0000-4000-8000-000000000703","serviceName":"my-project-dev","deploymentId":"00000000-0000-4000-8000-000000000704",
+        "hostUrls":["https://my-project-dev.euw1.runtime.example.test"],
+        "applicationCapabilities":{"voice":{"webhooks":{"answer_url":{"address":"https://my-project-dev.euw1.runtime.example.test/voice/answer","http_method":"POST"}}},
+        "messages":{"webhooks":{"inbound_url":{"address":"https://my-project-dev.euw1.runtime.example.test/messages/inbound","http_method":"POST"}}}}}
+steps: []
+expect-reads: [euw1 GET /regions/aws.euw1, euw1 GET /projects/my-project, euw1 GET /packages/<uuid>/build/status]

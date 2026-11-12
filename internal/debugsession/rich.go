@@ -18,7 +18,7 @@ const forwardingNotice = "Forwarding requests. Press Ctrl+C to stop."
 
 func (s *session) deployServiceRich() (platform.DebugService, error) {
 	step := s.tio.StartStep("Deploying debug server")
-	service, err := s.api.DeployDebugService(s.setup, s.region.Alias, s.cfg.AppID, s.cfg.Name, s.caps)
+	service, err := s.api.DeployDebugService(s.setup, s.region.Alias, s.cfg.AppID, s.cfg.Name, s.caps, s.appCaps)
 	if err != nil {
 		step.Stop()
 		return service, err
@@ -48,17 +48,22 @@ func (s *session) connectRich() *cause {
 	return nil
 }
 
-// printIntroRich shows where the debugger can be reached as a titled block. It is written with the console held, so
-// that the access line of a request that arrives just now does not split it.
+// printIntroRich shows where the debugger can be reached in a box and, when the platform applied any webhook address,
+// the webhooks box as vcr deploy draws it. It is written with the console held, so that the access line of a request
+// that arrives just now does not split it.
 func (s *session) printIntroRich() {
 	style := s.con.style
-	rows := []term.Row{
-		{Label: "Service", Value: term.Sanitize(s.service.ServiceName)},
-		{Label: "Host", Value: style.Bold(term.Sanitize(s.addrs.Host))},
+	rows := []term.BoxLine{
+		{Cells: []string{style.Gray("URL"), style.Bold(style.Cyan(term.Sanitize(s.addrs.Host)))}},
+		{Cells: []string{style.Gray("Service"), term.Sanitize(s.service.ServiceName)}},
 	}
+	webhooks := platform.WebhookLines(style, platform.WebhookAddresses(s.service.ApplicationCapabilities))
 	s.con.hold(func() {
 		fmt.Fprintln(s.tio.Out)
-		s.tio.Block(style.SuccessIcon(), "Debugger ready", rows, false)
+		s.tio.Box(style.SuccessIcon()+" Debugger ready", rows)
+		if len(webhooks) > 0 {
+			s.tio.Box(style.Bold(platform.WebhooksBoxTitle), webhooks)
+		}
 		fmt.Fprintln(s.tio.Out)
 		fmt.Fprintln(s.tio.Out, style.Gray(forwardingNotice))
 	})

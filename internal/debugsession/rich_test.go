@@ -37,21 +37,32 @@ func runLifecycle(t *testing.T, mode term.Mode) lifecycleRun {
 	return lifecycleRun{richRun: run, host: srv.Expand("http://${OTHER_HOST}"), reqs: debugServiceRequests(srv)}
 }
 
-func lifecyclePatterns(host string) []string {
+// debuggerBoxPatterns are the lines of the ready box of a service at host.
+func debuggerBoxPatterns(host, service string) []string {
 	return []string{
+		`^╭─ ✓ Debugger ready ─+╮$`,
+		`^│ +│$`,
+		`^│  URL      ` + regexp.QuoteMeta(host) + ` +│$`,
+		`^│  Service  ` + regexp.QuoteMeta(service) + ` +│$`,
+		`^│ +│$`,
+		`^╰─+╯$`,
+	}
+}
+
+func lifecyclePatterns(host string) []string {
+	patterns := []string{
 		literal("✓ Debug server deployed  dbg-service-1"),
 		literal("✓ Debug server ready"),
 		literal("✓ Debug proxy connected"),
 		literal(""),
-		literal("✓ Debugger ready"),
-		`^  Service:?\s+dbg-service-1$`,
-		`^  Host:?\s+` + regexp.QuoteMeta(host) + `$`,
+	}
+	return append(append(patterns, debuggerBoxPatterns(host, "dbg-service-1")...),
 		literal(""),
 		literal(forwardingLine),
 		literal("ready"),
 		literal(""),
 		literal(richRemoved),
-	}
+	)
 }
 
 func TestRichSessionLifecycleOutput(t *testing.T) {

@@ -316,7 +316,7 @@ func neverRetried() map[string]func(ctx context.Context, c *Client) error {
 		},
 		"DeleteInstance": func(ctx context.Context, c *Client) error { return c.DeleteInstance(ctx, "inst-1") },
 		"DeployDebugService": func(ctx context.Context, c *Client) error {
-			_, err := c.DeployDebugService(ctx, "aws.euw1", "app-1", "", manifest.Capabilities{})
+			_, err := c.DeployDebugService(ctx, "aws.euw1", "app-1", "", manifest.Capabilities{}, nil)
 			return err
 		},
 		"DebugServiceReady": func(ctx context.Context, c *Client) error {

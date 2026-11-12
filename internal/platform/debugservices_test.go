@@ -38,7 +38,7 @@ func TestDeployDebugServiceBody(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			s := newRouteServer(t, answerJSON(http.StatusOK, debugServiceReply("dbg-svc-1", "inst-1")))
 
-			got, err := s.client.DeployDebugService(t.Context(), "aws.euw1", "app-1", tc.service, caps)
+			got, err := s.client.DeployDebugService(t.Context(), "aws.euw1", "app-1", tc.service, caps, nil)
 
 			require.NoError(t, err)
 			assert.Equal(t, DebugService{ServiceName: "dbg-svc-1", PrivateKey: "pk", InstanceID: "inst-1", WebsocketPath: "abc123"}, got)
@@ -56,7 +56,7 @@ func TestDeployDebugServiceBody(t *testing.T) {
 func TestDeployDebugServiceNoCapabilitiesIsAnEmptyObject(t *testing.T) {
 	s := newRouteServer(t, answerJSON(http.StatusOK, debugServiceReply("dbg-svc-1", "inst-1")))
 
-	_, err := s.client.DeployDebugService(t.Context(), "aws.euw1", "app-1", "", manifest.Capabilities{})
+	_, err := s.client.DeployDebugService(t.Context(), "aws.euw1", "app-1", "", manifest.Capabilities{}, nil)
 
 	require.NoError(t, err)
 	assert.Equal(t, `{"runtime":"debug-proxy","region":"aws.euw1","apiApplicationId":"app-1","capabilities":{}}`, string(s.only(t).Body))
@@ -80,7 +80,7 @@ func TestDeployDebugServiceChecksServerNames(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			s := newRouteServer(t, answerJSON(http.StatusOK, debugServiceReply(tc.serviceName, tc.instanceID)))
 
-			got, err := s.client.DeployDebugService(t.Context(), "aws.euw1", "app-1", "", manifest.Capabilities{})
+			got, err := s.client.DeployDebugService(t.Context(), "aws.euw1", "app-1", "", manifest.Capabilities{}, nil)
 
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), tc.wantError)
@@ -92,7 +92,7 @@ func TestDeployDebugServiceChecksServerNames(t *testing.T) {
 func TestDeployDebugServiceAcceptsNoInstanceID(t *testing.T) {
 	s := newRouteServer(t, answerJSON(http.StatusOK, debugServiceReply("dbg-svc-1", "")))
 
-	got, err := s.client.DeployDebugService(t.Context(), "aws.euw1", "app-1", "", manifest.Capabilities{})
+	got, err := s.client.DeployDebugService(t.Context(), "aws.euw1", "app-1", "", manifest.Capabilities{}, nil)
 
 	require.NoError(t, err)
 	assert.Equal(t, DebugService{ServiceName: "dbg-svc-1", PrivateKey: "pk", WebsocketPath: "abc123"}, got,
@@ -102,7 +102,7 @@ func TestDeployDebugServiceAcceptsNoInstanceID(t *testing.T) {
 func TestDeployDebugServiceAcceptsANameEndingInAHyphen(t *testing.T) {
 	s := newRouteServer(t, answerJSON(http.StatusOK, debugServiceReply("my-service-", "00000000-0000-4000-8000-000000000771")))
 
-	got, err := s.client.DeployDebugService(t.Context(), "aws.euw1", "app-1", "", manifest.Capabilities{})
+	got, err := s.client.DeployDebugService(t.Context(), "aws.euw1", "app-1", "", manifest.Capabilities{}, nil)
 
 	require.NoError(t, err)
 	assert.Equal(t, "my-service-", got.ServiceName)
@@ -111,7 +111,7 @@ func TestDeployDebugServiceAcceptsANameEndingInAHyphen(t *testing.T) {
 func TestDeployDebugServiceFailureIsAnAPIError(t *testing.T) {
 	s := newRouteServer(t, answerJSON(http.StatusBadRequest, `{"error":{"code":5001,"message":"unknown region"}}`))
 
-	_, err := s.client.DeployDebugService(t.Context(), "aws.nowhere", "app-1", "", manifest.Capabilities{})
+	_, err := s.client.DeployDebugService(t.Context(), "aws.nowhere", "app-1", "", manifest.Capabilities{}, nil)
 
 	apiErr := apiErrorWithStatus(t, err, http.StatusBadRequest)
 	assert.Equal(t, "unknown region", apiErr.Message)
