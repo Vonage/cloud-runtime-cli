@@ -116,7 +116,7 @@ output must not change: `cd <WT> && make contract` passes at the end of every gr
 
 ## 9. Checks
 
-- [ ] 9.1 `cd <WT> && make build test lint tidy contract contract-rich` passes, and the leak check prints nothing
+- [x] 9.1 `cd <WT> && make build test lint tidy contract contract-rich` passes, and the leak check prints nothing
   before each commit. Install the build for a manual run of `vcr deploy` and `vcr debug` against a test project: the
   live line, the collapse and the boxes.
 
