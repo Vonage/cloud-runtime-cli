@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/Vonage/cloud-runtime-cli/compare/v3.1.0...v3.1.1) (2026-11-16)
+
+
+### 👷 Continuous Integration
+
+* code sign macOS binaries only when APPLE_NOTARIZE is true ([#113](https://github.com/Vonage/cloud-runtime-cli/issues/113)) ([1aa076d](https://github.com/Vonage/cloud-runtime-cli/commit/1aa076d94a03d2f92ae0c119a729189d474b3bc7))
+
 ## [3.1.0](https://github.com/Vonage/cloud-runtime-cli/compare/v3.0.0...v3.1.0) (2026-11-16)
 
 
