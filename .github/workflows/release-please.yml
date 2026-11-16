@@ -94,8 +94,9 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
-  # Build, sign and notarize (requires macOS for Apple signing). Notarization runs only when the
-  # repository variable APPLE_NOTARIZE is "true".
+  # Build, sign and notarize (requires macOS for Apple signing).
+  # Code signing and notarization run only when the repository variable APPLE_NOTARIZE is "true".
+  # Otherwise darwin/arm64 keeps the ad-hoc signature Go's linker gives it.
   build:
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
@@ -112,6 +113,7 @@ jobs:
           persist-credentials: false
 
       - name: Import codesign cert
+        if: vars.APPLE_NOTARIZE == 'true'
         uses: apple-actions/import-codesign-certs@63fff01cd422d4b7b855d40ca1e9d34d2de9427d # v3.0.0
         with:
           p12-file-base64: ${{ secrets.APPLE_CERT_P12_BASE64_ENCODED }}
@@ -158,11 +160,13 @@ jobs:
           done
 
       - name: Code sign darwin binaries
+        if: vars.APPLE_NOTARIZE == 'true'
         run: |
           codesign --timestamp --options=runtime -s "Developer ID Application: Nexmo Inc. (7F2B5ZSP8Q)" -v dist/vcr_darwin_amd64
           codesign --timestamp --options=runtime -s "Developer ID Application: Nexmo Inc. (7F2B5ZSP8Q)" -v dist/vcr_darwin_arm64
 
       - name: Verify code signing
+        if: vars.APPLE_NOTARIZE == 'true'
         run: |
           codesign -vvv --deep --strict dist/vcr_darwin_amd64
           codesign -vvv --deep --strict dist/vcr_darwin_arm64
