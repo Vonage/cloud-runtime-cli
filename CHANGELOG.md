@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/Vonage/cloud-runtime-cli/compare/v3.0.0...v3.1.0) (2026-11-16)
+
+
+### 🚀 Features
+
+* apply an application-capabilities block from vcr.yml on deploy and debug ([#110](https://github.com/Vonage/cloud-runtime-cli/issues/110)) ([5cc7c54](https://github.com/Vonage/cloud-runtime-cli/commit/5cc7c547581d9c8c8f29d8837f8f318d8ec26edb))
+
 ## [3.0.0](https://github.com/Vonage/cloud-runtime-cli/compare/v2.7.0...v3.0.0) (2026-11-10)
 
 
