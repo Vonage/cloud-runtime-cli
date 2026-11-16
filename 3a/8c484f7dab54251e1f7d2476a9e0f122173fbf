@@ -1,0 +1,18 @@
+.github/workflows/release-please.yml
+  h_df1d95ff1e9b8c 97-99,116,163,169
+.github/workflows/release.yml
+  h_df1d95ff1e9b8c 132-133,149,196,202
+README.md
+  h_df1d95ff1e9b8c 185
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3a8c484f7dab54251e1f7d2476a9e0f122173fbf",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
