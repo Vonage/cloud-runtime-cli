@@ -56,6 +56,18 @@ func fullManifest() *manifest.Manifest {
 	}
 }
 
+// exampleBlock is the application-capabilities block of the spec example, as plain maps. Each call builds a new value.
+func exampleBlock() map[string]any {
+	return map[string]any{
+		"voice": map[string]any{
+			"webhooks": map[string]any{
+				"answer_url": map[string]any{"address": "{{instance_url}}/answer", "http_method": "POST"},
+			},
+			"signed_callbacks": true,
+		},
+	}
+}
+
 // defaultsManifest is the value testdata/defaults.yml spells out.
 func defaultsManifest() *manifest.Manifest {
 	const (

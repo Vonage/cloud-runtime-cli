@@ -1,0 +1,864 @@
+{
+  "$id": "https://raw.githubusercontent.com/Vonage/cloud-runtime-cli/main/schema/vcr.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": true,
+  "description": "The Vonage Cloud Runtime manifest that the vcr CLI reads.",
+  "properties": {
+    "application-capabilities": {
+      "additionalProperties": true,
+      "description": "Configuration for the products available in this application",
+      "properties": {
+        "meetings": {
+          "additionalProperties": true,
+          "description": "Meetings related configuration",
+          "properties": {
+            "webhooks": {
+              "additionalProperties": true,
+              "properties": {
+                "recording_changed": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "address": {
+                      "description": "The URL that Vonage forwards recording information to on your server",
+                      "type": "string"
+                    },
+                    "http_method": {
+                      "description": "The HTTP method used to send recording information to your server (always `POST`)",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "room_changed": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "address": {
+                      "description": "The URL that Vonage forwards meeting room information on your server.",
+                      "type": "string"
+                    },
+                    "http_method": {
+                      "description": "The HTTP method used to send meeting room information to your server (always `POST`)",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "session_changed": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "address": {
+                      "description": "The URL that Vonage forwards session information on your server.",
+                      "type": "string"
+                    },
+                    "http_method": {
+                      "description": "The HTTP method used to send session information to your server (always `POST`)",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "messages": {
+          "additionalProperties": true,
+          "description": "Messages / Dispatch related configuration",
+          "properties": {
+            "webhooks": {
+              "additionalProperties": true,
+              "properties": {
+                "inbound_url": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "address": {
+                      "description": "The URL that Vonage forwards inbound messages to on your server",
+                      "type": "string"
+                    },
+                    "http_method": {
+                      "description": "The HTTP method used to send inbound messages to your server",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "status_url": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "address": {
+                      "description": "The URL that Vonage sends events related to your messages to",
+                      "type": "string"
+                    },
+                    "http_method": {
+                      "description": "The HTTP method used to send events to your server (always `POST`)",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "network_apis": {
+          "additionalProperties": true,
+          "description": "Network APIs",
+          "properties": {
+            "network_application_id": {
+              "type": "string"
+            },
+            "redirect_uri": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "rtc": {
+          "additionalProperties": true,
+          "description": "RTC / Conversation Service related configuration",
+          "properties": {
+            "signed_callbacks": {
+              "default": true,
+              "description": "Whether to use signed webhooks. This is a way of verifying that the request is coming from Vonage. Refer to [the Webhooks documentation](https://developer.vonage.com/en/getting-started/concepts/webhooks#decoding-signed-webhooks) for more information.",
+              "type": "boolean"
+            },
+            "webhooks": {
+              "additionalProperties": true,
+              "properties": {
+                "event_url": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "address": {
+                      "type": "string"
+                    },
+                    "http_method": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "vbc": {
+          "additionalProperties": true,
+          "description": "Specify the `vbc` capability to enable zero-rated calls for VBC number programmability service applications. This is always an empty object.",
+          "type": "object"
+        },
+        "verify": {
+          "additionalProperties": true,
+          "description": "Verify v2 related configuration",
+          "properties": {
+            "version": {
+              "description": "The version of the Verify API to use",
+              "type": "string"
+            },
+            "webhooks": {
+              "additionalProperties": true,
+              "properties": {
+                "status_url": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "address": {
+                      "description": "The URL that Vonage sends events related to your verify requests to",
+                      "type": "string"
+                    },
+                    "http_method": {
+                      "description": "The HTTP method used to send events to your server (always `POST`)",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "video": {
+          "additionalProperties": true,
+          "description": "Video related configuration",
+          "properties": {
+            "storage": {
+              "additionalProperties": true,
+              "properties": {
+                "cloud_storage": {
+                  "description": "Whether to use cloud storage feature",
+                  "type": "boolean"
+                },
+                "end_to_end_encryption": {
+                  "description": "Whether to use end-to-end encryption",
+                  "type": "boolean"
+                },
+                "server_side_encryption": {
+                  "description": "Whether to use server-side encryption",
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "webhooks": {
+              "additionalProperties": true,
+              "properties": {
+                "archive_status": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "active": {
+                      "description": "Whether the webhook is active",
+                      "type": "boolean"
+                    },
+                    "address": {
+                      "description": "The URL that Vonage sends events informing about the archive status",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "broadcast_status": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "active": {
+                      "description": "Whether the webhook is active",
+                      "type": "boolean"
+                    },
+                    "address": {
+                      "description": "The URL that Vonage sends events when a broadcast status changes",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "captions_status": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "active": {
+                      "description": "Whether the webhook is active",
+                      "type": "boolean"
+                    },
+                    "address": {
+                      "description": "The URL that Vonage sends events when captions status changes",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "connection_created": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "active": {
+                      "description": "Whether the webhook is active",
+                      "type": "boolean"
+                    },
+                    "address": {
+                      "description": "The URL that Vonage sends events when a video connection is created",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "connection_destroyed": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "active": {
+                      "description": "Whether the webhook is active",
+                      "type": "boolean"
+                    },
+                    "address": {
+                      "description": "The URL that Vonage sends events when a video connection is destroyed",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "render_status": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "active": {
+                      "description": "Whether the webhook is active",
+                      "type": "boolean"
+                    },
+                    "address": {
+                      "description": "The URL that Vonage sends events when a render status changes",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "session_created": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "active": {
+                      "description": "Whether the webhook is active",
+                      "type": "boolean"
+                    },
+                    "address": {
+                      "description": "The URL that Vonage sends events when a video session is created",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "session_destroyed": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "active": {
+                      "description": "Whether the webhook is active",
+                      "type": "boolean"
+                    },
+                    "address": {
+                      "description": "The URL that Vonage sends events when a video session is destroyed",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "session_notification": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "active": {
+                      "description": "Whether the webhook is active",
+                      "type": "boolean"
+                    },
+                    "address": {
+                      "description": "The URL that Vonage sends session notifications to",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "sip_call_created": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "active": {
+                      "description": "Whether the webhook is active",
+                      "type": "boolean"
+                    },
+                    "address": {
+                      "description": "The URL that Vonage sends events when a sip call is created",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "sip_call_destroyed": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "active": {
+                      "description": "Whether the webhook is active",
+                      "type": "boolean"
+                    },
+                    "address": {
+                      "description": "The URL that Vonage sends events when a sip call is destroyed",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "sip_call_mute_forced": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "active": {
+                      "description": "Whether the webhook is active",
+                      "type": "boolean"
+                    },
+                    "address": {
+                      "description": "The URL that Vonage sends events when a sip call is muted",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "sip_call_updated": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "active": {
+                      "description": "Whether the webhook is active",
+                      "type": "boolean"
+                    },
+                    "address": {
+                      "description": "The URL that Vonage sends events when a sip call is updated",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "stream_created": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "active": {
+                      "description": "Whether the webhook is active",
+                      "type": "boolean"
+                    },
+                    "address": {
+                      "description": "The URL that Vonage sends events when a stream is created",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "stream_destroyed": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "active": {
+                      "description": "Whether the webhook is active",
+                      "type": "boolean"
+                    },
+                    "address": {
+                      "description": "The URL that Vonage sends events when a stream is destroyed",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "voice": {
+          "additionalProperties": true,
+          "description": "Voice related configuration",
+          "properties": {
+            "conversations_ttl": {
+              "default": 48,
+              "description": "The length of time named conversations will remain active for after creation, in hours. Maximum value is 9000 (i.e. 365 days).",
+              "maximum": 9000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "leg_persistence_time": {
+              "default": 2,
+              "description": "The persistence duration for legs, in days. Maximum value is 31.",
+              "maximum": 31,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "region": {
+              "description": "Selecting a region means all inbound, programmable SIP and SIP connect calls will be sent to the selected region unless the call is sent to a regional endpoint, if the call is using a regional endpoint this will override the application setting. Use the following parameter values:\n  * **na-east** - North America - East (api-us-3.vonage.com)\n  * **na-west** - North America - West (api-us-4.vonage.com)\n  * **eu-east** - Europe - East (api-eu-4.vonage.com)\n  * **eu-west** - Europe - West (api-eu-3.vonage.com)\n  * **apac-sng** - Singapore (api-ap-3.vonage.com)\n  * **apac-australia** - Australia (api-ap-4.vonage.com)\n",
+              "enum": [
+                "na-east",
+                "na-west",
+                "eu-east",
+                "eu-west",
+                "apac-sng",
+                "apac-australia"
+              ],
+              "type": "string"
+            },
+            "signed_callbacks": {
+              "default": true,
+              "description": "Whether to use signed webhooks. This is a way of verifying that the request is coming from Vonage. Refer to [the Webhooks documentation](https://developer.vonage.com/en/getting-started/concepts/webhooks#decoding-signed-webhooks) for more information.",
+              "type": "boolean"
+            },
+            "webhooks": {
+              "additionalProperties": true,
+              "properties": {
+                "answer_url": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "address": {
+                      "description": "The URL that Vonage requests when a call is placed/received. Must return an NCCO",
+                      "type": "string"
+                    },
+                    "connect_timeout": {
+                      "description": "If Vonage can't connect to the webhook URL for this specified amount of time, then Vonage makes one additional attempt to connect to the webhook endpoint. This is an integer value specified in milliseconds.",
+                      "type": "integer"
+                    },
+                    "http_method": {
+                      "description": "The HTTP method used to fetch your NCCO from your `answer_url`",
+                      "type": "string"
+                    },
+                    "socket_timeout": {
+                      "description": "If a response from the webhook URL can't be read for this specified amount of time, then Vonage makes one additional attempt to read the webhook endpoint. This is an integer value specified in milliseconds.",
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "event_url": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "address": {
+                      "description": "The URL that Vonage sends events related to your call to",
+                      "type": "string"
+                    },
+                    "connect_timeout": {
+                      "description": "If Vonage can't connect to the webhook URL for this specified amount of time, then Vonage makes one additional attempt to connect to the webhook endpoint. This is an integer value specified in milliseconds.",
+                      "type": "integer"
+                    },
+                    "http_method": {
+                      "description": "The HTTP method used to send events to your server",
+                      "type": "string"
+                    },
+                    "socket_timeout": {
+                      "description": "If a response from the webhook URL can't be read for this specified amount of time, then Vonage makes one additional attempt to read the webhook endpoint. This is an integer value specified in milliseconds.",
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "fallback_answer_url": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "address": {
+                      "description": "If your `answer_url` is offline or returns a HTTP error code, Vonage will make a request to a\n`fallback_answer_url` if it is set. This URL must return an NCCO.\n",
+                      "type": "string"
+                    },
+                    "connect_timeout": {
+                      "description": "Connection timeout in milliseconds",
+                      "type": "integer"
+                    },
+                    "http_method": {
+                      "description": "The HTTP method used to fetch your NCCO from your `answer_url`",
+                      "type": "string"
+                    },
+                    "socket_timeout": {
+                      "description": "Reading timeout in milliseconds",
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "debug": {
+      "additionalProperties": true,
+      "description": "The settings vcr debug uses.",
+      "properties": {
+        "application-id": {
+          "description": "The ID of the Vonage application the debug session uses.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "entrypoint": {
+          "description": "The command that starts the application locally.",
+          "items": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "environment": {
+          "description": "Environment variables of the debug session.",
+          "items": {
+            "additionalProperties": true,
+            "description": "One environment variable.",
+            "properties": {
+              "name": {
+                "description": "The variable name.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "secret": {
+                "description": "The name of a secret that holds the value.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "value": {
+                "description": "The value.",
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              }
+            },
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "name": {
+          "description": "The debug instance name.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "preserve-data": {
+          "description": "Keep the session data after it stops.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "instance": {
+      "additionalProperties": true,
+      "description": "The instance that vcr deploy creates or updates.",
+      "properties": {
+        "application-id": {
+          "description": "The ID of the Vonage application the instance uses.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "build-script": {
+          "description": "A script run before the code is uploaded.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "capabilities": {
+          "description": "The Vonage capabilities to enable, for example voice or messages-v1. application-capabilities replaces this list.",
+          "items": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "domains": {
+          "description": "Custom domains for the instance.",
+          "items": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "entrypoint": {
+          "description": "The command that starts the application.",
+          "items": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "environment": {
+          "description": "Environment variables of the deployed instance.",
+          "items": {
+            "additionalProperties": true,
+            "description": "One environment variable.",
+            "properties": {
+              "name": {
+                "description": "The variable name.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "secret": {
+                "description": "The name of a secret that holds the value.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "value": {
+                "description": "The value.",
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              }
+            },
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "health-check-path": {
+          "description": "The path the platform calls to check the instance's health.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "description": "The instance name.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "region": {
+          "description": "The region, for example aws.euw1.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "runtime": {
+          "description": "The runtime, for example nodejs22.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scaling": {
+          "additionalProperties": true,
+          "description": "The instance's scaling limits.",
+          "properties": {
+            "max-scale": {
+              "description": "The largest number of replicas.",
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "min-scale": {
+              "description": "The smallest number of replicas.",
+              "type": [
+                "integer",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "security": {
+          "additionalProperties": true,
+          "description": "Who can call the instance.",
+          "properties": {
+            "access": {
+              "description": "The access level, for example public, private or authenticated.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "auth-method": {
+              "description": "The authentication method, for example vonage_basic.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "override": {
+              "description": "Access levels for single paths.",
+              "items": {
+                "additionalProperties": true,
+                "description": "The access level of one path.",
+                "properties": {
+                  "access": {
+                    "description": "The access level of the path.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "auth-method": {
+                    "description": "The authentication method of the path.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "path": {
+                    "description": "The path, for example /api/public.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "type": [
+                "array",
+                "null"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "project": {
+      "additionalProperties": true,
+      "description": "The project.",
+      "properties": {
+        "name": {
+          "description": "The project name.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": [
+        "object",
+        "null"
+      ]
+    }
+  },
+  "title": "vcr.yml",
+  "type": "object"
+}

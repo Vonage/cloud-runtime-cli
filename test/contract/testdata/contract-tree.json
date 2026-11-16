@@ -96,8 +96,8 @@
     "path": "vcr app",
     "use": "app \u003ccommand\u003e",
     "short": "Manage Vonage applications for VCR deployments",
-    "long": "Manage Vonage applications for VCR deployments.\n\nVonage applications are containers that hold your communication settings and\ncapabilities. Each VCR deployment must be linked to a Vonage application.\n\nWHAT IS A VONAGE APPLICATION?\n  A Vonage application provides:\n  • Authentication credentials (API keys and private keys)\n  • Enabled capabilities (Voice, Messages, RTC)\n  • Webhook URLs for receiving events\n\nAVAILABLE COMMANDS\n  create         Create a new Vonage application\n  remove (rm)    Remove a Vonage application\n  list (ls)      List all Vonage applications in your account\n  generate-keys  Generate new key pairs for an existing application\n\nWORKFLOW\n  1. Create an application: vcr app create --name my-app\n  2. Use the application ID in your vcr.yml manifest\n  3. Deploy your VCR application with: vcr deploy\n",
-    "example": "# Create a new application with Voice and Messages capabilities\n$ vcr app create --name my-app --voice --messages\n\n# Remove an application\n$ vcr app remove 12345678-1234-1234-1234-123456789abc\n\n# Generate new keys for an existing application\n$ vcr app generate-keys --app-id 12345678-1234-1234-1234-123456789abc\n\n# List all applications\n$ vcr app list\n\n# List applications filtered by name\n$ vcr app list --filter \"production\"\n",
+    "long": "Manage Vonage applications for VCR deployments.\n\nVonage applications are containers that hold your communication settings and\ncapabilities. Each VCR deployment must be linked to a Vonage application.\n\nWHAT IS A VONAGE APPLICATION?\n  A Vonage application provides:\n  • Authentication credentials (API keys and private keys)\n  • Enabled capabilities (Voice, Messages, RTC)\n  • Webhook URLs for receiving events\n\nAVAILABLE COMMANDS\n  create         Create a new Vonage application\n  remove (rm)    Remove a Vonage application\n  list (ls)      List all Vonage applications in your account\n  generate-keys  Generate new key pairs for an existing application\n  capabilities   Manage the application-capabilities block in vcr.yml\n\nWORKFLOW\n  1. Create an application: vcr app create --name my-app\n  2. Use the application ID in your vcr.yml manifest\n  3. Deploy your VCR application with: vcr deploy\n",
+    "example": "# Create a new application with Voice and Messages capabilities\n$ vcr app create --name my-app --voice --messages\n\n# Remove an application\n$ vcr app remove 12345678-1234-1234-1234-123456789abc\n\n# Generate new keys for an existing application\n$ vcr app generate-keys --app-id 12345678-1234-1234-1234-123456789abc\n\n# List all applications\n$ vcr app list\n\n# List applications filtered by name\n$ vcr app list --filter \"production\"\n\n# Add the default Voice and Messages capabilities to vcr.yml\n$ vcr app capabilities add --voice --messages\n",
     "argsValidatorSet": false,
     "runnable": false,
     "localFlags": null,
@@ -112,10 +112,144 @@
       "timeout"
     ],
     "children": [
+      "capabilities",
       "create",
       "generate-keys",
       "list",
       "remove"
+    ]
+  },
+  {
+    "path": "vcr app capabilities",
+    "use": "capabilities \u003ccommand\u003e",
+    "short": "Manage the application-capabilities block in vcr.yml",
+    "long": "Manage the application-capabilities block in vcr.yml.\n\nThe application-capabilities block of the manifest configures the capabilities\nof the Vonage application linked to your deployment, with webhook addresses\nthat can use {{instance_url}}. These commands edit only that block and work\noffline: they need no configuration, credentials or network.\n\nAVAILABLE COMMANDS\n  add  Add default capabilities to the application-capabilities block\n",
+    "example": "# Add the default Voice and Messages capabilities to vcr.yml\n$ vcr app capabilities add --voice --messages\n\n# Print the block instead of writing it\n$ vcr app capabilities add --rtc --print\n",
+    "argsValidatorSet": false,
+    "runnable": false,
+    "localFlags": null,
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
+    ],
+    "children": [
+      "add"
+    ]
+  },
+  {
+    "path": "vcr app capabilities add",
+    "use": "add",
+    "short": "Add default capabilities to the application-capabilities block",
+    "long": "Add default capabilities to the application-capabilities block of vcr.yml.\n\nThis command writes the default of each capability you name into the manifest's\napplication-capabilities block. Webhook addresses use {{instance_url}}, the URL\nof your deployed instance. The rest of the manifest is kept as written. When the\nmanifest has instance.capabilities, it is removed: the block replaces it.\n\nCAPABILITIES\n  • Voice         (--voice)         - /voice/answer and /voice/event\n  • Messages      (--messages)      - version v1, /messages/inbound and /messages/status\n  • RTC           (--rtc)           - /rtc/event\n  • Verify        (--verify)        - version v2, /verify/status\n  • Video         (--video)         - /video/session-created and five more, all active\n  • VBC           (--vbc)           - an empty mapping\n  • Meetings      (--meetings)      - /meetings/recording-changed, /meetings/room-changed\n                                      and /meetings/session-changed\n  • Network APIs  (--network-apis)  - the values of --network-application-id and --redirect-uri\n\nEvery webhook except Video's is sent with POST. A capability already in the block\nis kept and reported as skipped, unless --force is given.\n\nNOTE: The manifest is the one vcr deploy would use in the current directory, or\nthe one named by --filename. With --print, the resulting block is printed instead\nand no file is written; no manifest is needed.\n",
+    "example": "# Add the default Voice and Messages capabilities\n$ vcr app capabilities add --voice --messages\n✓ Added voice to application-capabilities in /path/to/project/vcr.yml\n✓ Added messages to application-capabilities in /path/to/project/vcr.yml\n\n# Print the block without writing the manifest\n$ vcr app capabilities add --rtc --print\n\n# Replace a capability that is already configured with its default\n$ vcr app capabilities add --voice --force\n\n# Add Network APIs\n$ vcr app capabilities add --network-apis --network-application-id my-network-app --redirect-uri https://example.com/callback\n",
+    "argsValidatorSet": true,
+    "runnable": true,
+    "localFlags": [
+      {
+        "name": "filename",
+        "shorthand": "f",
+        "type": "string",
+        "default": "",
+        "usage": "Path to manifest file (default: vcr.yml in project directory)"
+      },
+      {
+        "name": "force",
+        "type": "bool",
+        "default": "false",
+        "usage": "Replace capabilities that are already configured with their defaults",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "meetings",
+        "type": "bool",
+        "default": "false",
+        "usage": "Add the default Meetings capability",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "messages",
+        "type": "bool",
+        "default": "false",
+        "usage": "Add the default Messages capability",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "network-apis",
+        "type": "bool",
+        "default": "false",
+        "usage": "Add the Network APIs capability (needs --network-application-id and --redirect-uri)",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "network-application-id",
+        "type": "string",
+        "default": "",
+        "usage": "Network application ID for --network-apis"
+      },
+      {
+        "name": "print",
+        "type": "bool",
+        "default": "false",
+        "usage": "Print the resulting application-capabilities block instead of writing the manifest",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "redirect-uri",
+        "type": "string",
+        "default": "",
+        "usage": "Redirect URI for --network-apis"
+      },
+      {
+        "name": "rtc",
+        "type": "bool",
+        "default": "false",
+        "usage": "Add the default RTC (Real-Time Communication) capability",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "vbc",
+        "type": "bool",
+        "default": "false",
+        "usage": "Add the default VBC (Vonage Business Communications) capability",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "verify",
+        "type": "bool",
+        "default": "false",
+        "usage": "Add the default Verify capability",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "video",
+        "type": "bool",
+        "default": "false",
+        "usage": "Add the default Video capability",
+        "noOptDefVal": "true"
+      },
+      {
+        "name": "voice",
+        "type": "bool",
+        "default": "false",
+        "usage": "Add the default Voice capability",
+        "noOptDefVal": "true"
+      }
+    ],
+    "inheritedFlags": [
+      "api-key",
+      "api-secret",
+      "config-file",
+      "endpoint",
+      "graphql-endpoint",
+      "help",
+      "region",
+      "timeout"
     ]
   },
   {

@@ -18,7 +18,7 @@ func TestLocalAPIRecordsCallsAndReturnsConfiguredResults(t *testing.T) {
 		region:  platform.Region{Alias: "aws.euw1"},
 	}
 
-	service, err := api.DeployDebugService(t.Context(), "aws.euw1", "app-1", "name-1", manifest.Capabilities{})
+	service, err := api.DeployDebugService(t.Context(), "aws.euw1", "app-1", "name-1", manifest.Capabilities{}, nil)
 	require.NoError(t, err)
 	var answers []bool
 	for range 5 {
@@ -46,7 +46,7 @@ func TestLocalAPIResultsAndHooks(t *testing.T) {
 	boom := errors.New("boom")
 	api := &localAPI{deployErr: boom, readyErr: boom, deleteErr: boom}
 
-	_, deployErr := api.DeployDebugService(t.Context(), "", "", "", manifest.Capabilities{})
+	_, deployErr := api.DeployDebugService(t.Context(), "", "", "", manifest.Capabilities{}, nil)
 	_, readyErr := api.DebugServiceReady(t.Context(), "svc")
 	deleteErr := api.DeleteDebugService(t.Context(), "svc", false)
 
@@ -58,7 +58,7 @@ func TestLocalAPIResultsAndHooks(t *testing.T) {
 	api.onReady = func(readyCall) (bool, error) { return true, nil }
 	api.onDelete = func(deleteCall) error { return nil }
 
-	_, deployErr = api.DeployDebugService(t.Context(), "", "", "", manifest.Capabilities{})
+	_, deployErr = api.DeployDebugService(t.Context(), "", "", "", manifest.Capabilities{}, nil)
 	ready, readyErr := api.DebugServiceReady(t.Context(), "svc")
 	deleteErr = api.DeleteDebugService(t.Context(), "svc", false)
 

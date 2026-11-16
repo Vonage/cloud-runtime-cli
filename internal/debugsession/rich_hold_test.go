@@ -78,14 +78,11 @@ func TestReadyBlockIsNotSplitByAnAccessLine(t *testing.T) {
 	receive(t, blockDone, "the block")
 	receive(t, lineDone, "the access line")
 
-	requireLines(t, screenLines(screen.Screen()),
-		literal(""),
-		literal("✓ Debugger ready"),
-		`^  Service:?\s+svc-1$`,
-		`^  Host:?\s+http://localhost:1$`,
+	want := append([]string{literal("")}, debuggerBoxPatterns("http://localhost:1", "svc-1")...)
+	requireLines(t, screenLines(screen.Screen()), append(want,
 		literal(""),
 		literal(forwardingNotice),
 		literal("03:04:05  GET  /hello  200  <1ms"),
-	)
+	)...)
 	assert.True(t, consoleIsFree(con), "and the console is let go of afterwards")
 }

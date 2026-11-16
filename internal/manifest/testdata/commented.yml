@@ -1,0 +1,25 @@
+# Manifest for the booking app.
+project:
+  name: "booking-app" # the project name
+# The instance deployed by vcr deploy.
+instance:
+  name: 'dev'
+  runtime: nodejs22
+  region: aws.euw1 # closest region
+  application-id: "11111111-2222-3333-4444-555555555555"
+  environment:
+    # Numbers are quoted so they stay strings.
+    - name: VONAGE_NUMBER
+      value: "12012010601"
+  capabilities:
+    - voice
+    - messages-v1
+  entrypoint: [node, index.js]
+# Keys the CLI does not know stay.
+custom: 1
+debug:
+  name: debug
+  entrypoint:
+    - node
+    - --inspect
+    - index.js

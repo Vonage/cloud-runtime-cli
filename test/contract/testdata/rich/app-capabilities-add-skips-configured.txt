@@ -1,0 +1,6 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 120
+! voice is already configured, skipped (use --force to replace it)
+✓ Added rtc to application-capabilities in vcr.yml
+

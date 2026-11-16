@@ -1,0 +1,5 @@
+description: "add without a capability flag fails and names the flags"
+args: [app, capabilities, add]
+tty: true
+presentation: rich
+expect-reads: []

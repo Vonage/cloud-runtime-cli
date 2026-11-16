@@ -4,11 +4,14 @@ package manifest
 // Names are the manifest file names v2.6.1 looks for in a project directory; the newest modification time wins.
 var Names = []string{"neru.yaml", "neru.yml", "vcr.yaml", "vcr.yml"}
 
-// Manifest mirrors v2.6.1's pkg/config.Manifest: same YAML keys, non-strict parse (unknown keys ignored).
+// Manifest mirrors v2.6.1's pkg/config.Manifest plus application-capabilities, non-strict parse (unknown keys ignored).
 type Manifest struct {
 	Project  Project  `yaml:"project"`
 	Instance Instance `yaml:"instance"`
 	Debug    Debug    `yaml:"debug,omitempty"`
+	// ApplicationCapabilities is the Vonage application "capabilities" object exactly as written in vcr.yml. The
+	// CLI sends it as is; only CheckApplicationCapabilities looks inside.
+	ApplicationCapabilities map[string]any `yaml:"application-capabilities,omitempty"`
 }
 
 type Project struct {

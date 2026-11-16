@@ -34,3 +34,4 @@ build watch: deploy-build-* security-build-*
 debug-proxy protocol: debug-execute-roundtrip debug-remote-call-through-local-debugger debug-unknown-inbound-operation-ends-the-session debug-public-request-is-relayed debug-takeover-close-1008 security-escape-debug-access-log
 release and install: upgrade-* security-upgrade-*
 presentation gate: app-ui-*
+app capabilities: app-capabilities-*

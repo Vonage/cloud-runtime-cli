@@ -1,6 +1,7 @@
 package term
 
 import (
+	"strconv"
 	"strings"
 	"unicode/utf8"
 )
@@ -22,8 +23,8 @@ func (b *TermBuffer) Raw() string {
 func (b *TermBuffer) Screen() string { return renderScreen(b.Raw()) }
 
 // renderScreen replays text on an empty terminal: \r goes to the start of the row, \n to the start of the next one,
-// the erase sequences clear a row or the end of it, colour sequences are dropped, and any other rune overwrites the
-// cell under the cursor.
+// the erase sequences clear a row, the end of it or the end of the screen, the cursor moves up, colour sequences are
+// dropped, and any other rune overwrites the cell under the cursor.
 func renderScreen(text string) string {
 	s := &screenState{rows: [][]rune{nil}}
 	for i := 0; i < len(text); {
@@ -40,20 +41,24 @@ func renderScreen(text string) string {
 	return s.String()
 }
 
-// screenState is a terminal with unlimited width: the rows so far and the cursor on the last one.
+// screenState is a terminal with unlimited width and height: the rows so far and the cursor.
 type screenState struct {
 	rows [][]rune
+	cur  int // the cursor's row
 	col  int
 }
 
-func (s *screenState) row() int { return len(s.rows) - 1 }
+func (s *screenState) row() int { return s.cur }
 
 func (s *screenState) put(r rune) {
 	switch r {
 	case '\r':
 		s.col = 0
 	case '\n':
-		s.rows = append(s.rows, nil)
+		s.cur++
+		if s.cur == len(s.rows) {
+			s.rows = append(s.rows, nil)
+		}
 		s.col = 0
 	default:
 		s.write(r)
@@ -92,8 +97,38 @@ func (s *screenState) sequence(text string) int {
 		return end + 1
 	case 'K':
 		return s.erase(params, end+1)
+	case 'A':
+		return s.up(params, end+1)
+	case 'J':
+		return s.eraseBelow(params, end+1)
 	}
 	return 0
+}
+
+// up moves the cursor up by the parameter (1 when empty), stopping at the top row, and returns used.
+func (s *screenState) up(params string, used int) int {
+	n := 1
+	if params != "" {
+		parsed, err := strconv.Atoi(params)
+		if err != nil {
+			return 0
+		}
+		n = max(parsed, 1)
+	}
+	s.cur = max(s.cur-n, 0)
+	return used
+}
+
+// eraseBelow clears from the cursor to the end of the screen and returns used, or 0 for a parameter it does not know.
+func (s *screenState) eraseBelow(params string, used int) int {
+	if params != "" && params != "0" {
+		return 0
+	}
+	if s.col < len(s.rows[s.cur]) {
+		s.rows[s.cur] = s.rows[s.cur][:s.col]
+	}
+	s.rows = s.rows[:s.cur+1]
+	return used
 }
 
 // erase applies an erase-in-line sequence with the given parameter and returns used, or 0 for one it does not know.

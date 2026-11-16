@@ -1,0 +1,35 @@
+description: deploy from a terminal reads the build phases from Kaniko frames and leaves no build output on success
+group: deploy
+args: [deploy]
+cwd: work/project
+tty: true
+presentation: rich
+files:
+  - path: work/project/vcr.yml
+    content: |
+      project: {name: my-project}
+      instance: {name: dev, runtime: nodejs18, region: aws.euw1, application-id: 0f39f387-579b-4259-9f76-2715ff73b8b7, entrypoint: [node, index.js]}
+  - {path: work/project/index.js, content: "console.log('hi')\n"}
+  - {path: work/project/package.json, content: "{\"name\": \"my-project\", \"version\": \"1.0.0\"}\n"}
+fixtures:
+  build:
+    connections:
+      - - {send: "\u001b[35mℹ\u001b[0m Instance source code initialized successfully"}
+        - {send: "\u001b[35mℹ\u001b[0m Retrieving image manifest vcr.registry/nodejs18:latest"}
+        - {send: "\u001b[35mℹ\u001b[0m Retrieving image vcr.registry/nodejs18:latest from registry vcr.registry"}
+        - {send: "\u001b[35mℹ\u001b[0m Unpacking rootfs as cmd COPY . . requires it."}
+        - {send: "\u001b[35mℹ\u001b[0m WORKDIR /app"}
+        - {send: "\u001b[35mℹ\u001b[0m COPY . ."}
+        - {send: "\u001b[35mℹ\u001b[0m Cmd: /bin/sh"}
+        - {send: "\u001b[35mℹ\u001b[0m Util.Lookup returned: &{Uid:1000}"}
+        - {send: "\u001b[35mℹ\u001b[0m added 67 packages, and audited 68 packages in 2s"}
+        - {send: "\u001b[35mℹ\u001b[0m found 0 vulnerabilities"}
+        - {sleep: 1500ms}   # holds the screen while the steps read the live line and the tail
+        - {send: "\u001b[35mℹ\u001b[0m Taking snapshot of full filesystem..."}
+        - {send: "\u001b[35mℹ\u001b[0m Pushing image to vcr.registry/my-project:1"}
+        - {send: "\u001b[35mℹ\u001b[0m Pushed vcr.registry/my-project@sha256:0000000000000000000000000000000000000000000000000000000000000000"}
+        - {send: "\u001b[35mℹ\u001b[0m Status - completed"}
+steps:
+  - {expect: "5/7 Running build script"}
+  - {expect: "  │ found 0 vulnerabilities"}
+expect-reads: [euw1 GET /regions/aws.euw1, euw1 GET /projects/my-project, euw1 GET /packages/<uuid>/build/status]

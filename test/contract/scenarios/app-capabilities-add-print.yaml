@@ -1,0 +1,5 @@
+description: "--print shows the default Voice, Messages, RTC and Verify capabilities without a manifest"
+args: [app, capabilities, add, --voice, --messages, --rtc, --verify, --print]
+tty: true
+presentation: rich
+expect-reads: []

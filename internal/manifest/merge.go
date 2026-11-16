@@ -34,6 +34,7 @@ func cloneManifest(m *Manifest) *Manifest {
 	}
 	clone.Debug.Environment = slices.Clone(m.Debug.Environment)
 	clone.Debug.Entrypoint = slices.Clone(m.Debug.Entrypoint)
+	clone.ApplicationCapabilities = cloneBlock(m.ApplicationCapabilities)
 	return &clone
 }
 

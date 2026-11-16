@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	goldenPages       = 27
+	goldenPages       = 29
 	stdoutMarker      = "\n--- stdout ---\n"
 	stderrMarker      = "--- stderr ---\n"
 	exitPrefix        = "[exit="

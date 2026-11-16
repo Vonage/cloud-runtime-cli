@@ -1,19 +1,19 @@
 # vcr rich golden v1
 exit 0
-@@ stdout 431
+@@ stdout 834
 ✓ Project resolved  my-project
 ✓ Parameters validated
 ✓ Files packaged  3 files
 ✓ Source uploaded
 ✓ Package created  <uuid>
-  │ Starting build
-  │ Step 1/2 : install dependencies
-  │ ℹ Status - completed
 ✓ Package built
 ✓ Instance deployed
 
-✓ Instance has been deployed!
-  Instance id: <uuid>
-  Instance service name: my-project-dev
-  Instance host address: https://my-project-dev.euw1.runtime.example.test
+╭─ ✓ my-project is live ───────────────────────────────────────╮
+│                                                              │
+│  URL       https://my-project-dev.euw1.runtime.example.test  │
+│  Instance  <uuid>              │
+│  Service   my-project-dev                                    │
+│                                                              │
+╰──────────────────────────────────────────────────────────────╯
 

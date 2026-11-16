@@ -46,6 +46,7 @@ type fakeAPI struct {
 	frames        []string
 	watchErr      error
 	watchBlocks   bool          // WatchBuild sends its frames, then holds until its context ends
+	framesSent    chan struct{} // closed once WatchBuild has sent frames
 	lateFrames    []string      // WatchBuild sends these once BuildStatus has answered a final status
 	finalStatus   chan struct{} // closed when BuildStatus first answers a final status
 	closeFinal    sync.Once
@@ -179,10 +180,13 @@ func (f *fakeAPI) WatchBuild(ctx context.Context, packageID string, onLine func(
 	f.enter(callWatchBuild)
 	f.mu.Lock()
 	f.watchedID = packageID
-	frames, blocks, err, late, final := f.frames, f.watchBlocks, f.watchErr, f.lateFrames, f.finalStatus
+	frames, blocks, err, late, final, sent := f.frames, f.watchBlocks, f.watchErr, f.lateFrames, f.finalStatus, f.framesSent
 	f.mu.Unlock()
 	for _, frame := range frames {
 		onLine(frame)
+	}
+	if sent != nil {
+		close(sent)
 	}
 	if final != nil {
 		select {

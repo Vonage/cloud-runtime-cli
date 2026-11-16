@@ -1,0 +1,5 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 60
+✓ Replaced voice in application-capabilities in other.yml
+

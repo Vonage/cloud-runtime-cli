@@ -26,6 +26,8 @@ const (
 var (
 	errApplicationRequired = errors.New("application-id is required")
 	errRuntimeRequired     = errors.New("runtime is required")
+	errInstanceApplication = errors.New("application-capabilities would point the webhooks of the instance application " +
+		"at this debug session: set debug.application-id or --app-id to a different application")
 )
 
 // invocation is one run of `vcr debug`: the flags it got, the environment it runs in and the function that runs the
@@ -43,6 +45,9 @@ func (in *invocation) execute(cmd *cobra.Command, args []string) error {
 	ctx := cmd.Context()
 	dir, m, err := in.loadProject(args)
 	if err != nil {
+		return err
+	}
+	if err := manifest.CheckApplicationCapabilities(m, nil); err != nil {
 		return err
 	}
 	region := chooseRegion(in.env.Flags.Region, m, in.env.Settings.Region)
@@ -91,6 +96,9 @@ func (in *invocation) config(ctx context.Context, client *platform.Client, dir s
 	}
 	if appID, err = in.confirmApplication(ctx, client, appID, m.Instance.ApplicationID); err != nil {
 		return debugsession.Config{}, err
+	}
+	if len(m.ApplicationCapabilities) > 0 && appID == m.Instance.ApplicationID {
+		return debugsession.Config{}, errInstanceApplication
 	}
 	env := in.env
 	return debugsession.Config{

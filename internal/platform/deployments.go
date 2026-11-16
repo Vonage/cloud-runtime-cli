@@ -2,6 +2,7 @@ package platform
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"golang.org/x/mod/semver"
@@ -30,12 +31,13 @@ func (c *Client) CreateProject(ctx context.Context, name string) (string, error)
 }
 
 type PackageRequest struct {
-	SourceCodeKey   string                `json:"sourceCodeKey"`
-	Entrypoint      []string              `json:"entrypoint"`
-	Capabilities    manifest.Capabilities `json:"capabilities"`
-	BuildScriptPath string                `json:"buildScriptPath"`
-	Runtime         string                `json:"runtime"`
-	Name            string                `json:"name,omitempty"` // sent from v0.5 only
+	SourceCodeKey           string                `json:"sourceCodeKey"`
+	Entrypoint              []string              `json:"entrypoint"`
+	Capabilities            manifest.Capabilities `json:"capabilities"`
+	BuildScriptPath         string                `json:"buildScriptPath"`
+	Runtime                 string                `json:"runtime"`
+	Name                    string                `json:"name,omitempty"` // sent from v0.5 only
+	ApplicationCapabilities map[string]any        `json:"applicationCapabilities,omitempty"`
 }
 
 // CreatePackage is POST /packages and returns the package id. Never retried. Before v0.5 the name is left out,
@@ -99,10 +101,11 @@ type DeployRequest struct {
 }
 
 type DeployResult struct {
-	InstanceID   string   `json:"instanceId"`
-	ServiceName  string   `json:"serviceName"`
-	DeploymentID string   `json:"deploymentId"`
-	HostURLs     []string `json:"hostUrls"`
+	InstanceID              string          `json:"instanceId"`
+	ServiceName             string          `json:"serviceName"`
+	DeploymentID            string          `json:"deploymentId"`
+	HostURLs                []string        `json:"hostUrls"`
+	ApplicationCapabilities json.RawMessage `json:"applicationCapabilities,omitempty"`
 }
 
 // DeployInstance is POST /deployments. Never retried.

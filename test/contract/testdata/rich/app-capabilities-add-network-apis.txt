@@ -1,0 +1,8 @@
+# vcr rich golden v1
+exit 0
+@@ stdout 132
+application-capabilities:
+  network_apis:
+    network_application_id: my-network-app
+    redirect_uri: https://example.com/callback
+

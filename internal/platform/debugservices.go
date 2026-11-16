@@ -2,6 +2,7 @@ package platform
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -12,25 +13,27 @@ import (
 const debugProxyRuntime = "debug-proxy"
 
 type DebugService struct {
-	ServiceName   string `json:"serviceName"`
-	PrivateKey    string `json:"privateKey"`
-	InstanceID    string `json:"instanceId"`
-	WebsocketPath string `json:"websocketPath"`
+	ServiceName             string          `json:"serviceName"`
+	PrivateKey              string          `json:"privateKey"`
+	InstanceID              string          `json:"instanceId"`
+	WebsocketPath           string          `json:"websocketPath"`
+	ApplicationCapabilities json.RawMessage `json:"applicationCapabilities,omitempty"`
 }
 
 // debugServiceBody is the request of DeployDebugService; the order of its fields is the order of its JSON keys.
 type debugServiceBody struct {
-	Runtime          string                `json:"runtime"`
-	Region           string                `json:"region"`
-	APIApplicationID string                `json:"apiApplicationId"`
-	Name             string                `json:"name,omitempty"`
-	Capabilities     manifest.Capabilities `json:"capabilities"`
+	Runtime                 string                `json:"runtime"`
+	Region                  string                `json:"region"`
+	APIApplicationID        string                `json:"apiApplicationId"`
+	Name                    string                `json:"name,omitempty"`
+	Capabilities            manifest.Capabilities `json:"capabilities"`
+	ApplicationCapabilities map[string]any        `json:"applicationCapabilities,omitempty"`
 }
 
-// DeployDebugService is POST /debug/services {"runtime":"debug-proxy","region","apiApplicationId","name","capabilities"}.
+// DeployDebugService is POST /debug/services {"runtime":"debug-proxy","region","apiApplicationId","name","capabilities","applicationCapabilities"}.
 // The returned ServiceName is checked against the host-label rule before it is returned.
-func (c *Client) DeployDebugService(ctx context.Context, region, appID, name string, caps manifest.Capabilities) (DebugService, error) {
-	body := debugServiceBody{Runtime: debugProxyRuntime, Region: region, APIApplicationID: appID, Name: name, Capabilities: caps}
+func (c *Client) DeployDebugService(ctx context.Context, region, appID, name string, caps manifest.Capabilities, appCaps map[string]any) (DebugService, error) {
+	body := debugServiceBody{Runtime: debugProxyRuntime, Region: region, APIApplicationID: appID, Name: name, Capabilities: caps, ApplicationCapabilities: appCaps}
 	var out DebugService
 	if err := c.core.sendJSON(ctx, http.MethodPost, endpoint(c.base, "debug", "services"), body, &out); err != nil {
 		return DebugService{}, err

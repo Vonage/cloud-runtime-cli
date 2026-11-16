@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -225,11 +226,23 @@ func TestRichDeployRequestsMatchClassic(t *testing.T) {
 func TestStaticDeployMatchesRichScreen(t *testing.T) {
 	rich := newRichRun(t, term.Rich)
 	static := newRichRun(t, term.Static)
+	rich.api.frames = buildOf(scriptLines(1, 3))
+	static.api.frames = buildOf(scriptLines(1, 3))
 
 	require.NoError(t, rich.run())
 	require.NoError(t, static.run())
 
-	assert.Equal(t, rich.stdout.Screen(), static.stdout.Screen())
+	// The static screen keeps the script lines the rich one erased.
+	var script, rest []string
+	for _, line := range lines(static.stdout.Screen()) {
+		if strings.HasPrefix(line, "  │") {
+			script = append(script, line)
+		} else {
+			rest = append(rest, line)
+		}
+	}
+	assert.Equal(t, guttered(scriptLines(1, 3)), script)
+	assert.Equal(t, lines(rich.stdout.Screen()), rest)
 	assert.Equal(t, rich.stderr.Screen(), static.stderr.Screen())
 	for _, buffer := range []*term.TermBuffer{static.stdout, static.stderr} {
 		for _, sequence := range []string{"\r", "\x1b[2K", "\x1b[?25l"} {

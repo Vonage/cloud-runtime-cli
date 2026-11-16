@@ -41,8 +41,9 @@ type session struct {
 	con    *console
 	region platform.Region
 
-	caps manifest.Capabilities
-	vars []string // the NAME=value entries of the manifest's environment
+	caps    manifest.Capabilities
+	appCaps map[string]any // the manifest's block, sent on the debug-service request
+	vars    []string       // the NAME=value entries of the manifest's environment
 
 	ls       *Listeners
 	service  platform.DebugService
@@ -110,7 +111,7 @@ func (s *session) preflight() error {
 	if err != nil {
 		return fmt.Errorf("failed to parse capabilities: %w", err)
 	}
-	s.vars, s.caps = vars, caps
+	s.vars, s.caps, s.appCaps = vars, caps, m.ApplicationCapabilities
 	return nil
 }
 
@@ -130,7 +131,7 @@ func (s *session) deployService() (platform.DebugService, error) {
 		return s.deployServiceRich()
 	}
 	stop := s.tio.StartSpinner(" Deploying debug server...")
-	service, err := s.api.DeployDebugService(s.setup, s.region.Alias, s.cfg.AppID, s.cfg.Name, s.caps)
+	service, err := s.api.DeployDebugService(s.setup, s.region.Alias, s.cfg.AppID, s.cfg.Name, s.caps, s.appCaps)
 	stop()
 	return service, err
 }

@@ -10,7 +10,8 @@ import (
 	"github.com/Vonage/cloud-runtime-cli/internal/cli/cmdenv"
 )
 
-// NewCmd returns `vcr app` with create, generate-keys, list and remove, annotated cmdenv.Full.
+// NewCmd returns `vcr app` with create, generate-keys, list, remove and capabilities, annotated cmdenv.Full
+// (capabilities overrides it with cmdenv.None).
 func NewCmd(env *cmdenv.Env) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "app <command>",
@@ -31,6 +32,7 @@ func NewCmd(env *cmdenv.Env) *cobra.Command {
 			  remove (rm)    Remove a Vonage application
 			  list (ls)      List all Vonage applications in your account
 			  generate-keys  Generate new key pairs for an existing application
+			  capabilities   Manage the application-capabilities block in vcr.yml
 
 			WORKFLOW
 			  1. Create an application: vcr app create --name my-app
@@ -52,11 +54,14 @@ func NewCmd(env *cmdenv.Env) *cobra.Command {
 
 			# List applications filtered by name
 			$ vcr app list --filter "production"
+
+			# Add the default Voice and Messages capabilities to vcr.yml
+			$ vcr app capabilities add --voice --messages
 		`),
 		// The leaves inherit the mode: the root's pre-run finds the nearest annotation going up from the command.
 		Annotations: map[string]string{cmdenv.Annotation: cmdenv.Full},
 	}
-	cmd.AddCommand(newCreate(env), newGenerateKeys(env), newList(env), newRemove(env))
+	cmd.AddCommand(newCreate(env), newGenerateKeys(env), newList(env), newRemove(env), newCapabilities(env))
 	return cmd
 }
 

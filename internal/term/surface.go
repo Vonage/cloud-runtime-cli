@@ -1,6 +1,7 @@
 package term
 
 import (
+	"fmt"
 	"io"
 	"slices"
 	"sync"
@@ -9,6 +10,10 @@ import (
 // eraseLive returns to the start of the row and clears it. A drawn live line is erased with it alone, and a frame is
 // drawn after it.
 const eraseLive = "\r\x1b[2K"
+
+// eraseRegion returns to the start of the live row from the last of the rows drawn under it, and clears to the end
+// of the screen.
+const eraseRegion = "\r\x1b[%dA\x1b[J"
 
 // surface is the one screen that stdout and stderr share in Rich mode. Every write to either stream goes through it,
 // so the live line is erased before the text and drawn again after it. The live line itself is written to the real
@@ -21,6 +26,7 @@ type surface struct {
 	mu      sync.Mutex
 	steps   []*Step // the live steps, oldest first; only the last is drawn
 	drawn   bool    // the live line is on the screen now
+	below   int     // how many tail rows are drawn under the live line; the cursor is on the last of them
 	mid     bool    // the last write ended in the middle of a line: the live line is suspended until a newline
 	liveOff bool    // no live byte is written again: a write failed, or the IO was closed
 }
@@ -104,14 +110,23 @@ func (s *surface) eraseLocked() {
 	if !s.drawn || s.liveOff {
 		return
 	}
-	s.drawn = false
-	if _, err := io.WriteString(s.errOut, eraseLive); err != nil {
+	erase := s.eraseText()
+	s.drawn, s.below = false, 0
+	if _, err := io.WriteString(s.errOut, erase); err != nil {
 		s.liveOff = true
 	}
 }
 
-// drawTopLocked draws the newest step when it is old enough. A newer step that is not drawable yet leaves the line
-// as it is: an older step is never drawn in its place.
+// eraseText is what takes the drawn region off the screen and leaves the cursor at the start of the live row.
+func (s *surface) eraseText() string {
+	if !s.drawn || s.below == 0 {
+		return eraseLive
+	}
+	return fmt.Sprintf(eraseRegion, s.below)
+}
+
+// drawTopLocked draws the newest step, with its tail rows under it, when it is old enough. A newer step that is not
+// drawable yet leaves the region as it is: an older step is never drawn in its place.
 func (s *surface) drawTopLocked() {
 	if s.liveOff || s.mid || len(s.steps) == 0 {
 		return
@@ -121,12 +136,27 @@ func (s *surface) drawTopLocked() {
 	if elapsed < debounce {
 		return
 	}
-	frame := frameText(top.label, elapsed, s.owner.columns(), s.owner.Style().Gray)
-	if _, err := io.WriteString(s.errOut, eraseLive+frame); err != nil {
-		s.liveOff, s.drawn = true, false
+	width, dim := s.owner.columns(), s.owner.Style().Gray
+	bar, tail := top.region()
+	frame := frameText(top.label, elapsed, width, dim)
+	if bar != nil {
+		frame = progressFrame(top.label, *bar, elapsed, width, dim)
+	}
+	rows, below := tailText(tail, width, dim)
+	if _, err := io.WriteString(s.errOut, s.eraseText()+frame+rows); err != nil {
+		s.liveOff, s.drawn, s.below = true, false, 0
 		return
 	}
-	s.drawn = true
+	s.drawn, s.below = true, below
+}
+
+// refresh draws st again at once when it is the step on the live line.
+func (s *surface) refresh(st *Step) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if len(s.steps) > 0 && s.steps[len(s.steps)-1] == st {
+		s.drawTopLocked()
+	}
 }
 
 // push registers a live step. It reports false when the live line is off for good, so the step is not drawn or ticked.

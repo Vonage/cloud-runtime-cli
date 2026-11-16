@@ -180,3 +180,7 @@ security-build-frame-watch-failure-line-does-not-end-the-build stderr the build 
 security-build-frame-watch-failure-line-does-not-end-the-build exit the build status route decides the outcome; the build log stream only shows output
 security-build-frame-watch-failure-line-does-not-end-the-build requests the build status route decides the outcome; the build log stream only shows output
 
+help-app stdout vcr app capabilities was added
+help-group-without-subcommand stdout vcr app capabilities was added
+help-unknown-nested-subcommand stderr vcr app capabilities was added
+completion-complete-command stdout vcr app capabilities was added

@@ -39,8 +39,8 @@ func buildPlan(f flagValues, read *manifest.Manifest, dir, region string) stages
 	merged.Instance.Name = firstSet(f.instanceName, read.Instance.Name)
 	merged.Instance.Runtime = firstSet(f.runtime, read.Instance.Runtime)
 	merged.Instance.ApplicationID = firstSet(f.appID, read.Instance.ApplicationID)
-	if f.capabilities != "" {
-		merged.Instance.Capabilities = strings.Split(f.capabilities, ",")
+	if caps := flagCapabilities(f.capabilities); caps != nil {
+		merged.Instance.Capabilities = caps
 	}
 	return stages.Plan{
 		ProjectDir:   dir,
@@ -53,6 +53,14 @@ func buildPlan(f flagValues, read *manifest.Manifest, dir, region string) stages
 		Capabilities: merged.Instance.Capabilities,
 		TgzPath:      f.tgz,
 	}
+}
+
+// flagCapabilities is the --capabilities value split on commas as typed, or nil when the flag is empty.
+func flagCapabilities(v string) []string {
+	if v == "" {
+		return nil
+	}
+	return strings.Split(v, ",")
 }
 
 // firstSet returns preferred unless it is empty.
