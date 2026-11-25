@@ -20,3 +20,4 @@
 
 - [x] 5.1 Add `VCR_DEBUG_PROXY_URL` and the `/_vcr/<service>/` path to the ENVIRONMENT VARIABLES section of `internal/cli/debug/text.go`. Verify: `go run . debug --help` shows both. The help page changes `test/contract/testdata/golden-help/vcr_debug.txt`, the `vcr debug` entry of `test/contract/testdata/contract-tree.json` and `docs/vcr_debug.md` (`make docs`), and `help-debug` gets a `stdout` line in `test/contract/allowed-diffs.txt`; no make target writes the first two, so they were edited to match `go run . debug --help`.
 - [x] 5.2 Run the repo's checks. Verify: `make test && golangci-lint run`
+- [x] 5.3 Review fix: `VCR_DEBUG_PROXY_URL` carries the port the debugger actually bound, so `--debugger-port 0` works (`TestChildGetsTheBoundDebuggerPort`). Verify: `make test && make lint && make contract`
