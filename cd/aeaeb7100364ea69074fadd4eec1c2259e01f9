@@ -1,0 +1,22 @@
+openspec/changes/debug-forward-platform-calls/.openspec.yaml
+  h_df1d95ff1e9b8c 1-2
+openspec/changes/debug-forward-platform-calls/design.md
+  h_df1d95ff1e9b8c 1-40
+openspec/changes/debug-forward-platform-calls/proposal.md
+  h_df1d95ff1e9b8c 1-40
+openspec/changes/debug-forward-platform-calls/specs/debug-platform-calls/spec.md
+  h_df1d95ff1e9b8c 1-48
+openspec/changes/debug-forward-platform-calls/tasks.md
+  h_df1d95ff1e9b8c 1-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cdaeaeb7100364ea69074fadd4eec1c2259e01f9",
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
+    }
+  }
+}
