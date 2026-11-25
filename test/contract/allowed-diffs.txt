@@ -207,3 +207,4 @@ debug-takeover-close-1008 stdout the local app is also given VCR_DEBUG_PROXY_URL
 debug-unknown-inbound-operation-ends-the-session stdout the local app is also given VCR_DEBUG_PROXY_URL
 debug-verbose stdout the local app is also given VCR_DEBUG_PROXY_URL
 debug-yes-flag stdout the local app is also given VCR_DEBUG_PROXY_URL
+help-debug stdout vcr debug --help documents VCR_DEBUG_PROXY_URL and the /_vcr/ path

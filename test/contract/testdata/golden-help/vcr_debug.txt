@@ -39,6 +39,11 @@ ENVIRONMENT VARIABLES
   Environment variables from debug.environment (or instance.environment as fallback)
   in your manifest are loaded. For secrets, export them locally before running debug.
 
+  The app is also given VCR_DEBUG_PROXY_URL, the local debugger's address
+  (http://127.0.0.1:<debugger-port>). A request to
+  $VCR_DEBUG_PROXY_URL/_vcr/<service>/<path> is relayed to the platform service
+  <service> at /<path>, and the platform authenticates it.
+
 CLEANUP
   Press Ctrl+C to stop debug mode. The remote debug server is automatically removed
   unless --preserve-data is specified.
