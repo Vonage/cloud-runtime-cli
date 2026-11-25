@@ -55,6 +55,24 @@ func TestWireMessagesEncoding(t *testing.T) {
 			want: `{"id":"x3","operation":"execute-remote","request":{"faas_function":"","url":"","method":"","payload":""},` +
 				`"headers":null,"query":null}`,
 		},
+		{
+			name: "a remote request with zero broker auth and path has neither key",
+			msg: remoteRequestMessage{
+				ID: "x4", Operation: "execute-remote",
+				Request: remoteCommand{FAASFunction: "p", URL: "http://p/", Method: "GET", BrokerAuth: false, Path: ""},
+			},
+			want: `{"id":"x4","operation":"execute-remote","request":{"faas_function":"p","url":"http://p/","method":"GET","payload":null},` +
+				`"headers":null,"query":null}`,
+		},
+		{
+			name: "a platform service call",
+			msg: remoteRequestMessage{
+				ID: "x5", Operation: "execute-remote",
+				Request: remoteCommand{FAASFunction: "data-api", Method: "PUT", BrokerAuth: true, Path: "/v1/items"},
+			},
+			want: `{"id":"x5","operation":"execute-remote","request":{"faas_function":"data-api","url":"","method":"PUT","payload":null,` +
+				`"broker_auth":true,"path":"/v1/items"},"headers":null,"query":null}`,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

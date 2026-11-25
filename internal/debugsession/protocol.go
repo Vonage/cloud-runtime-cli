@@ -54,6 +54,10 @@ type remoteCommand struct {
 	URL          string `json:"url"`
 	Method       string `json:"method"`
 	Payload      []byte `json:"payload"`
+	// BrokerAuth asks the platform to call the service FAASFunction at Path with its own identity, instead of URL.
+	// Both are omitted when empty, so other calls are sent exactly as before.
+	BrokerAuth bool   `json:"broker_auth,omitempty"`
+	Path       string `json:"path,omitempty"`
 }
 
 // remoteRequestMessage is a call of the debugged app's SDK, sent to the proxy with the operation execute-remote.

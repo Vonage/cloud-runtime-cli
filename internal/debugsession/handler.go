@@ -22,6 +22,8 @@ type remoteRequest struct {
 	Payload      []byte
 	Headers      map[string]string // the first value of each request header
 	Query        url.Values
+	BrokerAuth   bool   // the platform calls FAASFunction at Path; URL is empty
+	Path         string // escaped, as the app sent it
 }
 
 // remoteResponse is the provider's answer.

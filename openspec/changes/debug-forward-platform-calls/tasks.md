@@ -4,7 +4,7 @@
 
 ## 2. Wire fields
 
-- [ ] 2.1 Test first in `internal/debugsession/protocol_test.go`: a `remoteRequestMessage` with zero `BrokerAuth` and `Path` marshals with no `broker_auth` or `path` key, and one with them set marshals `"broker_auth":true,"path":"/v1/items"`. Add both fields to `remoteCommand` in `protocol.go` with `omitempty`, and to `remoteRequest` in `handler.go`; copy them in `tunnel.go`'s `call`. Verify: `go test ./internal/debugsession/ -run TestWireMessages`
+- [x] 2.1 Test first in `internal/debugsession/protocol_test.go`: a `remoteRequestMessage` with zero `BrokerAuth` and `Path` marshals with no `broker_auth` or `path` key, and one with them set marshals `"broker_auth":true,"path":"/v1/items"`. Add both fields to `remoteCommand` in `protocol.go` with `omitempty`, and to `remoteRequest` in `handler.go`; copy them in `tunnel.go`'s `call`. Verify: `go test ./internal/debugsession/ -run TestWireMessages`
 
 ## 3. The `/_vcr/` mapping
 
