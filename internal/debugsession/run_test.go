@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -276,4 +277,19 @@ func TestPreserveDataReachesDelete(t *testing.T) {
 	requests := debugServiceRequests(srv)
 	require.NotEmpty(t, requests)
 	assert.Equal(t, "DELETE /debug/services/dbg-service-1?preserveData=true", requests[len(requests)-1])
+}
+
+func TestChildGetsTheBoundDebuggerPort(t *testing.T) {
+	setup := newLocalSetup(t)
+	file := filepath.Join(t.TempDir(), "env")
+	setup.cfg.Manifest.Debug.Entrypoint = helperSpec("dump-env", file).Entrypoint
+	setup.cfg.DebuggerPort = 0 // the system picks the port
+	run := setup.start(t)
+	waitForOutput(t, run.errOut, "exit status 0")
+	require.NoError(t, run.stop())
+
+	got := readEnvFile(t, file)["VCR_DEBUG_PROXY_URL"]
+	port, ok := strings.CutPrefix(got, "http://127.0.0.1:")
+	require.True(t, ok, got)
+	assert.NotEqual(t, "0", port)
 }

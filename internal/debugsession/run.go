@@ -184,6 +184,10 @@ func (s *session) connectProxy() *cause {
 // startApp shows where the debugger can be reached and starts the app with the debug environment.
 func (s *session) startApp() *cause {
 	s.printIntro()
+	debuggerPort := s.cfg.DebuggerPort
+	if s.ls != nil { // the bound port: --debugger-port 0 lets the system pick
+		debuggerPort = listenerPort(s.ls.V4)
+	}
 	env := debugEnvironment(os.Environ(), s.vars, debugVars{
 		ServiceName:  s.service.ServiceName,
 		InstanceID:   s.service.InstanceID,
@@ -195,7 +199,7 @@ func (s *session) startApp() *cause {
 		ProjectDir:   s.cfg.ProjectDir,
 		Region:       s.region,
 		AppPort:      s.cfg.AppPort,
-		DebuggerPort: s.cfg.DebuggerPort,
+		DebuggerPort: debuggerPort,
 	})
 	stdout, stderr := s.tio.ChildOutput()
 	c, err := startChild(childSpec{

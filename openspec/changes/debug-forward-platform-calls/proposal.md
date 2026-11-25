@@ -2,7 +2,7 @@ Branch: `feature/debug-forward-platform-calls`
 
 ## Why
 
-The newer platform SDKs, starting with the data SDK in `vcr-sdk-js`, authenticate with a platform token that only a workload running on the platform can obtain. Under `vcr debug` the app runs locally, so those SDKs can neither reach their services nor get a token. The platform's debug server can make the call with its own identity if the CLI tells it which service and path to call, instead of a URL.
+The newer platform SDKs authenticate with a platform token that only a workload running on the platform can obtain. Under `vcr debug` the app runs locally, so those SDKs can neither reach their services nor get a token. The platform's debug server can make the call with its own identity if the CLI tells it which service and path to call, instead of a URL.
 
 ## What Changes
 
@@ -28,7 +28,7 @@ None.
 - `test/fakeplatform`: the peer records the new fields.
 - No change to flags, config files or the existing relay.
 
-Sibling change: `vcr-sdk-js` `debug-tunnel-routing` sends SDK calls to `/_vcr/<service>/...`.
+The SDKs send their calls to `/_vcr/<service>/...` when `VCR_DEBUG_PROXY_URL` is set.
 
 ## Rollout
 
