@@ -1,6 +1,6 @@
 ## 1. Environment
 
-- [ ] 1.1 Test first in `internal/debugsession/env_test.go`: `debugEnvironment` with a `DebuggerPort` of 3001 contains `VCR_DEBUG_PROXY_URL=http://127.0.0.1:3001`, and with 4100 contains `...:4100`. Add `DebuggerPort` to `debugVars` in `internal/debugsession/env.go`, the variable to the fixed list, and pass `s.cfg.DebuggerPort` in `internal/debugsession/run.go`. Verify: `go test ./internal/debugsession/ -run 'TestDebugEnvironment'` (`TestDebugEnvironmentNamesAndValues` and `TestDebugEnvironmentHasNoUnlistedNames` list the variables and gain the new one)
+- [x] 1.1 Test first in `internal/debugsession/env_test.go`: `debugEnvironment` with a `DebuggerPort` of 3001 contains `VCR_DEBUG_PROXY_URL=http://127.0.0.1:3001`, and with 4100 contains `...:4100`. Add `DebuggerPort` to `debugVars` in `internal/debugsession/env.go`, the variable to the fixed list, and pass `s.cfg.DebuggerPort` in `internal/debugsession/run.go`. Verify: `go test ./internal/debugsession/ -run 'TestDebugEnvironment'` (`TestDebugEnvironmentNamesAndValues` and `TestDebugEnvironmentHasNoUnlistedNames` list the variables and gain the new one). The contract test app prints every variable name, so each debug scenario whose stdout gains `testapp env VCR_DEBUG_PROXY_URL` gets its own `stdout` line in `test/contract/allowed-diffs.txt`, and the `debug-on-terminal` rich golden is re-recorded with `make contract-rich-record`.
 
 ## 2. Wire fields
 

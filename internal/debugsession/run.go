@@ -185,16 +185,17 @@ func (s *session) connectProxy() *cause {
 func (s *session) startApp() *cause {
 	s.printIntro()
 	env := debugEnvironment(os.Environ(), s.vars, debugVars{
-		ServiceName: s.service.ServiceName,
-		InstanceID:  s.service.InstanceID,
-		PrivateKey:  s.service.PrivateKey,
-		PublicURL:   s.addrs.Host,
-		AppID:       s.cfg.AppID,
-		APIKey:      s.cfg.Creds.APIKey,
-		APISecret:   s.cfg.Creds.APISecret,
-		ProjectDir:  s.cfg.ProjectDir,
-		Region:      s.region,
-		AppPort:     s.cfg.AppPort,
+		ServiceName:  s.service.ServiceName,
+		InstanceID:   s.service.InstanceID,
+		PrivateKey:   s.service.PrivateKey,
+		PublicURL:    s.addrs.Host,
+		AppID:        s.cfg.AppID,
+		APIKey:       s.cfg.Creds.APIKey,
+		APISecret:    s.cfg.Creds.APISecret,
+		ProjectDir:   s.cfg.ProjectDir,
+		Region:       s.region,
+		AppPort:      s.cfg.AppPort,
+		DebuggerPort: s.cfg.DebuggerPort,
 	})
 	stdout, stderr := s.tio.ChildOutput()
 	c, err := startChild(childSpec{

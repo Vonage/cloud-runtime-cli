@@ -15,16 +15,17 @@ import (
 
 func testVars() debugVars {
 	return debugVars{
-		ServiceName: "dbg-service-1",
-		InstanceID:  "instance-1",
-		PrivateKey:  "private-key",
-		PublicURL:   "https://dbg-service-1.api.example.test",
-		AppID:       "app-1",
-		APIKey:      "key-1",
-		APISecret:   "secret-1",
-		ProjectDir:  "/work/project",
-		Region:      platform.Region{Alias: "aws.euw1", EndpointURLScheme: "https", DebuggerURLScheme: "wss"},
-		AppPort:     3000,
+		ServiceName:  "dbg-service-1",
+		InstanceID:   "instance-1",
+		PrivateKey:   "private-key",
+		PublicURL:    "https://dbg-service-1.api.example.test",
+		AppID:        "app-1",
+		APIKey:       "key-1",
+		APISecret:    "secret-1",
+		ProjectDir:   "/work/project",
+		Region:       platform.Region{Alias: "aws.euw1", EndpointURLScheme: "https", DebuggerURLScheme: "wss"},
+		AppPort:      3000,
+		DebuggerPort: 3001,
 	}
 }
 
@@ -54,6 +55,7 @@ var wantFixed = []string{
 	"VCR_DEBUGGER_URL_SCHEME=wss",
 	"VCR_REGION=aws.euw1",
 	"VCR_PORT=3000",
+	"VCR_DEBUG_PROXY_URL=http://127.0.0.1:3001",
 	"FORCE_COLOR=1",
 	"INSTANCE_ID=instance-1",
 }
@@ -71,7 +73,7 @@ func instanceList(envs ...manifest.Env) *manifest.Manifest {
 func TestDebugEnvironmentNamesAndValues(t *testing.T) {
 	got := debugEnvironment(nil, nil, testVars())
 
-	assert.Len(t, got, 25)
+	assert.Len(t, got, 26)
 	assert.Equal(t, wantFixed, got)
 }
 
@@ -81,11 +83,21 @@ func TestDebugEnvironmentWithoutInstanceID(t *testing.T) {
 
 	got := debugEnvironment(nil, nil, vars)
 
-	assert.Len(t, got, 24)
-	assert.Equal(t, wantFixed[:24], got)
+	assert.Len(t, got, 25)
+	assert.Equal(t, wantFixed[:25], got)
 	for _, entry := range got {
 		assert.NotContains(t, entry, "INSTANCE_ID=")
 	}
+}
+
+func TestDebugEnvironmentProxyURLUsesTheDebuggerPort(t *testing.T) {
+	vars := testVars()
+	vars.DebuggerPort = 4100
+
+	got := debugEnvironment(nil, nil, vars)
+
+	assert.Contains(t, got, "VCR_DEBUG_PROXY_URL=http://127.0.0.1:4100")
+	assert.NotContains(t, got, "VCR_DEBUG_PROXY_URL=http://127.0.0.1:3001")
 }
 
 func TestDebugEnvironmentHasNoUnlistedNames(t *testing.T) {
