@@ -10,6 +10,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"strings"
 	"sync"
@@ -18,6 +19,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/Vonage/cloud-runtime-cli/test/fakeplatform"
 )
 
 // callResult is what a call returned.
@@ -311,4 +314,31 @@ func TestFiveMegabyteBodiesThroughTheTunnel(t *testing.T) {
 		assert.Len(t, result.resp.Payload, size)
 		assert.Equal(t, want, sha256.Sum256(result.resp.Payload), "the app got the whole answer")
 	})
+}
+
+func TestPlatformServiceCallReachesThePeerAndIsReplayed(t *testing.T) {
+	fixtures := fakeplatform.Defaults()
+	fixtures.Debug.Remote = map[string]fakeplatform.RemoteAnswer{
+		"data-api": {Status: http.StatusCreated, Headers: map[string]string{"X-Data": "yes"}, Body: `{"ok":true}`},
+	}
+	srv := fakeplatform.Start(t, fixtures)
+	rig := newSharedRig(t, srv, rigOptions{})
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPut, "/_vcr/data-api/v1/items?collection=orders", strings.NewReader("{}"))
+
+	rec := callHandler(t, rig.tun, req)
+
+	assert.Equal(t, http.StatusCreated, rec.Code)
+	assert.Equal(t, "yes", rec.Header().Get("X-Data"))
+	assert.JSONEq(t, `{"ok":true}`, rec.Body.String())
+	var remote *fakeplatform.PeerRemoteRequest
+	for _, m := range srv.Peer().Received() {
+		if m.Remote != nil {
+			remote = m.Remote
+		}
+	}
+	require.NotNil(t, remote)
+	assert.Equal(t, fakeplatform.PeerRemoteCommand{
+		FAASFunction: "data-api", Method: http.MethodPut, Payload: []byte("{}"), BrokerAuth: true, Path: "/v1/items",
+	}, remote.Request)
+	assert.Equal(t, map[string][]string{"collection": {"orders"}}, remote.Query)
 }

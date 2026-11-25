@@ -14,7 +14,7 @@
 
 ## 4. Through the tunnel
 
-- [ ] 4.1 Test first in `internal/debugsession/tunnel_calls_test.go`, against `test/fakeplatform`: a `/_vcr/data-api/v1/items` call arrives at the peer with `broker_auth` and `path`, and the peer's answer is replayed to the app. Extend `test/fakeplatform/peertypes.go`'s remote request type with the two fields. Verify: `go test ./internal/debugsession/ ./test/fakeplatform/...`
+- [x] 4.1 Test first in `internal/debugsession/tunnel_calls_test.go`, against `test/fakeplatform`: a `/_vcr/data-api/v1/items` call arrives at the peer with `broker_auth` and `path`, and the peer's answer is replayed to the app. Extend `test/fakeplatform/peertypes.go`'s remote request type with the two fields. Verify: `go test ./internal/debugsession/ ./test/fakeplatform/...`. The test starts the shared fake platform (`fakeplatform.Start`) rather than the in-package local peer that the rest of `tunnel_calls_test.go` uses, and sends the call through `newLocalHandler`.
 
 ## 5. Docs and checks
 

@@ -47,6 +47,9 @@ type PeerRemoteCommand struct {
 	URL          string `json:"url"`
 	Method       string `json:"method"`
 	Payload      []byte `json:"payload"`
+	// BrokerAuth and Path are set for a call to a platform service by name, which has no URL.
+	BrokerAuth bool   `json:"broker_auth,omitempty"`
+	Path       string `json:"path,omitempty"`
 }
 
 // PeerRemoteRequest is a call of the debugged app's SDK through the CLI's
