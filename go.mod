@@ -11,7 +11,7 @@ require (
 	github.com/cli/cli/v2 v2.98.0
 	github.com/creack/pty v1.1.24
 	github.com/google/uuid v1.6.0
-	github.com/gorilla/websocket v1.5.3
+	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/mattn/go-runewidth v0.0.24
 	github.com/olekukonko/tablewriter v1.1.2
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06
@@ -53,6 +53,7 @@ require (
 	github.com/tklauser/numcpus v0.11.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
+	golang.org/x/net v0.57.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
 	golang.org/x/text v0.42.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
