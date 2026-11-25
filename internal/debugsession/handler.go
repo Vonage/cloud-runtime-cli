@@ -2,10 +2,12 @@ package debugsession
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
 	"path"
+	"regexp"
 	"strings"
 )
 
@@ -49,7 +51,12 @@ func newLocalHandler(caller remoteCaller) http.Handler {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		resp, err := caller.call(r.Context(), newRemoteRequest(r, payload))
+		req, err := newRemoteRequest(r, payload)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		resp, err := caller.call(r.Context(), req)
 		if r.Context().Err() != nil {
 			return
 		}
@@ -71,15 +78,26 @@ func newLocalHandler(caller remoteCaller) http.Handler {
 // /_vcr/<service>/<path>.
 const servicePrefix = "/_vcr/"
 
-// newRemoteRequest builds the call from the SDK's request. The provider is not checked: the platform decides.
-func newRemoteRequest(r *http.Request, payload []byte) remoteRequest {
+var (
+	// dnsLabel is what a service name must be, so that the platform never reads it as a host.
+	dnsLabel = regexp.MustCompile(`^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$`)
+
+	errServiceName = errors.New("the service after /_vcr/ must be a DNS label")
+)
+
+// newRemoteRequest builds the call from the SDK's request. Only a /_vcr/ service name is checked; any other provider
+// is relayed as it is and the platform decides.
+func newRemoteRequest(r *http.Request, payload []byte) (remoteRequest, error) {
 	query := r.URL.Query()
 	req := remoteRequest{Method: r.Method, Payload: payload, Headers: firstValues(r.Header), Query: query}
 	// The escaped path, so that an encoded "/" inside a segment reaches the service as it was sent.
 	if rest, ok := strings.CutPrefix(r.URL.EscapedPath(), servicePrefix); ok {
 		service, target, _ := strings.Cut(rest, "/")
+		if !dnsLabel.MatchString(service) {
+			return remoteRequest{}, errServiceName
+		}
 		req.BrokerAuth, req.FAASFunction, req.Path = true, service, "/"+target
-		return req
+		return req, nil
 	}
 	provider := query.Get("x-neru-debug-provider")
 	if provider == "" {
@@ -93,7 +111,7 @@ func newRemoteRequest(r *http.Request, payload []byte) remoteRequest {
 		target = v
 	}
 	req.FAASFunction, req.URL = provider, "http://"+provider+path.Join("/", target)
-	return req
+	return req, nil
 }
 
 // firstValues returns the first value of each header.
