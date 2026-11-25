@@ -1,36 +1,16 @@
 go.mod
-  e71c0413a19f8221 56
+  h_df1d95ff1e9b8c 56
 go.sum
-  e71c0413a19f8221 121-122
+  h_df1d95ff1e9b8c 121-122
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "vonage-override-1.0.0",
+  "git_ai_version": "1.7.5",
   "base_commit_sha": "471f796dacdfcfcd9d5bd225a9bad700d9bdce96",
-  "prompts": {
-    "e71c0413a19f8221": {
-      "agent_id": {
-        "tool": "kiro",
-        "id": "6139d6ee-16b0-4f67-9ac0-162ae1be894b",
-        "model": "claude-opus-5.5"
-      },
-      "human_author": "Simon Chan <simon.chan@vonage.com>",
-      "messages": [
-        {
-          "type": "user",
-          "text": "[vg-ai attribution override: 100% AI]",
-          "timestamp": "2026-11-25T19:20:36.933Z"
-        },
-        {
-          "type": "assistant",
-          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
-          "timestamp": "2026-11-25T19:20:36.933Z"
-        }
-      ],
-      "total_additions": 3,
-      "total_deletions": 3,
-      "accepted_lines": 3,
-      "overriden_lines": 0
+  "prompts": {},
+  "humans": {
+    "h_df1d95ff1e9b8c": {
+      "author": "Simon Chan <simon.chan@vonage.com>"
     }
   }
 }
