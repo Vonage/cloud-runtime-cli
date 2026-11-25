@@ -1,22 +1,42 @@
 openspec/changes/debug-forward-platform-calls/.openspec.yaml
-  h_df1d95ff1e9b8c 1-2
+  e61a5dd0f5179bb0 1-2
 openspec/changes/debug-forward-platform-calls/design.md
-  h_df1d95ff1e9b8c 1-40
+  e61a5dd0f5179bb0 1-40
 openspec/changes/debug-forward-platform-calls/proposal.md
-  h_df1d95ff1e9b8c 1-40
+  e61a5dd0f5179bb0 1-40
 openspec/changes/debug-forward-platform-calls/specs/debug-platform-calls/spec.md
-  h_df1d95ff1e9b8c 1-48
+  e61a5dd0f5179bb0 1-48
 openspec/changes/debug-forward-platform-calls/tasks.md
-  h_df1d95ff1e9b8c 1-22
+  e61a5dd0f5179bb0 1-22
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.7.5",
+  "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "cdaeaeb7100364ea69074fadd4eec1c2259e01f9",
-  "prompts": {},
-  "humans": {
-    "h_df1d95ff1e9b8c": {
-      "author": "Simon Chan <simon.chan@vonage.com>"
+  "prompts": {
+    "e61a5dd0f5179bb0": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "48d71449-dab4-4548-bbc5-719995d4a652",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-25T16:09:12.556Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
+          "timestamp": "2026-11-25T16:09:12.556Z"
+        }
+      ],
+      "total_additions": 152,
+      "total_deletions": 0,
+      "accepted_lines": 152,
+      "overriden_lines": 0
     }
   }
 }
