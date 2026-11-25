@@ -1,44 +1,19 @@
-docs/vcr_debug.md
-  38a1679df7a2b0c0 45-49
 internal/cli/debug/text.go
-  38a1679df7a2b0c0 42-46
-openspec/changes/debug-forward-platform-calls/tasks.md
-  38a1679df7a2b0c0 21
-test/contract/allowed-diffs.txt
-  38a1679df7a2b0c0 210
-test/contract/testdata/contract-tree.json
-  38a1679df7a2b0c0 565
-test/contract/testdata/golden-help/vcr_debug.txt
-  38a1679df7a2b0c0 42-46
+  s_ab9a8e30e17ac4::t_f24b3bee105927 42-46
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "vonage-override-1.0.0",
+  "git_ai_version": "1.7.5",
   "base_commit_sha": "97097b2fa64c24d035871bbf11910fee9952d311",
-  "prompts": {
-    "38a1679df7a2b0c0": {
+  "prompts": {},
+  "sessions": {
+    "s_ab9a8e30e17ac4": {
       "agent_id": {
         "tool": "kiro",
-        "id": "5d0b3e2e-f9a1-45ca-9fb5-71c01524f99b",
-        "model": "claude-opus-5.5"
+        "id": "sess_bb6fe327-5494-48d9-8e32-c24d94e92a9a",
+        "model": "auto"
       },
-      "human_author": "Simon Chan <simon.chan@vonage.com>",
-      "messages": [
-        {
-          "type": "user",
-          "text": "[vg-ai attribution override: 100% AI]",
-          "timestamp": "2026-11-25T17:08:49.037Z"
-        },
-        {
-          "type": "assistant",
-          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
-          "timestamp": "2026-11-25T17:08:49.037Z"
-        }
-      ],
-      "total_additions": 18,
-      "total_deletions": 2,
-      "accepted_lines": 18,
-      "overriden_lines": 0
+      "human_author": "Simon Chan <simon.chan@vonage.com>"
     }
   }
 }
