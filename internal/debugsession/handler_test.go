@@ -145,6 +145,43 @@ func TestHandlerQueryKeepsEveryParameter(t *testing.T) {
 	}, caller.only(t).Query)
 }
 
+func TestHandlerRelaysPlatformServiceCallByServiceAndPath(t *testing.T) {
+	caller := &fakeCaller{}
+	body := `{"id":"1"}`
+	req := newHandlerRequest(t, http.MethodPut, "/_vcr/data-api/v1/items?collection=orders", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	callHandler(t, caller, req)
+
+	got := caller.only(t)
+	assert.True(t, got.BrokerAuth)
+	assert.Equal(t, "data-api", got.FAASFunction)
+	assert.Equal(t, "/v1/items", got.Path)
+	assert.Empty(t, got.URL)
+	assert.Equal(t, http.MethodPut, got.Method)
+	assert.Equal(t, url.Values{"collection": {"orders"}}, got.Query)
+	assert.Equal(t, []byte(body), got.Payload)
+	assert.Equal(t, map[string]string{"Content-Type": "application/json"}, got.Headers)
+}
+
+func TestHandlerPlatformServicePath(t *testing.T) {
+	tests := []struct{ target, wantPath string }{
+		{"/_vcr/data-api", "/"},
+		{"/_vcr/data-api/v1/collections/a%2Fb", "/v1/collections/a%2Fb"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.target, func(t *testing.T) {
+			caller := &fakeCaller{}
+
+			callHandler(t, caller, newHandlerRequest(t, http.MethodGet, tt.target, nil))
+
+			got := caller.only(t)
+			assert.Equal(t, "data-api", got.FAASFunction)
+			assert.Equal(t, tt.wantPath, got.Path)
+		})
+	}
+}
+
 func TestHandlerReplaysResponse(t *testing.T) {
 	binary := make([]byte, 256)
 	var next byte
