@@ -1,0 +1,36 @@
+test/contract/pty.go
+  102e2b0ebb0d0b9e 11,57,64,71-98
+test/contract/pty_test.go
+  102e2b0ebb0d0b9e 6-8,10,88-124
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "c711f586585776898e8380b65f21e50711032103",
+  "prompts": {
+    "102e2b0ebb0d0b9e": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "23441394-0beb-4b1d-84d9-7e80d6d5256c",
+        "model": "claude-opus-5.5"
+      },
+      "human_author": "Simon Chan <simon.chan@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-26T14:05:10.125Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (kiro/claude-opus-5.5).",
+          "timestamp": "2026-11-26T14:05:10.125Z"
+        }
+      ],
+      "total_additions": 72,
+      "total_deletions": 2,
+      "accepted_lines": 72,
+      "overriden_lines": 0
+    }
+  }
+}
