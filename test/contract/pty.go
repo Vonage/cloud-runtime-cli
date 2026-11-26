@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/creack/pty"
@@ -53,18 +54,46 @@ func startPTY(exe string, sc Scenario, l Layout, env []string) (*proc, error) {
 	}
 	cmd := exec.CommandContext(context.Background(), exe, sc.Args...) //nolint:gosec // the harness starts the binary under test
 	cmd.Dir, cmd.Env = dir, env
-	master, err := pty.StartWithSize(cmd, &pty.Winsize{Rows: termRows, Cols: termCols})
+	master, wait, err := startOnPTY(cmd)
 	if err != nil {
 		return nil, fmt.Errorf("start %s on a terminal: %w", exe, err)
 	}
 	keys := &keyboard{f: master}
 	p := &proc{cmd: cmd, stdin: keys, done: make(chan struct{}), drained: make(chan struct{})}
 	go func() {
-		_ = cmd.Wait()
+		_ = wait()
 		close(p.done)
 	}()
 	go p.showOutput(master, keys)
 	return p, nil
+}
+
+// startOnPTY starts cmd on a new pseudo-terminal of termCols by termRows and
+// returns the terminal's master side and the function that waits for cmd.
+// The harness keeps its own copy of the terminal open until cmd has exited:
+// on macOS a terminal that nobody has open any more throws away the output
+// not read yet, and a short process can end before the reader gets to run.
+func startOnPTY(cmd *exec.Cmd) (*os.File, func() error, error) {
+	master, tty, err := pty.Open()
+	if err != nil {
+		return nil, nil, err
+	}
+	if err := pty.Setsize(master, &pty.Winsize{Rows: termRows, Cols: termCols}); err != nil {
+		_, _ = master.Close(), tty.Close()
+		return nil, nil, err
+	}
+	cmd.Stdin, cmd.Stdout, cmd.Stderr = tty, tty, tty
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true, Setctty: true}
+	if err := cmd.Start(); err != nil {
+		_, _ = master.Close(), tty.Close()
+		return nil, nil, err
+	}
+	wait := func() error {
+		err := cmd.Wait()
+		_ = tty.Close()
+		return err
+	}
+	return master, wait, nil
 }
 
 // showOutput reads the terminal until it ends (end of file, or the error that
