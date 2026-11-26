@@ -2,10 +2,13 @@ package debugsession
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
 	"path"
+	"regexp"
+	"strings"
 )
 
 const (
@@ -22,6 +25,8 @@ type remoteRequest struct {
 	Payload      []byte
 	Headers      map[string]string // the first value of each request header
 	Query        url.Values
+	BrokerAuth   bool   // the platform calls FAASFunction at Path; URL is empty
+	Path         string // escaped, as the app sent it
 }
 
 // remoteResponse is the provider's answer.
@@ -46,7 +51,12 @@ func newLocalHandler(caller remoteCaller) http.Handler {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		resp, err := caller.call(r.Context(), newRemoteRequest(r, payload))
+		req, err := newRemoteRequest(r, payload)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		resp, err := caller.call(r.Context(), req)
 		if r.Context().Err() != nil {
 			return
 		}
@@ -64,9 +74,31 @@ func newLocalHandler(caller remoteCaller) http.Handler {
 	})
 }
 
-// newRemoteRequest builds the call from the SDK's request. The provider is not checked: the platform decides.
-func newRemoteRequest(r *http.Request, payload []byte) remoteRequest {
+// servicePrefix starts the path of a call to a platform service that the platform authenticates itself:
+// /_vcr/<service>/<path>.
+const servicePrefix = "/_vcr/"
+
+var (
+	// dnsLabel is what a service name must be, so that the platform never reads it as a host.
+	dnsLabel = regexp.MustCompile(`^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$`)
+
+	errServiceName = errors.New("the service after /_vcr/ must be a DNS label")
+)
+
+// newRemoteRequest builds the call from the SDK's request. Only a /_vcr/ service name is checked; any other provider
+// is relayed as it is and the platform decides.
+func newRemoteRequest(r *http.Request, payload []byte) (remoteRequest, error) {
 	query := r.URL.Query()
+	req := remoteRequest{Method: r.Method, Payload: payload, Headers: firstValues(r.Header), Query: query}
+	// The escaped path, so that an encoded "/" inside a segment reaches the service as it was sent.
+	if rest, ok := strings.CutPrefix(r.URL.EscapedPath(), servicePrefix); ok {
+		service, target, _ := strings.Cut(rest, "/")
+		if !dnsLabel.MatchString(service) {
+			return remoteRequest{}, errServiceName
+		}
+		req.BrokerAuth, req.FAASFunction, req.Path = true, service, "/"+target
+		return req, nil
+	}
 	provider := query.Get("x-neru-debug-provider")
 	if provider == "" {
 		provider = query.Get("func")
@@ -78,18 +110,17 @@ func newRemoteRequest(r *http.Request, payload []byte) remoteRequest {
 	if v := query.Get("x-neru-debug-path"); v != "" {
 		target = v
 	}
-	headers := make(map[string]string, len(r.Header))
-	for name, values := range r.Header {
-		if len(values) > 0 {
-			headers[name] = values[0]
+	req.FAASFunction, req.URL = provider, "http://"+provider+path.Join("/", target)
+	return req, nil
+}
+
+// firstValues returns the first value of each header.
+func firstValues(header http.Header) map[string]string {
+	values := make(map[string]string, len(header))
+	for name, v := range header {
+		if len(v) > 0 {
+			values[name] = v[0]
 		}
 	}
-	return remoteRequest{
-		FAASFunction: provider,
-		URL:          "http://" + provider + path.Join("/", target),
-		Method:       r.Method,
-		Payload:      payload,
-		Headers:      headers,
-		Query:        query,
-	}
+	return values
 }

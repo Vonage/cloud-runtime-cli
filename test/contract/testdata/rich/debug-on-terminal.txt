@@ -1,6 +1,6 @@
 # vcr rich golden v1
 exit 0
-@@ stdout 1484
+@@ stdout 1516
 ✓ Debug server deployed  dbg-service-1
 ✓ Debug server ready
 ✓ Debug proxy connected
@@ -42,6 +42,7 @@ testapp env VCR_API_APPLICATION_ID
 testapp env VCR_CODE_DIR
 testapp env VCR_DEBUG
 testapp env VCR_DEBUGGER_URL_SCHEME
+testapp env VCR_DEBUG_PROXY_URL
 testapp env VCR_ENDPOINT_URL_SCHEME
 testapp env VCR_INSTANCE_PUBLIC_URL
 testapp env VCR_INSTANCE_SERVICE_NAME

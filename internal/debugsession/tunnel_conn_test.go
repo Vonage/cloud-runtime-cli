@@ -172,6 +172,17 @@ func (c *countedConn) Write(p []byte) (int, error) {
 	return n, err
 }
 
+// SetWriteDeadline counts a failure as a failed write: the websocket library sets the deadline before each write and
+// gives up there when the connection is already closed, so the write itself never arrives.
+func (c *countedConn) SetWriteDeadline(t time.Time) error {
+	err := c.Conn.SetWriteDeadline(t)
+	if err != nil {
+		c.writes.Add(1)
+		c.failed.Add(1)
+	}
+	return err
+}
+
 // writeCounter wraps the connections of a localAPI in countedConns.
 type writeCounter struct {
 	mu    sync.Mutex

@@ -303,9 +303,12 @@ func (t *tunnel) call(ctx context.Context, req remoteRequest) (remoteResponse, e
 	msg := remoteRequestMessage{
 		ID:        uuid.NewString(),
 		Operation: opExecuteRemote,
-		Request:   remoteCommand{FAASFunction: req.FAASFunction, URL: req.URL, Method: req.Method, Payload: payload},
-		Headers:   headers,
-		Query:     query,
+		Request: remoteCommand{
+			FAASFunction: req.FAASFunction, URL: req.URL, Method: req.Method, Payload: payload,
+			BrokerAuth: req.BrokerAuth, Path: req.Path,
+		},
+		Headers: headers,
+		Query:   query,
 	}
 	// The answer can arrive before send returns, so the entry exists before the message leaves.
 	answer := t.addPending(msg.ID)

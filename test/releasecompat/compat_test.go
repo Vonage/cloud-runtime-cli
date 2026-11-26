@@ -34,7 +34,7 @@ const (
 	tag          = "v9.9.9"
 	runningTag   = "v2.6.1"
 	signStepName = "Write checksums and sign them"
-	cmdTimeout   = 2 * time.Minute
+	cmdTimeout   = 5 * time.Minute // make build-all of five targets can take over two minutes on a busy CI runner
 )
 
 var releaseArchives = []string{

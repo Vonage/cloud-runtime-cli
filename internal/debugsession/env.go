@@ -23,6 +23,8 @@ type debugVars struct {
 	ProjectDir  string // absolute
 	Region      platform.Region
 	AppPort     int
+	// DebuggerPort is the local debugger's port; the app finds the debugger at VCR_DEBUG_PROXY_URL.
+	DebuggerPort int
 }
 
 // debugEnvironment returns base, then the manifest variables, then the fixed variables. A process started with it
@@ -54,6 +56,8 @@ func debugEnvironment(base, manifestVars []string, v debugVars) []string {
 		"VCR_DEBUGGER_URL_SCHEME=" + v.Region.DebuggerURLScheme,
 		"VCR_REGION=" + v.Region.Alias,
 		"VCR_PORT=" + port,
+		// 127.0.0.1, not localhost: the listener always binds it, and localhost can resolve to ::1 first.
+		"VCR_DEBUG_PROXY_URL=http://127.0.0.1:" + strconv.Itoa(v.DebuggerPort),
 		"FORCE_COLOR=1",
 	}
 	if v.InstanceID != "" {

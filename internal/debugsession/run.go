@@ -184,17 +184,22 @@ func (s *session) connectProxy() *cause {
 // startApp shows where the debugger can be reached and starts the app with the debug environment.
 func (s *session) startApp() *cause {
 	s.printIntro()
+	debuggerPort := s.cfg.DebuggerPort
+	if s.ls != nil { // the bound port: --debugger-port 0 lets the system pick
+		debuggerPort = listenerPort(s.ls.V4)
+	}
 	env := debugEnvironment(os.Environ(), s.vars, debugVars{
-		ServiceName: s.service.ServiceName,
-		InstanceID:  s.service.InstanceID,
-		PrivateKey:  s.service.PrivateKey,
-		PublicURL:   s.addrs.Host,
-		AppID:       s.cfg.AppID,
-		APIKey:      s.cfg.Creds.APIKey,
-		APISecret:   s.cfg.Creds.APISecret,
-		ProjectDir:  s.cfg.ProjectDir,
-		Region:      s.region,
-		AppPort:     s.cfg.AppPort,
+		ServiceName:  s.service.ServiceName,
+		InstanceID:   s.service.InstanceID,
+		PrivateKey:   s.service.PrivateKey,
+		PublicURL:    s.addrs.Host,
+		AppID:        s.cfg.AppID,
+		APIKey:       s.cfg.Creds.APIKey,
+		APISecret:    s.cfg.Creds.APISecret,
+		ProjectDir:   s.cfg.ProjectDir,
+		Region:       s.region,
+		AppPort:      s.cfg.AppPort,
+		DebuggerPort: debuggerPort,
 	})
 	stdout, stderr := s.tio.ChildOutput()
 	c, err := startChild(childSpec{

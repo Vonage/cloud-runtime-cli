@@ -3,7 +3,11 @@
 package contract
 
 import (
+	"io"
+	"os"
+	"os/exec"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -80,4 +84,41 @@ func TestPTYChildSeesATerminalOfTheAgreedSize(t *testing.T) {
 	res, err := runStubScenario(t, "version-pty-env", "args: [terminal]\ntty: true\n")
 	require.NoError(t, err)
 	assert.Equal(t, "tty true\nsize 100x40\nTERM xterm\n", res.Stdout)
+}
+
+// A reader that falls behind must still get everything: macOS throws away what a terminal holds once the last
+// process that has it open is gone, and a busy machine can run a short process to its end before the reader runs.
+func TestPTYOutputSurvivesAReaderThatStartsAfterTheExit(t *testing.T) {
+	exe, err := os.Executable()
+	require.NoError(t, err)
+	cmd := exec.CommandContext(t.Context(), exe, "rich-demo")
+	cmd.Env = append(os.Environ(), stubEnv+"=1", "VCR_UI=classic")
+	master, wait, err := startOnPTY(cmd)
+	require.NoError(t, err)
+	defer master.Close()
+
+	got := make(chan []byte, 1)
+	exited := make(chan error, 1)
+	readNow := make(chan struct{})
+	go func() {
+		<-readNow
+		b, _ := io.ReadAll(master)
+		got <- b
+	}()
+	go func() { exited <- wait() }()
+	select {
+	case err := <-exited:
+		require.NoError(t, err)
+		exited <- nil
+	case <-time.After(2 * time.Second):
+		// The child is held until its output is read: let the reader in and check nothing was lost.
+	}
+	close(readNow)
+	select {
+	case b := <-got:
+		assert.Equal(t, "✓ done\r\n", string(b))
+	case <-time.After(10 * time.Second):
+		t.Fatal("the terminal never reported its end")
+	}
+	require.NoError(t, <-exited)
 }
