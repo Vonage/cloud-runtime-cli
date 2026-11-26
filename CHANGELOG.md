@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/Vonage/cloud-runtime-cli/compare/v3.1.1...v3.2.0) (2026-11-26)
+
+
+### 🚀 Features
+
+* **debug:** relay platform service calls for newer SDKs ([#115](https://github.com/Vonage/cloud-runtime-cli/issues/115)) ([677c2c7](https://github.com/Vonage/cloud-runtime-cli/commit/677c2c7b58d15ec6c1bbd2ddcbd6104df22280f0))
+
 ## [3.1.1](https://github.com/Vonage/cloud-runtime-cli/compare/v3.1.0...v3.1.1) (2026-11-16)
 
 
